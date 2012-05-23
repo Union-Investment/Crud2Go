@@ -32,20 +32,62 @@
 <div id="main_content_wrap" class="outer">
   <section id="main_content" class="inner">
     <h3>Setup</h3>
-
-<ol>
-  <li>get a liferay server bundle</li>
-  <li>change the vaadin version in the bundle</li>
-  <li>configure a datasource</li>
-  <li>compile Crud2Go from source</li>
-  <li>deploy Crud2Go into liferay</li>
-  <li>configure Crud2Go portlet</li>
-</ol>
-
+      
+	<div class="article_content">
+				<div class="article">
+	                <h3>1. Get a liferay server bundle</span></h3>
+	                Download a liferay bundle from <a href="http://www.liferay.com" target="_blank">liferay homepage</a><br> 
+	                (here I use the jboss bundle)    
+	      </div>
+	      <br/>
+	      <div class="article">
+	                <h3>2. Change the vaadin version in the bundle</span></h3>
+	                <ul>		
+	            		<li>Download vaadin version XXXX from <a href="http://www.vaadin.com" target="_blank">vaadin homepage</a></li>
+	            		<li>Extract file</li>
+	            		<li>Replace vaadin jar in {appserver.deploy.dir}\ROOT.war\WEB-INF\lib file with the one downloaded before</li>
+	            		<li>Replace VAADIN dir with the one downloaded before (wie ist das mit widgetset compile ?) </li>
+	            	</ul>
+	      </div>
+	       <br/>
+	      <div class="article">
+	                <h3>3. Configure a datasource</span></h3>
+	                	<pre><code>
+	                	describe DS config		
+	                		
+	                		
+										</code></pre>
+	            		
+	      </div>
+	       <br/>
+	      <div class="article">
+	                <h3>4. Compile Crud2Go from source</span></h3>
+	             		<ul>
+	                	<li>Get sourcecode from git clone https://github.com/Union-IT-Services/Crud2Go.git</li>	
+	                	<li>run mvn clean install from eai-portal-build</li>	
+	                </ul>	
+	      </div>
+	      <br/>
+	      <div class="article">
+	                <h3>5. Deploy Crud2Go into liferay</span></h3>
+	                <ul>
+	                	<li>Login to liferay</li>	
+	                	<li>..... describe plugin installation here</li>	
+	                </ul>	
+	            
+	      </div>
+	      <br/>
+	      <div class="article">
+	                <h3>6. Configure Crud2Go portlet</span></h3>
+	            		<ul>
+	                	<li>Add portlet to page</li>	
+	                	<li>Upload configuration</li>	
+	                </ul>	
+	      </div>
 	      
-	
-
-			
+  </div>
+  
+ 
 
   </section>
 </div>
