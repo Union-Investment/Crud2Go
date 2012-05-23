@@ -433,7 +433,9 @@ ADD
 *******************************************************************************/
 
 
-.article {clear:both; margin:0; padding:20px; border:thin solid; border-color:#C5D2E2;border-radius: 15px;}
+.article {clear:both; margin:0; padding:20px; border:thin solid; border-color:#C5D2E2;border-radius: 15px;max-width: 1200px;
+
+	}
 .article h3 {margin:0 -20px; padding:3px; background:#DEE5FD url("../images/article_title.gif") 0 0 repeat-y;}
 .article h3 span {background:url("../images/ico_list.gif") 0 50% no-repeat; padding-left:25px;}  
 .article p {text-align:justify;}
