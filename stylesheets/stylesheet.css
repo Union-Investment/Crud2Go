@@ -29,6 +29,8 @@ time, mark, audio, video {
   vertical-align: baseline;
 }
 
+
+
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
@@ -58,7 +60,7 @@ Theme Styles
 body {
   box-sizing: border-box;
   color:#373737;
-  background: #212121;
+  background: #FFFFFF;
   font-size: 16px;
   font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -125,10 +127,6 @@ a {
   -ms-transition: text-shadow 0.5s ease;
 }
 
-#main_content a:hover {
-  color: #0069ba;
-  text-shadow: #0090ff 0px 0px 2px;
-}
 
 footer a:hover {
   color: #43adff;
@@ -273,7 +271,7 @@ Full-Width Styles
 .inner {
   position: relative;
   max-width: 1000px;
-  padding: 20px 10px;
+  padding: 10px 5px;
   margin: 0 auto;
 }
 
@@ -324,10 +322,10 @@ Full-Width Styles
 #downloads {
   position: absolute;
   width: 210px;
-  z-index: 10;
-  bottom: -40px;
+  z-index: 5;
+  bottom: 0px;
   right: 0;
-  height: 70px;
+  height: 50px;
   background: url('../images/icon_download.png') no-repeat 0% 90%;
 }
 
@@ -361,7 +359,7 @@ Full-Width Styles
 }
 
 #main_content_wrap {
-  background: #f2f2f2;
+  background: #FFFFFF;
   border-top: 1px solid #111;
   border-bottom: 1px solid #111;
 }
@@ -429,3 +427,20 @@ Small Device Styles
   }
 
 }
+
+/*******************************************************************************
+ADD
+*******************************************************************************/
+
+
+.article {clear:both; margin:0; padding:20px; border:thin solid; border-color:#C5D2E2;border-radius: 15px;}
+.article h3 {margin:0 -20px; padding:3px; background:#DEE5FD url("../images/article_title.gif") 0 0 repeat-y;}
+.article h3 span {background:url("../images/ico_list.gif") 0 50% no-repeat; padding-left:25px;}  
+.article p {text-align:justify;}
+
+
+.btn-more {margin:0 0 15px 0; padding:1px; border:0; position:relative;font-size:14px;}
+.btn-more a {display:block; position:absolute; top:0; right:0; width:67px; _width:95px; height:21px; margin:0; padding:0 0 0 28px; background:url("../images/btn_more.gif") 0 0 no-repeat; color:#FFF; text-decoration:none;}
+.btn-more a:hover {background:url("../images/btn_more.gif") -95px 0 no-repeat;color:#FFF; text-decoration:none;}
+
+
