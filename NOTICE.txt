@@ -1,0 +1,6 @@
+Crud2Go
+Copyright 2012, Union Investment
+
+This product includes software developed at 
+The Apache Software Foundation (http://www.apache.org/).
+Union Investment (http://www.union-investment.de)
