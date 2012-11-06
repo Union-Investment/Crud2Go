@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für eine Tabelle mit im Skript erzeugten Kontextmenüs an den Zellen einer generierten Spalte">
+	<page>
+		<table id="test-table" onInitialize="initialize(it)" sortable="true">
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+	<script><![CDATA[
+	
+		import com.vaadin.event.MouseEvents
+		
+		import org.vaadin.peter.contextmenu.ContextMenu
+		import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItem
+		
+		contextMenu = null
+		contextMenuContext = [:]
+		
+		def initialize(table) {
+			initializeTableColumn(table)
+		}
+
+		def getContextMenu(builder) {
+			if (contextMenu) {
+				return contextMenu
+			} 
+		
+			contextMenu = builder.contextMenu( 
+				onclick: { event ->
+					log.info "Angeklickt: $event.clickedItem.name mit Context $contextMenuContext"
+				},
+				items: ["Action 1", "Action 2", "Action 3"]
+			)
+		}
+	
+		
+		def initializeTableColumn(table) {
+			def columnName = 'generiert'
+		   	table.addGeneratedColumn(columnName) { row, builder ->
+				def rowId = row.id.containerRowId.internalId.toString()
+				def cellId = "$columnName ~ $rowId"
+				def localContextMenu = getContextMenu(builder)
+				
+		   		def embedded = builder.embedded(
+		   			// Das Vaadin-Kontextmenü-Add-On verlangt, dass die Debug-ID gesetzt ist. 			
+		   			debugId: cellId, 
+		   			source: builder.themeResource(resourceId: 'sofia/images/help.gif'), 
+		   			onclick: { event ->
+						if (MouseEvents.ClickEvent.BUTTON_RIGHT == event.getButton()) {
+
+							log.info "Right mouse button clicked on $cellId"
+							log.info "localContextMenu: $localContextMenu"
+
+							contextMenuContext = [rowId: rowId, cellId: cellId]
+							localContextMenu.show(event.source);
+						}
+		   		})
+		   		return embedded
+		   	}
+		}
+
+	]]></script>
+</portlet>

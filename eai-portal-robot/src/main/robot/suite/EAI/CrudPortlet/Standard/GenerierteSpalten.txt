@@ -1,0 +1,76 @@
+*** Settings ***
+Documentation   Story EAI-803: Als Entwickler möchte ich zur Laufzeit generierte Spalten zu einer Tabelle hinzufügen können
+Force Tags      autor-bsp  generierte-spalten  EAI-803
+
+*** Test Case ***
+1. Generierte Spalte kann eingefügt werden
+	[Tags]  EAI-803  EAI-803-1
+
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'GENERATED_COLUMNS.xml'
+	und es existiert die Spalte 'generated' nicht
+	
+	wenn der Button 'Spalte generieren' geklickt wird
+	
+	dann existiert die Spalte 'generated'
+
+
+2. Generierte Spalte kann wieder gelöscht werden
+	[Tags]  EAI-803  EAI-803-2
+
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'GENERATED_COLUMNS.xml'
+	und dann der Button 'Spalte generieren' geklickt wird
+	und es existiert die Spalte 'generated'
+	
+	wenn der Button 'Generierte Spalte löschen' geklickt wird
+	
+	dann existiert die Spalte 'generated' nicht
+
+	
+3. Mehrere Spalten können mit renderOnce erzeugt werden
+	[Tags]  EAI-803  EAI-803-3
+
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'GENERATED_COLUMNS.xml'
+	und es existiert die Spalte 'X1' nicht
+	und außerdem existiert die Spalte 'X2' nicht
+	und außerdem existiert die Spalte 'X3' nicht
+
+	wenn der Button '3 Spalten' geklickt wird
+
+	dann existiert die Spalte 'X1'
+	und außerdem existiert die Spalte 'X2'
+	und außerdem existiert die Spalte 'X3'
+
+
+4. Sichtbarkeit von Spalten kann am Table gesetzt werden
+	[Tags]  EAI-803  EAI-803-4
+
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'GENERATED_COLUMNS.xml'
+	und es existiert die Spalte 'ID'
+	und außerdem existiert die Spalte 'CNUMBER5_2'
+	und außerdem existiert die Spalte 'CDATE'
+	und außerdem existiert die Spalte 'CTIMESTAMP'
+	und außerdem existiert die Spalte 'CVARCHAR5_NN'
+	und außerdem existiert die Spalte 'CNUMBER5_2_NN'
+	und außerdem existiert die Spalte 'CDATE_NN'
+	und außerdem existiert die Spalte 'CTIMESTAMP_NN'
+	und außerdem existiert die Spalte 'TESTDATA'
+
+	wenn der Button 'Sichtbarkeit ändern' geklickt wird
+
+	dann existiert die Spalte 'CDATE'
+	und es existiert die Spalte 'CNUMBER5_2'
+	und es existiert die Spalte 'ID' nicht
+	und es existiert die Spalte 'CTIMESTAMP' nicht
+	und es existiert die Spalte 'CVARCHAR5_NN' nicht
+	und es existiert die Spalte 'CNUMBER5_2_NN' nicht
+	und es existiert die Spalte 'CDATE_NN' nicht
+	und es existiert die Spalte 'CTIMESTAMP_NN' nicht
+	und es existiert die Spalte 'TESTDATA' nicht
+
+	
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

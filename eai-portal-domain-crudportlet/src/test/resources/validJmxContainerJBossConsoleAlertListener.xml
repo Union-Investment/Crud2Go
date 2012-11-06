@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches JMX Container Beispiel">
+	<page>
+		<form>
+			<field name="name" title="Name"></field>
+			<field name="currentState" title="Status">
+				<checkbox checked-value="Started"/>
+			</field>
+			<action title="search"><search/></action>
+		</form>
+		<table>
+			<jmx-container server="service:jmx:rmi:///jndi/rmi://localhost:1090/jmxconnector" query="jboss.alerts:service=ConsoleAlertListener">
+				<attribute name="AlertName" type="java.lang.String" />
+			</jmx-container>
+			<columns>
+				<column name="AlertName" title="AlertName" editable="true" />
+			</columns>
+			<action onExecution="reconnect(it)" title="Reconnect"></action>
+		</table>
+	</page>
+	<script>
+		def reconnect(tableAction) {
+			tableAction.table.container.connect('service:jmx:rmi:///jndi/rmi://127.0.0.1:1090/jmxconnector')
+			tableAction.table.refresh()
+		}
+	</script>
+</portlet>

@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="urn:http.service.portal.liferay.com" xmlns:intf="urn:http.service.portal.liferay.com" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:http.service.portal.liferay.com">
+	<!--WSDL created by Apache Axis version: 1.4Built on Apr 22, 2006 (06:55:48 PDT)-->
+	<wsdl:types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:http.service.portal.liferay.com">
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+			<complexType name="ArrayOf_xsd_string">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="soapenc:string[]"/>
+					</restriction>
+				</complexContent>
+			</complexType>
+		</schema>
+	</wsdl:types>
+	<wsdl:message name="removeResourcePermissionsResponse"/>
+	<wsdl:message name="setIndividualResourcePermissionsRequest">
+		<wsdl:part name="groupId" type="xsd:long"/>
+		<wsdl:part name="companyId" type="xsd:long"/>
+		<wsdl:part name="name" type="xsd:string"/>
+		<wsdl:part name="primKey" type="xsd:string"/>
+		<wsdl:part name="roleId" type="xsd:long"/>
+		<wsdl:part name="actionIds" type="impl:ArrayOf_xsd_string"/>
+	</wsdl:message>
+	<wsdl:message name="removeResourcePermissionsRequest">
+		<wsdl:part name="groupId" type="xsd:long"/>
+		<wsdl:part name="companyId" type="xsd:long"/>
+		<wsdl:part name="name" type="xsd:string"/>
+		<wsdl:part name="scope" type="xsd:int"/>
+		<wsdl:part name="roleId" type="xsd:long"/>
+		<wsdl:part name="actionId" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="removeResourcePermissionResponse"/>
+	<wsdl:message name="addResourcePermissionResponse"/>
+	<wsdl:message name="setIndividualResourcePermissionsResponse"/>
+	<wsdl:message name="removeResourcePermissionRequest">
+		<wsdl:part name="groupId" type="xsd:long"/>
+		<wsdl:part name="companyId" type="xsd:long"/>
+		<wsdl:part name="name" type="xsd:string"/>
+		<wsdl:part name="scope" type="xsd:int"/>
+		<wsdl:part name="primKey" type="xsd:string"/>
+		<wsdl:part name="roleId" type="xsd:long"/>
+		<wsdl:part name="actionId" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="addResourcePermissionRequest">
+		<wsdl:part name="groupId" type="xsd:long"/>
+		<wsdl:part name="companyId" type="xsd:long"/>
+		<wsdl:part name="name" type="xsd:string"/>
+		<wsdl:part name="scope" type="xsd:int"/>
+		<wsdl:part name="primKey" type="xsd:string"/>
+		<wsdl:part name="roleId" type="xsd:long"/>
+		<wsdl:part name="actionId" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:portType name="ResourcePermissionServiceSoap">
+		<wsdl:operation name="addResourcePermission" parameterOrder="groupId companyId name scope primKey roleId actionId">
+			<wsdl:input message="impl:addResourcePermissionRequest" name="addResourcePermissionRequest"/>
+			<wsdl:output message="impl:addResourcePermissionResponse" name="addResourcePermissionResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="removeResourcePermission" parameterOrder="groupId companyId name scope primKey roleId actionId">
+			<wsdl:input message="impl:removeResourcePermissionRequest" name="removeResourcePermissionRequest"/>
+			<wsdl:output message="impl:removeResourcePermissionResponse" name="removeResourcePermissionResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="removeResourcePermissions" parameterOrder="groupId companyId name scope roleId actionId">
+			<wsdl:input message="impl:removeResourcePermissionsRequest" name="removeResourcePermissionsRequest"/>
+			<wsdl:output message="impl:removeResourcePermissionsResponse" name="removeResourcePermissionsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="setIndividualResourcePermissions" parameterOrder="groupId companyId name primKey roleId actionIds">
+			<wsdl:input message="impl:setIndividualResourcePermissionsRequest" name="setIndividualResourcePermissionsRequest"/>
+			<wsdl:output message="impl:setIndividualResourcePermissionsResponse" name="setIndividualResourcePermissionsResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="Portal_ResourcePermissionServiceSoapBinding" type="impl:ResourcePermissionServiceSoap">
+		<wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="addResourcePermission">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="addResourcePermissionRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="addResourcePermissionResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removeResourcePermission">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="removeResourcePermissionRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="removeResourcePermissionResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removeResourcePermissions">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="removeResourcePermissionsRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="removeResourcePermissionsResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="setIndividualResourcePermissions">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="setIndividualResourcePermissionsRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="setIndividualResourcePermissionsResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="ResourcePermissionServiceSoapService">
+		<wsdl:port binding="impl:Portal_ResourcePermissionServiceSoapBinding" name="Portal_ResourcePermissionService">
+			<wsdlsoap:address location="http://localhost:8080/api/axis/Portal_ResourcePermissionService"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

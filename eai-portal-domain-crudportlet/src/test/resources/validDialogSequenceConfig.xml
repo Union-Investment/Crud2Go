@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für eine Sequenz von aufeinanderfolgenden Dialogseiten">
+	<page>
+		<component generator="generateMainPage(builder)" />
+	</page>
+	<dialog id="dialog-1" backButtonCaption="Zurück">
+		<component generator="generateDialog1(builder)" />
+	</dialog>
+	<dialog id="dialog-2" backButtonCaption="Zurück">
+		<component generator="generateDialog2(builder)" />
+	</dialog>
+	<dialog id="dialog-3" backButtonCaption="Zurück">
+		<component generator="generateDialog3(builder)" />
+	</dialog>
+	<script><![CDATA[
+
+		def generateMainPage(builder) { generatePage(builder, 'Hauptseite', 'Zu Dialog 1') }
+		def generateDialog1(builder) { generatePage(builder, 'Dialog 1', 'Zu Dialog 2') }
+		def generateDialog2(builder) { generatePage(builder, 'Dialog 2', 'Zu Dialog 3') }
+
+		def generateDialog3(builder) {
+			builder.verticalLayout(spacing: true) {
+				label(caption: 'Dialog 3');
+			}
+		}
+		
+		def generatePage(builder, labelCaption, buttonCaption) {
+			builder.verticalLayout(spacing: true) {
+				label(caption: labelCaption);
+				button(caption: buttonCaption, onclick: { event -> 
+					switch(event.button.caption) {
+						case 'Zu Dialog 1':
+							openDialog1()
+							break 
+						case 'Zu Dialog 2':
+							openDialog2() 
+							break 
+						case 'Zu Dialog 3':
+							openDialog3()
+							break 
+						default:
+							throw new RuntimeException("Unbekannter Button: $event.button.caption") 
+					}
+				});
+			}
+		}
+		
+		def openDialog1() { portlet.page.attachDialog 'dialog-1' }
+		def openDialog2() { portlet.page.attachDialog 'dialog-2' }
+		def openDialog3() { portlet.page.attachDialog 'dialog-3' }
+		
+		
+	]]></script>
+</portlet>

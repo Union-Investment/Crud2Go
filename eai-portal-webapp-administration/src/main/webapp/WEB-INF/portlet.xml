@@ -1,0 +1,28 @@
+<portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
+	id="CRUD-Portlet" version="2.0">
+
+	<portlet>
+		<portlet-name>crudportlet</portlet-name>
+		<portlet-class>de.unioninvestment.eai.portal.support.scripting.web.GroovyCategorySpringApplicationPortlet</portlet-class>
+		<init-param>
+			<name>application</name>
+			<value>de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication</value>
+		</init-param>
+		<init-param>
+			<name>widgetset</name>
+			<value>de.unioninvestment.eai.portal.portlet.widgetset.SofiaWidgetset</value>
+		</init-param>
+		<supports>
+			<mime-type>text/html</mime-type>
+			<portlet-mode>view</portlet-mode>
+			<portlet-mode>edit</portlet-mode>
+			<portlet-mode>help</portlet-mode>
+		</supports>
+
+		<supported-locale>de</supported-locale>
+		<resource-bundle>de.unioninvestment.eai.portal.portlet.crud.portlet-info</resource-bundle>
+	</portlet>
+
+</portlet-app>

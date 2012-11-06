@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="SELECT_OPTION">
+	<page>
+		<table sortable="true">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM TEST_USER ORDER BY ID
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_USER
+					  (
+					    NAME,
+					    SPALTEEDIT
+					  )
+					  VALUES
+					  (
+					    $row.values.NAME,
+					    $row.values.SPALTEEDIT
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_USER SET 
+						NAME	  = $row.values.NAME,
+						SPALTEEDIT= $row.values.SPALTEEDIT
+					WHERE ID          = $row.values.ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_USER
+					WHERE ID = $row.values.ID
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true" />
+				<column name="NAME" editable="true">
+					<select>
+						<option key="DetlefKey">Detlef</option>
+						<option key="HansKey">Hans</option>
+						<option key="MüllerKey">Müller</option>
+					</select>
+				</column>
+				<column name="SPALTEEDIT" editable="true"  validate="required" validation-message="Wert darf nicht null sein">
+				<select> 
+						<option key="1">1</option>
+						<option key="2">2</option>
+					</select>
+				</column>
+			</columns>
+		</table>
+	</page>
+</portlet>

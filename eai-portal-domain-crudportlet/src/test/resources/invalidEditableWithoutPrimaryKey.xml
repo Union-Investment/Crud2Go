@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Invalide Konfiguration mit editierbarer Tabelle ohne Primary-Key-Column">
+	<!-- Test: de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilderTest#shouldNotBuildEditableConfigWithoutPrimaryKeyColumn -->
+	<page>
+		<table id="table">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM TEST_CRUD2
+				]]></query>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2
+					WHERE ID          = $row.values.ID
+				]]></update>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" />
+				<column name="CNUMBER5_2" title="CNUMBER5_2" />
+			</columns>
+		</table>
+	</page>
+</portlet>

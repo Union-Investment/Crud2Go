@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table onSelectionChange="println selection.ids.collect{it.asMap()}">
+			<database-table datasource="test" tablename="test_crud2" />
+			<action title="Selection löschen" id="id01" onExecution="deleteSelection(it)" />
+		</table>
+	</page>
+	<script><![CDATA[
+	def deleteSelection(tableAction) {
+		println 'calling removeAllRows() on selection ' + tableAction.table.selection.ids.collect{it.asMap()}
+		
+		tableAction.table.selection.removeAllRows()
+	}
+	]]></script>
+</portlet>

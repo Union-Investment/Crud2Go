@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Tabellen Beispiel">
+	<page>
+		<table rowStyle="getRowStyle(row)">
+			<database-table datasource="test" tablename="test_crud2" />
+			<columns>
+				<column name="ID"></column>
+				<column name="CNUMBER5_2" style="getColumnStyle(row, columnName)" editable="true"></column>
+			</columns>
+		</table>
+	</page>
+
+	<script><![CDATA[
+	def getColumnStyle(row, columnName) {
+		if (row.values[columnName] > 44) {
+			return 'warn'
+		}
+		return null;
+		}
+		
+	def getRowStyle(row) {
+		if (row.values['CNUMBER5_2'] > 44) {
+			return 'error'
+		}
+		return null;
+		}
+	]]>
+	</script>
+</portlet>

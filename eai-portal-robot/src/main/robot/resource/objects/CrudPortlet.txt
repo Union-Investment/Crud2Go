@@ -1,0 +1,502 @@
+*** Settings ***
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/common-keywords.txt
+
+
+*** Keywords ***
+
+####################################################
+###  Es existiert/existieren / Und weiterhin ... ###
+####################################################
+
+
+2 Zeilen Testdaten
+  	Execute SQL  insert into TEST_USER(NAME) values ('arnie')
+	Execute SQL  insert into TEST_USER(NAME) values ('ein wert')
+
+keine Testdaten in TEST_CLOB
+	Execute SQL  DELETE FROM TEST_CLOB
+
+Testdaten in TEST_CLOB
+	Execute SQL  DELETE FROM TEST_CLOB
+	Execute SQL  INSERT INTO TEST_CLOB (TEXT, DATA) VALUES ('ROBOT TEST ROW IN CLOB TABLE', 'Jemand musste Josef K. verleumdet haben, denn ohne dass er etwas Böses getan hätte, wurde er eines Morgens verhaftet. »Wie ein Hund! « sagte er, es war, als sollte die Scham ihn überleben. Als Gregor Samsa eines Morgens aus unruhigen Träumen erwachte, fand er sich in seinem Bett zu einem ungeheueren Ungeziefer verwandelt. Und es war ihnen wie eine Bestätigung ihrer neuen Träume und guten Absichten, als am Ziele ihrer Fahrt die Tochter als erste sich erhob und ihren jungen Körper dehnte. »Es ist ein eigentümlicher Apparat«, sagte der Offizier zu dem Forschungsreisenden und überblickte mit einem gewissermaßen bewundernden Blick den ihm doch wohlbekannten Apparat. Sie hätten noch ins Boot springen können, aber der Reisende hob ein schweres, geknotetes Tau vom Boden, drohte ihnen damit und hielt sie dadurch von dem Sprunge ab. In den letzten Jahrzehnten ist das Interesse an Hungerkünstlern sehr zurückgegangen. Aber sie überwanden sich, umdrängten den Käfig und wollten sich gar nicht fortrühren. Jemand musste Josef K. verleumdet haben, denn ohne dass er etwas Böses getan hätte, wurde er eines Morgens verhaftet. »Wie ein Hund! « sagte er, es war, als sollte die Scham ihn überleben. Als Gregor Samsa eines Morgens aus unruhigen Träumen erwachte, fand er sich in seinem Bett zu einem ungeheueren Ungeziefer verwandelt. Und es war ihnen wie eine Bestätigung ihrer neuen Träume und guten Absichten, als am Ziele ihrer Fahrt die Tochter als erste sich erhob und ihren jungen Körper dehnte. »Es ist ein eigentümlicher Apparat«, sagte der Offizier zu dem Forschungsreisenden und überblickte mit einem gewissermaßen bewundernden Blick den ihm doch wohlbekannten Apparat. Sie hätten noch ins Boot springen können, aber der Reisende hob ein schweres, geknotetes Tau vom Boden, drohte ihnen damit und hielt sie dadurch von dem Sprunge ab. In den letzten Jahrzehnten ist das Interesse an Hungerkünstlern sehr zurückgegangen. Aber sie überwanden sich, umdrängten den Käfig und wollten sich gar nicht fortrühren. Jemand musste Josef K. verleumdet haben, denn ohne dass er etwas Böses getan hätte, wurde er eines Morgens verhaftet. »Wie ein Hund! « sagte er, es war, als sollte die Scham ihn überleben. Als Gregor Samsa eines Morgens aus unruhigen Träumen erwachte, fand er sich in seinem Bett zu einem ungeheueren Ungeziefer verwandelt. Und es war ihnen wie eine Bestätigung ihrer neuen Träume und guten Absichten, als am Ziele ihrer Fahrt die Tochter als erste sich erhob und ihren jungen Körper dehnte. »Es ist ein eigentümlicher Apparat«, sagte der Offizier zu dem Forschungsreisenden und überblickte mit einem gewissermaßen bewundernden Blick den ihm doch wohlbekannten Apparat. Sie hätten noch ins Boot springen können, aber der Reisende hob ein schweres, geknotetes Tau vom Boden, drohte ihnen damit und hielt sie dadurch von dem Sprunge ab. In den letzten Jahrzehnten ist das Interesse an Hungerkünstlern sehr zurückgegangen. Aber sie überwanden sich, umdrängten den Käfig und wollten sich gar nicht fortrühren. Jemand musste Josef K. verleumdet haben, denn ohne dass er etwas Böses getan hätte, wurde er eines Morgens verhaftet. »Wie ein Hund! « sagte er, es war, als sollte die Scham ihn überleben. Als Gregor Samsa eines Morgens aus unruhigen Träumen erwachte, fand er sich in seinem Bett zu einem ungeheueren Ungeziefer verwandelt. Und es war ihnen wie eine Bestätigung ihrer neuen Träume und guten Absichten, als am Ziele ihrer Fahrt die Tochter als erste sich erhob und ihren jungen Körper dehnt...')
+	${rowId} =  Read Single Value From Table  TEST_CLOB  ID  TEXT = 'ROBOT TEST ROW IN CLOB TABLE' 
+	Set Test Variable  ${rowId}
+
+Testdaten in TEST_BLOB
+	Initialisiere TEST_BLOB Tabelle
+	Execute SQL  INSERT INTO TEST_BLOB VALUES (1, 'Datei1', RAWTOHEX('Inhalt von Datei1'))
+	
+Testdaten in TEST_CRUD2
+	Initialisiere TEST_CRUD2 Tabelle
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (1,1,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST1',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (2,2,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST2',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (3,3,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST3',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (4,4,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST4',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (5,5,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST5',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (6,6,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST6',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (7,7,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST7',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (8,8,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST8',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (9,9,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST9',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (10,10,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST0',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+
+Testdaten für die Default-Sortierung in TEST_CRUD2
+	Testdaten in TEST_CRUD2
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (11,15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'A',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (12,15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'C',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (13,15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'B',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (14,14,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (15,13,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (16,12,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (17,11,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+
+wurde im FormularFeld '${feldname}' der Eintrag '${wert}' ausgewählt
+	Vaadin Click  css=.v-formlayout tr:contains('${feldname}') div.v-filterselect-button
+	Wait Until Page Contains Element  css=td.gwt-MenuItem:contains('${wert}') span
+	Vaadin Click  css=td.gwt-MenuItem:contains('${wert}') span
+	
+
+############################
+###  Wenn / Und dann ... ###
+############################
+
+eine existierende Datasource ${datasource} und Tabelle ${tabelle} angegeben wird
+	Vaadin Click  css=header:contains("CRUD-Portlet") ul.portlet-options a.nobr
+	Vaadin Click  css=a[id^='_crudportlet'][href*='mode=edit']
+	Wait Until Page Contains Element  css=input.dataSourceName
+	Input Text  css=input.dataSourceName  ${datasource}
+	Input Text  css=input.tableName  ${tabelle}
+	Click Button  css=span.v-button-caption:contains("Speichern")
+	Wait until page contains  Data Source: EAI, Tabelle: ${tabelle}
+	Page Should Contain Element  css=div.v-label:contains("Data Source: EAI, Tabelle: ${tabelle}")  Data Source: EAI, Tabelle: ${tabelle}
+	
+eine existierende Datasource ${datasource} und kein Tabellenname angegeben wird	
+	Vaadin Click  css=header:contains("CRUD-Portlet") ul.portlet-options a.nobr
+	Vaadin Click  css=a[id^='_crudportlet'][href*='mode=edit']
+	Wait Until Page Contains Element  css=input.dataSourceName
+	Input Text  css=input.dataSourceName  ${datasource}
+	Click Button  css=span.v-button-caption:contains("Speichern")  don't wait
+	
+werden die Tabelleninhalte der TEST_USER angezeigt
+	Wait until page contains  ID  10s
+	Wait until page contains  NAME  10s
+
+Tabelle ist sortierbar
+	No Operation
+	
+Tabelleninhalte ist filterbar
+	Wait Until Page Contains Element  css=div.v-caption div.v-captiontext:contains("Tabellenspalte")
+	Wait Until Page Contains Element  css=div.v-caption div.v-captiontext:contains("Filter")
+	
+Tabellenspalten können aus- und eingeblendet werden
+	No Operation
+			
+auf editieren klickt
+	Vaadin Click  css=span.v-button-caption:contains("Editieren")
+	Wait Until Page Contains Element  css=span.v-button-caption:contains("Editieren verlassen")
+	
+auf search klickt
+	Vaadin Click  css=span.v-button-caption:contains("search")
+	
+	
+auf abbrechen klickt
+	Vaadin Click  css=span.v-button-caption:contains("Abbrechen")
+	Wait Until Page Contains Element  css=div.v-table-crudEditMode
+	
+auf Query Attribute anzeigen klickt
+	Vaadin Click  css=span.v-button-caption:contains("Query Attribute anzeigen")
+	Wait Until Page Contains Element  xpath=//div[@class="v-label"]//div//table[@id="JMXQueryResultTable"]
+	
+auf MBean Attribute anzeigen klickt
+	Vaadin Click  css=span.v-button-caption:contains("MBean Attribute anzeigen")
+	Wait Until Page Contains Element  xpath=//div[@class="v-label"]//div//table[@id="JMXMBeanResultTable"]
+		
+auf Neue Zeile klickt
+	Vaadin Click  css=span.v-button-caption:contains("Neue Zeile")
+	Sleep  1s
+	
+auf Speichern klickt
+	Vaadin Click  css=span.v-button-caption:contains("Speichern")
+	Wait Until Page Contains Element  css=span.v-button-caption:contains("Editieren verlassen")
+
+auf die Zeile mit ${WERT} doppelt klickt
+	Vaadin Double Click  css=div.v-table-cell-wrapper:contains(${WERT})
+
+die XML Konfiguration: 'exisitierende Datasource ${datasource} und Tabelle ${tabelle} zum editieren auswählt
+	der Benutzer die Portalseite öffnet
+	eine existierende Datasource ${datasource} und Tabelle ${tabelle} angegeben wird
+		
+Tabelle auf ${USERNAME} und ${WERT} filtert
+	Vaadin Click  css=div.v-filterselect-button
+	Vaadin Click  css=div.v-filterselect-suggestmenu table td:contains("${USERNAME}")
+	Input Text  css=input.v-textfield  ${WERT}
+	Click Element   css=div.v-app-CrudPortletApplication  don't wait
+	
+die Tabelle auf ${WERT} filtert
+	Input Text  css=input.v-textfield  ${WERT}
+	auf suchen klickt
+
+die Tabelle ohne Suchbutton auf ${WERT} filtert
+	Button 'search' is nicht vorhanden
+	Input Text  css=input.v-textfield  ${WERT}
+	Vaadin Press Enter
+
+auf suchen klickt
+	Vaadin Click  css=span.v-button-caption:contains("suchen")
+	Wait for AJAX calls to complete	
+	
+	
+Tabelle nach ${WERT} durchsucht
+	Vaadin Click  css=td.v-formlayout-contentcell
+	Input Text  css=input.v-textfield  ${WERT}
+	auf search klickt
+	
+die Zeile '${ZEILE}' doppelt ancklickt
+	Vaadin Double Click  xpath=//table[@class="v-table-table"]//tr[${ZEILE}]//td[1]
+	Wait until page contains  Vorheriger  10s
+
+im Feld '${SPALTE}' mit HTML Element '${HTML}' der Zeile '${ZEILE}' den Wert auf '${WERT}' aendert
+	Wait Until Page Contains Element  css=div.v-formlayout table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE}) ${HTML}  5s
+	Input Text  css=div.v-formlayout table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE}) ${HTML}  ${WERT}
+
+die 1.Spalte auf ${WERT} ändert	
+	auf editieren klickt
+	Call Selenium Api  mouseDown  css=table.v-table-table tr td:nth-child(2) div
+	Call Selenium Api  mouseUp  css=table.v-table-table tr td:nth-child(2) div
+	Input Text  css=table.v-table-table tr td:nth-child(2) input  ${WERT}
+	
+den Editier-Modus verlässt
+	Vaadin Click  css=span.v-button-caption:contains("Editieren verlassen")
+	Sleep  2s	
+
+den Button '${TEXT}' klickt
+	Page Should Contain Element  css=span.v-button-caption:contains("${TEXT}")
+	Vaadin Click  css=span.v-button-caption:contains("${TEXT}")
+	Sleep  1s
+	
+das Feld verlässt	
+	Call Selenium Api  mouseDown  css=table.v-table-table tr:nth-child(2) td:nth-child(2)
+	Call Selenium Api  mouseUp  css=table.v-table-table tr:nth-child(2) td:nth-child(2)
+	Sleep  2s
+
+hat das Feld ${FELD_NAME} in der Tabelle ${TABELLE} den Wert ${WERT}	
+	${VALUE}= 	Read single Value from Table 	${TABELLE} 	${FELD_NAME} 	${FELD_NAME}='${WERT}'	
+	Should Be True  '${VALUE}'=='${WERT}'
+
+eine neue Zeile mit dem Wert '${NAME}' einfügt
+	auf editieren klickt	
+	auf Neue Zeile klickt
+	Input Text  css=table.v-table-table tr td:nth-child(2) input  ${NAME}
+	den Editier-Modus verlässt	
+
+eine neue Zeile mit ID '${ID}' und dem Wert '${NAME}' einfügt
+	auf editieren klickt	
+	auf Neue Zeile klickt
+	Input Text  css=table.v-table-table tr td:nth-child(1) input  ${ID}
+	Input Text  css=table.v-table-table tr td:nth-child(2) input  ${NAME}
+	den Editier-Modus verlässt	
+	
+der Benutzer die erste Zeile löscht
+	auf editieren klickt
+	Call Selenium Api  mouseDown  css=table.v-table-table tr td:nth-child(1) div
+	Call Selenium Api  mouseUp  css=table.v-table-table tr td:nth-child(1) div
+	Vaadin Click  css=span.v-button-caption:contains("Zeile Löschen")	
+	den Editier-Modus verlässt
+	
+ist die Tabelle ${TABELLE} leer
+	Sleep  2s
+	Table Must Be Empty  ${TABELLE}	
+
+die SVG Grafik anklickt
+	Vaadin Click  id=jep
+
+das Tab '${NAME}' anklickt
+	Call Selenium Api  mouseDown  css=div.v-captiontext:contains("${NAME}")
+	Call Selenium Api  mouseUp  css=div.v-captiontext:contains("${NAME}")
+
+der BLOB in Zeile ${ZEILE} heruntergeladen wird
+	Call Selenium Api  click  css=span:contains("Hier runterladen")
+
+der Button '${BUTTON}' geklickt wird
+	der Button '${BUTTON}' angeklickt
+
+das Popup mit X geschlossen wird
+	Vaadin Click  css=div.v-window-closebox
+	
+mit der Maus über die Header-Zeile der ${spalte}. Spalte gefahren wird
+	Set Test Variable  ${spalte}
+
+wird die ${zeile}. Zeile der Tabelle im Formularmodus angezeigt
+	auf editieren klickt
+	${trNum} =  Evaluate  ${zeile}+1
+	Vaadin Double Click  css=tr:nth-child(${trNum}) td:nth-child(1)
+	
+mit der Maus im Formular auf den Titel des Feldes '${feld}' gefahren wird 
+	Call Selenium Api  mouseOver  css=tr td:contains("${feld}") div span
+	Sleep  2s
+
+auf die Hilfe-Seite gewechselt wird
+	Open Portlet Page 'Hilfe'
+
+die Konfigurationansicht öffnet
+	Open Portlet Page 'Präferenzen'
+
+##########################
+###  Dann / Und es ... ###
+##########################
+
+wird '${INHALT}' angezeigt
+	Wait until page contains  ${INHALT}  10s
+
+wird das Bild '${ADRESSE}' angezeigt
+	Page Should Contain Element  xpath=//img[@src="${ADRESSE}"]
+
+wird die Meldung '${meldung}' angezeigt
+	Wait until page contains  ${meldung}  20s
+
+wird ein Link mit dem Text '${text}' angezeigt	
+	Wait until page contains  ${text}  10s
+
+wird als Portlet-Titel '${TEXT}' angezeigt
+	Wait until page contains  ${TEXT}  10s
+
+Tabelle hat die Spalte '${TEXT}'
+	Wait until page contains  ${TEXT}  10s
+
+Button Editieren ist ausgeschlatet	
+	Wait Until Page Contains Element  css=div.v-disabled span.v-button-caption:contains("Editieren")
+	
+Button '${TEXT}' is nicht vorhanden	
+	Page Should Not Contain  ${TEXT}
+	
+ist der Button '${TEXT}' vorhanden
+	Page Should Contain Element  css=span.v-button-caption:contains("${TEXT}")
+
+ist der Button '${TEXT}' nicht vorhanden
+	Page Should Not Contain Element  css=span.v-button-caption:contains("${TEXT}")
+	
+werden keine Daten angezeigt
+	Page Should Not Contain Element  css=table.v-table-table tr:nth-child(1) td:nth-child(1)
+	
+der Button '${BUTTON}' angeklickt
+	Page Should Contain Element  css=span.v-button-caption:contains("${BUTTON}")
+	Vaadin Click  css=span.v-button-caption:contains(${BUTTON})
+	Wait for AJAX calls to complete	
+	
+und der Title des Portlets lautet '${TEXT}'
+	Wait until page contains  ${TEXT}  10s
+	
+wird die Spalte '${TEXT}' nicht angezeigt
+	 Wait Until Keyword Succeeds  10s  1s  Page Should Not Contain Element  css=.crudTable td:contains('${TEXT}')
+	
+wird der Text '${TEXT}' angezeigt
+	Wait Until Page Contains  ${TEXT}
+	
+wird eine Fehlermeldung mit dem Text '${TEXT}' angezeigt
+	${var}  Get Text  xpath=//div[@class="v-Notification error v-Notification-error"]//p
+	Should Be True  '${var}'=='${TEXT}'
+
+wird eine Warnung mit dem Text '${TEXT}' angezeigt
+	${var}  Get Text  xpath=//div[@class="v-Notification warning v-Notification-warning"]//p
+	Should Be True  '${var}'=='${TEXT}'
+	
+wird eine Tray-Benachrichtigung mit dem Text '${TEXT}' angezeigt
+	${var}  Get Text  xpath=//div[@class="v-Notification tray v-Notification-tray"]//p
+	Should Be True  '${var}'=='${TEXT}'
+		
+wird der Text '${TEXT}' nicht angezeigt
+	Wait Until Keyword Succeeds  10s  1s  Page Should Not Contain  ${TEXT}
+	
+wird die Spalte '${TEXT}' angezeigt	
+	Wait until page contains  ${TEXT}  10s
+	
+Spalte '${SPALTE}' den Wert '${TEXT}'
+	${var} =  Get Text  css=div.v-table-crudViewMode table tr td:nth-child(${SPALTE})
+	Should Be True  '${var}'=='${TEXT}'
+	
+hat die Spalte '${SPALTE}' in der Zeile '${ZEILE}' den Wert '${TEXT}'
+	${var} =  Get Text  css=table.v-table-table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE})
+	Should Be True  '${var}'=='${TEXT}'
+	
+hat in der Hauptmaske mit dem HTMLelement '${HTML}' die Spalte '${SPALTE}' der Zeile '${ZEILE}' den Wert '${TEXT}'
+	${var} =  Get Text  xpath=//div[@class="v-table-body"]//div//table//tr[${ZEILE}]//td[${SPALTE}]${HTML}
+	Should Be True  '${var}'=='${TEXT}'
+	
+hat in der Formedit-Tabelle mit dem HTMLelement '${HTML}' und der Methode Value die Spalte '${SPALTE}' der Zeile '${ZEILE}' den Wert '${WERT}'
+	Sleep  1s
+	${var} =  Get Value  xpath=//div[@class="v-formlayout"]//table//tr[${ZEILE}]//td[${SPALTE}]${HTML}
+	Should Be True  '${var}'=='${WERT}'
+	
+hat in der Formedit-Tabelle mit dem HTMLelement '${HTML}' und der Methode Text die Spalte '${SPALTE}' der Zeile '${ZEILE}' den Wert '${WERT}'
+	Sleep  1s
+	${var} =  Get Text  xpath=//div[@class="v-formlayout"]//table//tr[${ZEILE}]//td[${SPALTE}]${HTML}
+	Should Be True  '${var}'=='${WERT}'
+	
+hat die Spalte '${SPALTE}' die Breite '${WERT}'
+	${var}  Get Element Attribute  xpath=//table[@class="v-table-table"]//tr[1]//td[${SPALTE}]@style
+	Should Be True  '${var}'=='${WERT}'
+
+hat die Tabellen Zeile die Höhe '${WERT}'
+	${var}  Get Element Attribute  xpath=//table[@class="v-table-table"]//tr//td[1]//div//div@style
+	Should Contain  ${var}  ${WERT}
+
+hat die Spalte '${SPALTE}' den Titel '${WERT}'
+	${var}  Get Text  xpath=//div[@class="v-table-header"]//table//tr[1]//td[${SPALTE}]
+	Should Be True  '${var}'=='${WERT}'
+
+ist die Zeile '${ZEILE}' und Spalte '${SPALTE}' im Mulitline Modus
+	eine neue Zeile einfügen aufruft  
+	Vaadin MouseDownAndUp  xpath=//table[@class="v-table-table"]//tr[${ZEILE}]//td[1]//div[@class="v-table-cell-wrapper"]
+	Page Should Contain Element   xpath=//table[@class="v-table-table"]//tr[${ZEILE}]//td[${SPALTE}]//textarea[@class="v-textarea"]
+	
+eine neue Zeile einfügt und den Editieren Modus verlässt
+	eine neue Zeile einfügen aufruft
+  	den Editier-Modus verlässt
+  
+eine neue Zeile einfügen aufruft  
+ 	auf editieren klickt
+  	auf Neue Zeile klickt
+
+wird die Validierungsfehlermeldung '${TEXT}' angezeigt
+	${var}  Get Text  xpath=//div[@class="v-Notification error v-Notification-error"]//h1
+	Should Be True  '${var}'=='${TEXT}'
+	
+wird der InputPromt '${TEXT}' in der Spalte '${SPALTE}' angezeigt
+	Call Selenium Api  assertValue  css=table.v-table-table tr td:nth-child(${SPALTE}) input  ${TEXT}
+		
+in der '${ZEILE}'. Zeile und '${SPALTE}'. Spalte den Wert '${WERT}' auswählt
+	Vaadin Click  css=table.v-table-table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE}) div.v-filterselect-button
+	Vaadin Click  css=td.gwt-MenuItem:contains("${WERT}")
+
+steht in der '${ZEILE}'. Zeile und '${SPALTE}'. Spalte der Wert '${TEXT}'
+	${var} =  Get Text  css=table.v-table-table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE}) div
+	Should Be True  '${var}'=='${TEXT}'	
+
+steht in der Eingabefeld der '${ZEILE}'. Zeile und '${SPALTE}'. Spalte der Wert '${TEXT}'
+	Call Selenium Api  assertValue  css=table.v-table-table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE}) input  ${TEXT}
+
+der Administrator die Fehlermeldung schließt	
+	Vaadin Click  xpath=//div[@class="v-Notification error v-Notification-error"]//div
+	Sleep  2s
+	Page Should Not Contain Element  xpath=//div[@class="v-Notification error v-Notification-error"]//div
+
+steht ${WERT} in einem mehrzeiligen Eingabefeld
+	Wait Until Page Contains Element  css=textarea.v-textarea[rows="5"]
+	${textareaContent} =  Get Value  css=textarea.v-textarea[rows="5"]
+	Should Contain  ${textareaContent}  ${WERT}
+
+der Text im mehrzeiligen Eingabefeld auf '${WERT}' geändert wird
+	Wait Until Page Contains Element  css=textarea.v-textarea[rows="5"]
+	Input Text  css=textarea.v-textarea[rows="5"]  ${WERT}
+
+der Text im Eingabefeld '${TITEL}' auf '${WERT}' geändert wird
+	Wait Until Page Contains Element  css=tr.v-formlayout-row:contains('${TITEL}') td input.v-textfield
+	Input Text  css=tr.v-formlayout-row:contains('${TITEL}') td input.v-textfield  ${WERT}
+
+enthält der Datenbankeintrag in der Tabelle ${TABLE} identifiziert durch den Wert ${ID-WERT} in Spalte ${ID-SPALTE} den Teilstring ${STRING} in Spalte ${WERT-SPALTE}
+	${data} =  Read Single Value From Table  ${TABLE}  ${WERT-SPALTE}  ${ID-SPALTE} = ${ID-WERT}
+	Should Contain  ${data}  ${STRING}
+
+ist im geöffneten Popupfenster der Text '${WERT}' vorhanden
+	Wait Until Page Contains  ${WERT}
+
+die Zeile mit ID ${ID} anklickt
+	Call Selenium Api  mouseDown  css=td.v-table-cell-content div.v-table-cell-wrapper:contains("${ID}")
+	Call Selenium Api  mouseUp  css=td.v-table-cell-content div.v-table-cell-wrapper:contains("${ID}")
+	
+ist die ${SPALTE}. Spalte in der selektierten Zeile editierbar
+	Page Should Contain Element  css=tr.v-selected td:nth-child(${SPALTE}) input
+
+ist die ${SPALTE}. Spalte in der selektierten Zeile nicht editierbar
+	Page Should Not Contain Element  css=tr.v-selected td:nth-child(${SPALTE}) input
+		
+existiert die Spalte '${NAME}'
+	Wait Until Page Contains Element  css=div.v-table-header tr td:contains("${NAME}")
+
+existiert die Spalte '${NAME}' nicht
+	Page Should Not Contain Element  css=div.v-table-header tr td:contains("${NAME}")
+
+erscheint ein Dialog mit Titel '${title}', Meldung '${message}' und den Buttons '${accept}' und '${decline}'
+	Page Should Contain Element  css=div.popupContent div.v-window-header:contains("${title}")
+	Page Should Contain Element  css=div.popupContent div.v-label:contains("${message}")
+	Page Should Contain Element  css=div.popupContent span.v-button-caption:contains("${accept}")
+	Page Should Contain Element  css=div.popupContent span.v-button-caption:contains("${decline}")
+	
+erscheint ein Dialog mit dem Text '${message}'
+	Page Should Contain Element  css=div.popupContent div.v-label:contains("${message}")
+
+erscheint der Tooltip '${tooltip}'
+	Page Should Contain Element  css=tr:nth-child(1) td:nth-child(${spalte}) span[title="${tooltip}"]
+
+erscheint der Vaadin Tooltip '${tooltip}'
+	Element Should Be Visible  css=div.v-tooltip-text:contains("${tooltip}")
+
+wird die Liste der DataSources mit dem Eintrag 'test' angezeigt
+	Zeile 1 und Spalte 1 einer Tabelle enthält den Text 'test'
+	
+werden die Verbindungsdaten zur DataSource 'test' angezeigt
+	Zeile 1 und Spalte 2 einer Tabelle enthält den Text 'XE'
+	Zeile 1 und Spalte 3 einer Tabelle enthält den Text 'test'
+
+besteht die Auswahl '${wert}' im Formularfeld '${feldname}' weiterhin
+	Textfield Value Should Be  css=.v-formlayout tr:contains('${feldname}') input  ${wert}
+
+##########################
+###  Utility Keywords  ###
+##########################
+
+Open Portlet Page '${title}'
+	Open Portlet Context Menu
+	Vaadin Click  css=div.lfr-component.lfr-menu-list ul li:contains('${title}') a
+	Wait Until Page Loaded	
+
+Open Portlet Context Menu
+	Vaadin Click  css=div.portlet-boundary_crudportlet_WAR_eaiadministration_ header menu.portlet-topper-toolbar ul li strong a
+	Wait Until Page Contains Element  xpath=//div[@class='lfr-component lfr-menu-list']  2s
+	
+
+Zeile ${zeile} und Spalte ${spalte} einer Tabelle enthält den Text '${text}'
+	Page should contain element  css=table tr:nth-child(${zeile}) td:nth-child(${spalte}):contains('${text}')
+
+
+Erstelle TestUser Table	
+	Run Keyword And Ignore Error  Führe SQL 'DROP Trigger TEST_USER_TRIGGER' aus
+	Run Keyword And Ignore Error  Führe SQL 'DROP sequence TEST_USER_SEQ' aus
+	Run Keyword And Ignore Error  Führe SQL 'DROP TABLE TEST_USER' aus
+	Run Keyword And Ignore Error  Führe SQL 'CREATE TABLE TEST_USER(ID number,NAME VARCHAR2(255),SPALTEEDIT VARCHAR2(255),PRIMARY KEY (ID))' aus
+	Run Keyword And Ignore Error  Führe SQL 'CREATE sequence TEST_USER_SEQ start with 1 increment by 1 nomaxvalue' aus
+	Run Keyword And Ignore Error  Führe SQL 'CREATE trigger TEST_USER_TRIGGER before insert on TEST_USER for each row begin select TEST_USER_SEQ.nextval into :new.ID from dual; end;' aus
+
+Initialisiere TEST_CRUD2 Tabelle
+	Run Keyword  Führe SQL 'DROP TRIGGER TEST_CRUD2_TRIGGER' aus
+	Run Keyword  Führe SQL 'DROP SEQUENCE TEST_CRUD2_SEQ' aus
+	Run Keyword  Führe SQL 'DROP TABLE TEST_CRUD2' aus
+	Run Keyword  Führe SQL 'CREATE TABLE TEST_CRUD2 (ID NUMBER, CNUMBER5_2 NUMBER(5,2), CDATE DATE, CTIMESTAMP TIMESTAMP (6), CVARCHAR5_NN VARCHAR2(5 BYTE), CNUMBER5_2_NN NUMBER(5,2), CDATE_NN DATE, CTIMESTAMP_NN TIMESTAMP (6), TESTDATA VARCHAR2(255 BYTE),PRIMARY KEY (ID))' aus
+	Run Keyword  Führe SQL 'CREATE SEQUENCE TEST_CRUD2_SEQ MINVALUE 1 MAXVALUE 999999999999999999999999999 INCREMENT BY 1 START WITH 1' aus
+	Run Keyword  Führe SQL 'CREATE TRIGGER TEST_CRUD2_TRIGGER before insert on TEST_CRUD2 for each row begin select TEST_CRUD2_SEQ.nextval into :new.ID from dual; end;' aus
+
+Initialisiere TEST_BLOB Tabelle
+	Run Keyword  Führe SQL 'DROP TRIGGER TEST_BLOB_TRIGGER' aus
+	Run Keyword  Führe SQL 'DROP SEQUENCE TEST_BLOB_SEQ' aus
+	Run Keyword  Führe SQL 'DROP TABLE TEST_BLOB' aus
+	Run Keyword  Führe SQL 'CREATE TABLE TEST_BLOB (ID NUMBER, TEXT VARCHAR2(80 BYTE), DATA BLOB, PRIMARY KEY (ID))' aus
+	Run Keyword  Führe SQL 'CREATE SEQUENCE TEST_BLOB_SEQ MINVALUE 1 MAXVALUE 999999999999999999999999999 INCREMENT BY 1 START WITH 1' aus
+	Run Keyword  Führe SQL 'CREATE TRIGGER TEST_BLOB_TRIGGER before insert on TEST_BLOB for each row begin select TEST_BLOB_SEQ.nextval into :new.ID from dual; end;' aus
+	
+##########################
+###  Setup / Teardown  ###
+##########################
+	 
+Formular Editieren Initialisieren
+	Testdaten in TEST_CRUD2
+	
+Initalisiere CrudPortlet Test    
+	Erstelle TestUser Table 
+	
+Auf Hauptseite zurückwechseln
+	Vaadin Click  css=header.portlet-topper a.portlet-icon-back 
+	Wait Until Page Loaded
+	

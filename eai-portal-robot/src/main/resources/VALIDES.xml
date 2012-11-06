@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet" 
+	title="VALIDES XML">
+	<page>
+		<table sortable="true">
+			<database-table datasource="test" tablename="test_crud2"/>
+		</table>
+	</page>
+</portlet>

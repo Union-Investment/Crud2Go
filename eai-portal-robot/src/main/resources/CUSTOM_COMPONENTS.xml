@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<component id="scriptComponent001" generator="buildCustomButton(builder)" />
+		<component id="scriptComponent002" generator="buildCustomImageLinks(builder)" />
+		<component id="scriptComponent003" generator="buildCustomLabels(builder)" />
+	</page>
+	<script><![CDATA[
+		def buildCustomButton(builder) {
+			builder.button(caption:'Klick mich!', onclick: { event -> event.button.caption = 'geklickt!'})
+		}
+		
+		def buildCustomImageLinks(builder) {
+			builder.verticalLayout(spacing: true) {
+				builder.link(
+					resource: builder.externalResource('http://www.google.de'), 
+					icon: builder.externalResource('http://www.google.de/logos/2011/noyce11-hp.jpg')
+				)
+				builder.link(
+					resource: builder.externalResource('http://www.yahoo.de'), 
+					icon: builder.externalResource('http://l.yimg.com/a/i/ww/met/logo/20100909/yahoo_logo_de.png')
+				)
+			}
+		}
+		
+		def buildCustomLabels(builder) {
+			builder.horizontalLayout() {
+				builder.label(caption: 'label-1');
+				builder.label(caption: 'label-2');
+				builder.label(caption: 'label-3');
+			}
+		}
+	]]></script>
+</portlet>

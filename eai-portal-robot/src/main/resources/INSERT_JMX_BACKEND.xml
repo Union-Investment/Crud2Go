@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Tabellen Beispiel">
+	<page>
+		<table id="table1">
+			<jmx-container query="Catalina:type=Connector,port=*" server="service:jmx:rmi:///jndi/rmi://localhost:9003/jmxrmi">
+				<attribute name="URIEncoding" type="java.lang.String" />
+				<attribute name="maxPostSize" type="java.lang.String" />
+				<attribute name="serviceNames" type="[Ljavax.management.ObjectName;" />
+				<attribute name="serverInfo" type="java.lang.String" />
+				<attribute name="port" type="java.lang.String" />
+			</jmx-container>
+			<columns>
+				<column name="port" editable="true" />
+				<column name="URIEncoding" editable="true" />
+				<column name="serverInfo" editable="true" hidden="true" />
+			</columns>
+		</table>
+
+	</page>
+</portlet>

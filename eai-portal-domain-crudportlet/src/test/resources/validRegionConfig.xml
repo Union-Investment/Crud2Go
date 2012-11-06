@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Collapsable regions (Region-Tag)">
+	<page>
+		<region title="myRegion" collapsible="true" collapsed="true">
+			<table>
+				<database-table datasource="test" tablename="test_crud2" />
+			</table>
+			
+			<region id="anotherRegion" title="bla">
+				<table>
+					<database-table datasource="test" tablename="test_crud2" />
+				</table>
+			</region>
+		</region>
+	</page>
+</portlet>

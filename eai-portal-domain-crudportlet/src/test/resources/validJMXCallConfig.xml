@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="JMX_ERWEITERUNG">
+	<page>
+		<form columns="5">
+			<field name="server" title="Server" default="localhost" />
+			<field name="port" title="Port" default="9003" />
+			<field name="objectNameForQuery" title="Query Object Name" default="Catalina:type=Connector,port=*" />
+			<field name="objectNameForMBean" title="MBean Object Name" default="Catalina:type=Connector,port=8009" />
+			<field name="abttributes" title="Attribute" default="URIEncoding,port,protocol" />
+			<action title="Query Attribute anzeigen" onExecution="showPopup('query')"></action>
+			<action title="MBean Attribute anzeigen" onExecution="showPopup('mbean')"></action>
+		</form>
+	</page>
+	<script>
+	def showPopup(mode) {
+		def port = portlet.page.elements[0].fields.port.value
+		def server = portlet.page.elements[0].fields.server.value
+		def objectNameForQuery = portlet.page.elements[0].fields.objectNameForQuery.value
+		def objectNameForMBean = portlet.page.elements[0].fields.objectNameForMBean.value
+		def abttributes = portlet.page.elements[0].fields.abttributes.value.split(',') as ArrayList
+		
+		def query = jmx("service:jmx:rmi:///jndi/rmi://$server:$port/jmxrmi").query(objectNameForQuery, abttributes)
+		def mbean = jmx("service:jmx:rmi:///jndi/rmi://$server:$port/jmxrmi").proxyFor(objectNameForMBean)
+	
+		if(mode == "query") {
+			showPopup "Query Attribute", {
+				h3('Query Attribute')
+				table(id: 'JMXQueryResultTable', border:'2', cellpadding:'10', cellspacing:'5', width:'100%') {
+					query.each() { 
+						key, value ->
+						tr() {
+							td(key)
+							value.each() {
+								key2, value2 ->
+								td(value2)
+							};
+						}
+					};
+				}
+			}
+		}
+		
+		if(mode == "mbean") {
+			showPopup "MBean Attribute", {
+				h3('MBean Attribute')
+				table(id: 'JMXMBeanResultTable', border:'2', cellpadding:'10', cellspacing:'5', width:'100%') {
+					mbean.listAttributeNames().each() {
+						attribute ->
+						tr() {
+							td(attribute)
+							td(mbean.getProperty(attribute))
+						}
+					};
+				}
+			}
+		}
+	}
+	</script>
+</portlet>

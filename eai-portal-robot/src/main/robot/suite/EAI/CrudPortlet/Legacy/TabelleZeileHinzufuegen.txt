@@ -1,0 +1,49 @@
+*** Settings ***
+Documentation   Story: Als Benutzer möchte ich die Daten einer beliebigen bekannten \
+...				Oracle Datasource ansehen können und in die Tabelle eine neue Zeile hinzufügen
+
+*** Test Case ***
+1. Zeile Hinzufügen
+	[Tags]  CRUD-3  INSERT
+	
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'INSERT.xml' hochlädt
+	werden die Tabelleninhalte der TEST_USER angezeigt
+	
+	und dann eine neue Zeile mit ID '4711' und dem Wert 'Detlef' einfügt
+	dann hat das Feld NAME in der Tabelle TEST_USER den Wert Detlef
+
+2. Zeile Hinzufügen - 2
+	[Tags]  EAI-46  INSERT
+	
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'INSERT_FREEFORM.xml' hochlädt
+	werden die Tabelleninhalte der TEST_USER angezeigt
+	
+	und dann eine neue Zeile mit dem Wert 'Detlef' einfügt
+	dann hat das Feld NAME in der Tabelle TEST_USER den Wert Detlef 
+
+2. Hinzufügen nicht möglich
+	[Tags]  EAI-46  INSERT
+	
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'NOT_INSERT_FREEFORM.xml' hochlädt
+	werden die Tabelleninhalte der TEST_USER angezeigt
+	
+	und das Button 'Editieren' is nicht vorhanden
+	
+	
+
+*** Settings ***
+Force Tags      autor-mca
+...				crud-3
+Resource        ${RESOURCES}/import/CrudPortlet.txt

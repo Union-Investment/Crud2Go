@@ -1,0 +1,20 @@
+*** Settings ***
+Documentation   Story EAI-664: Als Entwickler möchte ich BLOBs aus Tabellen anzeigen und aktualisieren können.
+Force Tags      autor-bsp  blob-support  EAI-664
+
+*** Test Case ***
+
+BLOB herunterladen
+	[Documentation]  Prüft ob BLOBs aus einer Tabelle in der GUI per Link heruntergeladen werden können.
+	...				 Dies funktioniert nicht wenn der Browser ein PopUp öffnet (z. B. Google Chrome)
+	[Tags]  NichtAusfuehren
+	
+	Es existieren Testdaten in TEST_BLOB
+	und außerdem ein Portlet mit der XML-Konfiguration 'BLOB_SUPPORT.xml'
+	
+	wenn dann der BLOB in Zeile 1 heruntergeladen wird
+	
+	dann wird 'Inhalt von Datei1' angezeigt
+
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

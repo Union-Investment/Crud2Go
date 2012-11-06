@@ -1,0 +1,25 @@
+*** Settings ***
+Documentation   Story: Als Entwickler möchte ich für Zahlenspalten ein Pattern angeben können, um z. B. IDs ohne Punkt/Komma-Notation anzuzeigen
+
+*** Test Case ***
+1. Dynamischer Feld-Schutz nach Spaltenname
+	[Tags]  EAI-806  
+	[Documentation]  Lädt die Test-Konfiguration und überpruft ob die Formatierung der beiden Zahlenspalten korrekt ist.
+	
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	und außerdem Testdaten in TEST_CRUD2
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'DISPLAY_FORMAT.xml' hochlädt
+
+	dann steht in der '1'. Zeile und '2'. Spalte der Wert 'foo 1'
+	und dann steht in der '1'. Zeile und '3'. Spalte der Wert '0015'
+	
+	dann steht in der '10'. Zeile und '2'. Spalte der Wert 'foo 10'
+	und dann steht in der '10'. Zeile und '3'. Spalte der Wert '0015'
+
+*** Settings ***
+Force Tags      autor-bsp  spalten-formatierung  
+...				crud-1  
+Resource        ${RESOURCES}/import/CrudPortlet.txt

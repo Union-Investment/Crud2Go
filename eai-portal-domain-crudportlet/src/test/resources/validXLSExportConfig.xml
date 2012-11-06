@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table id="table" row-height="30" export="xls">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_CRUD2
+					  (
+					    CNUMBER5_2,
+					    CDATE,
+					    CTIMESTAMP,
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN,
+					    TESTDATA
+					  )
+					  VALUES
+					  (
+					    $row.values.CNUMBER5_2,
+					    $row.values.CDATE,
+					    SYSDATE,
+					    $row.values.CVARCHAR5_NN,
+					    $row.values.CNUMBER5_2_NN,
+					    $row.values.CDATE_NN,
+					    SYSDATE,
+					    $row.values.TESTDATA
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CDATE	      = $row.values.CDATE,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+						CDATE_NN	  = $row.values.CDATE_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.values.ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_CRUD2
+					WHERE ID = $row.values.ID
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true"/>
+				<column name="CNUMBER5_2" title="Zahl" editable="true" />
+				<column name="CDATE" editable="false" />
+				<column name="CTIMESTAMP" />
+				<column name="CVARCHAR5_NN" editable="true" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN" hidden="true"/>
+				<column name="TESTDATA" editable="true" width="300" validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt"/>
+			</columns>
+		</table>
+	</page>
+</portlet>

@@ -1,0 +1,8 @@
+*** Settings ***
+Documentation   Tests für CRUD-Portlet bei eingeloggtem Standarduser
+
+
+*** Settings ***
+Suite Setup     System Initialisieren
+Suite Teardown  System Bereinigen
+Resource        ${RESOURCES}/import/CrudPortlet.txt

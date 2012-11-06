@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="ROW_FORMULAR_EDIT">
+	<page>
+		<table row-editable="isRowEditable(it, row)">
+			<database-query datasource="test">
+				<query>
+					<![CDATA[
+						SELECT * FROM TEST_CRUD2
+					]]>
+				</query>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.values.ID
+				]]></update>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true" title="ID" />
+				<column name="CNUMBER5_2" title="Zahl" editable="isEditable(table, columnName, row)" />
+				<column name="CVARCHAR5_NN" title="Text"  editable="isEditable(table, columnName, row)"/>
+				<column name="TESTDATA" title="Langer Text" editable="isEditable(table, columnName, row)" />
+			</columns>
+		</table>
+			
+	</page>
+	
+	<script><![CDATA[
+		def isEditable(table, columnName, row) {
+			if ( row.values.ID <= 6 ) {
+				if ( columnName == 'CNUMBER5_2' ) return true;
+				return false;
+			} else {
+				return true
+			}
+		}
+		def isRowEditable(table, row) {
+			if ( row.values.ID > 6 ) {
+				return isIdDividableBy(2, row)
+			} else {
+				return true
+			}
+		}
+		def isIdDividableBy(divisor, row) { 
+			BigDecimal id = (BigDecimal) row.getValues().get("ID")
+			return id.remainder(new BigDecimal(divisor)).compareTo(BigDecimal.ZERO) == 0
+		}
+	]]></script>
+</portlet>

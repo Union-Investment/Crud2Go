@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet" title="Einfaches Beispiel">
+	<tabs>
+		<tab onShow="onShow(it)" onHide="onHide(it)" id="tab1" title="Tab 1">
+			<form columns="1">
+				<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+				<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+					<select>
+						<query datasource="test"><![CDATA[
+						select 
+							CVARCHAR5_NN as key, 
+							CVARCHAR5_NN as title 
+						from test_crud2
+					]]>
+					</query>
+					</select>
+				</field>
+				<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+					<date display="picker" format="yyyy" />
+				</field>
+
+				<action title="search" id="id01"><search/></action>
+				<action title="reset" id="id02"><reset/></action>
+			</form>
+			<table sortable="true">
+				<database-table datasource="test" tablename="test_crud2" />
+			</table>
+		</tab>
+		<tab onShow="onShow(it)" onHide="onHide(it)" id="tab2" title="Tab 2">
+			<form columns="1">
+				<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+				<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+					<select>
+						<query datasource="test"><![CDATA[
+						select 
+							CVARCHAR5_NN as key, 
+							CVARCHAR5_NN as title 
+						from test_crud2
+					]]>
+					</query>
+					</select>
+				</field>
+				<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+					<date display="picker" format="yyyy" />
+				</field>
+
+				<action title="search" id="id03"><search/></action>
+				<action title="reset" id="id04"><reset/></action>
+			</form>
+			<table sortable="true">
+				<database-table datasource="test" tablename="test_crud2" />
+			</table>
+		</tab>
+	</tabs>
+	<script><![CDATA[
+		def onShow(tab) { println "Tab gewechselt. Aktueller Tab: $tab.id"}
+		def onHide(tab) { println "Tab gewechselt. Tab verlassen: $tab.id"}
+	]]></script>
+</portlet>

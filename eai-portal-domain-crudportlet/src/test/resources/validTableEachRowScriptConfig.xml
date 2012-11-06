@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+			<action title="Selektions-Werte ausgeben" id="id1" onExecution="showSelection(it.table.selection)" />
+			<action title="Selektion klonen" id="id2" onExecution="cloneSelection(it.table.selection)" />
+		</table>
+	</page>
+	<script><![CDATA[
+	def showSelection(selection) {
+		println 'Iterating through selection ...'
+		selection.eachRow { row ->
+			println row.values
+		}
+	}
+	def cloneSelection(selection) {
+		println 'Cloning selection ...'
+		selection.eachRow { row ->
+			println row.clone().values
+		}
+	}
+	]]></script>
+</portlet>

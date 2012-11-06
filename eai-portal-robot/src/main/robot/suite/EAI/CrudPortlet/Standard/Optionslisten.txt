@@ -1,0 +1,18 @@
+*** Settings ***
+
+*** Test Case ***
+Auswahl soll dach refresh einer Optionsliste bestehen bleiben
+	[Tags]  author_mjartanc
+
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'QUERY_OPTIONLISTS.xml'
+	und außerdem wurde im FormularFeld 'CVARCHAR5_NN' der Eintrag 'TEST3' ausgewählt
+	
+	wenn der Button 'refresh' geklickt wird
+	
+	dann besteht die Auswahl 'TEST3' im Formularfeld 'CVARCHAR5_NN' weiterhin
+
+
+	
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

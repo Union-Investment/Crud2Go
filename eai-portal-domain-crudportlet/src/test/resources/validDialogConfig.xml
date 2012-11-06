@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für eine Hauptseite mit Unter- bzw. Detailseiten">
+	<page>
+		<table id="table-1" onDoubleClick="openDialog1(it,row)">
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+	<dialog id="dialog-1" backButtonCaption="Zurück">
+		<table id="table" row-height="30">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT ID, CTIMESTAMP_NN, TESTDATA FROM test_crud2
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true"/>
+				<column name="CTIMESTAMP_NN" />
+				<column name="TESTDATA" editable="true" width="300"/>
+			</columns>
+		</table>
+	</dialog>
+	<script><![CDATA[
+		def openDialog1(table,row) {  
+			portlet.page.attachDialog "dialog-1"
+		}
+	]]></script>
+</portlet>

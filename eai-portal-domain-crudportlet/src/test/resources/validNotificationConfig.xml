@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Notification Beispiel">
+	<page>
+		<component id="scriptWarning" generator="buildWarningNotification()" />
+		<component id="scriptError" generator="buildErrorNotification()" />
+		<component id="scriptInfo" generator="buildInfoNotification()" />
+	</page>
+	<script><![CDATA[
+		def buildWarningNotification() {
+			def button = new Button('Zeige Warnung')
+		    button.addListener({ 
+		    	showWarning 'Dies ist eine Warnung'
+		    } as Button.ClickListener)
+			return button
+		}
+		
+		def buildErrorNotification() {
+			def button = new Button('Zeige Fehler')
+		    button.addListener({ 
+		    	showError 'Dies ist ein Fehler'
+		    } as Button.ClickListener)
+			return button
+		}
+		
+		def buildInfoNotification() {				
+			def button = new Button('Zeige Info')
+		    button.addListener({ 
+		    	showInfo 'Dies ist eine Info'
+		    } as Button.ClickListener)
+			return button
+		}
+	]]></script>
+</portlet>

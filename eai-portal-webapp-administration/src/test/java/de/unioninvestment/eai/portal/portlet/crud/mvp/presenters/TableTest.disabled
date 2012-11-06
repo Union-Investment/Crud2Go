@@ -1,0 +1,455 @@
+package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
+
+import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import com.vaadin.addon.sqlcontainer.SQLContainer;
+import com.vaadin.addon.sqlcontainer.query.Filter;
+import com.vaadin.addon.sqlcontainer.query.Filter.ComparisonType;
+import com.vaadin.data.Buffered.SourceException;
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ConversionException;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Select;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.Window.Notification;
+
+import de.unioninvestment.eai.portal.portlet.crud.datatypes.NumberDataType;
+import de.unioninvestment.eai.portal.portlet.crud.datatypes.StringDataType;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView;
+import de.unioninvestment.eai.portal.portlet.crud.table.DisplaySupport;
+import de.unioninvestment.eai.portal.portlet.crud.table.EditorSupport;
+import de.unioninvestment.eai.portal.portlet.crud.table.FilterSupport;
+import de.unioninvestment.eai.portal.portlet.crud.ui.BufferedTable;
+import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+
+public class TableTest extends SpringPortletContextTest {
+
+	@Mock
+	public DatabaseTableContainer databaseTableContainerMock;
+
+	@Mock
+	private TableView tableViewMock;
+
+	@Mock
+	private BufferedTable bufferedTableMock;
+
+	@Mock
+	private SQLContainer vaadinContainerMock;
+
+	@Mock
+	private Page pageMock;
+
+	private List<DisplaySupport> displayHelpers;
+
+	@Mock
+	private List<EditorSupport> editors;
+
+	@Mock
+	private List<FilterSupport> filters;
+
+	@Mock
+	private TextField textField;
+
+	@Mock
+	private Select columnField;
+
+	@Mock
+	private Button removeButton;
+
+	@Mock
+	private Button insertButton;
+
+	@Mock
+	private Button revertButton;
+
+	@Mock
+	private Button editButton;
+
+	private Table table;
+
+	private TableColumn testCol;
+
+	private TableColumns columns;
+
+	private void prepareContainerMock() throws SQLException {
+
+		displayHelpers = new ArrayList<DisplaySupport>();
+		displayHelpers.add(new NumberDataType());
+
+		when(tableViewMock.getTableComponent()).thenReturn(bufferedTableMock);
+
+		when(databaseTableContainerMock.getVaadinContainer()).thenReturn(
+				vaadinContainerMock);
+
+		when(bufferedTableMock.getVisibleColumns()).thenReturn(new Object[] {});
+
+		when(vaadinContainerMock.getContainerPropertyIds()).thenAnswer(
+				new Answer<Collection<DisplaySupport>>() {
+
+					@Override
+					public Collection<DisplaySupport> answer(
+							InvocationOnMock invocation) throws Throwable {
+						return displayHelpers;
+					}
+				});
+
+		when(tableViewMock.getFilterValueField()).thenReturn(textField);
+		when(tableViewMock.getFilterColumnField()).thenReturn(columnField);
+
+		when(tableViewMock.getEditButton()).thenReturn(editButton);
+		when(tableViewMock.getRevertButton()).thenReturn(revertButton);
+		when(tableViewMock.getInsertButton()).thenReturn(insertButton);
+		when(tableViewMock.getRemoveButton()).thenReturn(removeButton);
+
+	}
+
+	
+	@Before
+	public void setUp() throws SQLException {
+		MockitoAnnotations.initMocks(this);
+		prepareContainerMock();
+
+		testCol = new TableColumn("test", "title", false, false, false, false,
+				null, null, null);
+		columns = new TableColumns(Arrays.asList(testCol));
+
+		table = new Table(pageMock, databaseTableContainerMock, tableViewMock,
+				columns, null, displayHelpers, filters, editors);
+	}
+
+	@Test
+	public void shouldFormatPropertyValue() {
+		TextField property = new TextField("test1");
+		table.formatPropertyValue(1, 1, property);
+		verify(stringDataTypeMock).supportsDisplaying(property.getType());
+		verify(stringDataTypeMock).formatPropertyValue(property);
+	}
+
+
+	@Test
+	public void testUpdateFilterColumn() {
+		tableViewMock.getFilterColumnField().setValue("MYCOL");
+
+		verify(vaadinContainerMock, never()).addFilter(
+				new Filter("MYCOL", ComparisonType.CONTAINS, null));
+	}
+
+	@Test
+	public void shouldInitializeViewFromContainer() throws SQLException {
+		assertEquals(databaseTableContainerMock, table.getContainer());
+		verify(tableViewMock).initialize(
+				databaseTableContainerMock.getVaadinContainer(),
+				displayHelpers, 200, false, false, false);
+	}
+
+	@Test
+	public void shouldReturnParameters() throws SQLException {
+		assertEquals(pageMock, table.getPage());
+		assertEquals(tableViewMock, table.getView());
+	}
+
+	@Test
+	public void shouldSetViewNotEditable() {
+		when(bufferedTableMock.isEditable()).thenReturn(true, false);
+
+		table.onChangeMode();
+		verify(editButton).setCaption(
+				getMessage("portlet.crud.button.editMode"));
+		verify(bufferedTableMock).removeStyleName("crudEditMode");
+		verify(bufferedTableMock).addStyleName("crudViewMode");
+		verify(bufferedTableMock).setEditable(false);
+		verify(insertButton).setVisible(false);
+		verify(revertButton).setVisible(false);
+		verify(removeButton).setVisible(false);
+	}
+
+	@Test
+	public void shouldSetViewEditable() {
+		when(bufferedTableMock.isEditable()).thenReturn(false, true);
+
+		table.onChangeMode();
+
+		verify(editButton).setCaption(
+				getMessage("portlet.crud.button.viewMode"));
+		verify(bufferedTableMock).removeStyleName("crudViewMode");
+		verify(bufferedTableMock).addStyleName("crudEditMode");
+		verify(bufferedTableMock).setEditable(true);
+		verify(insertButton).setVisible(true);
+		verify(revertButton).setVisible(true);
+		verify(removeButton).setVisible(true);
+	}
+
+	@Test
+	public void shouldRenderColumnTitle() {
+
+		// already happens at construction time
+		// table.renderTableHeader(bufferedTableMock);
+
+		verify(bufferedTableMock).setColumnHeader("test", "title");
+	}
+
+	// @Test
+	/*
+	 * public void shouldHideHiddenColumn() { TableColumn testCol = new
+	 * TableColumn("test", null, true, false, false, null);
+	 * 
+	 * table.hideNotVisibleColumns(bufferedTableMock, Arrays.asList(testCol));
+	 * 
+	 * verify(bufferedTableMock, atLeastOnce()).setVisibleColumns( eq(new
+	 * Object[] {})); }
+	 */
+	@Test
+	public void shouldCommitChangesOnRowChange()
+			throws UnsupportedOperationException, SQLException {
+
+		table.setUncommittedItemId(1);
+
+		when(bufferedTableMock.getValue()).thenReturn(2);
+		when(bufferedTableMock.isEditable()).thenReturn(true);
+		table.onSelectionChanged();
+
+		verify(bufferedTableMock).commitFieldValues();
+		verify(bufferedTableMock).commit();
+	}
+
+	@Test
+	public void shouldRevertSelectionIfCommitFails()
+			throws UnsupportedOperationException, SQLException {
+
+		table.setUncommittedItemId(1);
+
+		when(bufferedTableMock.isEditable()).thenReturn(true);
+		when(bufferedTableMock.getValue()).thenReturn(2);
+		doThrow(new SQLException()).when(vaadinContainerMock).commit();
+
+		table.onSelectionChanged();
+
+		verify(bufferedTableMock).commitFieldValues();
+		verify(vaadinContainerMock).commit();
+		verify(bufferedTableMock).setValue(1);
+	}
+
+	@Test
+	public void testDisplayException() {
+		RuntimeException reMock = mock(RuntimeException.class);
+		when(reMock.getMessage()).thenReturn(null);
+
+		table.onError(reMock);
+
+		verify(tableViewMock).showNotification(
+				"Es ist ein Fehler vom Typ \"" + reMock.getClass().getName()
+						+ "\" aufgetreten.", Notification.TYPE_ERROR_MESSAGE);
+	}
+
+	@Test
+	public void shouldCorrectlyDisplayConversionExceptions() {
+		ConversionException exception = new Property.ConversionException(
+				"MyMessage");
+
+		table.onError(new RuntimeException(exception));
+
+		verify(tableViewMock).showNotification("MyMessage",
+				Notification.TYPE_ERROR_MESSAGE);
+	}
+
+	@Test
+	public void shouldCorrectlyDisplayInvalidValueExceptions() {
+		InvalidValueException exception = new InvalidValueException(
+				"MyMessage");
+		TextField field = new TextField("NAME");
+		table.onError(new SourceException(field, exception));
+
+		verify(tableViewMock).showNotification("NAME: MyMessage",
+				Notification.TYPE_ERROR_MESSAGE);
+	}
+
+
+	@Test
+	public void shouldCommitWhileLeavingEditMode() throws SQLException {
+
+		when(bufferedTableMock.isEditable()).thenReturn(false, true);
+		// switch to edit
+		table.onChangeMode();
+		verify(vaadinContainerMock, never()).commit();
+
+		// switch back to view
+		table.onChangeMode();
+		verify(vaadinContainerMock).commit();
+	}
+
+	@Test
+	public void testBlankRow() {
+		table.onAddBlankRow();
+		table.onAddBlankRow();
+		verify(bufferedTableMock, times(2)).addItem();
+		verify(bufferedTableMock, times(2)).commit();
+	}
+
+	@Test
+	public void testBlankRowCommitFalse() {
+		doThrow(new IllegalArgumentException("Test-Exception")).when(
+				bufferedTableMock).commit();
+		table.onAddBlankRow();
+		verify(bufferedTableMock, never()).addItem();
+	}
+
+	@Test
+	public void shouldRemoveRowNextRowNotNull() {
+		table.setUncommittedItemId(1);
+		when(bufferedTableMock.isEditable()).thenReturn(true);
+		when(bufferedTableMock.nextItemId(1)).thenReturn(2);
+
+		table.onRemoveRow();
+
+		verify(bufferedTableMock, times(1)).removeItem(1);
+		verify(bufferedTableMock, times(1)).nextItemId(1);
+		verify(bufferedTableMock, never()).prevItemId(1);
+		verify(bufferedTableMock, times(1)).commit();
+	}
+
+	@Test
+	public void shouldRemoveRowNextRowNull() {
+		table.setUncommittedItemId(1);
+		when(bufferedTableMock.isEditable()).thenReturn(true);
+		when(bufferedTableMock.nextItemId(1)).thenReturn(null);
+
+		table.onRemoveRow();
+
+		verify(bufferedTableMock, times(1)).removeItem(1);
+		verify(bufferedTableMock, times(1)).nextItemId(1);
+		verify(bufferedTableMock, times(1)).prevItemId(1);
+		verify(bufferedTableMock, times(1)).commit();
+	}
+
+	@Test
+	public void shouldRevertChanges() throws UnsupportedOperationException,
+			SQLException {
+		table.onRevertChanges();
+		verify(bufferedTableMock, times(1)).discard();
+		verify(vaadinContainerMock, never()).commit();
+		verify(vaadinContainerMock, times(1)).rollback();
+	}
+
+	@Test
+	public void shouldRevertChangesException()
+			throws UnsupportedOperationException, SQLException {
+		doThrow(new IllegalStateException("test-exception")).when(
+				vaadinContainerMock).rollback();
+		table.onRevertChanges();
+		verify(tableViewMock).showNotification("test-exception",
+				Notification.TYPE_ERROR_MESSAGE);
+	}
+
+	@Test
+	public void shouldInitializeListenerInsertableAndNotDeleteable() {
+		when(databaseTableContainerMock.isInsertable()).thenReturn(true);
+		when(databaseTableContainerMock.isDeleteable()).thenReturn(false);
+		table = new Table(pageMock, databaseTableContainerMock, tableViewMock,
+				columns, null, displayHelpers, filters, editors);
+		verify(tableViewMock).getEditButton();
+		verify(tableViewMock).getRevertButton();
+		verify(tableViewMock).getInsertButton();
+		verify(tableViewMock, never()).getRemoveButton();
+	}
+
+	@Test
+	public void shouldInitializeListenerDeleteable() {
+		when(databaseTableContainerMock.isDeleteable()).thenReturn(true);
+		table = new Table(pageMock, databaseTableContainerMock, tableViewMock,
+				columns, null, displayHelpers, filters, editors);
+		verify(tableViewMock).getRemoveButton();
+	}
+
+	@Test
+	public void shouldInitializeFilters() {
+		when(bufferedTableMock.getVisibleColumns()).thenReturn(
+				new String[] { "testObject-ID" });
+		when(tableViewMock.getFilterColumnField()).thenReturn(columnField);
+		List<FilterSupport> testFilters = new ArrayList<FilterSupport>();
+		testFilters.add(new StringDataType());
+		table = new Table(pageMock, databaseTableContainerMock, tableViewMock,
+				columns, null, displayHelpers, testFilters, editors);
+		verify(columnField).addItem("testObject-ID");
+	}
+
+	@Test
+	public void shouldUpdateColumnWidth() {
+		final List<String> containerPropertyIds = new ArrayList<String>();
+		containerPropertyIds.add("testID");
+		containerPropertyIds.add("testID2");
+		containerPropertyIds.add("testID3");
+		containerPropertyIds.add("testID4");
+		when(tableViewMock.getTableComponent()).thenReturn(bufferedTableMock);
+		when(bufferedTableMock.getContainerPropertyIds()).thenAnswer(
+				new Answer<Collection<String>>() {
+					@Override
+					public Collection<String> answer(InvocationOnMock invocation)
+							throws Throwable {
+						return containerPropertyIds;
+					}
+				});
+		TableColumn testColTmp1 = new TableColumn("testID", "title", false,
+				false, false, false, BigInteger.valueOf(100), null, null);
+		TableColumn testColTmp2 = new TableColumn("testID2", "title", false,
+				false, false, false, BigInteger.valueOf(120), null, null);
+		TableColumn testColTmp3 = new TableColumn("testID3", "title", false,
+				false, false, false, null, null, null);
+		TableColumn testColTmp4 = new TableColumn("testID3", "title", false,
+				false, false, false, BigInteger.valueOf(0), null, null);
+		TableColumns columnsTmp = new TableColumns(Arrays.asList(testColTmp1,
+				testColTmp2, testColTmp3, testColTmp4));
+		table = new Table(pageMock, databaseTableContainerMock, tableViewMock,
+				columnsTmp, null, displayHelpers, filters, editors);
+		verify(bufferedTableMock).setColumnWidth(testColTmp1.getName(),
+				testColTmp1.getWidth());
+		verify(bufferedTableMock).setColumnWidth(testColTmp2.getName(),
+				testColTmp2.getWidth());
+		verify(bufferedTableMock, never()).setColumnWidth(
+				testColTmp3.getName(), 0);
+		verify(bufferedTableMock, never()).setColumnWidth(
+				testColTmp4.getName(), 0);
+	}
+
+	@Test
+	public void shouldRemoveRowAndJumpToNextRow() {
+		table.setUncommittedItemId(5);
+
+		when(bufferedTableMock.addItem()).thenReturn(6);
+
+		table.onAddBlankRow();
+		verify(bufferedTableMock).select(6);
+	}
+
+	@Test
+	public void shouldRemoveLastRowAndJumpToPreviousRow() {
+		table.setUncommittedItemId(5);
+
+		when(bufferedTableMock.addItem()).thenReturn(4);
+
+		table.onAddBlankRow();
+		verify(bufferedTableMock).select(4);
+	}
+
+}

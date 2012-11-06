@@ -1,0 +1,28 @@
+*** Settings ***
+Documentation   Story: Als Benutzer möchte ich die Daten einer beliebigen bekannten \
+...				Oracle Datasource ansehen können und eine Zeile aus der Datasource löschen
+
+*** Test Case ***
+1. Zeile Löschen
+	[Tags]  CRUD-4  
+	
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	und weiterhin 2 Zeilen Testdaten
+	
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'INSERT_SCRIPT_BACKEND.xml' hochlädt
+	werden die Tabelleninhalte der TEST_USER angezeigt
+	
+	
+	wenn der Benutzer die erste Zeile löscht
+	wenn der Benutzer die erste Zeile löscht 
+	
+	dann wird der Text 'arnie' nicht angezeigt
+	und dann wird der Text 'ein Wert' nicht angezeigt
+	
+
+*** Settings ***
+Force Tags      autor-mca
+...				crud-4
+Resource        ${RESOURCES}/import/CrudPortlet.txt

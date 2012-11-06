@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+			<field name="TESTDATA" title="Test-Data" input-prompt="Eingabe" />
+			<field name="CVARCHAR5_NN" title="PROD">
+				<checkbox checked-value="PROD" />
+			</field>
+			
+			<action title="search" id="id001"><search/></action>
+			<action title="reset" id="id002"><reset/></action>
+			
+		</form>
+		<table sortable="true">
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+</portlet>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für dynamischen Schreibschutz einzelner Zellen und ganzer Zeilen">
+	<page>
+		<tabs>
+			<tab id="single-cell-write-protection" title="Einzelne Zellen">
+				<table row-height="30">
+					<database-query datasource="test">
+						<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+						<insert><![CDATA[
+					INSERT INTO TEST_CRUD2
+					  (
+					    CNUMBER5_2,
+					    CDATE,
+					    CTIMESTAMP,
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN,
+					    TESTDATA
+					  )
+					  VALUES
+					  (
+					    $row.values.CNUMBER5_2,
+					    $row.values.CDATE,
+					    $row.values.YSDATE,
+					    $row.values.CVARCHAR5_NN,
+					    $row.values.CNUMBER5_2_NN,
+					    $row.values.CDATE_NN,
+					    SYSDATE,
+					    $row.values.TESTDATA
+					  )
+				]]></insert>
+						<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CDATE	      = $row.values.CDATE,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+						CDATE_NN	  = $row.values.CDATE_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.values.ID
+				]]></update>
+						<delete><![CDATA[
+					DELETE FROM TEST_CRUD2
+					WHERE ID = $row.values.ID
+				]]></delete>
+					</database-query>
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true" display-format="#">
+							<select>
+								<query>select key , title from TEST_CRUD2_DROP_NUMBER</query>
+							</select>
+						</column>
+						<column name="CDATE" editable="isEditable(table, columnName, row)" />
+						<column name="CTIMESTAMP" />
+						<column name="CVARCHAR5_NN" editable="isEditable(table, columnName, row)">
+							<checkbox checked-value="true" unchecked-value="false" />
+						</column>
+						<column name="CNUMBER5_2_NN"
+							editable="anotherIsEditableHandler(table, columnName, row)" />
+						<column name="CDATE_NN" editable="true">
+							<select>
+								<query>select to_char(dateCol, 'dd.MM.yyyy') as key , to_char(dateCol, 'dd.MM.yyyy') as title from TEST_CRUD2_DROP_DATE</query>
+							</select>
+						</column>
+						<column name="CTIMESTAMP_NN" hidden="true" />
+						<column name="TESTDATA" multiline="true" editable="true">
+							<select>
+								<query>select key , title from TEST_CRUD2_DROP_TEXT</query>
+							</select>
+						</column>
+					</columns>
+				</table>
+			</tab>
+			<tab id="row-write-protection" title="Ganze Zeile">
+				<table row-editable="isRowEditable(it, row)">
+					<database-table datasource="test" tablename="test_crud2" />
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true" />
+						<column name="CDATE" editable="true" />
+						<column name="CTIMESTAMP" editable="true" />
+					</columns>
+				</table>
+			</tab>
+			<tab id="single-cell-write-protection-formedit" title="Einzelne Zellen (FormEdit)">
+				<table row-height="30" edit-form="true">
+					<database-query datasource="test">
+						<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+						<insert><![CDATA[
+					INSERT INTO TEST_CRUD2
+					  (
+					    CNUMBER5_2,
+					    CDATE,
+					    CTIMESTAMP,
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN,
+					    TESTDATA
+					  )
+					  VALUES
+					  (
+					    $row.values.CNUMBER5_2,
+					    $row.values.CDATE,
+					    $row.values.YSDATE,
+					    $row.values.CVARCHAR5_NN,
+					    $row.values.CNUMBER5_2_NN,
+					    $row.values.CDATE_NN,
+					    SYSDATE,
+					    $row.values.TESTDATA
+					  )
+				]]></insert>
+						<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CDATE	      = $row.values.CDATE,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+						CDATE_NN	  = $row.values.CDATE_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.values.ID
+				]]></update>
+						<delete><![CDATA[
+					DELETE FROM TEST_CRUD2
+					WHERE ID = $row.values.ID
+				]]></delete>
+					</database-query>
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true" display-format="#">
+							<select>
+								<query>select key , title from TEST_CRUD2_DROP_NUMBER</query>
+							</select>
+						</column>
+						<column name="CDATE" editable="isEditable(table, columnName, row)" />
+						<column name="CTIMESTAMP" />
+						<column name="CVARCHAR5_NN" editable="isEditable(table, columnName, row)">
+							<checkbox checked-value="true" unchecked-value="false" />
+						</column>
+						<column name="CNUMBER5_2_NN"
+							editable="anotherIsEditableHandler(table, columnName, row)" />
+						<column name="CDATE_NN" editable="true">
+							<select>
+								<query>select to_char(dateCol, 'dd.MM.yyyy') as key , to_char(dateCol, 'dd.MM.yyyy') as title from TEST_CRUD2_DROP_DATE</query>
+							</select>
+						</column>
+						<column name="CTIMESTAMP_NN" hidden="true" />
+						<column name="TESTDATA" multiline="true" editable="true">
+							<select>
+								<query>select key , title from TEST_CRUD2_DROP_TEXT</query>
+							</select>
+						</column>
+					</columns>
+				</table>
+			</tab>
+			<tab id="row-write-protection-formedit" title="Ganze Zeile (FormEdit)">
+				<table row-editable="isRowEditable(it, row)" edit-form="true">
+					<database-table datasource="test" tablename="test_crud2" />
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true" />
+						<column name="CDATE" editable="true" />
+						<column name="CTIMESTAMP" editable="true" />
+					</columns>
+				</table>
+			</tab>
+		</tabs>
+	</page>
+
+	<script><![CDATA[
+
+		/**
+		 * Dieser isEditable-Handler kümmert sich um mehrere Spalten. Da der Spaltenname
+		 * als Parameter übergeben wird, kann in der Methode eine Fallunterscheidung getroffen
+		 * werden.
+		 */
+		def isEditable(table, columnName, row) {
+			if ("CDATE".equals(columnName))
+			{
+				// Schreibschutz für das Feld CDATE in jeder Zeile mit ungerader ID, 
+				// Zeilen mit gerader ID sind editierbar
+				return isIdDividableBy(2, row) 
+			}
+			else if ("CVARCHAR5_NN".equals(columnName))
+			{
+				// Schreibschutz für das Feld CVARCHAR5_NN in jeder Zeile mit
+				// durch 3 teilbarer ID,  alle anderen Zeilen sind editierbar 
+				return isIdDividableBy(3, row)
+			}
+			else
+			{
+				println "Unbekannter Spaltenname: " + columnName
+			}
+		}
+
+		/**
+		 * Alternativ zu einem isEditable-Handler für alle Spalte (wie oben 
+		 * angedeutet) lässt sich natürlich auch für jede Spalte ein eigener
+		 * isEditable-Handler definieren.
+		 */
+		def anotherIsEditableHandler(table, columnName, row) {
+			// In Ermangelung kreativerer Ideen ist das Feld zufällig 
+			// schreibgeschützt oder editierbar.
+			return new java.util.Random().nextBoolean()
+		}
+		
+		
+		/**
+		 * isEditable-Handler für die komplette Zeile
+		 */
+		def isRowEditable(table, row)
+		{
+			// Komplettschreibschutz für alle Zeilen, deren ID nicht durch 4 teilbar ist.
+			return isIdDividableBy(4, row)
+		}
+
+		/**
+		 * Hilfsmethode für sinnfreien Schreibschutz basierend auf der Teilbarkeit
+		 * der ID der Zeile.
+		 */
+		def isIdDividableBy(divisor, row)
+		{ 
+			BigDecimal id = (BigDecimal) row.getValues().get("ID")
+			return id.remainder(new BigDecimal(divisor)).compareTo(BigDecimal.ZERO) == 0
+		}		
+	]]></script>
+</portlet>

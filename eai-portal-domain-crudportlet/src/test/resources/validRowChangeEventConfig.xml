@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für onRowChange">
+	<page>
+		<table onRowChange="handleRowChange(it,row,changedValues)" id="table1" >
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+		<script><![CDATA[
+		 def handleRowChange(it, row, changedValues) {
+			 showPopup "Modified State", {
+			 	h3('Modified fields and old values')
+			 	table(cellpadding: 5, cellspacing: 2) {
+				 	tr {
+			 			th(style:'background-color:#aaaaaa', 'Feld')
+			 			th(style:'background-color:#aaaaaa', 'Aktueller Wert')
+			 			th(style:'background-color:#aaaaaa', 'Vorheriger Wert')
+			 		}
+			 		row.fields.each { name, field ->
+				 		tr {
+				 			td(style:'background-color:#eeeeee', name)
+				 			td(style:'background-color:#eeeeee', field.value)
+				 			td(style:'background-color:#eeeeee', changedValues[name])
+				 		}
+					}
+				}
+		 	}
+		 }
+		]]></script>
+</portlet>

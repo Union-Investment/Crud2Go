@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Suche ohne Extraclick und collabsible region">
+	<page>
+		<region title="Suchen" collapsible="true" collapsed="true">
+			<form columns="1" triggerOnChanges="id01">
+				<field name="CNUMBER5_2" title="Zahl" input-prompt="Eingabe" />
+				<field name="CVARCHAR5_NN" title="Text" input-prompt="Eingabe">
+					<select>
+						<query datasource="test"><![CDATA[
+							select CVARCHAR5_NN as key, CVARCHAR5_NN as title from TEST_CRUD2
+						]]></query>
+					</select>
+				</field>
+				<action title="search" id="id01">
+					<search>
+						<tables>
+							<!-- Tabelle außerhalb der Region, daher explizit anzugeben -->
+							<table id="table1"/>
+						</tables>
+						<apply-filters>
+							<equals column="CNUMBER5_2" field="CNUMBER5_2" />
+							<equals column="CVARCHAR5_NN" field="CVARCHAR5_NN" />
+						</apply-filters>
+					</search>
+				</action>
+				<action title="reset" id="id02">
+					<reset />
+				</action>
+			</form>
+		</region>
+		<table id="table1">
+			<database-query datasource="test">
+				<query>
+					<![CDATA[
+						SELECT * FROM TEST_CRUD2
+					]]>
+				</query>
+				<insert>
+					<![CDATA[
+						INSERT INTO TEST_CRUD2 (
+						    CNUMBER5_2,
+						    CVARCHAR5_NN
+						)
+						VALUES (
+						    $row.values.CNUMBER5_2,
+						    $row.values.CVARCHAR5_NN
+						)
+					]]>
+				</insert>
+				<update>
+					<![CDATA[
+						UPDATE TEST_CRUD2 SET 
+							CNUMBER5_2	  	= $row.values.CNUMBER5_2,
+							CVARCHAR5_NN	= $row.values.CVARCHAR5_NN
+						WHERE ID = $row.values.ID
+					]]>
+				</update>
+				<delete>
+					<![CDATA[
+						DELETE FROM TEST_CRUD2
+						WHERE ID = $row.values.ID
+					]]>
+				</delete>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true" />
+				<column name="CVARCHAR5_NN" editable="true" title="Text" />
+				<column name="CNUMBER5_2" editable="true" title="Zahl" />
+			</columns>
+		</table>
+	</page>
+</portlet>

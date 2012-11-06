@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Tabellen Beispiel">
+	<page>
+		<table id="table1">
+			<script-container delegate="new MyCustomBackend()" />
+			<columns>
+				<column name="ID" primary-key="true" />
+				<column name="NAME" editable="true" />
+				<column name="SPALTEEDIT" editable="true" hidden="true" />
+			</columns>
+			<action onExecution="it.table.refresh()" title="refresh"></action>
+		</table>
+
+	</page>
+	<script><![CDATA[
+    class MyCustomBackend implements ScriptContainerBackend {
+    
+    	Map data = [1:[1,'arnie',null],2:[2,'ein Wert',null]]
+    	Long id = 3
+    	
+		Closure metaData = {
+			ID(type:Long,readonly:true, required:false, partOfPrimaryKey:true)
+			NAME(type:String,readonly:false, required:false)
+			SPALTEEDIT(type:String,readonly:false, required:false)
+		}
+		
+		List read() {
+			println data.size()
+			return data.values().asList()
+		}
+		
+		void update(List rows) {
+			rows.each { row ->
+				if (row.isNewItem()) {
+					data.put(id, [id++, row.values.NAME,row.values.SPALTEEDIT])
+				} else if (row.isModified()) {
+				  	data.put(row.values.ID, [row.values.ID,row.values.NAME,row.values.SPALTEEDIT])
+				} else if (row.isDeleted()) {
+					data.remove(row.values.ID)	
+				}
+			}
+		}
+	}
+]]>
+</script>
+</portlet>

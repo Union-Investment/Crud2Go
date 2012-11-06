@@ -1,0 +1,47 @@
+*** Settings ***
+Documentation   Story UI-130: Erweiterung des CRUD-Portlets um Tooltips, Alignment und ConfirmationDialog
+Force Tags      autor-cmj  confirmation-dialog  UI-130  mantis-4703
+
+*** Test Case ***
+Bestätigungsdialog wird angezeigt
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'CONFIRMATION_DIALOG.xml'
+	
+	wenn der Button 'Confirm' geklickt wird
+	
+	dann erscheint ein Dialog mit Titel 'My Title', Meldung 'Are you really really sure?' und den Buttons 'Yes' und 'No'
+
+
+Ergebnis des Bestätigungsdialogs wird angezeigt
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'CONFIRMATION_DIALOG.xml'
+	und dann der Button 'Confirm' geklickt wird
+
+	wenn der Button 'Yes' geklickt wird
+	
+	dann erscheint ein Dialog mit dem Text 'Result: true'
+
+
+Negatives Ergebnis des Bestätigungsdialogs wird angezeigt
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'CONFIRMATION_DIALOG.xml'
+	und dann der Button 'Confirm' geklickt wird
+
+	wenn der Button 'No' geklickt wird
+	
+	dann erscheint ein Dialog mit dem Text 'Result: false'
+
+
+Ergebnis bei Abbruch des des Bestätigungsdialogs wird angezeigt
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'CONFIRMATION_DIALOG.xml'
+	und dann der Button 'Confirm' geklickt wird
+
+	wenn das Popup mit X geschlossen wird
+	
+	dann erscheint ein Dialog mit dem Text 'Result: false'
+
+
+	
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

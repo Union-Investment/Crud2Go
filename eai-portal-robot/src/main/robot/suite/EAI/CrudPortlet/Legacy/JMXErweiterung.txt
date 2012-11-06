@@ -1,0 +1,45 @@
+*** Settings ***
+Documentation   Story: Als Entwickler möchte ich im Scripting über eine API JMX-Operationen auf den Osiris Servern ausführen können, um diese zu Administrieren
+
+*** Test Case ***
+1. JMX Attribute werden nach Query-Aufruf angezeigt
+	[Tags]  EAI-583  JMX
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'JMX_ERWEITERUNG.xml' hochlädt
+
+	und dann auf Query Attribute anzeigen klickt
+
+	dann ist im geöffneten Popupfenster der Text 'UTF-8' vorhanden
+	dann ist im geöffneten Popupfenster der Text 'AJP/1.3' vorhanden
+	dann ist im geöffneten Popupfenster der Text '8009' vorhanden
+	dann ist im geöffneten Popupfenster der Text '8080' vorhanden
+	dann ist im geöffneten Popupfenster der Text 'HTTP/1.1' vorhanden
+	
+
+2. JMX Attribute werden nach MBean-Aufruf angezeigt
+	[Tags]  EAI-583  JMX
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'JMX_ERWEITERUNG.xml' hochlädt
+
+	und dann auf MBean Attribute anzeigen klickt
+
+	dann ist im geöffneten Popupfenster der Text 'URIEncoding' vorhanden
+	dann ist im geöffneten Popupfenster der Text 'protocol' vorhanden
+	dann ist im geöffneten Popupfenster der Text 'port' vorhanden
+	dann ist im geöffneten Popupfenster der Text 'UTF-8' vorhanden
+	dann ist im geöffneten Popupfenster der Text 'AJP/1.3' vorhanden
+	dann ist im geöffneten Popupfenster der Text '8009' vorhanden
+
+*** Settings ***
+Force Tags      autor-nwo  
+...				crud-1  
+...				requires-jboss
+Resource        ${RESOURCES}/import/CrudPortlet.txt

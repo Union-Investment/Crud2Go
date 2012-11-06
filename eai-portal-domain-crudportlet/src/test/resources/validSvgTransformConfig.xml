@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches SVG Beispiel">
+	<page>
+		<component generator="buildSVG(builder)" />
+	</page>
+	
+	<script><![CDATA[
+		def openXsltStream() {
+			def xsltUrl = this.getClass().getResource("eai/svgTransform.xsl")
+			log.debug (xsltUrl != null ? xsltUrl.toString() : "xsltUrl is null")  
+			if (xsltUrl != null) {
+				xsltStream = xsltUrl.openStream()
+				return xsltStream
+			} else {
+				log.error "svgTransform.xsl not found"
+				return null
+			}
+		}
+		
+		def buildSVG(builder) {
+			def start = Calendar.instance.time.time
+			
+			def result = builder.svgComponent(
+				source: builder.streamResource(
+					stream: { builder.xslt(
+						input: new ByteArrayInputStream(getSVG().bytes),
+						xslt: openXsltStream()
+					) },
+					filename: 'bla.svg',
+					mimetype: 'image/svg+xml'
+				),
+				onSvgMessage: { event -> println "Event empfangen: ${event}" }
+			);
+			
+			def end = Calendar.instance.time.time
+			
+			println "Transformation: ${end - start} ms"
+			
+			return result
+		}
+		
+		def getSVG() { 
+			'''
+			<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+			 "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+			<svg width="374pt" height="398pt"
+			 viewBox="0.00 0.00 374.00 398.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+				<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 394)">
+					<title>provox&#45;sd&#45;targetadaptor&#45;sa</title>
+					<polygon fill="white" stroke="white" points="-4,5 -4,-394 371,-394 371,5 -4,5"/>
+					<text text-anchor="middle" x="183" y="-7.2" font-family="Helvetica,sans-Serif" font-size="12.00">provox&#45;sd&#45;targetadaptor&#45;sa</text>
+					<g id="node1" class="node">
+						<title>db_provox_sd_targetadaptor_mapping</title>
+						<a xlink:href="/dbweb/action/dbobject.do?type=rule&amp;tree=provox-sd-targetadaptor&amp;key=mapping" xlink:title="Rule\nsystem=&#39;provox&#45;sd&#45;targetadaptor&#39;\nkey=&#39;mapping&#39;">
+							<polygon fill="none" stroke="black" points="149,-309.5 9,-309.5 9,-268.5 149,-268.5 149,-309.5"/>
+							<text text-anchor="middle" x="79" y="-298.3" font-family="Helvetica,sans-Serif" font-size="8.00">Rule</text>
+							<text text-anchor="middle" x="79" y="-287.3" font-family="Helvetica,sans-Serif" font-size="8.00">system=&#39;provox&#45;sd&#45;targetadaptor&#39;</text>
+							<text text-anchor="middle" x="79" y="-276.3" font-family="Helvetica,sans-Serif" font-size="8.00">key=&#39;mapping&#39;</text>
+						</a>
+					</g>
+					<g id="node2" class="node">
+						<title>PROVOX_FULL</title>
+						<a xlink:href="/dbweb/action/dbobject.do?type=datasource&amp;name=PROVOX_FULL" xlink:title="PROVOX_FULL">
+							<image xlink:href="MessageStoreIcon.gif" width="72px" height="42px" preserveAspectRatio="xMinYMin meet" x="245" y="-64"/>
+							<polygon fill="none" stroke="white" points="317,-64 245,-64 245,-22 317,-22 317,-64"/>
+							<text text-anchor="middle" x="281" y="-41.3" font-family="Helvetica,sans-Serif" font-size="8.00">PROVOX_FULL</text>
+						</a>
+					</g>
+				</g>
+			</svg>
+			'''
+		}
+	]]></script>
+</portlet>

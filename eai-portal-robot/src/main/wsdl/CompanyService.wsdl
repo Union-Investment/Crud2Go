@@ -1,0 +1,299 @@
+<?xml version="1.0"?>
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="urn:http.service.portal.liferay.com" xmlns:intf="urn:http.service.portal.liferay.com" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns1="http://model.portal.liferay.com" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:http.service.portal.liferay.com">
+	<!--WSDL created by Apache Axis version: 1.4Built on Apr 22, 2006 (06:55:48 PDT)-->
+	<wsdl:types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://model.portal.liferay.com">
+			<import namespace="urn:http.service.portal.liferay.com"/>
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+			<complexType name="CompanySoap">
+				<sequence>
+					<element name="accountId" type="xsd:long"/>
+					<element name="active" type="xsd:boolean"/>
+					<element name="companyId" type="xsd:long"/>
+					<element name="homeURL" nillable="true" type="soapenc:string"/>
+					<element name="key" nillable="true" type="soapenc:string"/>
+					<element name="logoId" type="xsd:long"/>
+					<element name="maxUsers" type="xsd:int"/>
+					<element name="mx" nillable="true" type="soapenc:string"/>
+					<element name="primaryKey" type="xsd:long"/>
+					<element name="system" type="xsd:boolean"/>
+					<element name="webId" nillable="true" type="soapenc:string"/>
+				</sequence>
+			</complexType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:http.service.portal.liferay.com">
+			<import namespace="http://model.portal.liferay.com"/>
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+			<complexType name="ArrayOf_xsd_string">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="soapenc:string[]"/>
+					</restriction>
+				</complexContent>
+			</complexType>
+		</schema>
+	</wsdl:types>
+	<wsdl:message name="updateSecurityRequest">
+		<wsdl:part name="companyId" type="xsd:long"/>
+		<wsdl:part name="authType" type="xsd:string"/>
+		<wsdl:part name="autoLogin" type="xsd:boolean"/>
+		<wsdl:part name="sendPassword" type="xsd:boolean"/>
+		<wsdl:part name="strangers" type="xsd:boolean"/>
+		<wsdl:part name="strangersWithMx" type="xsd:boolean"/>
+		<wsdl:part name="strangersVerify" type="xsd:boolean"/>
+		<wsdl:part name="siteLogo" type="xsd:boolean"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByMxRequest">
+		<wsdl:part name="mx" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="deleteLogoResponse"/>
+	<wsdl:message name="updateDisplayResponse"/>
+	<wsdl:message name="updateCompanyResponse1">
+		<wsdl:part name="updateCompanyReturn" type="tns1:CompanySoap"/>
+	</wsdl:message>
+	<wsdl:message name="updateSecurityResponse"/>
+	<wsdl:message name="updateCompanyRequest">
+		<wsdl:part name="companyId" type="xsd:long"/>
+		<wsdl:part name="virtualHost" type="xsd:string"/>
+		<wsdl:part name="mx" type="xsd:string"/>
+		<wsdl:part name="maxUsers" type="xsd:int"/>
+		<wsdl:part name="active" type="xsd:boolean"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByVirtualHostRequest">
+		<wsdl:part name="virtualHost" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="addCompanyResponse">
+		<wsdl:part name="addCompanyReturn" type="tns1:CompanySoap"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByLogoIdRequest">
+		<wsdl:part name="logoId" type="xsd:long"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByIdRequest">
+		<wsdl:part name="companyId" type="xsd:long"/>
+	</wsdl:message>
+	<wsdl:message name="addCompanyRequest">
+		<wsdl:part name="webId" type="xsd:string"/>
+		<wsdl:part name="virtualHost" type="xsd:string"/>
+		<wsdl:part name="mx" type="xsd:string"/>
+		<wsdl:part name="shardName" type="xsd:string"/>
+		<wsdl:part name="system" type="xsd:boolean"/>
+		<wsdl:part name="maxUsers" type="xsd:int"/>
+		<wsdl:part name="active" type="xsd:boolean"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByLogoIdResponse">
+		<wsdl:part name="getCompanyByLogoIdReturn" type="tns1:CompanySoap"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByWebIdResponse">
+		<wsdl:part name="getCompanyByWebIdReturn" type="tns1:CompanySoap"/>
+	</wsdl:message>
+	<wsdl:message name="updateDisplayRequest">
+		<wsdl:part name="companyId" type="xsd:long"/>
+		<wsdl:part name="languageId" type="xsd:string"/>
+		<wsdl:part name="timeZoneId" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="removePreferencesResponse"/>
+	<wsdl:message name="deleteLogoRequest">
+		<wsdl:part name="companyId" type="xsd:long"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByWebIdRequest">
+		<wsdl:part name="webId" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="removePreferencesRequest">
+		<wsdl:part name="companyId" type="xsd:long"/>
+		<wsdl:part name="keys" type="impl:ArrayOf_xsd_string"/>
+	</wsdl:message>
+	<wsdl:message name="updateCompanyResponse">
+		<wsdl:part name="updateCompanyReturn" type="tns1:CompanySoap"/>
+	</wsdl:message>
+	<wsdl:message name="updateCompanyRequest1">
+		<wsdl:part name="companyId" type="xsd:long"/>
+		<wsdl:part name="virtualHost" type="xsd:string"/>
+		<wsdl:part name="mx" type="xsd:string"/>
+		<wsdl:part name="homeURL" type="xsd:string"/>
+		<wsdl:part name="name" type="xsd:string"/>
+		<wsdl:part name="legalName" type="xsd:string"/>
+		<wsdl:part name="legalId" type="xsd:string"/>
+		<wsdl:part name="legalType" type="xsd:string"/>
+		<wsdl:part name="sicCode" type="xsd:string"/>
+		<wsdl:part name="tickerSymbol" type="xsd:string"/>
+		<wsdl:part name="industry" type="xsd:string"/>
+		<wsdl:part name="type" type="xsd:string"/>
+		<wsdl:part name="size" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByMxResponse">
+		<wsdl:part name="getCompanyByMxReturn" type="tns1:CompanySoap"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByIdResponse">
+		<wsdl:part name="getCompanyByIdReturn" type="tns1:CompanySoap"/>
+	</wsdl:message>
+	<wsdl:message name="getCompanyByVirtualHostResponse">
+		<wsdl:part name="getCompanyByVirtualHostReturn" type="tns1:CompanySoap"/>
+	</wsdl:message>
+	<wsdl:portType name="CompanyServiceSoap">
+		<wsdl:operation name="addCompany" parameterOrder="webId virtualHost mx shardName system maxUsers active">
+			<wsdl:input message="impl:addCompanyRequest" name="addCompanyRequest"/>
+			<wsdl:output message="impl:addCompanyResponse" name="addCompanyResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="deleteLogo" parameterOrder="companyId">
+			<wsdl:input message="impl:deleteLogoRequest" name="deleteLogoRequest"/>
+			<wsdl:output message="impl:deleteLogoResponse" name="deleteLogoResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyById" parameterOrder="companyId">
+			<wsdl:input message="impl:getCompanyByIdRequest" name="getCompanyByIdRequest"/>
+			<wsdl:output message="impl:getCompanyByIdResponse" name="getCompanyByIdResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyByLogoId" parameterOrder="logoId">
+			<wsdl:input message="impl:getCompanyByLogoIdRequest" name="getCompanyByLogoIdRequest"/>
+			<wsdl:output message="impl:getCompanyByLogoIdResponse" name="getCompanyByLogoIdResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyByMx" parameterOrder="mx">
+			<wsdl:input message="impl:getCompanyByMxRequest" name="getCompanyByMxRequest"/>
+			<wsdl:output message="impl:getCompanyByMxResponse" name="getCompanyByMxResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyByVirtualHost" parameterOrder="virtualHost">
+			<wsdl:input message="impl:getCompanyByVirtualHostRequest" name="getCompanyByVirtualHostRequest"/>
+			<wsdl:output message="impl:getCompanyByVirtualHostResponse" name="getCompanyByVirtualHostResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyByWebId" parameterOrder="webId">
+			<wsdl:input message="impl:getCompanyByWebIdRequest" name="getCompanyByWebIdRequest"/>
+			<wsdl:output message="impl:getCompanyByWebIdResponse" name="getCompanyByWebIdResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="removePreferences" parameterOrder="companyId keys">
+			<wsdl:input message="impl:removePreferencesRequest" name="removePreferencesRequest"/>
+			<wsdl:output message="impl:removePreferencesResponse" name="removePreferencesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="updateCompany" parameterOrder="companyId virtualHost mx maxUsers active">
+			<wsdl:input message="impl:updateCompanyRequest" name="updateCompanyRequest"/>
+			<wsdl:output message="impl:updateCompanyResponse" name="updateCompanyResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="updateCompany" parameterOrder="companyId virtualHost mx homeURL name legalName legalId legalType sicCode tickerSymbol industry type size">
+			<wsdl:input message="impl:updateCompanyRequest1" name="updateCompanyRequest1"/>
+			<wsdl:output message="impl:updateCompanyResponse1" name="updateCompanyResponse1"/>
+		</wsdl:operation>
+		<wsdl:operation name="updateDisplay" parameterOrder="companyId languageId timeZoneId">
+			<wsdl:input message="impl:updateDisplayRequest" name="updateDisplayRequest"/>
+			<wsdl:output message="impl:updateDisplayResponse" name="updateDisplayResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="updateSecurity" parameterOrder="companyId authType autoLogin sendPassword strangers strangersWithMx strangersVerify siteLogo">
+			<wsdl:input message="impl:updateSecurityRequest" name="updateSecurityRequest"/>
+			<wsdl:output message="impl:updateSecurityResponse" name="updateSecurityResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="Portal_CompanyServiceSoapBinding" type="impl:CompanyServiceSoap">
+		<wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="addCompany">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="addCompanyRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="addCompanyResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteLogo">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="deleteLogoRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="deleteLogoResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyById">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="getCompanyByIdRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="getCompanyByIdResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyByLogoId">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="getCompanyByLogoIdRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="getCompanyByLogoIdResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyByMx">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="getCompanyByMxRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="getCompanyByMxResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyByVirtualHost">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="getCompanyByVirtualHostRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="getCompanyByVirtualHostResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getCompanyByWebId">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="getCompanyByWebIdRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="getCompanyByWebIdResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removePreferences">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="removePreferencesRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="removePreferencesResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updateCompany">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="updateCompanyRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="updateCompanyResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updateCompany">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="updateCompanyRequest1">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="updateCompanyResponse1">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updateDisplay">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="updateDisplayRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="updateDisplayResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updateSecurity">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="updateSecurityRequest">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:input>
+			<wsdl:output name="updateSecurityResponse">
+				<wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:http.service.portal.liferay.com" use="encoded"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="CompanyServiceSoapService">
+		<wsdl:port binding="impl:Portal_CompanyServiceSoapBinding" name="Portal_CompanyService">
+			<wsdlsoap:address location="http://localhost:8080/api/axis/Portal_CompanyService"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

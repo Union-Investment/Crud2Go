@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Invalide Konfiguration mit exportierbarer Tabelle ohne Primary-Key-Column">
+	<!-- Test: de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilderTest#shouldNotBuildExportableConfigWithoutPrimaryKeyColumn -->
+	<page>
+		<table id="table" editable="false" export="xls">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" />
+			</columns>
+		</table>
+	</page>
+</portlet>

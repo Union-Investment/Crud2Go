@@ -1,0 +1,116 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.uit.eai.portal</groupId>
+		<artifactId>eai-portal-build</artifactId>
+		<version>1.31.0-SNAPSHOT</version>
+		<relativePath>../eai-portal-build/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>eai-portal-xsd-crudportlet</artifactId>
+	<name>Osiris :: Investment :: EAI-Portal-Administration :: CRUD-Portlet XSD</name>
+
+	<properties>
+		<maven.xsddoc.src>${basedir}/src/main/resources/de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd</maven.xsddoc.src>
+		<maven.xsddoc.target>${project.build.directory}/site/xsddoc</maven.xsddoc.target>
+	</properties>
+	
+	
+
+	<dependencies>
+
+		<!-- Test Dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<schemaDirectory>${basedir}/src/main/resources/de/unioninvestment/eai/portal/portlet/crud</schemaDirectory>
+					<packageName>de.unioninvestment.eai.portal.portlet.crud.config</packageName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<phase>pre-site</phase>
+						<configuration>
+							<target>
+								<mkdir dir="${maven.xsddoc.target}" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>site</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<includePluginDependencies>true</includePluginDependencies>
+							<mainClass>net.sf.xframe.xsddoc.Main</mainClass>
+							<arguments>
+								<argument>-o</argument>
+								<argument>${maven.xsddoc.target}</argument>
+								<argument>-t</argument>
+								<argument>CRUD Portlet XSD Dokumentation</argument>
+								<argument>-v</argument>
+								<argument>${maven.xsddoc.src}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>xsddoc</groupId>
+						<artifactId>xsddoc</artifactId>
+						<version>1.0</version>
+					</dependency>
+					<dependency>
+						<groupId>xalan</groupId>
+						<artifactId>xalan</artifactId>
+						<version>2.7.0</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

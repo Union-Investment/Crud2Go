@@ -1,0 +1,51 @@
+*** Settings ***
+Documentation   Story: Als Entwickler möchte ich Zeilen/Felder dynamisch schreibschützen können, um Fehleingaben zu verhindern
+
+*** Test Case ***
+1. Dynamischer Feld-Schutz nach Spaltenname
+	[Tags]  EAI-589
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	und außerdem Testdaten in TEST_CRUD2
+	
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'DYNAMIC_WRITE_PROTECT.xml' hochlädt
+
+	und dann auf editieren klickt
+	und dann die Zeile mit ID 1 anklickt
+
+	ist die 1. Spalte in der selektierten Zeile nicht editierbar
+	ist die 2. Spalte in der selektierten Zeile editierbar
+	ist die 3. Spalte in der selektierten Zeile nicht editierbar
+	ist die 4. Spalte in der selektierten Zeile nicht editierbar
+
+2. Dynamischer Zeilen-Schutz nach ID-Inhalt
+	[Tags]  EAI-589
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	und außerdem Testdaten in TEST_CRUD2
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'DYNAMIC_WRITE_PROTECT.xml' hochlädt
+
+	und dann auf editieren klickt
+	und dann die Zeile mit ID 7 anklickt
+
+	ist die 1. Spalte in der selektierten Zeile nicht editierbar
+	ist die 2. Spalte in der selektierten Zeile nicht editierbar
+	ist die 3. Spalte in der selektierten Zeile nicht editierbar
+	ist die 4. Spalte in der selektierten Zeile nicht editierbar
+	
+	und dann die Zeile mit ID 8 anklickt
+
+	ist die 1. Spalte in der selektierten Zeile nicht editierbar
+	ist die 2. Spalte in der selektierten Zeile editierbar
+	ist die 3. Spalte in der selektierten Zeile editierbar
+	ist die 4. Spalte in der selektierten Zeile editierbar
+
+*** Settings ***
+Force Tags      autor-nwo  
+...				crud-1  
+Resource        ${RESOURCES}/import/CrudPortlet.txt

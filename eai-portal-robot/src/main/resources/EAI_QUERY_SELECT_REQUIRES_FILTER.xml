@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="EAI_QUERY_SELECT_REQUIRES_FILTER">
+	<page>
+		<form>
+			<field name="CNUMBER5_2" title="CNUMBER5_2" />
+			<action title="suchen">
+				<search requires-filter="true">
+					<apply-filters>
+							<equals field="CNUMBER5_2" column="CNUMBER5_2" />
+					</apply-filters>
+				</search>
+			</action>
+		</form>
+		<table>
+			<database-query datasource="test" filter-policy="nothing">
+				<query><![CDATA[
+					SELECT ID,CNUMBER5_2 FROM test_crud2
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true"/>
+				<column name="CNUMBER5_2"/>
+			</columns>
+		</table>
+	</page>
+</portlet>

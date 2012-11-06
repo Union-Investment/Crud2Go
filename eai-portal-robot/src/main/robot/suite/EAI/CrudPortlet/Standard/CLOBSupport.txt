@@ -1,0 +1,53 @@
+*** Settings ***
+Documentation   Story: Als Benutzer möchte ich die Tabellen mit CLOB-Spalten pflegen können\
+...             Abnahme: Es können bestehende CLOB-Daten geladen und angezeigt werden, \
+...             neue Zeilen in Tabellen mit CLOB-Spalten angelegt werden und \
+...             bestehende Zeilen gepflegt werden.
+
+Force Tags      autor-mbo  clob-support  EAI-585
+
+*** Test Case ***
+
+CLOB aus der Datenbank laden und in der Formularansicht anzeigen
+	Es existieren Testdaten in TEST_CLOB
+	und außerdem ein Portlet mit der XML-Konfiguration 'CLOB_SUPPORT.xml'
+
+	wenn der Button 'Editieren' geklickt wird
+	und dann auf die Zeile mit 'ROBOT TEST ROW IN CLOB TABLE' doppelt klickt
+	
+	dann steht Jemand musste Josef K. verleumdet haben in einem mehrzeiligen Eingabefeld
+	und dann steht und ihren jungen Körper dehnt... in einem mehrzeiligen Eingabefeld
+
+
+CLOB aus der Datenbank laden und Inhalt ändern
+	Es existieren Testdaten in TEST_CLOB
+	und außerdem ein Portlet mit der XML-Konfiguration 'CLOB_SUPPORT.xml'
+
+	wenn der Button 'Editieren' geklickt wird
+	und dann auf die Zeile mit 'ROBOT TEST ROW IN CLOB TABLE' doppelt klickt
+	und dann der Text im mehrzeiligen Eingabefeld auf 'Auch gibt es niemanden, der den Schmerz an sich liebt, sucht oder wünscht, nur, weil er Schmerz ist, es sei denn, es kommt zu zufälligen Umständen, in denen Mühen und Schmerz ihm große Freude bereiten können. Um ein triviales Beispiel zu nehmen, wer von uns unterzieht sich je anstrengender körperlicher Betätigung, außer um Vorteile daraus zu ziehen? Aber wer hat irgend ein Recht, einen Menschen zu tadeln, der die Entscheidung trifft, eine Freude zu genießen, die keine unangenehmen Folgen hat, oder einen, der Schmerz vermeidet, welcher keine daraus resultierende Freude nach sich zieht? Auch gibt es niemanden, der den Schmerz an sich liebt, sucht oder wünscht, nur, weil er Schmerz ist, es sei denn, es kommt zu zufälligen Umständen, in denen Mühen und Schmerz ihm große Freude bereiten können. Um ein triviales Beispiel zu nehmen, wer von uns unterzieht sich je anstrengender körperlicher Betätigung, außer um Vorteile daraus zu ziehen? Aber wer hat irgend ein Recht, einen Menschen zu tadeln, der die Entscheidung trifft, eine Freude zu genießen, die keine unangenehmen Folgen hat, oder einen, der Schmerz vermeidet, welcher keine daraus resultierende Freude nach sich zieht? Auch gibt es niemanden, der den Schmerz an sich liebt, sucht oder wünscht, nur, weil er Schmerz ist, es sei denn, es kommt zu zufälligen Umständen, in denen Mühen und Schmerz ihm große Freude bereiten können. Um ein triviales Beispiel zu nehmen, wer von uns unterzieht sich je anstrengender körperlicher Betätigung, außer um Vorteile daraus zu ziehen? Aber wer hat irgend ein Recht, einen Menschen zu tadeln, der die Entscheidung trifft, eine Freude zu genießen, die keine unangenehmen Folgen hat, oder einen, der Schmerz vermeidet, welcher keine daraus resultierende Freude nach sich zieht? Auch gibt es niemanden, der den Schmerz an sich liebt, sucht oder wünscht, nur, weil er Schmerz ist, es sei denn, es kommt zu zufälligen Umständen, in denen Mühen und Schmerz ihm große Freude bereiten können. Um ein triviales Beispiel zu nehmen, wer von uns unterzieht sich je anstrengender körperlicher Betätigung, außer um Vorteile daraus zu ziehen? Aber wer hat irgend ein Recht, einen Menschen zu tadeln, der die Entscheidung trifft, eine Freude zu genießen, die keine unangenehmen Folgen hat, oder einen, der Schmerz vermeidet, welcher keine daraus resultierende Freude nach sich zieht? Auch gibt es niemanden, der den Schmerz an sich liebt, sucht oder wünscht, nur, weil er Schmerz ist, es sei denn, es kommt zu zufälligen Umständen, in denen Mühen und Schmerz ihm große Freude bereiten können. Um ein triviales Beispiel zu nehmen, wer von uns unterzieht sich je anstrengender körperlicher Betätigung, außer um Vorteile daraus zu ziehen? Aber wer hat irgend ein Recht, einen Menschen zu tadeln, der die Entscheidung trifft, eine Freude zu genießen, die keine unangenehmen Folgen hat, oder einen, der Schmerz vermeidet, welcher keine daraus resultierende Freude nach sich zieht? Auch gibt es niemanden, der den Schmerz an sich liebt, sucht oder wünscht, nur, weil er Schmerz ist, es sei denn, es kommt zu zufälligen Umständen, in denen Mühen und Schmerz ihm große Freude bereiten können. Um ein triviales Beispiel zu nehmen, wer von uns unterzieht sich je anstrengender körperlicher Betätigung, außer um Vorteile daraus zu ziehen? Aber wer hat irgend ein Recht, einen Menschen zu tadeln, der die Entscheidung trifft, eine Freude zu genießen, die keine unangenehmen Folgen hat, oder einen, der Schmerz vermeidet, welcher keine daraus resultierende Freude nach sich zieht? Auch gibt es niemanden, der den Schmerz an sich liebt, sucht oder wünscht, nur, weil er Schmerz ist, es sei denn, es kommt zu zufälligen Umständen, in denen Mühen und Schmerz ihm große Freude bereiten können. Um ein triviales Beispiel zu nehmen, wer von uns unterzieht sich je anstrengender körperlicher Betätigung, außer um Vorteile daraus zu ziehen? Aber wer hat irgend ein Recht, einen Menschen zu tadeln, der die Entscheidung trifft, eine Freude zu genießen, die keine unangenehmen Folgen hat, oder einen, der Schmerz vermeidet, welcher keine daraus resultierende Freude nach sich zieht? Auch gibt es niemanden, der den Schmerz an sich liebt, sucht oder wünscht, nur, weil er Schmerz ist, es sei denn, es kommt zu zufälligen Umständen, in denen Mühen und Schmerz ihm große Freude bereiten können. Um ein triviales Beispiel zu nehmen, wer von uns unterzieht sich je anstrengender körperlicher Betätigung, außer um Vorteile daraus zu ziehen? Aber wer hat irgend ein Recht, einen Menschen zu tadeln, der die Entscheidung trifft, eine Freude zu genießen, die keine unangenehmen Folgen hat, oder einen, der Schmerz vermeidet, welcher keine daraus resultierende Freude nach sich zieht? Auch gibt es niemanden, der den Schmerz an sich liebt, sucht oder wünscht, nur, weil er Schmerz ist, es sei denn, es kommt zu zufälligen Umständen, in denen Mühen und Schmerz ihm große Freude bereiten können.' geändert wird
+	und dann auf Speichern klickt
+	und dann den Editier-Modus verlässt
+	
+	dann enthält der Datenbankeintrag in der Tabelle TEST_CLOB identifiziert durch den Wert ${rowId} in Spalte ID den Teilstring Auch gibt es niemanden, der den Schmerz an sich liebt in Spalte DATA
+	und dann enthält der Datenbankeintrag in der Tabelle TEST_CLOB identifiziert durch den Wert ${rowId} in Spalte ID den Teilstring in denen Mühen und Schmerz ihm große Freude bereiten können. in Spalte DATA
+
+
+Neue Zeile in CLOB-Tabelle hinzufügen
+	Es existieren keine Testdaten in TEST_CLOB
+	und außerdem ein Portlet mit der XML-Konfiguration 'CLOB_SUPPORT.xml'
+	
+	wenn der Button 'Editieren' geklickt wird
+	und dann der Button 'Neue Zeile' geklickt wird
+	und dann der Text im mehrzeiligen Eingabefeld auf 'Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und Konsonantien leben die Blindtexte. Abgeschieden wohnen Sie in Buchstabhausen an der Küste des Semantik, eines großen Sprachozeans. Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land, in dem einem gebratene Satzteile in den Mund fliegen. Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber beschloß eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum, hinaus zu gehen in die weite Grammatik. Der große Oxmox riet ihr davon ab, da es dort wimmele von bösen Kommata, wilden Fragezeichen und hinterhältigen Semikoli, doch das Blindtextchen ließ sich nicht beirren. Es packte seine sieben Versalien, schob sich sein Initial in den Gürtel und machte sich auf den Weg.' geändert wird
+	und dann im Feld '3' mit HTML Element 'input' der Zeile '2' den Wert auf 'ROBOT TEST ROW IN CLOB TABLE' aendert
+	und dann auf Speichern klickt
+	und dann den Editier-Modus verlässt
+	
+	${rowId} =  Read Single Value From Table  TEST_CLOB  ID  TEXT = 'ROBOT TEST ROW IN CLOB TABLE'
+	
+	dann enthält der Datenbankeintrag in der Tabelle TEST_CLOB identifiziert durch den Wert ${rowId} in Spalte ID den Teilstring Weit hinten, hinter den Wortbergen in Spalte DATA
+	und dann enthält der Datenbankeintrag in der Tabelle TEST_CLOB identifiziert durch den Wert ${rowId} in Spalte ID den Teilstring und machte sich auf den Weg. in Spalte DATA
+
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

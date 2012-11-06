@@ -1,0 +1,117 @@
+*** Settings ***
+Library         OperatingSystem
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+
+***Keywords***
+
+####################################################
+###  Suite Lifecycle                             ###
+####################################################
+
+Init Browser
+	Set Selenium Timeout  120s
+	Open Browser  http://${BASE_URL}${CONTEXT}/  ${BROWSER_PROFILE}
+	Maximize Browser Window
+	Set Selenium Timeout  15s
+
+System Initialisieren
+	Init Browser
+	Init Database
+
+Benutzer mit Administratorrolle anmelden
+	Add Liferay User  atdd  welcome  FirstName  LastName  atdd@codecentric.de  Administrator
+	Login To Liferay as atdd changing password welcome to atdd
+
+System und Benutzer initialisieren
+	System Initialisieren
+	Benutzer mit Administratorrolle anmelden
+	
+Bereinige CrudPortlet Test
+    Run Keyword If Test Failed  Log Screenshot
+    Run Keyword If  ${TEST MESSAGE.count('Timed out')}  Set Tags  Timeouted
+    Probably Leave Configuration Page
+	Run Keyword And Ignore Error  Logout from Liferay
+	Remove User atdd
+    Delete All Cookies
+	Delete All Portlet Configs
+
+System Bereinigen
+	Run Keyword And Ignore Error  Logout from Liferay
+	Remove User atdd
+	Delete All Portlet Configs
+	Close All Browsers
+	Disconnect Database
+
+Verarbeite Testergebnis
+    Run Keyword If Test Failed  Log Screenshot
+    Run Keyword If  ${TEST MESSAGE.count('Timed out')}  Set Tags  Timeouted
+
+
+####################################################
+###  Es existiert/existieren / Und weiterhin ... ###
+####################################################
+
+
+die XML Konfiguration: '${XML}' hochlädt
+	Wait until page contains element  css=div.crudPortletId  15s
+	${portletId} =  Get Text  css=div.crudPortletId
+	${communityId} =  Get Text  css=div.crudPortletCommunityId
+	insert Blob  ${portletId}  ${communityId}  ${XML}  atdd
+	Delete All Cookies
+	Call Selenium Api  refresh
+	Wait Until Page Loaded
+
+ein Portlet mit der XML-Konfiguration '${XML}'
+	Wait until page contains element  css=div.crudPortletId  15s
+	${portletId} =  Get Text  css=div.crudPortletId
+	${communityId} =  Get Text  css=div.crudPortletCommunityId
+	insert Blob  ${portletId}  ${communityId}  ${XML}  atdd
+	Go To  http://${BASE_URL}${CONTEXT}?restartApplication
+
+eine Portalseite mit CRUD-Portlet
+	Go To  http://${BASE_URL}${CONTEXT}?restartApplication
+
+ein Benutzer ohne Berechtigungen zum Lesen von Tabellen
+	Add Liferay User  atdd  welcome  FirstName  LastName  atdd@codecentric.de  Administrator
+
+ein Benutzer mit Berechtigungen zum Lesen von Tabellen
+	Add User atdd password welcome first name ATDD surname LastName email atdd@codecentric.de roles portlet-crud-r
+	
+ein Benutzer
+	Add Liferay User  atdd  welcome  FirstName  LastName  atdd@codecentric.de  Administrator
+	
+ein eingeschränkter Benutzer
+	Add Liferay User  atdd  welcome  FirstName  LastName  atdd@codecentric.de  User
+
+ein Benutzer mit Berechtigungen zum Schreiben von Tabellen
+	Add User atdd password welcome first name ATDD surname LastName email atdd@codecentric.de roles portlet-crud-r
+
+ist das Portlet noch nicht konfiguriert
+	No operation
+	
+############################
+###  Wenn / Und dann ... ###
+############################	
+
+das Portlet mit der XML-Konfiguration '${XML}' geladen ist
+	ein Portlet mit der XML-Konfiguration '${XML}'
+
+er die Portalseite öffnet 
+	Login To Liferay as atdd changing password welcome to atdd
+	Go To  http://${BASE_URL}${CONTEXT}
+
+
+############################
+###  Utility keywords    ###
+############################	
+
+Probably Leave Configuration Page
+	Run Keyword And Ignore Error  Click Link  Zurück zur Seite
+	Run Keyword And Ignore Error  Click Link  Return to Full Page
+	Run Keyword And Ignore Error  Click Link  Zurück zur Seite
+	Run Keyword And Ignore Error  Click Link  Return to Full Page
+ 

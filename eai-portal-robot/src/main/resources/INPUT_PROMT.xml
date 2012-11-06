@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table>
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM TEST_USER
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_USER
+					  (
+					    NAME,
+					    SPALTEEDIT
+					  )
+					  VALUES
+					  (
+					    $row.values.NAME,
+					    $row.values.SPALTEEDIT
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_USER SET 
+						NAME	      = $row.values.NAME,
+						SPALTEEDIT    = $row.values.SPALTEEDIT
+					WHERE ID          = $row.values.ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_USER
+					WHERE ID = $row.values.ID
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true" />
+				<column name="NAME" editable="true" input-prompt="Name eintragen" />
+				<column name="SPALTEEDIT" editable="true" input-prompt="Wert eintragen" />
+			</columns>
+		</table>
+	</page>
+</portlet>

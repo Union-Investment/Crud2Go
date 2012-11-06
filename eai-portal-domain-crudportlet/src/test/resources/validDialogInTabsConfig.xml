@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für eine Hauptseite mit Unter- bzw. Detailseiten">
+	
+	<tabs>
+		<tab id="tab1" title="First Tab">
+			<table sortable="true" onDoubleClick="openDialog(it,row,'dialog-1')">
+				<database-table datasource="test" tablename="test_crud2" />
+			</table>
+		</tab>
+		<tab id="tab2" title="Second Tab">
+			<table sortable="true" onDoubleClick="openDialog(it,row,'dialog-1')">
+				<database-table datasource="test" tablename="test_crud2" />
+			</table>
+		</tab>
+		<tab id="tab3" title="Third Tab">
+			<table sortable="true" onDoubleClick="openDialog(it,row,'dialog-2')">
+				<database-table datasource="test" tablename="test_crud2" />
+			</table>
+		</tab>
+	</tabs>
+
+	<dialog id="dialog-1" backButtonCaption="Zurück">
+		<table id="table001" row-height="30">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT ID, CTIMESTAMP_NN, TESTDATA FROM test_crud2
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true"/>
+				<column name="TESTDATA" editable="true" width="300"/>
+			</columns>
+		</table>
+	</dialog>
+	
+	<dialog id="dialog-2" backButtonCaption="Zurück">
+		<table id="table002" row-height="30">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT ID, CTIMESTAMP_NN, TESTDATA FROM test_crud2
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true"/>
+				<column name="CTIMESTAMP_NN" />
+			</columns>
+		</table>
+	</dialog>
+
+	<script><![CDATA[
+		def openDialog(it, row, dialogId) {
+			portlet.tabs.activeTab.attachDialog(dialogId);
+		}
+	]]></script>
+</portlet>

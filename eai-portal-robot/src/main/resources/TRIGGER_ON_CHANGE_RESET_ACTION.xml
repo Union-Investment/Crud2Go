@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel fuer eine triggerOnChanges Action">
+	<page>
+		<form columns="1" triggerOnChanges="id02">
+			<field name="CNUMBER5_2" title="Zahl" input-prompt="Eingabe" />
+			<action title="search" id="id01">
+				<search>
+					<apply-filters>
+						<equals column="CNUMBER5_2" field="CNUMBER5_2" />
+					</apply-filters>
+				</search>
+			</action>
+			<action title="reset" id="id02">
+				<reset/>
+			</action>
+		</form>
+		<table>
+			<database-query datasource="test">
+				<query>
+					<![CDATA[
+						SELECT * FROM TEST_CRUD2
+					]]>
+				</query>
+				<insert>
+					<![CDATA[
+						INSERT INTO TEST_CRUD2 (
+						    CNUMBER5_2,
+						    CVARCHAR5_NN
+						)
+						VALUES (
+						    $row.values.CNUMBER5_2,
+						    $row.values.CVARCHAR5_NN
+						)
+					]]>
+				</insert>
+				<update>
+					<![CDATA[
+						UPDATE TEST_CRUD2 SET 
+							CNUMBER5_2	  	= $row.values.CNUMBER5_2,
+							CVARCHAR5_NN	= $row.values.CVARCHAR5_NN
+						WHERE ID = $row.values.ID
+					]]>
+				</update>
+				<delete>
+					<![CDATA[
+						DELETE FROM TEST_CRUD2
+						WHERE ID = $row.values.ID
+					]]>
+				</delete>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true" />
+				<column name="CVARCHAR5_NN" editable="true" title="Text" />
+				<column name="CNUMBER5_2" editable="true" title="Zahl" />
+			</columns>
+		</table>
+	</page>
+</portlet>

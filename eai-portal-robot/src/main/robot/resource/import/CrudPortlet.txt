@@ -1,0 +1,3 @@
+*** Settings ***
+Resource        ${RESOURCES}/German-BDD.txt
+Resource        ${RESOURCES}/objects/CrudPortlet.txt

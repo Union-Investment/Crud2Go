@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table>
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM TEST_USER
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true" />
+				<column name="NAME" editable="true" />
+				<column name="SPALTEEDIT" editable="true"/>
+			</columns>
+		</table>
+	</page>
+</portlet>

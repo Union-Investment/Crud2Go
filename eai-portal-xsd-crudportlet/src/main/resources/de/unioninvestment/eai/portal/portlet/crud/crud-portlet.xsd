@@ -1,0 +1,2048 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	xmlns:tns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
+	elementFormDefault="qualified" jaxb:version="2.0">
+
+	<element name="portlet" type="tns:PortletConfig" />
+
+	<complexType name="PortletConfig">
+		<annotation>
+			<documentation>
+				Konfiguration des Portlets auf oberster Ebene.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="roles" type="tns:RolesConfig" minOccurs="0"
+				maxOccurs="1" />
+			<choice>
+				<element name="page" type="tns:PageConfig" />
+				<element name="tabs" type="tns:TabsConfig" />
+			</choice>
+			<element name="dialog" type="tns:DialogConfig" minOccurs="0"
+				maxOccurs="unbounded" />
+			<element name="script" type="tns:ScriptConfig" minOccurs="0" />
+		</sequence>
+		<attribute name="title" type="string">
+			<annotation>
+				<documentation>
+					In der Portlettitelleiste angezeigte Titel des
+					Portlets.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="ScriptConfig">
+		<annotation>
+			<appinfo>
+				<jaxb:property name="value">
+					<jaxb:baseType
+						name="de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript">
+						<jaxb:javaType
+							name="de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript"
+							parseMethod="de.unioninvestment.eai.portal.portlet.crud.config.converter.GroovyScriptConverter.parseStringToGroovyScript"
+							printMethod="de.unioninvestment.eai.portal.portlet.crud.config.converter.GroovyScriptConverter.printGroovyScript" />
+					</jaxb:baseType>
+				</jaxb:property>
+			</appinfo>
+			<documentation>
+				Groovyscriptblock
+			</documentation>
+		</annotation>
+		<simpleContent>
+			<extension base="string" />
+		</simpleContent>
+	</complexType>
+
+	<complexType name="RolesConfig">
+		<annotation>
+			<documentation>
+				Die fuer das Portlet gueltigen Benutzerrollen.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="role" type="tns:RoleConfig" minOccurs="1"
+				maxOccurs="unbounded" />
+		</sequence>
+
+	</complexType>
+
+	<complexType name="RoleConfig">
+		<annotation>
+			<documentation>
+				Eine Benutzerrolle im Portal.
+			</documentation>
+		</annotation>
+		<attribute name="name" type="string" use="required">
+			<annotation>
+				<documentation>
+					Frei waehlbarer Name einer Benutzerrolle.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="SecurableConfig" abstract="true">
+		<annotation>
+			<documentation>
+				Oberklasse fuer alle Elemente, an denen Berechtigungen
+				konfiguriert werden koennen
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="permissions" type="tns:PermissionsConfig"
+				minOccurs="0">
+				<annotation>
+					<documentation>Optionale Berechtigungskonfiguration</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="PermissionsConfig">
+		<annotation>
+			<documentation>
+				Berechtigungen fuer die Komponente.
+			</documentation>
+		</annotation>
+		<choice maxOccurs="unbounded">
+			<annotation>
+				<appinfo>
+					<jaxb:property name="entries" />
+				</appinfo>
+			</annotation>
+			<element name="allow" type="tns:AllowConfig" />
+			<element name="deny" type="tns:DenyConfig" />
+		</choice>
+	</complexType>
+
+	<complexType name="PermissionConfig" abstract="true">
+		<annotation>
+			<documentation>
+				Eine Berechtigungskonfiguration fuer eine bestimmte
+				Aktion.
+			</documentation>
+		</annotation>
+		<attribute name="action" use="required">
+			<annotation>
+				<documentation>
+					Eine fuer diese Komponente gueltige Aktion.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="roles" use="required">
+			<annotation>
+				<documentation>
+					Eine kommaseparierte Liste von Benutzerrollen.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="AllowConfig">
+		<annotation>
+			<documentation>
+				Eine Berechtigung fuer eine bestimmte Aktion.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:PermissionConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="DenyConfig">
+		<annotation>
+			<documentation>
+				Eine Einschraenkung fuer eine bestimmte Aktion.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:PermissionConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="PanelConfig" abstract="true">
+		<annotation>
+			<documentation>
+				Eine Seite, die im Portlet dargestellt werden kann.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComponentConfig">
+				<sequence>
+					<choice maxOccurs="unbounded">
+						<annotation>
+							<appinfo>
+								<jaxb:property name="elements" />
+							</appinfo>
+						</annotation>
+						<element name="form" type="tns:FormConfig" />
+						<element name="table" type="tns:TableConfig" />
+						<element name="tabs" type="tns:TabsConfig" />
+						<element name="component" type="tns:ScriptComponentConfig" />
+						<element name="region" type="tns:RegionConfig" />
+					</choice>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="RegionConfig">
+		<annotation>
+			<documentation>
+				Ein Bereich innerhalb einer Seite.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:PanelConfig">
+				<attribute name="id" type="ID">
+					<annotation>
+						<documentation>
+							Die im XML eindeutige ID.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="title" type="string">
+					<annotation>
+						<documentation>
+							Der Text, der in der Titelzeile angezeigt werden
+							soll.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="collapsible" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Definiert, ob der Bereich auf- und zuklappbar ist.
+							Optional und standardmäßig "false".
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="collapsed" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Definiert, ob der Bereich initial auf- oder
+							zugeklappt angezeigt wird
+							(sofern collapsible auf true gesetzt
+							ist). Optional und standardmäßig "false".
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onCollapse" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onExpand" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="ComponentConfig" abstract="true">
+		<annotation>
+			<documentation>
+				Ein abstraktes Seitenelement innerhalb eines Panel.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:SecurableConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="ScriptComponentConfig">
+		<annotation>
+			<documentation>
+				Element zur Representation einer Skript-Komponente.
+				Die konkrete GUI-Komponente wird von dem definierten
+				Generator-Skript gebaut.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComponentConfig">
+				<attribute name="id" type="ID" use="optional">
+					<annotation>
+						<documentation>
+							Optionale eindeutige (innerhalb der Konfiguration)
+							ID der Skript-Komponente.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="generator" type="tns:groovy" use="required">
+					<annotation>
+						<documentation>
+							Die Groovy-Closure zur Generierung der
+							GUI-Komponente.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="PageConfig">
+		<annotation>
+			<documentation>
+				Hauptseite, die im Portlet dargestellt werden kann.
+				Die Hauptseiten erscheinen als Tab-Reiter, sobald mehr als eine
+				Seite existiert.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:PanelConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="TabsConfig">
+		<annotation>
+			<documentation>
+				Ein Containerelement fuer ein oder mehre Tabs.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComponentConfig">
+				<sequence>
+					<element name="tab" type="tns:TabConfig" minOccurs="1"
+						maxOccurs="unbounded" />
+				</sequence>
+				<attribute name="onChange" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="TabConfig">
+		<annotation>
+			<documentation>
+				Ein Tab-Panel fuer die Darstellung.
+			</documentation>
+		</annotation>
+
+		<complexContent>
+			<extension base="tns:PanelConfig">
+				<attribute name="id" type="ID" use="required">
+					<annotation>
+						<documentation>
+							Die im XML eindeutige ID.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="title" type="string" use="required">
+					<annotation>
+						<documentation>
+							Der Reitertitel.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onShow" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onHide" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="DialogConfig">
+		<annotation>
+			<documentation>
+				Unter- oder Detailseite zu einer per page-Tag
+				konfigurierten Seite oder einem per tab-Tag
+				konfigurierten Reiter.
+				Die Unterseite ist zunaechst nicht sichtbar,
+				kann aber als Reaktion
+				auf ein Ereignis (z. B. Doppelklick auf eine Tabellenzeile)
+				angezeigt werden. Wenn die Unterseite angezeigt wird, ersetzt sie
+				die Hauptseite. Jede Unterseite muss zwingend eine
+				Zurueck-Schaltflaeche enthalten, diese bewirkt, dass die Unterseite
+				wieder aus- und die Hauptseite wieder eingeblendet wird.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:PanelConfig">
+				<attribute name="id" type="ID" use="required">
+					<annotation>
+						<documentation>
+							Die im XML eindeutige ID.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="backButtonCaption" type="string" use="required">
+					<annotation>
+						<documentation>
+							Beschriftung des Zurueck-Buttons oben rechts im
+							Dialog.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="FormConfig">
+		<annotation>
+			<documentation>
+				Anzeige eines (Such-)Formulars
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComponentConfig">
+				<sequence>
+					<element name="field" type="tns:FormFieldConfig" maxOccurs="unbounded" />
+					<element name="action" type="tns:FormActionConfig"
+						maxOccurs="unbounded" />
+				</sequence>
+				<attribute name="columns" type="int" default="1">
+					<annotation>
+						<documentation>
+							Angabe wieviele Felder jeweils nebeneinander
+							dargestellt werden sollen
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="id" type="ID">
+					<annotation>
+						<documentation>
+							Die im XML eindeutige ID.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="triggerOnChanges" type="string">
+					<annotation>
+						<documentation>
+							Referenz auf die Aktion die angestoßen werden soll,
+							wenn sich im Formular etwas ändert.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="FormFieldConfig">
+		<annotation>
+			<documentation>
+				Eingabefeld eines (Such-)Formulars
+			</documentation>
+		</annotation>
+		<choice minOccurs="0">
+			<element name="select" type="tns:FormSelectConfig" />
+			<element name="checkbox" type="tns:CheckboxConfig" />
+			<element name="date" type="tns:DateConfig" />
+		</choice>
+		<attribute name="name" use="required">
+			<annotation>
+				<documentation>
+					Der Name des Felds. Bei der Suche in einer Tabelle
+					muss dieses Feld mit
+					einem Column-Name dieser Tabelle
+					uebereinstimmen.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="title" type="string">
+			<annotation>
+				<documentation>
+					Alternative Bezeichnung fuer die Darstellung.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="input-prompt" type="string">
+			<annotation>
+				<documentation>
+					Anzeigetext bei leerem Eingabefeld
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="default" type="string">
+			<annotation>
+				<documentation>
+					Standartwert
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="validate" type="string">
+			<annotation>
+				<documentation>
+					Kommaseparierte Liste von Validierungsregeln. Im Fehlerfall wird
+					die im Attribut validation-message angegebene Meldung ausgegeben.
+					Folgende Regeln werden unterstuetzt:
+					<table>
+						<tr>
+							<td>required</td>
+							<td>Pflichtfeld</td>
+						</tr>
+						<tr>
+							<td>maxlen=n</td>
+							<td>maximale werden n Zeichen akzeptiert</td>
+						</tr>
+						<tr>
+							<td>regexp=[a-zA-Z\\,]+</td>
+							<td>Der angegebene regulaere Ausdruck wird validiert</td>
+						</tr>
+					</table>
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="validation-message" type="string">
+			<annotation>
+				<documentation>
+					Fehlermeldung bei fehlgeschlagener Validierung
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="onValueChange" type="tns:groovy">
+			<annotation>
+				<documentation>
+					Groovy Closure
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="CheckboxConfig">
+		<annotation>
+			<documentation>
+				Checkbox
+			</documentation>
+		</annotation>
+		<attribute name="unchecked-value">
+			<annotation>
+				<documentation>
+					Feldwert im unselektierten Zustand, wenn das Attribut
+					nicht gesetzt ist dann wird auf das Feld im unselektierten Zustand
+					nicht gefiltert.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="checked-value" use="required">
+			<annotation>
+				<documentation>
+					Feldwert im selektierten Zustand.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="DateConfig">
+		<annotation>
+			<documentation>
+				Datumsfeld
+			</documentation>
+		</annotation>
+		<attribute name="format">
+			<annotation>
+				<documentation>
+					Datumsformat gemaess SimpleDateFormat Pattern.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="display" type="tns:DateDisplayType"
+			default="picker">
+			<annotation>
+				<documentation>
+					Datumseingabetyp
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="default" type="string">
+			<annotation>
+				<documentation>
+					Standartwert
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+
+	<simpleType name="TableExportType">
+		<annotation>
+			<documentation>
+				Formattyp fuer den Export der Tablendaten.
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="xls">
+				<annotation>
+					<documentation>
+						Excel Export
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="csv">
+				<annotation>
+					<documentation>
+						CSV Export
+					</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="DateDisplayType">
+		<annotation>
+			<documentation>
+				Typ der auzufuehrenden Aktion auf einem Formular
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="picker">
+				<annotation>
+					<documentation>
+						Datepicker Formularelement
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="input">
+				<annotation>
+					<documentation>
+						Einfache Texteingabe fuer das Datum.
+					</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+	<complexType name="AbstractActionConfig" abstract="true">
+		<annotation>
+			<documentation>
+				Abstrakter Basistyp fuer Aktionen
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:SecurableConfig">
+				<sequence>
+					<element name="triggers" type="tns:TriggersConfig"
+						minOccurs="0" maxOccurs="1" />
+				</sequence>
+				<attribute name="id" type="ID">
+					<annotation>
+						<documentation>
+							Die im XML eindeutige ID.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="title" type="string" use="required">
+					<annotation>
+						<documentation>
+							Titel des Buttons
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="FormActionConfig">
+		<annotation>
+			<documentation>
+				Aktions-Button in einem (Such-)Formulars
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:AbstractActionConfig">
+				<choice>
+					<element name="search" type="tns:SearchConfig" minOccurs="0" />
+					<element name="reset" type="tns:ResetConfig" minOccurs="0" />
+				</choice>
+				<attribute name="input-prompt" type="string">
+					<annotation>
+						<documentation>
+							Anzeigetext bei leerem Eingabefeld
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onExecution" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="ResetConfig">
+		<annotation>
+			<documentation>
+				Button zum Zuruecksetzen eines (Such-)Formulars
+			</documentation>
+		</annotation>
+	</complexType>
+
+	<complexType name="TriggersConfig">
+		<annotation>
+			<documentation>
+				Auflistung der Trigger
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="trigger" type="tns:TriggerConfig" minOccurs="0"
+				maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<complexType name="TriggerConfig">
+		<annotation>
+			<documentation>
+				Konfiguration eines Triggers
+			</documentation>
+		</annotation>
+		<attribute name="action" type="IDREF" use="required">
+			<annotation>
+				<documentation>
+					Referenz auf die zu triggernde Action.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="SearchConfig">
+		<annotation>
+			<documentation>
+				Konfiguration einer Suche
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="tables" type="tns:SearchTablesConfig"
+				minOccurs="0" />
+			<element name="apply-filters" type="tns:ApplyFiltersConfig"
+				minOccurs="0" />
+		</sequence>
+		<attribute name="timeoutInSeconds" type="int" default="0">
+			<annotation>
+				<documentation>
+					Ein Zeitlimit für die Suche in Sekunden.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="requires-filter" default="false" type="boolean">
+			<annotation>
+				<documentation>
+					Muss-Filter-Einstellung
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="SearchTablesConfig">
+		<annotation>
+			<documentation>
+				Angabe der Tabellen, auf die die Suche angewendet
+				werden soll
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="table" type="tns:SearchTableConfig" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<complexType name="SearchTableConfig">
+		<annotation>
+			<documentation>
+				Angabe einer Tabelle, auf die die Suche angewendet
+				werden soll
+			</documentation>
+		</annotation>
+		<attribute name="id" type="IDREF" use="required">
+			<annotation>
+				<documentation>
+					ID der Tabelle
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="FilterConfig" abstract="true">
+		<annotation>
+			<documentation>
+				Allgemeiner Typ fuer Filter
+			</documentation>
+		</annotation>
+		<attribute name="table" type="string">
+			<annotation>
+				<documentation>
+					Einschraenkung der Filter-Gueltigkeit auf die
+					angegebene Tabelle (per ID)
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="FilterListConfig" abstract="true">
+		<annotation>
+			<documentation>
+				Klammer fuer mehrere Filter
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterConfig">
+				<sequence>
+					<choice maxOccurs="unbounded">
+						<annotation>
+							<appinfo>
+								<jaxb:property name="filters" />
+							</appinfo>
+						</annotation>
+						<element name="equals" type="tns:EqualsFilterConfig" />
+						<element name="greater" type="tns:GreaterFilterConfig" />
+						<element name="greater-or-equal" type="tns:GreaterOrEqualFilterConfig" />
+						<element name="less" type="tns:LessFilterConfig" />
+						<element name="less-or-equal" type="tns:LessOrEqualFilterConfig" />
+						<element name="starts-with" type="tns:StartsWithFilterConfig" />
+						<element name="ends-with" type="tns:EndsWithFilterConfig" />
+						<element name="contains" type="tns:ContainsFilterConfig" />
+						<element name="any" type="tns:AnyFilterConfig" />
+						<element name="all" type="tns:AllFilterConfig" />
+						<element name="not" type="tns:NotFilterConfig" />
+						<element name="sql" type="tns:SQLFilterConfig" />
+						<element name="include-filter" type="tns:IncludeFilterConfig" />
+						<element name="nothing" type="tns:NothingFilterConfig" />
+					</choice>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="IncludeFilterConfig">
+		<annotation>
+			<documentation>
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterConfig">
+				<attribute name="action" type="IDREF" use="required">
+					<annotation>
+						<documentation>
+							Referenz auf ein Searchformaction
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="ApplyFiltersConfig">
+		<annotation>
+			<documentation>
+				Klammer fuer manuelle Filterkonfiguration
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterListConfig" />
+		</complexContent>
+	</complexType>
+
+
+	<complexType name="ComparisonFilterConfig" abstract="true">
+		<annotation>
+			<documentation>
+				Obertyp fuer Vergleichsfilter
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterConfig">
+				<attribute name="field" type="string" use="required">
+					<annotation>
+						<documentation>
+							Name des Formularfelds
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="column" type="string" use="required">
+					<annotation>
+						<documentation>
+							Name der Tabellenspalte
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="EqualsFilterConfig">
+		<annotation>
+			<documentation>
+				Filter auf Gleichheit
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComparisonFilterConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="GreaterFilterConfig">
+		<annotation>
+			<documentation>
+				Filter auf Groesser
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComparisonFilterConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="GreaterOrEqualFilterConfig">
+		<annotation>
+			<documentation>
+				Filter auf Groesser oder Gleich
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComparisonFilterConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="LessFilterConfig">
+		<annotation>
+			<documentation>
+				Filter auf Kleiner
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComparisonFilterConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="LessOrEqualFilterConfig">
+		<annotation>
+			<documentation>
+				Filter auf Kleiner oder Gleich
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComparisonFilterConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="StartsWithFilterConfig">
+		<annotation>
+			<documentation>
+				Textfilter auf gleichen Anfang
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComparisonFilterConfig">
+				<attribute name="case-sensitive" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Angabe ob Gross-/Kleinschreibung beruecksichtigt
+							werden soll
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="EndsWithFilterConfig">
+		<annotation>
+			<documentation>
+				Textfilter auf gleiches Ende
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComparisonFilterConfig">
+				<attribute name="case-sensitive" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Angabe ob Gross-/Kleinschreibung beruecksichtigt
+							werden soll
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="ContainsFilterConfig">
+		<annotation>
+			<documentation>
+				Textfilter auf gleiches Ende
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComparisonFilterConfig">
+				<attribute name="case-sensitive" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Angabe ob Gross-/Kleinschreibung beruecksichtigt
+							werden soll
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="NotFilterConfig">
+		<annotation>
+			<documentation>
+				Inversion von Subfiltern. Bei mehreren Subfiltern
+				werden diese UND-verknuepft
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterListConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="SQLFilterConfig">
+		<annotation>
+			<documentation>
+				SQL-Filter
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterConfig">
+				<sequence>
+					<element name="where" type="string" />
+				</sequence>
+				<attribute name="column" type="string" use="required">
+					<annotation>
+						<documentation>
+							Name der Tabellenspalte
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="AnyFilterConfig">
+		<annotation>
+			<documentation>
+				ODER-Verknuepfung von Unterfiltern
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterListConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="AllFilterConfig">
+		<annotation>
+			<documentation>
+				UND-Verknuepfung von Unterfiltern
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterListConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="NothingFilterConfig">
+		<annotation>
+			<documentation>
+				Blockiert alles.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterConfig" />
+		</complexContent>
+	</complexType>
+
+	<complexType name="TableConfig">
+		<annotation>
+			<documentation>
+				Anzeige einer Tabelle.
+
+				Folgenden Aktionen koennen mit
+				Berechtigungen hinterlegt werden:
+				all,display,build,edit
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComponentConfig">
+				<sequence>
+					<choice>
+						<element name="database-table" type="tns:DatabaseTableConfig" />
+						<element name="database-query" type="tns:DatabaseQueryConfig" />
+						<element name="script-container" type="tns:ScriptContainerConfig" />
+						<element name="jmx-container" type="tns:JmxContainerConfig" />
+					</choice>
+					<element name="columns" type="tns:ColumnsConfig" minOccurs="0" />
+					<element name="action" type="tns:TableActionConfig"
+						minOccurs="0" maxOccurs="unbounded" />
+				</sequence>
+				<attribute name="id" type="ID">
+					<annotation>
+						<documentation>
+							Die im XML eindeutige ID.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="edit-form" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Ob das Editieren einer Tabellenzeile mit einem
+							Formular erfolgen soll.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="editable" type="boolean" default="true">
+					<annotation>
+						<documentation>
+							Gibt an ob in den Edit-Modus gewechselt werden kann
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="row-height" type="int">
+					<annotation>
+						<documentation>
+							Legt die die Pixelhoehe der Tabellenzeilen fest.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="sortable" type="boolean" default="true">
+					<annotation>
+						<documentation>
+							Gibt an ob in der Tabelle sortiert werden darf.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="page-length" type="int" default="15">
+					<annotation>
+						<documentation>
+							Anzahl angezeigter Zeilen. 0 deaktiviert Paging
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="cache-rate" type="double" default="2.0">
+					<annotation>
+						<documentation>
+							Faktor, der angibt, wieviele Zeilen ueber die
+							aktuelle Ansicht hinaus gerendert werden sollen.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onSelectionChange" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Dieses Closure Event wird aufgerufen wenn sich die
+							Zeilenauswahl auf der Tabelle aendert.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onInitialize" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Diese Closure wird einmalig nach dem Initialisieren
+							der Tabelle ausgefuehrt.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onDoubleClick" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Dieses Closure Event wird beim Doppelklick auf eine
+							Zeile aufgerufen.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onModeChange" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Dieses Closure Event wird beim Wechel zwischen
+							View- und Edit-Mode aufgerufen.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onRowChange" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Dieses Closure Event wird aufgerufen, wenn sich
+							min. ein Wert der Zeile sich aendert hat.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="rowStyle" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Closure zum Veraendern der Zeilendarstellung.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="export" type="tns:TableExportType">
+					<annotation>
+						<documentation>
+							Ermoeglicht einen Export der Tabellendaten in ein
+							unterstuetztes Format an. Moegliche Formate sind xls (Excel) und
+							csv (Text).
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="row-editable" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Closure, die dynamisch abhaengig vom Inhalt der
+							Zeile
+							entscheiden kann, ob die Zeile editierbar ist oder
+							schreibgeschuetzt.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="TableActionConfig">
+		<annotation>
+			<documentation>
+				TableAktions-Button fuer eine Tabelle
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:AbstractActionConfig">
+				<attribute name="onExecution" type="tns:groovy" use="required">
+					<annotation>
+						<documentation>
+							Groovy Closure
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+
+	</complexType>
+
+	<simpleType name="groovy">
+		<annotation>
+			<appinfo>
+				<jaxb:javaType
+					name="de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript"
+					parseMethod="de.unioninvestment.eai.portal.portlet.crud.config.converter.GroovyScriptConverter.parseStringToGroovyScript"
+					printMethod="de.unioninvestment.eai.portal.portlet.crud.config.converter.GroovyScriptConverter.printGroovyScript" />
+			</appinfo>
+			<documentation>
+				Groovyscriptblock
+			</documentation>
+		</annotation>
+		<restriction base="string" />
+	</simpleType>
+
+	<complexType name="ContainerConfig" abstract="true">
+		<annotation>
+			<documentation>
+				Eine Seite, die im Portlet dargestellt werden kann.
+
+				Folgenden Aktionen koennen mit Berechtigungen
+				hinterlegt werden:
+				all,update,add,delete
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:SecurableConfig">
+				<sequence>
+					<element name="default-order" minOccurs="0"
+						type="tns:DefaultOrderConfig" />
+				</sequence>
+				<attribute name="onUpdate" type="tns:groovy" />
+
+				<attribute name="onCreate" type="tns:groovy" />
+
+				<attribute name="onInsert" type="tns:groovy" />
+
+				<attribute name="onDelete" type="tns:groovy" />
+
+				<attribute name="onCommit" type="tns:groovy" />
+
+				<attribute name="filter-policy" type="tns:FilterPolicyConfig"
+					default="all" />
+
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="DatabaseTableConfig">
+		<annotation>
+			<documentation>
+				Datenquelle ist eine Oracle Tabelle. In diesem Fall
+				ist keine Columns-Definition anzugeben.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ContainerConfig">
+				<attribute name="datasource" type="string" use="required">
+					<annotation>
+						<documentation>
+							Angabe der JNDI-DataSource.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="tablename" type="string" use="required">
+					<annotation>
+						<documentation>
+							Angabe des Datenbank-Tabellennamens.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="pagelength" type="int" default="100">
+					<annotation>
+						<documentation>
+							Page Size des SQLContainer.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="export-pagelength" type="int" default="1000">
+					<annotation>
+						<documentation>
+							Page Size des SQLContainer bei Export
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="sizeValid" type="int" default="10">
+					<annotation>
+						<documentation>
+							Die Anzahl der Gasamteinträge wird teilweise
+							mehrfach aufgerufen.
+							Um die Perfomance zu verbessern wird dieser
+							Wert zwischengespeichert.
+							Mit SizeValid wird angegeben, wie viele
+							Sekunden der zwischengespeicherte Wert gültig sein soll.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="DatabaseQueryConfig">
+		<complexContent>
+			<extension base="tns:ContainerConfig">
+				<sequence>
+					<element name="query" type="string">
+						<annotation>
+							<documentation>
+								Das SQL Select fuer die Tabellenanzeige.
+							</documentation>
+						</annotation>
+					</element>
+					<element name="insert" type="tns:StatementConfig"
+						minOccurs="0">
+						<annotation>
+							<documentation>
+								Je nach type-Attribut entweder das SQL-Statement oder
+								das
+								Groovy-Skript fuer das Einfuegen neuer Zeilen.
+								Fuer das Einfuegen
+								der Spaltenwerte kann auf die
+								Variable $row zugegriffen werden
+								oder auf
+								andere im Skript definierte Variablen.
+								Beispiel:
+								<pre>
+									INSERT INTO myTable (id, mycol, user) VALUES
+									($row.values.id,
+									$row.values.mycol, $currentUser)
+								</pre>
+							</documentation>
+						</annotation>
+					</element>
+					<element name="update" type="tns:StatementConfig"
+						minOccurs="0">
+						<annotation>
+							<documentation>
+								Je nach type-Attribut entweder das SQL-Statement oder
+								das
+								Groovy-Skript fuer das Veraendern bestehender Zeilen.
+								Fuer die
+								Spaltenwerte kann auf die Variable $row zugegriffen
+								werden oder
+								auf
+								andere im Skript definierte Variablen.
+								Beispiel:
+								<pre>
+									UPDATE myTable SET mycol=$row.values.mycol,
+									user=$currentUser
+									WHERE id=$row.values.id
+								</pre>
+							</documentation>
+						</annotation>
+					</element>
+					<element name="delete" type="tns:StatementConfig"
+						minOccurs="0">
+						<annotation>
+							<documentation>
+								Je nach type-Attribut entweder das SQL-Statement oder
+								das
+								Groovy-Skript fuer das Loeschen von Zeilen.
+								Fuer die Spaltenwerte
+								kann auf die Variable $row zugegriffen
+								werden oder auf andere im
+								Skript definierte Variablen.
+								Beispiel:
+								<pre>
+									DELETE FROM myTable WHERE id=$row.values.id
+								</pre>
+							</documentation>
+						</annotation>
+					</element>
+				</sequence>
+				<attribute name="datasource" type="string" use="required">
+					<annotation>
+						<documentation>
+							Angabe der JNDI-DataSource.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="pagelength" type="int" default="100">
+					<annotation>
+						<documentation>
+							Page Size des SQLContainer.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="export-pagelength" type="int" default="1000">
+					<annotation>
+						<documentation>
+							Page Size des SQLContainer bei Export
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="sizeValid" type="int" default="10">
+					<annotation>
+						<documentation>
+							Die Anzahl der Gasamteinträge wird teilweise
+							mehrfach aufgerufen.
+							Um die Perfomance zu verbessern wird dieser
+							Wert zwischengespeichert.
+							Mit SizeValid wird angegeben, wie viele
+							Sekunden der zwischengespeicherte Wert gültig sein soll.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="ScriptContainerConfig">
+		<complexContent>
+			<extension base="tns:ContainerConfig">
+				<attribute name="delegate" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Dao-Implementierung im Script
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="JmxContainerConfig">
+		<complexContent>
+			<extension base="tns:ContainerConfig">
+				<sequence>
+					<element name="attribute" minOccurs="1" maxOccurs="unbounded">
+						<complexType>
+							<sequence>
+								<element name="server-side-getter" type="string"
+									minOccurs="0" />
+							</sequence>
+							<attribute name="name" type="string" use="required">
+								<annotation>
+									<documentation>Attributsbezeichnung</documentation>
+								</annotation>
+							</attribute>
+							<attribute name="type" type="string" default="java.lang.String">
+								<annotation>
+									<documentation>Datentyp des Attributs</documentation>
+								</annotation>
+							</attribute>
+							<attribute name="required" type="boolean" default="false">
+								<annotation>
+									<documentation>Ob das Attribut ein Pflichtfeld ist
+									</documentation>
+								</annotation>
+							</attribute>
+							<attribute name="readonly" type="boolean" default="false">
+								<annotation>
+									<documentation>Ob das Attribut änderbar ist </documentation>
+								</annotation>
+							</attribute>
+						</complexType>
+					</element>
+				</sequence>
+				<attribute name="server" type="string">
+					<annotation>
+						<documentation>Service-URL des JMX-Servers</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="query" type="string">
+					<annotation>
+						<documentation>Suchstring</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="StatementConfig">
+		<annotation>
+			<appinfo>
+				<jaxb:property name="statement">
+					<jaxb:baseType
+						name="de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript">
+						<jaxb:javaType
+							name="de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript"
+							parseMethod="de.unioninvestment.eai.portal.portlet.crud.config.converter.GroovyScriptConverter.parseStringToGroovyScript"
+							printMethod="de.unioninvestment.eai.portal.portlet.crud.config.converter.GroovyScriptConverter.printGroovyScript" />
+					</jaxb:baseType>
+				</jaxb:property>
+			</appinfo>
+			<documentation>
+				Je nach type-Attribut entweder ein SQL-Statement oder
+				ein Groovy-Skript fuer das Einfuegen, Veraendern
+				oder Loeschen neuer
+				Zeilen.
+			</documentation>
+		</annotation>
+		<simpleContent>
+			<extension base="string">
+				<attribute name="type" default="sql">
+					<annotation>
+						<documentation>
+							Typ des SQL-Statements, entweder sql oder script,
+							Default ist sql.
+						</documentation>
+					</annotation>
+					<simpleType>
+						<annotation>
+							<appinfo>
+								<jaxb:typesafeEnumClass name="Type" />
+							</appinfo>
+						</annotation>
+						<restriction base="string">
+							<enumeration value="sql" />
+							<enumeration value="script" />
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+
+	<complexType name="ColumnsConfig">
+		<annotation>
+			<documentation>
+				Spalten eines SQL Query Results, welche in der View
+				angezeigt werden sollen.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="column" type="tns:ColumnConfig" minOccurs="0"
+				maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<complexType name="ColumnConfig">
+		<annotation>
+			<documentation>
+				Eine Spalte welche angezeigt werden soll, der Name
+				muss mit dem Abfragenamen uebereinstimmen.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:SecurableConfig">
+				<sequence>
+					<choice minOccurs="0">
+						<element minOccurs="0" maxOccurs="1" name="select"
+							type="tns:SelectConfig">
+							<annotation>
+								<documentation>Folgenden Aktionen koennen mit Berechtigungen
+									hinterlegt werden: all,edit,display
+								</documentation>
+							</annotation>
+						</element>
+						<element minOccurs="0" maxOccurs="1" name="checkbox"
+							type="tns:CheckboxConfig">
+							<annotation>
+								<documentation>Folgenden Aktionen koennen mit Berechtigungen
+									hinterlegt werden: all,edit,display
+								</documentation>
+							</annotation>
+						</element>
+					</choice>
+					<element name="tooltip" minOccurs="0" maxOccurs="1" type="string" />
+					<element name="binary" minOccurs="0" type="tns:BinaryConfig" />
+				</sequence>
+				<attribute name="hidden" type="tns:ColumnHiddenConfig"
+					default="false">
+					<annotation>
+						<documentation>
+							Gibt an, ob die Tabellenspalte Teil des Ergebnis,
+							aber nicht sichtbar sein soll.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="name" use="required">
+					<annotation>
+						<documentation>
+							Der Name der Spalte, dieser muss mit dem Resultset
+							der Ergebnismenge uebereinstimmen.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="primary-key" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Gibt an, ob die Tabellenspalte Teil des
+							Primaerschluessels sein soll.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="width" type="int">
+					<annotation>
+						<documentation>
+							Legt die die Breite einer Spalte in Pixel fest.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="editable" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Entweder true (Spalte ist immer editierbar) oder
+							false (Spalte ist nie editierbar) oder eine Groovy-Closure,
+							die
+							dynamisch abhaengig vom Inhalt der Zeile entscheiden kann, ob
+							diese Zelle (diese Spalte in der aktuellen Zeile) editierbar ist
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="title" type="string">
+					<annotation>
+						<documentation>
+							Beschreibt eine alternative Bezeichnung fuer die
+							Darstellung.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="longtitle" type="string">
+					<annotation>
+						<documentation>
+							Langtext für die Beschreibung einer Spalte. Diese
+							wird als Tooltip im Column-Header bzw. im Detail-Formular
+							angezeigt.
+							Der Text sollte maximal 80 Zeichen und keine Umbrüche
+							enthalten, um von allen Browsern unterstützt zu werden.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="multiline" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Ermoeglicht eine mehrzeiliges Editieren von Werten.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="rows" type="int">
+					<annotation>
+						<documentation>
+							Anzahl angezeigter Zeilen im Formularmodus fuer
+							Multiline-Felder
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="input-prompt" type="string">
+					<annotation>
+						<documentation>
+							Anzeigetext bei leerem Eingabefeld
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="validate" type="string">
+					<annotation>
+						<documentation>
+							Kommaseparierte Liste von Validierungsregeln. Im Fehlerfall wird
+							die im Attribut validation-message angegebene Meldung ausgegeben.
+							Folgende Regeln werden unterstuetzt:
+							<table>
+								<tr>
+									<td>required</td>
+									<td>Pflichtfeld</td>
+								</tr>
+								<tr>
+									<td>maxlen=n</td>
+									<td>maximale werden n Zeichen akzeptiert</td>
+								</tr>
+								<tr>
+									<td>regexp=[a-zA-Z\\,]+</td>
+									<td>Der angegebene regulaere Ausdruck wird validiert</td>
+								</tr>
+							</table>
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="validation-message" type="string">
+					<annotation>
+						<documentation>
+							Fehlermeldung bei fehlgeschlagener Validierung
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="style" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Closure zum Veraendern der Spaltendarstellung.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="default" type="tns:groovy">
+					<annotation>
+						<documentation>
+							GString zum Setzen eines Defaultwerts.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="generator" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Skript, das den Inhalt der Spalte im Browser
+							erstellt.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="generated-value" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Skript, das den Inhalt der Spalte im Export
+							erstellt.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="generated-type" type="tns:ExportTypeConfig">
+					<annotation>
+						<documentation>
+							Typ einer exportierbaren generierten Spalte.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="display-format" type="string">
+					<annotation>
+						<documentation>
+
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<simpleType name="FilterPolicyConfig">
+		<annotation>
+			<documentation>
+				Policy zur Abschaltung der Filterung bzw. Anzeige
+				einer leeren Menge
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="all">
+				<annotation>
+					<documentation>
+						Filterung ist immer aktiv
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="nothing">
+				<annotation>
+					<documentation>
+						Filterung ist bei der Initialisierung inaktiv
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="nothing-at-all">
+				<annotation>
+					<documentation>
+						Filterung ist immer inaktiv
+					</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="ColumnHiddenConfig">
+		<annotation>
+			<documentation>
+				Optionen fuer das Hidden-Parameter einer Spalte
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="true">
+				<annotation>
+					<documentation>
+						Spalte ist immer nicht sichtbar
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="false">
+				<annotation>
+					<documentation>
+						Spalte ist immer sichtbar
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="in-form">
+				<annotation>
+					<documentation>
+						Spalte ist in der Formularansicht nicht sichtbar
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="in-table">
+				<annotation>
+					<documentation>
+						Spalte ist im Inline-Edit-Modus nicht sichtbar
+					</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="ExportTypeConfig">
+		<annotation>
+			<documentation>
+				Typ einer exportierbaren generierten Spalte
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="java.lang.String" />
+			<enumeration value="java.lang.Double" />
+			<enumeration value="java.lang.Integer" />
+			<enumeration value="java.math.BigDecimal" />
+		</restriction>
+	</simpleType>
+
+	<complexType name="DefaultOrderConfig">
+		<annotation>
+			<documentation>
+				Legt eine ein initale Order Reihenfolge fuer ein
+				Container fest.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="order" type="tns:OrderConfig" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<complexType name="OrderConfig">
+		<annotation>
+			<documentation>
+				Ein Spalte welche feur ein initialen Order
+				beruecksichtigt werden soll
+			</documentation>
+		</annotation>
+		<attribute name="column" use="required" />
+		<attribute name="direction" default="asc"
+			type="tns:OrderDirectionConfig" />
+	</complexType>
+
+	<simpleType name="OrderDirectionConfig">
+		<annotation>
+			<documentation>
+				Optionen fuer die Order Richtung
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="asc">
+				<annotation>
+					<documentation>
+						Aufsteigende Reihenfolge
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="desc">
+				<annotation>
+					<documentation>
+						Absteigende Reihenfolge
+					</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+
+	<complexType name="SelectConfig">
+		<annotation>
+			<documentation>
+				Die Eingabe erfolgt ueber ein Dropdown. Die
+				Auswahlelemente koennen fest
+				vorgegeben oder flexibel ueber eine
+				Datenbankabfrage gefuellt werden.
+			</documentation>
+		</annotation>
+		<choice>
+			<element name="option" type="tns:OptionConfig" maxOccurs="unbounded" />
+			<element name="query" type="tns:QueryConfig">
+				<annotation>
+					<documentation>
+						Angabe einer SQL-Abfrage zur Befuellung der
+						Drop-Down-Liste. Die Query muss zwei Spalten KEY und TITLE
+						zurueckliefern. KEY enthaelt den zu speichernden Wert und TITLE
+						den Anzeigetext.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="dynamic">
+				<annotation>
+					<documentation>
+						Dynamische Befuellung der Drop-Down-Liste durch ein
+						Groovy-Script.
+					</documentation>
+				</annotation>
+				<complexType>
+					<attribute name="options" type="tns:groovy">
+						<annotation>
+							<documentation>
+								Groovy Closure
+							</documentation>
+						</annotation>
+					</attribute>
+				</complexType>
+			</element>
+		</choice>
+		<attribute name="id" type="ID">
+			<annotation>
+				<documentation>
+					Die im XML eindeutige ID.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="FormSelectConfig">
+		<annotation>
+			<documentation>
+				Die Eingabe erfolgt ueber ein Dropdown. Die
+				Auswahlelemente koennen fest
+				vorgegeben oder flexibel ueber eine
+				Datenbankabfrage gefuellt werden.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:SelectConfig">
+				<attribute name="multiSelect" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Gibt an, ob mehrere Zeile gleichzeitig selektiert
+							werden koennen.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="visibleRows" type="int" default="1">
+					<annotation>
+						<documentation>
+							Gibt an, wie viele Zeile gleichzeitig sichtbar
+							sind.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onChange" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+
+	<complexType name="QueryConfig">
+		<annotation>
+			<documentation>
+				Angabe einer SQL-Abfrage zur Befuellung der
+				Drop-Down-Liste. Die Query muss zwei Spalten KEY und TITLE
+				zurueckliefern. KEY enthaelt den zu speichernden Wert und TITLE
+				den
+				Anzeigetext.
+			</documentation>
+		</annotation>
+		<simpleContent>
+			<extension base="string">
+				<attribute name="datasource" type="string" use="optional">
+					<annotation>
+						<documentation>
+							Angabe der JNDI-DataSource. Pflichtfeld bei
+							Formularen, bei Tabellen optional.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+
+	<complexType name="BinaryConfig">
+		<annotation>
+			<documentation>
+				Auswahloption
+			</documentation>
+		</annotation>
+		<attribute use="required" name="filename" />
+		<attribute use="required" name="mine-type" />
+		<attribute name="download-caption" />
+		<attribute name="upload-caption" />
+		<attribute name="maxFileSize" default="5242880" type="int">
+			<annotation>
+				<documentation>
+					Die Maximale Dateigröße in Bytes.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+
+	<complexType name="OptionConfig">
+		<annotation>
+			<documentation>
+				Auswahloption
+			</documentation>
+		</annotation>
+		<simpleContent>
+			<extension base="string">
+				<attribute name="key" type="string" use="required">
+					<annotation>
+						<documentation>
+							Der Wert eines Auswahlelements.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+
+	<annotation>
+		<appinfo>
+			<jaxb:globalBindings>
+				<jaxb:serializable uid="1" />
+			</jaxb:globalBindings>
+		</appinfo>
+	</annotation>
+
+</schema>

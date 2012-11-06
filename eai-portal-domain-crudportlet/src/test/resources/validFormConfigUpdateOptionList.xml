@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+			<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+				<select id="queryOptionListID"  multiSelect="true" visibleRows="20">
+					<query datasource="test"><![CDATA[
+						select 
+							key, 
+							title 
+						from test_crud2_drop_number order by key
+					]]>
+					</query>
+				</select>
+			</field>
+			<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+				<date display="picker" format="yyyy" />
+			</field>
+			<field name="CNUMBER5_2_NN" title="CNUMBER5">
+				<checkbox checked-value="112" />
+			</field>
+
+			<action title="search" id="id001"><search/></action>
+			<action title="reset" id="id002"><reset/></action>
+			<action title="addOption" onExecution="addOption(it)" />
+		</form>
+		<table id="table" sortable="true">
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+	<script><![CDATA[
+		def addOption(it) {
+			sql("test").query("select max(key) as maxkey from test_crud2_drop_number") {rs ->
+				if (rs.next()) {
+					sql("test").executeInsert("insert into test_crud2_drop_number values(?,?)",[rs.getInt("maxkey")+1,"TEST"+(rs.getInt("maxkey")+1)])
+					portlet.getElementById('queryOptionListID').refresh()
+				}
+			}
+		}
+	]]></script>
+</portlet>

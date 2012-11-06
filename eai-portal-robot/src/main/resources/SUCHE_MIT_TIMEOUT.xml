@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet" 
+	title="SUCHE MIT TIMEOUT">
+	<page>
+		<form columns="1">
+			<field name="ANSWER" title="Die Frage" />
+			<action title="search">
+				<search timeoutInSeconds="1" />
+			</action>
+		</form>
+		<table>
+			<database-query datasource="test">
+				<query><![CDATA[
+					select FUNC_SLEEP(5) AS ANSWER from DUAL
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ANSWER" primary-key="true"/>
+			</columns>
+		</table>
+	</page>
+</portlet>

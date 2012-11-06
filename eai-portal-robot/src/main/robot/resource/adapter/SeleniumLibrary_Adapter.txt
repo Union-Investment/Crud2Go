@@ -1,0 +1,53 @@
+*** Settings ***
+Documentation   Import der SeleniumLibrary, um eine homogene Anbindung zu gewährleisten. Zusätzlich werden noch einige andere, hilfreiche Keywords implementiert. 
+Library         String
+Library         SeleniumLibrary  15s  ${SELENIUM_SERVER_HOST}  ${SELENIUM_PORT}
+
+*** Keywords ***
+Element Should Have Style
+    [Arguments]  ${elementId}  ${style}  ${timeout}=0s
+    Wait For Condition  window.document.getElementById('${elementId}').style.cssText.toLowerCase().indexOf('${style}')>=0  ${timeout}
+
+Log Screenshot
+	Log  Browser-Profil: '${BROWSER_PROFILE}'
+	${isChrome} =				Evaluate  '${BROWSER_PROFILE}'.count('googlechrome') > 0
+	${isIE} =					Evaluate  '${BROWSER_PROFILE}'.count('ie') > 0
+	${isInternetExplorer} =		Evaluate  '${BROWSER_PROFILE}'.count('internetexplorer') > 0
+	Log  ${isChrome} ${isIE} ${isInternetExplorer}
+    Run Keyword If  	${isChrome} or ${isIE} or ${isInternetExplorer}		Capture Screenshot
+    Run Keyword Unless  ${isChrome} or ${isIE} or ${isInternetExplorer}		Capture Page Screenshot
+
+Teardown Selenium
+    Run Keyword If Test Failed  Log Screenshot
+    Run Keyword If  ${TEST MESSAGE.count('Timed out')}  Set Tags  Timeouted
+    Delete All Cookies
+
+Click If Visible
+    [Arguments]  ${visibleElement}  ${clickTarget}
+	${visible} =  Call Selenium API  is_visible  ${visibleElement}
+	Run Keyword If  ${visible} == False  Click Element  ${clickTarget}  don't wait
+	
+Download File  [Arguments]  ${COOKIE}  ${URL}  ${FILENAME}
+	${COOKIE_VALUE} =  Call Selenium API  get_cookie_by_name  ${COOKIE}
+	${rc}  ${output} =  Run and Return RC and Output  wget --no-proxy --cookies=on --header "Cookie: ${COOKIE}=${COOKIE_VALUE}" -O "${OUTPUT_DIR}${/}${FILENAME}" ${URL}
+	Log  ${output}  DEBUG
+	Should Be Equal As Integers  ${rc}  0  "wget wurde mit Fehler ${rc} beendet."
+
+Vaadin Click  [Arguments]  ${ELEMENT}
+	Wait Until Page Contains Element  ${ELEMENT} 
+	Call Selenium Api  click  ${ELEMENT}	
+
+Vaadin Double Click  [Arguments]  ${ELEMENT}
+	Wait Until Page Contains Element  ${ELEMENT} 
+	Call Selenium Api  doubleClick   ${ELEMENT}	
+	
+Vaadin MouseDownAndUp  [Arguments]  ${ELEMENT}
+	Call Selenium Api  mouseDown  ${ELEMENT}
+	Call Selenium Api  mouseUp  ${ELEMENT}
+
+Vaadin Press Enter 
+	Press Key Native  10	
+	
+Wait for AJAX calls to complete
+	Wait for condition  var x=false; for (var cl in window.vaadin.clients) x = x || window.vaadin.clients[cl].isActive(); x==false  60s
+	

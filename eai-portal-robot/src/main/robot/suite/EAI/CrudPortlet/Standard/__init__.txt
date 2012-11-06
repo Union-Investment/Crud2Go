@@ -1,0 +1,8 @@
+*** Settings ***
+Documentation   Tests für CRUD-Portlet bei eingeloggtem Standarduser
+
+
+*** Settings ***
+Suite Setup     Benutzer mit Administratorrolle anmelden
+Test Teardown   Verarbeite Testergebnis
+Resource        ${RESOURCES}/import/CrudPortlet.txt

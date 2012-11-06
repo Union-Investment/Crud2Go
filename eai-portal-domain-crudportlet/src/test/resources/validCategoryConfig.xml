@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet" title="Einfaches Beispiel">
+	<page>
+		<table id="table" row-height="30" onSelectionChange="callback(it,selection)">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true"/>
+				<column name="CNUMBER5_2" title="Zahl" editable="true" />
+				<column name="CDATE" editable="false" />
+				<column name="CTIMESTAMP" />
+				<column name="CVARCHAR5_NN" editable="true" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN" hidden="true"/>
+				<column name="TESTDATA" editable="true" width="300" validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt"/>
+			</columns>
+		</table>
+	</page>
+	<script><![CDATA[
+		def callback(it,selection) {
+			println "method called.";
+			println "selection.ids: ${selection.ids.size()}";
+			
+			def list = new ArrayList(selection.ids);
+			list.partition(3).each({ sublist ->
+				println "sublist = ${sublist}";
+			});
+		}
+	]]></script>
+</portlet>

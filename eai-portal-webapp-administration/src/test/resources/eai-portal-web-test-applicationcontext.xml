@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<context:annotation-config />
+
+	<bean id="defaultSelectWidth" class="java.lang.Integer">
+		<constructor-arg type="java.lang.String" value="100"/>
+	</bean>
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">        
+		<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver"/>        
+		<property name="url" value="jdbc:derby:memory:MyDB;create=true"/>    
+	</bean>
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="configurationDAO" class="de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate"/>
+	</bean>
+	
+	<bean id="crudPortletHelpUrl" class="java.lang.String">
+		<constructor-arg value="http://test" />
+	</bean>
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>de.unioninvestment.eai.portal.portlet.crud.messages</value>
+				<value>de.unioninvestment.eai.portal.portlet.crud.domain.messages</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.mockito.Mockito" factory-method="mock">
+		<constructor-arg
+			value="de.unioninvestment.eai.portal.portlet.crud.beans.J2EEConnectionPool" />
+	</bean>
+	<util:list id="dataTypes">
+		<bean
+			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.NumberDataType" />
+		<bean
+			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.StringDataType" />
+		<bean
+			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.SqlDateDataType" />
+		<bean
+			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.SqlTimestampDataType" />
+		<bean
+			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.SqlTimeDataType" />
+		<bean
+			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.OracleTimestampDataType" />
+		<bean
+			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.OtherDataType" />
+	</util:list>
+
+	<bean class="org.mockito.Mockito" factory-method="mock">
+		<constructor-arg
+			value="org.springframework.jdbc.core.JdbcTemplate" />
+	</bean>
+	<bean class="org.mockito.Mockito" factory-method="mock">
+		<constructor-arg
+			value="de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService" />
+	</bean>
+</beans>

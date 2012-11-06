@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Confirmation Dialog Beispiel">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+			<action onExecution="doConfirm()" title="Confirm"></action>
+		</table>
+	</page>
+	
+	<script>
+	def doConfirm() {
+		confirm("My Title", "Are you really really sure?", "Yes", "No") { dialog ->
+			showPopup "Titel", "Result: ${dialog.isConfirmed()}"
+		}
+	}
+	</script>
+</portlet>

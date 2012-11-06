@@ -1,0 +1,47 @@
+*** Settings ***
+Library         de.unioninvestment.eai.portal.robot.LiferayLibrary  ${BASE_URL}  ${LIFERAY_USER}  ${LIFERAY_PASSWORD}
+
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+
+*** Keywords ***
+
+Login to Liferay as ${username} using password ${password}
+	Fill out login form with user ${username} and password ${password}
+	Page Should Contain Element  css=span.sign-out
+	Approve Terms Of Use if required
+
+Login to Liferay as ${username} changing password ${oldPassword} to ${newPassword}
+	Fill out login form with user ${username} and password ${oldPassword}
+	Fill out password reset dialog with new password ${newPassword}
+	Page Should Contain Element  css=span.sign-out
+	Approve Terms Of Use if required
+
+Fill out login form with user ${username} and password ${password}	
+	Click Link  sign-in
+	Input Text  css=div.portlet-login fieldset input:nth-child(1)	${username}
+	Input Text  css=div.portlet-login input[type='password']  		${password}
+	Click Link  css=div.portlet-login input[type='submit']
+
+Fill out password reset dialog with new password ${newPassword}
+	Input Text  password1	${newPassword}
+	Input Text  password2	${newPassword}
+	Click Button  Speichern
+
+Approve Terms Of Use if required
+	${status}  ${value} =  Run Keyword And Ignore Error  Page Should Contain Element  portlet_terms-of-use  
+	Run Keyword If 	'${status}' == 'PASS'  Click Link	css=input.aui-button-input-submit
+	Run Keyword If 	'${status}' == 'PASS'  Wait Until Page Contains Element  css=input#reminderQueryAnswer
+	Run Keyword If 	'${status}' == 'PASS'  Input Text	reminderQueryAnswer  atdd
+	Run Keyword If 	'${status}' == 'PASS'  Click Link	css=input.aui-button-input-submit
+
+Logout from Liferay
+	Go To  http://${BASE_URL}${CONTEXT}
+	Click Link  /de/c/portal/logout	
+
+Add User ${username} password ${password} first name ${firstname} surname ${surname} email ${email} roles ${roles}
+	Run Keyword And Ignore Error  Remove User ${username}
+	Add Liferay User  ${username}  ${password}  ${firstname}  ${surname}  ${email}  Administrator 
+
+Remove User ${username}
+	Remove Liferay User  ${username}

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für dynamisch hinzugefügte, entfernte und unsichtbar/sichtbar gemachte Spalten">
+	<page>
+		<table id="test-table" onInitialize="initialize(it)" sortable="true">
+			<database-table datasource="test" tablename="test_crud2" />
+			<action onExecution="addColumnFromAction(it)" title="+1" />
+			<action onExecution="removeColumn(it)" title="-1" />
+			<action onExecution="renderOnce(it)" title="-X, +3" />
+			<action onExecution="toggleVisibility(it)" title="Sichtbar/Unsichtbar" />
+		</table>
+	</page>
+	<script><![CDATA[
+
+		columnCounter = 0
+		
+		// Für toggleVisibility(tableAction) 
+		visibleColumnsAfterNextToggling = [
+			'CDATE_NN', 
+			'CVARCHAR5_NN', 
+			'CDATE', 
+			'ID', 
+			'CTIMESTAMP_NN']
+
+		/**
+		 * Initialisierung, hier wird direkt beim Aufbau der Tabelle eine generierte Spalte
+		 * hinzugefügt.
+		 */
+		def initialize(table) {
+			addColumnToTable(table)
+		}	
+
+		def addColumnFromAction(tableAction) {
+			addColumnToTable(tableAction.table)
+		}
+
+		/**
+		 * Fügt eine neue Spalte hinzu.
+		 */
+		def addColumnToTable(table) {
+			columnCounter++
+			def columnName = String.valueOf(columnCounter)
+			def columnTitle = 'generierte Spalte ' + columnCounter
+	    	table.addGeneratedColumn(columnName, columnTitle) { row, builder ->
+		    		builder.label(value: 'Foo')
+	    	}
+		}
+
+		/**
+		 * Entfernt die letzte per addColumnToTable(table) hinzugefügte Spalte wieder.
+		 */ 
+		def removeColumn(tableAction) {
+			if (columnCounter > 0) {
+				def columnName = String.valueOf(columnCounter)
+		    	def table = tableAction.table
+		    	table.removeGeneratedColumn(columnName)
+				columnCounter--
+			}
+		}
+
+		/**
+		 * Löscht alle bisher dynamisch hinzugefügten Spalten und fügt drei
+		 * neue Spalten hinzu. Dies passiert in einem renderOnce-Block, so
+		 * dass die Tabelle erst nach Abschluss der letzten Veränderung neu 
+		 * gezeichnet wird.
+		 */
+		def renderOnce(tableAction) {
+	    	def table = tableAction.table
+	    	table.renderOnce({
+	    		table.clearAllGeneratedColumns()
+		    	table.addGeneratedColumn('X1', 'X1') { row, builder -> builder.label(value: 'Bar') }
+		    	table.addGeneratedColumn('X2', 'X2') { row, builder -> builder.label(value: '42') }
+		    	table.addGeneratedColumn('X3', 'X3') { row, builder -> builder.label(value: '...') }
+		    })
+		    columnCounter = 0
+		}
+		
+		/**
+		 * Schaltet die Sichtbarkeit von Tabellenspalten um und legt die Reihenfolge der Spalten fest.
+		 */
+		def toggleVisibility(tableAction) {
+	    	def table = tableAction.table
+	    	def tmpVisibleColumns = table.getVisibleColumns()
+	    	table.setVisibleColumns(visibleColumnsAfterNextToggling)
+	    	visibleColumnsAfterNextToggling = tmpVisibleColumns
+		}
+	]]></script>
+</portlet>

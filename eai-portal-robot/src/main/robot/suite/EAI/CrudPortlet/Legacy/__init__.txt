@@ -1,0 +1,8 @@
+*** Settings ***
+Documentation   Tests für CRUD-Portlet bei eingeloggtem Standarduser
+
+
+*** Settings ***
+Test Setup      Initalisiere CrudPortlet Test
+Test Teardown   Bereinige CrudPortlet Test
+Resource        ${RESOURCES}/import/CrudPortlet.txt

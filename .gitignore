@@ -1,6 +1,12 @@
-*.class
+.settings
+.project
+.classpath
+target
 
-# Package Files #
-*.jar
-*.war
-*.ear
+/eai-portal-server/downloads
+
+/eai-osiris-webapp-remoting/svg
+/eai-portal-webapp-administration/derby.log
+/eai-portal-webapp-administration/src/main/webapp/VAADIN/widgetsets/de.unioninvestment.eai.portal.portlet.widgetset.SofiaWidgetset-deploy
+
+/eai-portal-domain-crudportlet/derby.log

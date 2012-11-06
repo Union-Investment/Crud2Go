@@ -1,0 +1,112 @@
+*** Settings ***
+Documentation   Story: Als Anwender möchte ich an Stelle von Inline-Editierung Tabellenzeilen per Formular pflegen können
+
+*** Test Case ***
+1. In den Formular - Editieren - Modus Wechseln mit entsprechendem Datensatz
+	[Tags]  EAI-579
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'ROW_FORMULAR_EDIT.xml' hochlädt
+
+	und dann auf editieren klickt
+	und dann die Zeile '1' doppelt ancklickt
+
+	dann hat in der Formedit-Tabelle mit dem HTMLelement '//input' und der Methode Value die Spalte '3' der Zeile '1' den Wert '1'
+	dann hat in der Formedit-Tabelle mit dem HTMLelement '//input' und der Methode Value die Spalte '3' der Zeile '2' den Wert '1'
+	dann hat in der Formedit-Tabelle mit dem HTMLelement '//input' und der Methode Value die Spalte '3' der Zeile '3' den Wert 'TEST'
+	dann hat in der Formedit-Tabelle mit dem HTMLelement '//textarea' und der Methode Value die Spalte '3' der Zeile '4' den Wert 'Dies ist ein sehr langer Text'
+
+2. Werte ändern und speichern
+	[Tags]  EAI-579
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'ROW_FORMULAR_EDIT.xml' hochlädt
+
+	und dann auf editieren klickt
+	und dann die Zeile '2' doppelt ancklickt
+	und dann im Feld '3' mit HTML Element 'input' der Zeile '2' den Wert auf '5' aendert
+
+	dann hat in der Formedit-Tabelle mit dem HTMLelement '//input' und der Methode Value die Spalte '3' der Zeile '2' den Wert '5'
+	
+# Test temporär auskommentiert, da er Testdaten in einem bestimmten
+# Zustand voraussetzt. Müssen wir mal generell durch ein Initialisieren
+# der DB im Setup und Teardown lösen. Tests müssen dann benötigte Daten
+# vorher selbst in die DB injizieren. BK 22.11.2011
+#	
+#3. Werte ändern, speichern und die Werte sind in der Hauptmaske korrekt
+#	[Tags]  EAI-579   
+#
+#	Es existiert eine Portalseite mit CRUD-Portlet
+#	und weiterhin ein Benutzer
+#
+#	wenn er die Portalseite öffnet 
+#	und dann die XML Konfiguration: 'ROW_FORMULAR_EDIT.xml' hochlädt
+#
+#	und dann auf editieren klickt
+#	und dann die Zeile '3' doppelt ancklickt
+#	und dann im Feld '3' mit HTML Element 'input' der Zeile '2' den Wert auf '5' aendert
+#	und dann im Feld '3' mit HTML Element 'textarea' der Zeile '4' den Wert auf 'Kurzer Text' aendert
+#	und dann auf zurueck klickt
+#	
+#	hat in der Hauptmaske mit dem HTMLelement '//div//div' die Spalte '2' der Zeile '3' den Wert '5'
+#	hat in der Hauptmaske mit dem HTMLelement '//div//div' die Spalte '4' der Zeile '3' den Wert 'Kurzer Text'
+
+4. Validierungsfehlermeldung wird angezeigt
+	[Tags]  EAI-579
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'ROW_FORMULAR_EDIT.xml' hochlädt
+
+	und dann auf editieren klickt
+	und dann die Zeile '4' doppelt ancklickt
+	und dann im Feld '3' mit HTML Element 'input' der Zeile '2' den Wert auf 'char' aendert
+	und dann den Button 'Speichern' klickt
+	dann hat in der Formedit-Tabelle mit dem HTMLelement '//div//div//@class' und der Methode Value die Spalte '2' der Zeile '2' den Wert 'v-errorindicator'
+	
+5. Pflichtfeld wird angezeigt
+	[Tags]  EAI-579
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'ROW_FORMULAR_EDIT.xml' hochlädt
+
+	und dann auf editieren klickt
+	und dann die Zeile '5' doppelt ancklickt
+	
+	dann hat in der Formedit-Tabelle mit dem HTMLelement '//div//span//@class' und der Methode Value die Spalte '1' der Zeile '2' den Wert 'v-required-field-indicator'
+	
+6. Abbrechen wird geklickt
+	[Tags]  EAI-579
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'ROW_FORMULAR_EDIT.xml' hochlädt
+
+	und dann auf editieren klickt
+	und dann die Zeile '1' doppelt ancklickt
+	und dann im Feld '3' mit HTML Element 'input' der Zeile '2' den Wert auf '5' aendert
+	und dann auf abbrechen klickt
+	und dann den Editier-Modus verlässt
+	
+	dann hat die Spalte '2' in der Zeile '1' den Wert '1'
+
+	
+
+*** Settings ***
+Suite Setup     Formular Editieren Initialisieren
+Force Tags      autor-nwo  
+...				crud-1  
+Resource        ${RESOURCES}/import/CrudPortlet.txt

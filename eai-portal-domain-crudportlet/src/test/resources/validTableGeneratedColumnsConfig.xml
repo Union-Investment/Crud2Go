@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für generierte Spalten in Tabellen">
+	<page>
+		<table row-height="30">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CDATE	      = $row.values.CDATE,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+						CDATE_NN	  = $row.values.CDATE_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.values.ID
+				]]></update>
+			</database-query>
+			<columns>
+				<column name="Generiert" generator="buildColumn()" />
+				<column name="ID" title="ID" primary-key="true"/>
+				<column name="CNUMBER5_2" title="Zahl" editable="true" />
+				<column name="CDATE" editable="true" />
+				<column name="CVARCHAR5_NN" editable="true" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="TESTDATA" editable="true" />
+			</columns>
+		</table>
+	</page>
+	
+	<script><![CDATA[
+		def buildColumn() {
+			new Button('Text')
+			 // builder.button(captiom:'Click me')
+		}
+	]]></script>
+</portlet>

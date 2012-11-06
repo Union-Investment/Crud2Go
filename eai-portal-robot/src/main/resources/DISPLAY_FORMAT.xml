@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table id="table" row-height="30">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN
+					WHERE ID          = $row.values.ID
+				]]></update>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true" />
+				<column name="CNUMBER5_2" title="Zahl" editable="true" display-format="'foo '#,###.##" />
+				<column name="CNUMBER5_2_NN" title="Zahl - formatiert" editable="true" display-format="0000" />
+			</columns>
+		</table>
+	</page>
+</portlet>

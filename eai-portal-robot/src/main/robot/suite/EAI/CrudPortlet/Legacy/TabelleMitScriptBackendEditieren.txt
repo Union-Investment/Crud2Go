@@ -1,0 +1,53 @@
+*** Settings ***
+Documentation   Story: Als Benutzer möchte ich die Daten einer Tabelle editieren und speichern
+
+*** Test Case ***
+1. Editieren - Modus Verlassen
+	[Tags]  EAI-580
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'INSERT_SCRIPT_BACKEND.xml' hochlädt
+
+	und dann die 1.Spalte auf arnie2 ändert
+	und dann den Editier-Modus verlässt
+
+	dann wird der Text 'arnie2' angezeigt
+
+
+2. Editieren - Feld Verlassen
+	[Tags]  EAI-580
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'INSERT_SCRIPT_BACKEND.xml' hochlädt
+	und dann die 1.Spalte auf arnie1 ändert
+	und dann das Feld verlässt
+	und dann den Editier-Modus verlässt
+	dann wird der Text 'arnie1' angezeigt
+	
+	
+3. Ansicht - Editieren Modus
+	[Tags]  EAI-580
+	[Documentation]  Nur bei Editiermodus wird die Splate 'SPALTEEDIT' eingeblendet.
+	
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'INSERT_SCRIPT_BACKEND.xml' hochlädt
+	Und dann wird die Spalte 'SPALTEEDIT' nicht angezeigt
+	Und dann auf editieren klickt
+	
+	dann wird die Spalte 'SPALTEEDIT' nicht angezeigt
+		
+
+
+
+*** Settings ***
+Force Tags      autor-cmj  autor-mca  
+...				crud-1  
+Resource        ${RESOURCES}/import/CrudPortlet.txt

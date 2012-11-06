@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet" 
+	title="SUCHE MIT TIMEOUT">
+	<page>
+		<form columns="1">
+			<field name="ANSWER" title="Die Frage" />
+			<action id="search" title="search">
+				<search />
+			</action>
+			<action title="timeout on" onExecution="setTimeoutForSearch(1)"/>
+			<action title="timeout off" onExecution="setTimeoutForSearch(0)"/>
+		</form>
+		<table >
+			<database-query datasource="test">
+				<query><![CDATA[
+					select FUNC_SLEEP(3) as ANSWER from DUAL
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ANSWER" primary-key="true"/>
+			</columns>
+		</table>
+	</page>
+	<script>
+	def setTimeoutForSearch(int seconds) {
+		portlet.getElementById('search').timeout = seconds
+	}
+	</script>
+</portlet>

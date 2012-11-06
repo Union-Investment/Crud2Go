@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für OptionList-Refresh in Tabellen">
+	<page>
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+			<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+				<select id="queryOptionListID"  multiSelect="false">
+					<query datasource="test"><![CDATA[
+						select 
+							CNUMBER5_2 as key, 
+							CNUMBER5_2 as title 
+						from test_crud2 order by key
+					]]>
+					</query>
+				</select>
+			</field>
+			<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+				<date display="picker" format="yyyy" />
+			</field>
+			<field name="CNUMBER5_2_NN" title="CNUMBER5">
+				<checkbox checked-value="112" />
+			</field>
+
+			<action title="search" id="id001"><search/></action>
+		</form>
+		<table id="table" sortable="true" onModeChange="refreshOptionList()">
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+	<script><![CDATA[
+		def refreshOptionList() {
+			portlet.getElementById('queryOptionListID').refresh()
+		} 
+	]]>
+	</script>
+</portlet>

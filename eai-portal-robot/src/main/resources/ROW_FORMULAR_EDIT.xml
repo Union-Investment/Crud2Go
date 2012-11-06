@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="ROW_FORMULAR_EDIT">
+	<page>
+		<table edit-form="true">
+			<database-query datasource="test">
+				<query>
+					<![CDATA[
+						SELECT * FROM TEST_CRUD2
+					]]>
+				</query>
+				<insert>
+					<![CDATA[
+						INSERT INTO TEST_CRUD2 (
+							CNUMBER5_2,
+							CVARCHAR5_NN,
+							TESTDATA,
+						)
+						VALUES (
+							10,
+							'TEST'
+							'Dies ist ein sehr langer Text'
+						)
+					]]>
+				</insert>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.values.ID
+				]]></update>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true" title="ID" />
+				<column name="CNUMBER5_2" editable="true" title="Zahl" 
+					validate="required" 
+					validation-message="Pflichtfelder bitte ausfüllen." />
+				<column name="CVARCHAR5_NN" title="Text" />
+				<column name="TESTDATA" editable="true" title="Langer Text"
+					multiline="true" rows="20" validate="maxlen=40,required"
+					validation-message="Pflichtfeld, Max. 40 Zeichen sind erlaubt" />
+			</columns>
+		</table>
+	</page>
+</portlet>

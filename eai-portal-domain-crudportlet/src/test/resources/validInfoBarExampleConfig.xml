@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für Informationsbox">
+	<page>
+		<component id="info" generator="showWarning(builder, 'Dieses Portlet zeigt auf Produktivdaten!')" />
+	</page>
+	<script><![CDATA[
+		def showWarning(builder, message) {
+			builder.label(contentMode: Label.CONTENT_XHTML, value:"""
+				<div style="padding:10px; color: #ffffff; background-color: #dd0000">
+					<strong>$message</strong>
+				</div>
+			""")
+		}
+	]]></script>
+</portlet>
+

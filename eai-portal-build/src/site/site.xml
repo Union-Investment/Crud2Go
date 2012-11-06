@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="EAI-Portal" xmlns="http://maven.apache.org/DECORATION/1.0.0" schemaLocation="http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+  <body>
+	<menu ref="parent"/>
+	<menu ref="modules"/>
+	<menu ref="reports"/>
+  </body>
+</project>
+    

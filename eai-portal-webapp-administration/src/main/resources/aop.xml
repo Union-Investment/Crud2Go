@@ -1,0 +1,13 @@
+<!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
+<aspectj>
+	<weaver options="-showWeaveInfo -verbose">
+		<!-- only weave classes in our application-specific packages -->
+		<include within="de.unioninvestment.eai.portal..*" />
+		<include within="de.unioninvestment.eai.portal.portlet.crud.*" />
+		<dump within="de.unioninvestment.eai.portal..*" />
+	</weaver>
+	<aspects>
+		<aspect
+			name="org.springframework.beans.factory.aspectj.AnnotationBeanConfigurerAspect" />
+	</aspects>
+</aspectj>

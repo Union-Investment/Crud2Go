@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<resource-action-mapping>
+	<!-- keine DTD da sonst Probleme auftreten wenn keine Internetverbindung 
+		besteht -->
+	<model-resource>
+		<model-name>de.unioninvestment.eai.portal.portlet.crud.domain.model.Role</model-name>
+		<portlet-ref>
+			<portlet-name>crudportlet</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>MEMBER</action-key>
+				<action-key>PERMISSIONS</action-key>
+			</supports>
+			<site-member-defaults></site-member-defaults>
+			<guest-defaults></guest-defaults>
+			<guest-unsupported></guest-unsupported>
+			<owner-defaults>
+				<action-key>PERMISSIONS</action-key>
+			</owner-defaults>
+		</permissions>
+	</model-resource>
+</resource-action-mapping>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" onValueChange="field1Changed(it)" />
+			<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe" onValueChange="field2Changed(it)">
+				<select>
+					<query datasource="test"><![CDATA[
+						select 
+							CVARCHAR5_NN as key, 
+							CVARCHAR5_NN as title 
+						from test_crud2
+					]]>
+					</query>
+				</select>
+			</field>
+			<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe" onValueChange="field3Changed(it)">
+				<date display="picker" format="yyyy" />
+			</field>
+			<field name="CNUMBER5_2_NN" title="CNUMBER5" onValueChange="field4Changed(it)">
+				<checkbox checked-value="112" />
+			</field>
+
+			<action title="search" id="id001" onExecution="suche(it)"><search/></action>
+			<action title="reset" id="id002" onExecution="reset(it)"><reset/></action>
+			<action title="irgendwas" id="id003" onExecution="machWasAnderes(it)" />
+		</form>
+		<table sortable="true">
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+	<script><![CDATA[
+		def suche(formAction) { println "Suche ausgeführt..."}
+		def reset(formAction) { println "Reset ausgeführt..."}
+		def machWasAnderes(formAction) { println "irgendwas ausgeführt..."}
+		def field1Changed(formAction) { println "Imputfeld 1 geändert..." }
+		def field2Changed(formAction) { println "Imputfeld 2 geändert..."}
+		def field3Changed(formAction) { println "Imputfeld 3 geändert..."}
+		def field4Changed(formAction) { println "Imputfeld 4 geändert..."}
+	]]></script>
+</portlet>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Remote Backend Beispiel">
+	<page>
+		<table>
+			<jmx-container server="service:jmx:rmi:///jndi/rmi://10.253.129.8:1090/jmxconnector">
+				<attribute name="Name" type="java.lang.String" readonly="true">
+					<server-side-getter>
+						<![CDATA[
+							mbean.Name.toString()
+						]]>
+					</server-side-getter>
+				</attribute>
+				<attribute name="JNDI" type="java.lang.String" readonly="true">
+					<server-side-getter>
+						<![CDATA[
+							mbean.JNDIName.toString()
+						]]>
+					</server-side-getter>
+				</attribute>
+				<attribute name="MessageCount" type="java.lang.String" readonly="true">
+					<server-side-getter>
+						<![CDATA[
+							mbean.MessageCount.toString()
+						]]>
+					</server-side-getter>
+				</attribute>
+			</jmx-container>
+			<columns>
+				<column name="Name" title="Name" />
+				<column name="JNDI" title="JNDI" />
+				<column name="MessageCount" title="MessageCount" />
+			</columns>
+			<action onExecution="setQuery(it)" title="Set new query"></action>
+		</table>
+	</page>
+	<script>
+	def setQuery(tableAction) {
+		tableAction.table.container.query = 'jboss.messaging.destination:service=Queue,*'
+		tableAction.table.refresh()
+	}
+	</script>
+</portlet>

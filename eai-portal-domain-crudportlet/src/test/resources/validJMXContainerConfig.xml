@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches JMX Container Beispiel">
+	<page>
+		<form>
+			<field name="name" title="Name"></field>
+			<field name="currentState" title="Status">
+				<checkbox checked-value="Started"/>
+			</field>
+			<action title="search"><search/></action>
+		</form>
+		<table>
+			<jmx-container>
+				<attribute name="name" type="java.lang.String" readonly="true" />
+				<attribute name="currentState" type="java.lang.String" readonly="true" />
+				<attribute name="description" type="java.lang.String" readonly="true" />
+				<attribute name="serviceUnits" type="[Ljavax.management.ObjectName;" readonly="true" />
+			</jmx-container>
+			<columns>
+				<column name="name" title="Name" />
+				<column name="description" title="Beschreibung" />
+				<column name="currentState" title="Status" />
+			</columns>
+			<action onExecution="setQuery(it)" title="Set new query"></action>
+			<action onExecution="resetQuery(it)" title="Reset query"></action>
+			<action onExecution="reconnectNode3(it)" title="Connect to Node3"></action>
+			<action onExecution="reconnectNode6(it)" title="Connect to Node6"></action>
+		</table>
+	</page>
+	<script>
+	def setQuery(tableAction) {
+		tableAction.table.container.query = 'org.apache.servicemix:Type=ServiceAssembly,Name=provox-bestand-targetadaptor-sa,*'
+		tableAction.table.refresh()
+	}
+	def resetQuery(tableAction) {
+		tableAction.table.container.query = 'org.apache.servicemix:Type=ServiceAssembly,*'
+		tableAction.table.refresh()
+	}
+	def reconnectNode3(tableAction) {
+		tableAction.table.container.query = 'org.apache.servicemix:Type=ServiceAssembly,*'
+		tableAction.table.container.connect('service:jmx:rmi:///jndi/rmi://10.253.129.8:1390/jmxconnector')
+		tableAction.table.refresh()
+	}
+	def reconnectNode6(tableAction) {
+		tableAction.table.container.query = 'org.apache.servicemix:Type=ServiceAssembly,*'
+		tableAction.table.container.connect('service:jmx:rmi:///jndi/rmi://10.253.129.8:1690/jmxconnector')
+		tableAction.table.refresh()
+	}
+	</script>
+</portlet>

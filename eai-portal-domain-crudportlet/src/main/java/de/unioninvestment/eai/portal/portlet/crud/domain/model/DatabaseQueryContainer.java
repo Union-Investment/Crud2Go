@@ -1,0 +1,317 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one
+* or more contributor license agreements.  See the NOTICE file
+* distributed with this work for additional information
+* regarding copyright ownership.  The ASF licenses this file
+* to you under the Apache License, Version 2.0 (the
+* "License"); you may not use this file except in compliance
+* with the License.  You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+package de.unioninvestment.eai.portal.portlet.crud.domain.model;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+
+import com.vaadin.addon.sqlcontainer.RowId;
+import com.vaadin.addon.sqlcontainer.RowItem;
+import com.vaadin.addon.sqlcontainer.SQLContainer;
+import com.vaadin.addon.sqlcontainer.TemporaryRowId;
+
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQueryEventWrapper;
+import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
+import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
+
+/**
+ * Repräsentation eines auf SQL Anweisungen basierten Vaadin Containers als
+ * Backend für die Tabellenansicht.
+ * 
+ * @author markus.bonsch
+ * 
+ */
+public class DatabaseQueryContainer extends AbstractDatabaseContainer {
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger LOG = LoggerFactory
+			.getLogger(DatabaseQueryContainer.class);
+
+	private final String query;
+
+	private boolean insertable;
+	private boolean updateable;
+	private boolean deleteable;
+
+	private final List<String> primaryKeys;
+
+	private final ConnectionPool connectionPool;
+
+	private DatabaseQueryDelegate databaseQueryDelegate;
+
+	@SuppressWarnings("unused")
+	private String currentUsername;
+
+	private final Integer pageLength;
+
+	private final Integer sizeValidTimeout;
+
+	private final Integer exportPageLength;
+
+	/**
+	 * Erzeugt bei der Initialisierung eine neue {@link SQLContainer} Instanz
+	 * auf Basis der übergebenen SQLQuery.
+	 * 
+	 * @param datasource
+	 *            Das DataSource-Kürzel
+	 * @param sqlQuery
+	 *            Das select für die Query-Ansicht
+	 * @param insertable
+	 *            ob insert-Statements erlaubt sind
+	 * @param updateable
+	 *            ob update-Statements erlaubt sind
+	 * @param deleteable
+	 *            ob delete-Statements erlaubt sind
+	 * @param primaryKeys
+	 *            Liste der Primarykeys
+	 * @param connectionPool
+	 *            Der zu verwendende ConnectionPool
+	 * @param currentUsername
+	 *            Aktueller Benutzername
+	 * @param filterPolicy
+	 * @param sizeValidTimeout
+	 *            Cachttimeout für die Anzahl aller selektierten Einträge
+	 * @param pageLength
+	 *            Anzahl der Einträge pro Seite
+	 */
+	public DatabaseQueryContainer(String datasource, String sqlQuery,
+			boolean insertable, boolean updateable, boolean deleteable,
+			List<String> primaryKeys, ConnectionPool connectionPool,
+			String currentUsername, Map<String, String> displayPattern,
+			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy,
+			int pageLength, int exportPageLength, Integer sizeValidTimeout) {
+		super(displayPattern, defaultOrder, filterPolicy);
+
+		this.insertable = insertable;
+		this.updateable = updateable;
+		this.deleteable = deleteable;
+		this.pageLength = pageLength;
+		this.exportPageLength = exportPageLength;
+		this.sizeValidTimeout = sizeValidTimeout;
+		Assert.notNull(datasource, "DataSource is required");
+		Assert.notNull(sqlQuery, "SQL-Query is required");
+
+		this.datasource = datasource;
+		this.query = sqlQuery;
+		this.primaryKeys = primaryKeys;
+		this.connectionPool = connectionPool;
+		this.currentUsername = currentUsername;
+
+		checkThatPrimaryKeysExistForEditing();
+	}
+
+	private void checkThatPrimaryKeysExistForEditing() {
+		if (isEditable()) {
+			if (primaryKeys == null || primaryKeys.isEmpty()) {
+				throw new BusinessException(
+						"portlet.crud.error.primaryKeysRequired");
+			}
+		}
+	}
+
+	private boolean isEditable() {
+		return insertable || updateable || deleteable;
+	}
+
+	private FreeformQueryEventWrapper getFreeformQueryEventWrapper() {
+		return (FreeformQueryEventWrapper) this.queryDelegate;
+	}
+
+	@Override
+	protected SQLContainerEventWrapper createVaadinContainer() {
+		try {
+			queryDelegate = new FreeformQueryEventWrapper(this, query,
+					connectionPool, getOnInsertEventRouter(),
+					getOnUpdateEventRouter(), getOnDeleteEventRouter(),
+					primaryKeys.toArray(new String[primaryKeys.size()]));
+			this.getFreeformQueryEventWrapper().setDelegate(
+					databaseQueryDelegate);
+			SQLContainerEventWrapper sqlContainerEventWrapper = new SQLContainerEventWrapper(
+					queryDelegate, this, getOnCreateEventRouter());
+
+			sqlContainerEventWrapper.setPageLength(pageLength);
+			sqlContainerEventWrapper
+					.setSizeValidMilliSeconds((sizeValidTimeout * 1000));
+
+			// sqlContainerEventWrapper.setDebugMode(false);
+			return sqlContainerEventWrapper;
+
+		} catch (SQLException e) {
+			LOG.warn(e.getLocalizedMessage(), e);
+			throw new BusinessException("portlet.crud.error.wrongQuery",
+					datasource, query);
+		} catch (RuntimeException e) {
+			LOG.warn(e.getLocalizedMessage(), e);
+			throw new BusinessException("portlet.crud.error.wrongQuery",
+					datasource, query);
+		}
+	}
+
+	@Override
+	public boolean isInsertable() {
+		return insertable;
+	}
+
+	@Override
+	public boolean isUpdateable() {
+		return updateable;
+	}
+
+	@Override
+	public boolean isDeleteable() {
+		return deleteable;
+	}
+
+	@Override
+	public List<String> getPrimaryKeyColumns() {
+		return queryDelegate.getPrimaryKeyColumns();
+	}
+
+	/**
+	 * @param databaseQueryDelegate
+	 *            wird aus Scripting erstellt
+	 */
+	public void setDatabaseQueryDelegate(
+			DatabaseQueryDelegate databaseQueryDelegate) {
+		this.databaseQueryDelegate = databaseQueryDelegate;
+	}
+
+	public DatabaseQueryDelegate getDatabaseQueryDelegate() {
+		return databaseQueryDelegate;
+	}
+
+	@Override
+	public void commit() {
+		super.commit();
+		try {
+			if (isAdditionalColumnModified()) {
+				try {
+					queryDelegate.beginTransaction();
+					for (ContainerRowId containerRowId : blobFields.keySet()) {
+						RowItem item = (RowItem) getVaadinContainer()
+								.getItemUnfiltered(
+										containerRowId.getInternalId());
+						queryDelegate.storeRow(item);
+					}
+					for (ContainerRowId containerRowId : clobFields.keySet()) {
+						RowItem item = (RowItem) getVaadinContainer()
+								.getItemUnfiltered(
+										containerRowId.getInternalId());
+						queryDelegate.storeRow(item);
+					}
+					queryDelegate.commit();
+					getVaadinContainer().refresh();
+				} catch (SQLException e) {
+					try {
+						queryDelegate.rollback();
+					} catch (SQLException e1) {
+						throw new ContainerException(e1);
+					}
+					throw new ContainerException(e);
+				}
+			}
+		} finally {
+			clearAdditionalFields();
+		}
+	}
+
+	@Override
+	public void rollback() {
+		try {
+			super.rollback();
+		} finally {
+			clearAdditionalFields();
+		}
+	}
+
+	@Override
+	public ContainerClob getCLob(ContainerRowId containerRowId,
+			String columnName) {
+
+		if (clobFields.containsKey(containerRowId)) {
+			if (clobFields.get(containerRowId).containsKey(columnName)) {
+				return clobFields.get(containerRowId).get(columnName);
+			}
+		}
+
+		if (containerRowId.getInternalId() instanceof TemporaryRowId) {
+			ContainerClob clob = new ContainerClob();
+			setCLob(containerRowId, columnName, clob);
+			return clob;
+		}
+
+		ContainerClob clob = new ContainerClob(
+				this.getFreeformQueryEventWrapper(), containerRowId, columnName);
+		setCLob(containerRowId, columnName, clob);
+		return clob;
+	}
+
+	@Override
+	public boolean isBLobEmpty(ContainerRowId rowId, String columnName) {
+		return this.getFreeformQueryEventWrapper().hasBlobData(
+				(RowId) rowId.getInternalId(), columnName);
+	}
+
+	@Override
+	public ContainerBlob getBLob(ContainerRowId containerRowId,
+			String columnName) {
+		if (blobFields.containsKey(containerRowId)) {
+			if (blobFields.get(containerRowId).containsKey(columnName)) {
+				return blobFields.get(containerRowId).get(columnName);
+			}
+		}
+
+		if (containerRowId.getInternalId() instanceof TemporaryRowId) {
+			ContainerBlob blob = new ContainerBlob();
+			setBLob(containerRowId, columnName, blob);
+			return blob;
+		}
+
+		ContainerBlob blob = new ContainerBlob(
+				this.getFreeformQueryEventWrapper(), containerRowId, columnName);
+		setBLob(containerRowId, columnName, blob);
+		return blob;
+	}
+
+	/**
+	 * For unit test
+	 * 
+	 * @param queryDelegate
+	 */
+	void setQueryDelegate(FreeformQueryEventWrapper queryDelegate) {
+		this.queryDelegate = queryDelegate;
+	}
+
+	@Override
+	public void withExportSettings(ExportCallback exportCallback) {
+		try {
+			getVaadinContainer().setPageLength(exportPageLength);
+			super.withExportSettings(exportCallback);
+		} finally {
+			getVaadinContainer().setPageLength(pageLength);
+		}
+	}
+}

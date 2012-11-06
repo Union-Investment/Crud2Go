@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Popup Beispiel">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+			<action onExecution="showMyPopup()" title="Show Popup"></action>
+		</table>
+	</page>
+	
+	<script>
+	def showMyPopup() {
+		showPopup "Titel", { 
+			div(style:'color:#ff0000', '''
+					Lorem ipsum dolor sit amet, consectetuer 
+					adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+					natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
+					Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. 
+					Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, 
+					vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, 
+					justo. Nullam dictum felis eu pede mollis pretium. 
+					Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi.'''.stripIndent())
+			h3('Überschrift')
+			div('''
+					Lorem ipsum dolor sit amet, consectetuer 
+					adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+					natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
+					Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. 
+					Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, 
+					vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, 
+					justo. Nullam dictum felis eu pede mollis pretium. 
+					Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi.'''.stripIndent())
+			table(border:'1', cellpadding:'10') {
+				tr() {
+					th('Prozent')
+					th('Währung')
+					th('Wert')
+				}
+				tr() {
+					td('77%')
+					td('€')
+					td('79')
+				}
+				tr() {
+					td('57%')
+					td('$')
+					td('11')
+				}
+			}
+		}
+		
+	}
+	</script>
+</portlet>

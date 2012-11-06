@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet 
+	title="Einfaches Beispiel">
+	<tabs>
+		<tab name="tab1" title="Tab mit Suche">
+			<form columns="1">
+				<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+				<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+					<select>
+						<query datasource="eai"><![CDATA[
+						select 
+							CVARCHAR5_NN as key, 
+							CVARCHAR5_NN as title 
+						from test_crud2
+					]]>
+					</query>
+					</select>
+				</field>
+				<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+					<date display="picker" format="yyyy" />
+				</field>
+				<field name="CNUMBER5_2_NN" title="CNUMBER5">
+					<checkbox checked-value="112" />
+				</field>
+
+				<action name="search" type="search">
+					<apply-filters>
+						<if field="CNUMBER5_2_NN" has-value="112">
+							<any>
+								<equal column="CNUMBER5_2" value="1"/>
+								<equal column="CNUMBER5_2" value="12"/>
+							</any>
+						</if>
+						<equal field="CNUMBER5_2" column="CNUMBER5_2" />
+						<equal field="CVARCHAR5_NN" column="CVARCHAR5_NN" />
+						<greater-or-equal field="CDATE" column="CDATE" />
+						<less field-name="CDATE" column-name="CDATE" />
+					</apply-filters>
+				</action>
+				<action name="reset" type="reset" />
+			</form>
+			<table sortable="true">
+				<database-table datasource="eai" tablename="test_crud2" />
+			</table>
+		</tab>
+		<tab name="tab2" title="Tab- und SubTab-Suche">
+			<form name="form2" columns="1">
+				<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+				<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+					<select>
+						<query datasource="eai"><![CDATA[
+						select 
+							CVARCHAR5_NN as key, 
+							CVARCHAR5_NN as title 
+						from test_crud2
+					]]>
+					</query>
+					</select>
+				</field>
+				<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+					<date display="picker" format="yyyy" />
+				</field>
+				<field name="CNUMBER5_2_NN" title="CNUMBER5">
+					<checkbox checked-value="112" />
+				</field>
+
+				<action name="search" type="search">
+					<includes>
+						<include table="table2"/>
+						<include table="table21"/>
+						<include table="table22"/>
+					</includes>
+					<apply-filters>
+						<start-with field="CVARCHAR5_NN" column="CVARCHAR5_NN" />
+						<all table="table21">
+							<equal field="CNUMBER5_2" column="CNUMBER5_2" />
+						</all>
+						<all table="table22">
+							<starts-with field="CNUMBER5_2" column="CNUMBER5_2" />
+						</all>
+					</apply-filters>
+
+				</action>
+				<action name="reset" type="reset" />
+			</form>
+			<table name="tab2Table" sortable="true">
+				<database-table datasource="eai" tablename="test_crud2" />
+			</table>
+			<tabs>
+				<tab name="tab21">
+					<form columns="1">
+						<field name="CNUMBER5_2_NN" title="Number 5 NotNull"
+							input-prompt="Eingabe" />
+
+						<action name="search" type="search">
+							<apply-filters>
+								<include-filters form="form2" action="search" />
+								<equal field-name="CNUMBER5_2_NN" column-name="CNUMBER5_2_NN" />
+							</apply-filters>
+						</action>
+						<action name="reset" type="reset" />
+					</form>
+					<table name="table21" sortable="true">
+						<database-table datasource="eai" tablename="test_crud2" />
+					</table>
+
+				</tab>
+				<tab name="tab22" title="2. Untertab">
+					<table name="table22" sortable="true">
+						<database-table datasource="eai" tablename="test_crud2" />
+					</table>
+				</tab>
+			</tabs>
+		</tab>
+	</tabs>
+</portlet>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="MULTI_LINE">
+	<page>
+		<table>
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM TEST_USER
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_USER
+					  (
+					    NAME,
+					    SPALTEEDIT
+					  )
+					  VALUES
+					  (
+					    $row.values.NAME,
+					    $row.values.SPALTEEDIT
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_USER SET 
+						NAME	  = $row.values.NAME,
+						SPALTEEDIT= $row.values.SPALTEEDIT
+					WHERE ID          = $row.values.ID
+				]]></update>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true"/>
+				<column name="SPALTEEDIT"  multiline="true" editable="true"  />
+				<column name="NAME" editable="true" />
+			</columns>
+		</table>
+	</page>
+</portlet>

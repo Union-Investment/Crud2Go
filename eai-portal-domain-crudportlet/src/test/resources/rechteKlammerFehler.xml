@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Deployment Log">
+	<page>
+		<table>
+			<database-query datasource="eai">
+				<query><![CDATA[
+					select OS_DEPLOY_LOG.*, case when error is null then 'Deployment successful' else 'Error' end MESSAGE from OS_DEPLOY_LOG  order by STARTDATE desc
+				]]></query>
+				<update><![CDATA[
+					UPDATE OS_DEPLOY_LOG SET 
+						CRITICALITY	  = $row.values.CRITICALITY,
+						SECURITY	  = $row.values.SECURITY
+					WHERE ID          = $row.values.ID
+				]]></update>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true"/>
+				<column name="PROJECTNAME" title="Project"/>
+				<column name="PROJECTVERSION" title="Version"/>
+				<column name="STARTDATE" title="Started"/>
+				<column name="ENDDATE" title="Finished"/>
+				<column name="SYSTEMNAME" title="System"/>
+				<column name="USERNAME" title="User"/>
+				<column name="MESSAGE" title="Message"/>
+				<column name="CRITICALITY" title="Criticality" editable="true">
+					<select>
+						<option key="Q10/Q9">Q10/Q9</option>
+						<option key="Q7">Q7</option>
+						<option key="Q4">Q4</option>
+					</select>
+				</column>
+				<column name="SECURITY" title="Security" editable="true">
+					<select>
+						<option key="Relevant">Relevant</option>
+						<option key="Nicht relevant">Nicht relevant</option>
+					</select>
+				</column>
+			</columns>
+		</table>
+	</page>
+</portlet>

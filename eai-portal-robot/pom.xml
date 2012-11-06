@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<parent>
+		<groupId>de.uit.eai.portal</groupId>
+		<artifactId>eai-portal-build</artifactId>
+		<version>1.43-SNAPSHOT</version>
+		<relativePath>../eai-portal-build/pom.xml</relativePath>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>eai-portal-robot</artifactId>
+	<name>Osiris :: Investment :: EAI-Portal-Administration :: Robot Fachtests</name>
+
+	<dependencies>
+		<!-- <dependency> <groupId>org.seleniumhq.selenium.client-drivers</groupId> 
+			<artifactId>selenium-java-client-driver</artifactId> <version>2.0b2</version> 
+			<type>jar</type> <scope>compile</scope> </dependency> -->
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>1.4</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-server</artifactId>
+			<version>2.25.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>robotframework</groupId>
+			<artifactId>dblibrary</artifactId>
+			<version>1.1-UI</version>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>orai18n</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.robotframework</groupId>
+			<artifactId>robotframework</artifactId>
+			<version>2.6.3-SL28</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ftpserver</groupId>
+			<artifactId>ftpserver-core</artifactId>
+			<version>1.0.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockftpserver</groupId>
+			<artifactId>MockFtpServer</artifactId>
+			<version>2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>1.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>robot</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>org.robotframework.RobotFramework</mainClass>
+					<classpathScope>runtime</classpathScope>
+
+					<arguments>
+						<!-- don't use colors on the console -->
+						<argument>-C</argument>
+						<argument>off</argument>
+
+						<!-- set some variables defaults are in <properties>-element overrides 
+							are in profiles, when activated -->
+						<argument>--variable</argument>
+						<argument>SELENIUM_SERVER_HOST:${SELENIUM_SERVER_HOST}</argument>
+						<argument>--variable</argument>
+						<argument>SELENIUM_PORT:${SELENIUM_PORT}</argument>
+						<argument>--variable</argument>
+						<argument>DB_URL:${DB_URL}</argument>
+						<argument>--variable</argument>
+						<argument>DB_USER:${DB_USER}</argument>
+						<argument>--variable</argument>
+						<argument>DB_PASSWORD:${DB_PASSWORD}</argument>
+						<argument>--variable</argument>
+						<argument>LIFERAY_DB_URL:${LIFERAY_DB_URL}</argument>
+						<argument>--variable</argument>
+						<argument>LIFERAY_DB_USER:${LIFERAY_DB_USER}</argument>
+						<argument>--variable</argument>
+						<argument>LIFERAY_DB_PASSWORD:${LIFERAY_DB_PASSWORD}</argument>
+						<argument>--variable</argument>
+						<argument>LIFERAY_USER:${LIFERAY_USER}</argument>
+						<argument>--variable</argument>
+						<argument>LIFERAY_PASSWORD:${LIFERAY_PASSWORD}</argument>
+						<argument>--variable</argument>
+						<argument>LIFERAY_COMMUNITY_ID:${LIFERAY_COMMUNITY_ID}</argument>
+						<argument>--variable</argument>
+						<argument>BASE_URL:${BASE_URL}</argument>
+						<argument>--variable</argument>
+						<argument>CONTEXT:${CONTEXT}</argument>
+						<argument>--variable</argument>
+						<argument>BROWSER_PROFILE:${BROWSER_PROFILE}</argument>
+
+						<!-- let robot know where our custom keywords are -->
+						<argument>--variable</argument>
+						<argument>RESOURCES:${project.basedir}/src/main/robot/resource</argument>
+
+						<!-- configure the reporting -->
+						<argument>--outputdir</argument>
+						<argument>${REPORT_DIR}</argument>
+						<argument>--output</argument>
+						<argument>${ROBOT_REPORT_PRE}-output.xml</argument>
+						<argument>--log</argument>
+						<argument>${ROBOT_REPORT_PRE}-log.html</argument>
+						<argument>--report</argument>
+						<argument>${ROBOT_REPORT_PRE}-report.html</argument>
+						<argument>--loglevel</argument>
+						<argument>debug</argument>
+						<argument>--reportbackground</argument>
+						<argument>"#9F6:#FC0:#F33"</argument>
+
+						<!-- tags for noncritical tests (means they are ok to fail) -->
+						<argument>--noncritical</argument>
+						<argument>In_Arbeit</argument>
+						<argument>--noncritical</argument>
+						<argument>Timeouted</argument>
+
+						<!-- exclude and include tagged tags -->
+						<argument>--exclude</argument>
+						<argument>${ROBOT_EXCLUDE}</argument>
+						<argument>--exclude</argument>
+						<argument>${ROBOT_EXCLUDE_2}</argument>
+						<argument>--include</argument>
+						<argument>${ROBOT_INCLUDE}</argument>
+
+						<!-- tells robot which suite and which test to run "test *" means all 
+							tests, but the asterisk is not handled correctly by Jython. hence the escape, 
+							to that you can write "test all" instead -->
+						<argument>--escape</argument>
+						<argument>star:all</argument>
+						<argument>--suite</argument>
+						<argument>${ROBOT_SUITE}</argument>
+						<argument>--test</argument>
+						<argument>${ROBOT_TEST}</argument>
+
+						<!-- configures where the tests are located -->
+						<argument>${ROBOT_TESTS}</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!-- Download der WSDLS über http://localhost:8080/api/axis, Neuerstellen 
+					der Stubs über "mvn axistools:wsdl2java" -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>axistools-maven-plugin</artifactId>
+				<version>1.4</version>
+				<configuration>
+					<sourceDirectory>src/main/wsdl</sourceDirectory>
+					<outputDirectory>src/main/java</outputDirectory>
+					<wsdlFiles>
+						<wsdlFile>RoleService.wsdl</wsdlFile>
+						<wsdlFile>CompanyService.wsdl</wsdlFile>
+						<wsdlFile>ResourcePermissionService.wsdl</wsdlFile>
+						<wsdlFile>UserService.wsdl</wsdlFile>
+					</wsdlFiles>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<properties>
+		<!-- Default: local testing with firefox -->
+		<ROBOT_TESTS_ROOT>${project.basedir}/src/main/robot/suite</ROBOT_TESTS_ROOT>
+		<ROBOT_TESTS>${ROBOT_TESTS_ROOT}/${ROBOT_TEST_SUITES}</ROBOT_TESTS>
+		<ROBOT_TEST_SUITES>EAI</ROBOT_TEST_SUITES>
+		<ROBOT_SUITE>all</ROBOT_SUITE>
+		<ROBOT_TEST>all</ROBOT_TEST>
+		<ROBOT_INCLUDE>all</ROBOT_INCLUDE>
+		<ROBOT_EXCLUDE>NichtAusfuehren</ROBOT_EXCLUDE>
+		<ROBOT_EXCLUDE_2>requires-jboss</ROBOT_EXCLUDE_2>
+
+		<BROWSER_PROFILE>firefox</BROWSER_PROFILE>
+		<BROWSER_PROFILE_NAME>firefox</BROWSER_PROFILE_NAME>
+		
+		<BASE_URL>localhost:9080</BASE_URL>
+		<CONTEXT>/</CONTEXT>
+		<TESTENV>LOCAL</TESTENV>
+
+		<REPORT_DIR>${project.build.directory}/robot</REPORT_DIR>
+		<ROBOT_REPORT_PRE>${project.artifactId}-${ROBOT_TEST_SUITES}-${TESTENV}-${BROWSER_PROFILE_NAME}</ROBOT_REPORT_PRE>
+
+		<SELENIUM_SERVER_HOST>localhost</SELENIUM_SERVER_HOST>
+		<SELENIUM_PORT>4455</SELENIUM_PORT>
+
+		<DB_URL>jdbc:oracle:thin:@localhost:1521:XE</DB_URL>
+		<DB_USER>test</DB_USER>
+		<DB_PASSWORD>test</DB_PASSWORD>
+
+		<LIFERAY_DB_URL>jdbc:oracle:thin:@localhost:1521:XE</LIFERAY_DB_URL>
+		<LIFERAY_DB_USER>liferay</LIFERAY_DB_USER>
+		<LIFERAY_DB_PASSWORD>liferay</LIFERAY_DB_PASSWORD>
+
+		<LIFERAY_USER>test</LIFERAY_USER>
+		<LIFERAY_PASSWORD>test</LIFERAY_PASSWORD>
+
+		<LIFERAY_COMMUNITY_ID>10157</LIFERAY_COMMUNITY_ID>
+	</properties>
+
+	<profiles>
+		<!-- profile for various browsers. set the BROWSER_PROFILE property can 
+			be activated from hudson by setting the environment variable maven.browser-profile 
+			to firefox, iexplorer or chrome -->
+		<profile>
+			<id>firefox</id>
+			<activation>
+				<property>
+					<name>maven.browser-profile</name>
+					<value>firefox</value>
+				</property>
+			</activation>
+			<properties>
+				<BROWSER_PROFILE>firefox</BROWSER_PROFILE>
+				<BROWSER_PROFILE_NAME>firefox</BROWSER_PROFILE_NAME>
+			</properties>
+		</profile>
+		<profile>
+			<id>iexplorer</id>
+			<activation>
+				<property>
+					<name>maven.browser-profile</name>
+					<value>ie</value>
+				</property>
+			</activation>
+			<properties>
+				<BROWSER_PROFILE>ie</BROWSER_PROFILE>
+				<BROWSER_PROFILE_NAME>ie</BROWSER_PROFILE_NAME>
+			</properties>
+		</profile>
+		<profile>
+			<id>chrome</id>
+			<activation>
+				<property>
+					<name>maven.browser-profile</name>
+					<value>chrome</value>
+				</property>
+			</activation>
+			<properties>
+				<BROWSER_PROFILE>googlechrome</BROWSER_PROFILE>
+				<BROWSER_PROFILE_NAME>googlechrome</BROWSER_PROFILE_NAME>
+			</properties>
+		</profile>
+		<profile>
+			<id>ci</id>
+			<activation>
+				<property>
+					<!-- this is set automatically by Hudson, thus, configure here what 
+						is different when tests are run on hudson server -->
+					<name>env.WORKSPACE</name>
+				</property>
+			</activation>
+			<properties>
+				<SELENIUM_SERVER_HOST>192.168.134.19</SELENIUM_SERVER_HOST>
+				<SELENIUM_PORT>4444</SELENIUM_PORT>
+				<REPORT_DIR>${env.WORKSPACE}</REPORT_DIR>
+				<ROBOT_EXCLUDE_2>DO_NOT_MATCH_ANYTHING</ROBOT_EXCLUDE_2>
+			</properties>
+		</profile>
+	</profiles>
+</project>

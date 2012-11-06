@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<roles>
+		<role name="admin" />
+		<role name="benutzer" />
+	</roles>
+	<page>
+		<tabs>
+			<permissions>
+				<allow roles="admin" action="build"/>
+				<deny roles="benutzer" action="build"/>
+				<deny roles="anonymous" action="build"/>
+			</permissions>
+			<tab title="Tab mit Berechtigung" id="tab01">
+				<table id="table1">
+					<database-table datasource="test" tablename="test_crud2" />
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true" />
+					</columns>
+				</table>
+			</tab>
+		</tabs>
+	</page>
+</portlet>

@@ -1,0 +1,23 @@
+*** Settings ***
+Library         org.robot.database.keywords.DatabaseLibrary
+
+*** Keywords ***
+
+Init Database
+	Import Library  org.robot.database.keywords.DatabaseLibrary
+	Connect To Database  oracle.jdbc.pool.OracleConnectionPoolDataSource  ${DB_URL}  ${DB_USER}  ${DB_PASSWORD}
+
+Disconnect Database
+	Import Library  org.robot.database.keywords.DatabaseLibrary
+	Disconnect from Database
+	
+
+Führe SQL Skript '${SQL_DATEI}' aus
+	Execute SQL From File  ${SQL_DATEI}
+	
+Führe Commit aus
+	Execute SQL  Commit
+	
+	
+Führe SQL '${ANWEISUNG}' aus	
+	Execute SQL  ${ANWEISUNG}

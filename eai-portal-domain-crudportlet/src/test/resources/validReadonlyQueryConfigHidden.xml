@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Großes Beispiel">
+	<page>
+		<table row-height="50">
+			<database-query datasource="test">
+				<query><![CDATA[
+					select * 
+					from SQLENGINECONFIG_SDW
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO SQLENGINECONFIG_SDW
+					  (
+					    CMD,
+					    OLD_ID,
+					    OLD_SYSTEM,
+					    OLD_KEY,
+					    OLD_XML,
+					    OLD_GEAENDERTVON,
+					    OLD_GEAENDERTAM,
+					    NEW_ID,
+					    NEW_SYSTEM,
+					    NEW_KEY,
+					    NEW_XML,
+					    NEW_GEAENDERTVON,
+					    NEW_GEAENDERTAM,
+					    ORDERID
+					  )
+					  VALUES
+					  (
+					    $row.values.CMD,
+					    $row.values.OLD_ID,
+					    $row.values.OLD_SYSTEM,
+					    $row.values.OLD_KEY,
+					    $row.values.OLD_XML,
+					    $row.values.OLD_GEAENDERTVON,
+					    $row.values.OLD_GEAENDERTAM,
+					    $row.values.NEW_ID,
+					    $row.values.NEW_SYSTEM,
+					    $row.values.NEW_KEY,
+					    $row.values.NEW_XML,
+					    $row.values.NEW_GEAENDERTVON,
+					    $row.values.NEW_GEAENDERTAM,
+					    $row.values.ORDERID
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE SQLENGINECONFIG_SDW SET 
+						CMD=$row.values.CMD,
+					    OLD_ID=$row.values.OLD_ID,
+					    OLD_SYSTEM=$row.values.OLD_SYSTEM,
+					    OLD_KEY=$row.values.OLD_KEY,
+					    OLD_XML=$row.values.OLD_XML,
+					    OLD_GEAENDERTVON=$row.values.OLD_GEAENDERTVON,
+					    OLD_GEAENDERTAM=$row.values.OLD_GEAENDERTAM,
+					    NEW_ID=$row.values.NEW_ID,
+					    NEW_SYSTEM=$row.values.NEW_SYSTEM,
+					    NEW_KEY=$row.values.NEW_KEY,
+					    NEW_XML=$row.values.NEW_XML,
+					    NEW_GEAENDERTVON=$row.values.NEW_GEAENDERTVON,
+					    NEW_GEAENDERTAM=$row.values.NEW_GEAENDERTAM
+					WHERE ORDERID          = $row.values.ORDERID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM SQLENGINECONFIG_SDW
+					WHERE ORDERID = $row.values.ORDERID
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ORDERID" primary-key="true"/>
+				<column name="CMD" editable="true">
+				<select>
+				<option key="horst">kappes</option><option key="test">tester</option>
+					<!--<query>select id as key, name as value from test_user</query>  -->
+				</select>
+				</column>
+				<column name="OLD_ID" title="Alter Key" editable="true" input-prompt="Testprompt"/>
+				<column name="NEW_ID" title="Neuer Key" editable="true" />
+				<column name="OLD_SYSTEM" editable="true" multiline="true" hidden="true"/>
+				<column name="NEW_SYSTEM" hidden="true" editable="true" input-prompt="Testprompt" />
+				<column name="OLD_KEY" width="100" editable="true" />
+				<column name="NEW_KEY" width="50" editable="true" />
+				<column name="OLD_XML" editable="true" />	
+				<column name="NEW_XML" editable="true" />
+				<column name="OLD_GEAENDERTVON" editable="true" />
+				<column name="OLD_GEAENDERTAM" editable="true" />
+				<column name="NEW_GEAENDERTVON" editable="true" />
+			</columns>
+		</table>
+	</page>
+</portlet>

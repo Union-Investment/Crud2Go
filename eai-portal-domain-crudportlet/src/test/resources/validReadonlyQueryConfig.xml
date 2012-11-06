@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table>
+			<database-query datasource="test">
+				<query><![CDATA[
+					select * 
+					from test_crud2
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true"/>
+				<column name="CNUMBER5_2"/>
+				<column name="CDATE"/>
+			</columns>
+		</table>
+	</page>
+</portlet>

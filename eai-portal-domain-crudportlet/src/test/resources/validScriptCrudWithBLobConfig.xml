@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für Script-CRUD-Operationen">
+	<page>
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+			<action title="search" id="id001">
+				<search />
+			</action>
+			<action title="reset" id="id002">
+				<reset />
+			</action>
+		</form>
+		<table id="table" row-height="30">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT *
+					FROM TEST_PARENT P INNER JOIN TEST_CHILD C ON P.ID = C.PARENT_ID
+				]]></query>
+				<insert type="script">
+				<![CDATA[
+					doInsert(row) // Kommentarzeichen nur fuer ConfigurationScriptsCompilerTest.shouldCompileStatementClosure
+				]]></insert>
+				<update type="script">
+				<![CDATA[
+					return doUpdate(row) // Kommentarzeichen nur fuer ConfigurationScriptsCompilerTest.shouldCompileStatementClosure
+				]]></update>
+				<delete type="script">
+				<![CDATA[
+					return doDelete(row) // Kommentarzeichen nur fuer ConfigurationScriptsCompilerTest.shouldCompileStatementClosure
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true" editable="true" />
+				<column name="NAME" title="NAME" editable="true" />
+				<column name="VALUE" title="VALUE" editable="true" />
+			</columns>
+		</table>
+	</page>
+	<script><![CDATA[
+		def doInsert(row)
+ 		{
+ 			def id = sql.firstRow("select MYSEQUENCE.NextVal from Dual")[0]
+ 			
+			sql("test").executeInsert("""\
+					INSERT INTO TEST_PARENT values ($id,$row.values.NAME)
+					  """)
+			sql("test").updateBLob("select MYBLOB from TEST_PARENT where ID=$id", 
+				container.getBLob(row, 'MYBLOB')
+		}
+
+		def doUpdate(row)
+ 		{
+			def count = sql("test").executeUpdate("""
+					UPDATE TEST_PARENT SET
+						NAME = $row.values.NAME 
+					WHERE ID = $row.values.ID
+					""")
+			sql("test").updateBLob("select MYBLOB from TEST_PARENT where ID=$row.values.ID for update", 
+				container.getBLob(row, 'MYBLOB')
+			return 2
+		}
+		
+		def doDelete(row)
+		{
+			sql("test").executeUpdate("""\
+				DELETE FROM TEST_CHILD
+				WHERE PARENT_ID = $row.values.ID
+			""")
+
+			sql("test").executeUpdate("""\
+				DELETE FROM TEST_PARENT
+				WHERE ID = $row.values.ID
+			""")
+			
+			return 2
+		}				
+							
+	]]></script>
+</portlet>

@@ -1,0 +1,22 @@
+*** Settings ***
+Documentation   Story: Als Entwickler möchte ich Tabellen generierte Spalten hinzufügen können, 
+...             um dynamisch Komponenten wie Buttons, Links und Icons anzeigen zu können. \
+
+
+*** Test Case ***
+1. Generierte Spalte mit einem Button angezeigen.
+	[Tags]  EAI_584  mbo
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'GENERIERTE_SPALTE.xml' hochlädt
+
+	dann ist der Button 'Button 1' vorhanden	
+
+
+
+*** Settings ***
+Force Tags      autor-mbo  generierte Spalten
+Resource        ${RESOURCES}/import/CrudPortlet.txt

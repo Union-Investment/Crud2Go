@@ -1,0 +1,24 @@
+*** Settings ***
+Documentation   Story: Als Entwickler möchte ich existierende SVG-Grafiken anzeigen 
+... 			und mit Grafikelemente verlinken können\
+
+
+*** Test Case ***
+
+1. Ein SVG darstellen und nach einem klick ein SVG-Event ausführen
+	[Tags]  EAI_587  mbo
+	[Documentation]  Testet den Klick Event auf einer SVG Grafik
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	
+	wenn er die Portalseite öffnet 
+	und dann die XML Konfiguration: 'SVG_COMPONENT.xml' hochlädt
+	und weiterhin die SVG Grafik anklickt
+	
+    dann ist im geöffneten Popupfenster der Text 'SVG Event' vorhanden
+
+
+*** Settings ***
+Force Tags      autor-mbo  svg-support
+Resource        ${RESOURCES}/import/CrudPortlet.txt

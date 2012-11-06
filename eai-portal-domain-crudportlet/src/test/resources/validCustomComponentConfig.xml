@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Custom Component Beispiel">
+	<page>
+		<component id="scriptComponent001" generator="buildComponent(builder)" />
+		<tabs>
+			<tab title="Tab 1" id="tab001">
+				<component id="scriptComponent002" generator="buildTab1(builder)" />
+			</tab>
+			<tab title="Tab 2" id="tab002">
+				<component id="scriptComponent003" generator="buildTab2(builder)" />
+			</tab>
+	
+		</tabs>
+	</page>
+	<script><![CDATA[
+		def buildComponent(builder) {
+			def b = builder.button(caption:'Klick mich!', onclick: { event -> event.button.caption = 'geklickt!'});
+		}
+
+		def buildTab1(builder) {
+			builder.verticalLayout(spacing: true) {
+				link(resource: externalResource('http://www.google.de'), icon:externalResource('http://www.google.de/logos/2011/noyce11-hp.jpg'));
+				link(resource: externalResource('http://www.yahoo.de'), icon:externalResource('http://l.yimg.com/a/i/ww/met/logo/20100909/yahoo_logo_de.png'));
+			}
+		}
+		
+	
+		def buildTab2(builder) {
+			builder.horizontalLayout() {
+				label(caption: 'label-1');
+				label(caption: 'label-2');
+				label(caption: 'label-3');
+			}
+		}
+	]]></script>
+</portlet>

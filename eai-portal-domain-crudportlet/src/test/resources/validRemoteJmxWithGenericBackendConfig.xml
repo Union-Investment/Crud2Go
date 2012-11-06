@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für Script-Container">
+	<page>
+		<table id="table1">
+			<script-container delegate="new MyCustomBackend()" />
+			<action onExecution="it.table.refresh()" title="refresh"></action>
+		</table>
+
+	</page>
+	<script><![CDATA[
+	class Global {
+			static portlet
+			static jmx
+		}
+		
+		Global.portlet = portlet
+		Global.jmx = jmx
+	
+    class MyCustomBackend implements ScriptContainerBackend {
+    
+    	
+		Closure metaData = {
+			FILENAME(type:String,readonly:true, required:true, partOfPrimaryKey:true)
+			PATH(type:String,readonly:true, required:true, partOfPrimaryKey:true)
+			MODIFIED(type:java.util.Date,readonly:true, required:true, partOfPrimaryKey:true)
+		}
+		
+		List read() {
+			def file = Global.jmx("service:jmx:rmi:///jndi/rmi://localhost:1090/jmxconnector").executeScript("return new File('C:\\\\')")
+			return file.listFiles().collect {currentFile -> [currentFile.name,currentFile.absolutePath,new java.util.Date(currentFile.lastModified())]}
+		}
+		
+		void update(List rows) {
+			//tue nix
+		}
+	}
+]]>
+</script>
+</portlet>

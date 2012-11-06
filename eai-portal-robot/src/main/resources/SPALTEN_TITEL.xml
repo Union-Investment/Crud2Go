@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="SPALTEN_TITEL">
+	<page>
+		<table>
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM TEST_USER
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_USER
+					  (
+					    NAME,
+					    SPALTEEDIT
+					  )
+					  VALUES
+					  (
+					    $row.values.NAME,
+					    $row.values.SPALTEEDIT
+					  )
+				]]></insert>
+			</database-query>
+			<columns>
+				<column name="ID" title="TITEL_ID" primary-key="true"/>
+				<column name="SPALTEEDIT" title="TITEL_2" width="223"  />
+				<column name="NAME" title="NAME_TITEL" width="224" />
+			</columns>
+		</table>
+	</page>
+</portlet>

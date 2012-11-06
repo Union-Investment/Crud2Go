@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+			<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+				<date display="picker" format="yyyy" />
+			</field>
+			<field name="CNUMBER5_2_NN" title="CNUMBER5">
+				<checkbox checked-value="112" />
+			</field>
+			<field name="CVARCHAR5_NN" title="Multiselect">
+				<select visibleRows="3">
+					<query datasource="test"><![CDATA[
+						select 
+							CVARCHAR5_NN as key, 
+							CVARCHAR5_NN as title 
+						from test_crud2
+					]]>
+					</query>
+				</select>
+			</field>
+
+			<action title="search" id="id001">
+			<search><!-- 
+				<apply-filters>
+					<equals column="CNUMBER5_2_NN" field="CVARCHAR5_NN"/>
+				</apply-filters>
+				 -->
+			</search>
+			</action>
+			<action title="reset" id="id002"><reset/></action>
+		</form> 
+		<table id="table" sortable="true">
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+</portlet>

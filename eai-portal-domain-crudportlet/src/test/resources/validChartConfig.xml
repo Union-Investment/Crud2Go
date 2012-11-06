@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Custom Component Beispiel">
+	<page>
+		<component id="scriptComponent001" generator="buildComponent(builder)" />
+	</page>
+	<script><![CDATA[
+		import org.jfree.chart.ChartFactory;
+		import org.jfree.chart.JFreeChart;
+		import org.jfree.chart.plot.PlotOrientation;
+		import org.jfree.data.category.CategoryDataset;
+		import org.jfree.data.category.DefaultCategoryDataset;
+		
+		def buildComponent(builder) {
+			CategoryDataset dataset = createDataset();
+			JFreeChart chart = ChartFactory.createBarChart("title", "category-axis-label", "value-axis-label", dataset, PlotOrientation.VERTICAL, true, false, false); 
+			def component = builder.chart(chart:chart);
+		}
+		
+		def createDataset() {
+			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+			
+			// row keys...
+	        String series1 = "First";
+	        String series2 = "Second";
+	        String series3 = "Third";
+	
+	        // column keys...
+	        String category1 = "Category 1";
+	        String category2 = "Category 2";
+	        String category3 = "Category 3";
+	        String category4 = "Category 4";
+	        String category5 = "Category 5";
+			
+			dataset.addValue(1.0, series1, category1);
+	        dataset.addValue(4.0, series1, category2);
+	        dataset.addValue(3.0, series1, category3);
+	        dataset.addValue(5.0, series1, category4);
+	        dataset.addValue(5.0, series1, category5);
+	
+	        dataset.addValue(5.0, series2, category1);
+	        dataset.addValue(7.0, series2, category2);
+	        dataset.addValue(6.0, series2, category3);
+	        dataset.addValue(8.0, series2, category4);
+	        dataset.addValue(4.0, series2, category5);
+	
+	        dataset.addValue(4.0, series3, category1);
+	        dataset.addValue(3.0, series3, category2);
+	        dataset.addValue(2.0, series3, category3);
+	        dataset.addValue(3.0, series3, category4);
+	        dataset.addValue(6.0, series3, category5);
+			
+	        return dataset;
+		}
+	]]></script>
+</portlet>

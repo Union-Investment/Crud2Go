@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+	<script><![CDATA[
+		sql("eai").eachRow("select * from test_crud2") { row ->
+			log.info "$row"
+		}
+	]]></script>
+</portlet>

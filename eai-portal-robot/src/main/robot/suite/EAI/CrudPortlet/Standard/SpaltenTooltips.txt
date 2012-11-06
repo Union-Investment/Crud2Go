@@ -1,0 +1,26 @@
+*** Settings ***
+Documentation   Story UI-130: Erweiterung des CRUD-Portlets um Tooltips, Alignment und ConfirmationDialog
+Force Tags      autor-cmj  column-tooltips  UI-130  mantis-4703
+
+*** Test Case ***
+Tooltip in Tabellen-Header wird angezeigt
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'COLUMN_TOOLTIPS.xml'
+	
+	wenn mit der Maus über die Header-Zeile der 2. Spalte gefahren wird
+	
+	dann erscheint der Tooltip 'Zahl (optional)'
+
+Tooltip in Editierformular wird angezeigt
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'COLUMN_TOOLTIPS.xml'
+	und außerdem wird die 1. Zeile der Tabelle im Formularmodus angezeigt
+	
+	wenn mit der Maus im Formular auf den Titel des Feldes 'Zahl' gefahren wird 
+	
+	dann erscheint der Vaadin Tooltip 'Zahl (optional)'
+
+
+	
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

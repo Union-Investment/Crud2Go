@@ -1,0 +1,36 @@
+*** Settings ***
+Documentation   Story: abc erste zeile \r
+...             story zweite zeile
+...             Abnahme: bla bla bla
+
+# Dateiendung ist VORLAGE._TXT_ damit die Vorlage nicht als Test ausgeführt
+# wird, falls man ein anderes Exclude-Tag als NichtAusfuehren wählt.  
+
+*** Keyword ***
+Verhalten
+    [Arguments]  ${abc}  ${xzy}
+ 
+    Es existiert ...
+    Und ...
+    Und ...
+    
+    Wenn ...
+    Und ...
+    Und ...
+    
+    Dann ...
+    Und ...
+    Und ...
+
+| *Test Case* | | *abc* | *xyz* |
+| <name>        |       |       |
+| <name>        |       |       |
+| <name>        |       |       |
+
+*** Settings ***
+Test Teardown   Teardown Selenium
+Test Template   Verhalten
+Force Tags      autor-<name>
+...             vam-<jira-nummer>
+...             NichtAusfuehren
+Resource        ${RESOURCES}/import/<FunctionalGroup>.txt

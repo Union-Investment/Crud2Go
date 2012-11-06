@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für den Modified-Check bei onUpdate">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" onUpdate="checkModifiedState(it, row)"/>
+		</table>
+	</page>
+	<script><![CDATA[
+	def checkModifiedState(table, row) {
+		showPopup "Modified State", "Modified fields: ${row.fields.values().findAll({it.modified})*.name}"
+	}
+	]]></script>
+</portlet>

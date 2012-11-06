@@ -1,0 +1,21 @@
+*** Settings ***
+Documentation   
+Test Teardown	Auf Hauptseite zurückwechseln	
+Force Tags      autor-cmj  datasourceinfo  UI-350
+
+*** Test Case ***
+
+Liste der Datenquellen auf Hilfeseite anzeigen
+	Es existiert ein Portlet mit der XML-Konfiguration 'VALIDES.xml'
+	wenn auf die Hilfe-Seite gewechselt wird
+	dann wird die Liste der DataSources mit dem Eintrag 'test' angezeigt
+
+Verbindungsdaten zu Datenquellen auf Hilfeseite anzeigen
+	[Tags]  requires-jboss  
+	Es existiert ein Portlet mit der XML-Konfiguration 'VALIDES.xml'
+	wenn auf die Hilfe-Seite gewechselt wird
+	dann werden die Verbindungsdaten zur DataSource 'test' angezeigt 
+
+	
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

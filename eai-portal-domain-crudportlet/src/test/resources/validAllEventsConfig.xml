@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<form>
+			<field onValueChange="logEvent 'onFormFieldValueChange',it"
+				name="CVARCHAR5_NN"></field>
+			<action onExecution="logEvent 'onExecution',it" title="Suchen"
+				id="id001">
+					<search>
+						<apply-filters>
+							<sql column="test"><where></where></sql>
+							<sql column="test1"><where></where></sql>
+							<sql column="test2"><where></where></sql>
+							<sql column="test3"><where></where></sql>
+							<sql column="test4"><where></where></sql>
+						</apply-filters>
+					</search>
+				</action>
+		</form>
+		<tabs onChange="logEvent 'onChange',it">
+			<tab onHide="logEvent 'onHide',it" onShow="logEvent 'onShow',it"
+				id="tab1" title="Tab 1">
+				<table onModeChange="logEvent 'onModeChange',it,mode" onRowChange="logEvent 'rowChange',it,row"
+					onSelectionChange="logEvent 'onSelectionChange',it,selection.ids.collect{it.asMap()}">
+					<database-query datasource="test"
+						onCreate="logEvent 'onCreate',it,row.id.asMap()" onDelete="logEvent 'onDelete',it,row.id.asMap()"
+						onInsert="logEvent 'onInsert',it,row.id.asMap()" onUpdate="logEvent 'onUpdate',it,row.id.asMap()">
+						<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+						<insert><![CDATA[
+					INSERT INTO TEST_CRUD2
+					  (
+					    CNUMBER5_2,
+					    CDATE,
+					    CTIMESTAMP,
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN,
+					    TESTDATA
+					  )
+					  VALUES
+					  (
+					    $row.values.CNUMBER5_2,
+					    $row.values.CDATE,
+					    SYSDATE,
+					    $row.values.CVARCHAR5_NN,
+					    $row.values.CNUMBER5_2_NN,
+					    $row.values.CDATE_NN,
+					    SYSDATE,
+					    $row.values.TESTDATA
+					  )
+				]]></insert>
+						<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CDATE	      = $row.values.CDATE,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+						CDATE_NN	  = $row.values.CDATE_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.values.ID
+				]]></update>
+						<delete><![CDATA[
+					DELETE FROM TEST_CRUD2
+					WHERE ID = $row.values.ID
+				]]></delete>
+					</database-query>
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true" />
+						<column name="CDATE" editable="false" />
+						<column name="CTIMESTAMP" />
+						<column name="CVARCHAR5_NN" editable="true" />
+						<column name="CNUMBER5_2_NN" editable="true" />
+						<column name="CDATE_NN" editable="true" />
+						<column name="CTIMESTAMP_NN" hidden="true" />
+						<column name="TESTDATA" editable="true" width="300"
+							validate="maxlen=80,required" />
+					</columns>
+					<action onExecution="logEvent 'tableAction.onExecution',it"
+						title="test123" id="id002" />
+				</table>
+			</tab>
+			<tab onHide="logEvent 'onHide',it" onShow="logEvent 'onShow',it"
+				id="tab2" title="Tab 2">
+				<table onModeChange="logEvent 'onModeChange',it,mode"
+					onSelectionChange="logEvent 'onSelectionChange',it,selection.ids.collect{it.asMap()}">
+					<database-table datasource="test" tablename="test_crud2"
+						onCreate="logEvent 'onCreate',it,row.id.asMap()" onDelete="logEvent 'onDelete',it,row.id.asMap()"
+						onInsert="logEvent 'onInsert',it,row.id.asMap()" onUpdate="logEvent 'onUpdate',it,row.id.asMap()" />
+				</table>
+			</tab>
+		</tabs>
+	</page>
+	<script><![CDATA[
+		def logEvent(name, it, param = 'keine') {
+			println "Event [${it.getClass().simpleName}.$name], Parameter: $param"
+		}
+	]]></script>
+</portlet>

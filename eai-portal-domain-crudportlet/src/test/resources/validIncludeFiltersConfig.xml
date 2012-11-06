@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+			<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+				<select>
+					<query datasource="test"><![CDATA[
+					select 
+						CVARCHAR5_NN as key, 
+						CVARCHAR5_NN as title 
+					from test_crud2
+				]]>
+				</query>
+				</select>
+			</field>
+			<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+				<date display="picker" format="yyyy" />
+			</field>
+
+			<action title="search" id="searchAction01">
+				<search>
+					<apply-filters>
+						<equals column="CNUMBER5_2" field="CNUMBER5_2"/>
+						<equals column="CVARCHAR5_NN" field="CVARCHAR5_NN"/>
+						<equals column="CDATE" field="CDATE"/>
+					</apply-filters>
+				</search>
+			</action>
+			<action title="reset" id="id02"><reset/></action>
+		</form>
+		<table sortable="true">
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+			<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+				<select>
+					<query datasource="test"><![CDATA[
+					select 
+						CVARCHAR5_NN as key, 
+						CVARCHAR5_NN as title 
+					from test_crud2
+				]]>
+				</query>
+				</select>
+			</field>
+			<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+				<date display="picker" format="yyyy" />
+			</field>
+
+			<action title="search" id="searchAction02">
+				<search>
+					<apply-filters>
+						<include-filter action="searchAction01"/>
+					</apply-filters>
+				</search>
+			</action>
+			<action title="reset" id="id03"><reset/></action>
+		</form>
+
+		<table sortable="true">
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+
+	</page>
+</portlet>

@@ -1,0 +1,4 @@
+*** Settings ***
+Resource        ${RESOURCES}/German-BDD.txt
+Resource        ${RESOURCES}/import/CrudPortlet.txt
+Resource        ${RESOURCES}/objects/PortletBerechtigungen.txt

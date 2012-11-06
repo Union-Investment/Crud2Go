@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Tabellen Beispiel">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+			<columns>
+				<column style="getCoumnStyle(row, columnName)" name="ID"></column>
+				<column name="CNUMBER5_2" style="getCoumnStyle(row, columnName)" editable="true"></column>
+			</columns>
+			<action title="heller" onExecution="setCurStyle(-1,it.table)" id="id02" />
+			<action title="dunkler" onExecution="setCurStyle(1,it.table)" id="id01" />
+		</table>
+	</page>
+
+	<script><![CDATA[
+		curStyle=0
+		
+		def setCurStyle(v,table){
+			curStyle=curStyle+v;
+			table.refresh();
+		}
+		
+		def getCoumnStyle(row, columnName) {
+			if(curStyle<=0)
+				return "primaer_05";
+			else if(curStyle==1)
+				return "primaer_10";	
+			else if(curStyle==2)
+				return "primaer_20";	
+			else if(curStyle==3)
+				return "primaer_35";	
+			else if(curStyle==4)
+				return "primaer_40";
+			else if (curStyle>=5)
+				return "primaer_55";
+			else 
+				return null;
+		}
+	
+	]]>
+	</script>
+</portlet>

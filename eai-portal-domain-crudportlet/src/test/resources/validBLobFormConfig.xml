@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches BLob Beispiel">
+	<page>
+		<table id="table" row-height="30" edit-form="true">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM TEST_BLOB
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_BLOB(TEXT,DATA) 
+					VALUES($row.values.TEXT,$row.values.DATA)
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_BLOB 
+					SET TEXT=$row.values.TEXT,DATA=$row.values.DATA 
+					WHERE id = $row.values.ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_BLOB
+					WHERE ID = $row.values.ID
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true"/>
+				<column name="TEXT" title="Text" editable="true" />
+				<column name="DATA" title="BlobDaten" editable="true" >
+					<binary filename="test.pdf" mine-type="application/pdf" download-caption="Hier runterladen" upload-caption="hier hochladen" maxFileSize="1242880"/>
+				</column>
+			</columns>
+		</table>
+	</page>
+	<script><![CDATA[
+
+	]]></script>
+
+</portlet>

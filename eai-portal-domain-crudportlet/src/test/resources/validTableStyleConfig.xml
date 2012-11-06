@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table rowStyle="getRowStyle(row)">
+			<database-table datasource="test" tablename="test_crud2" />
+			<columns>
+				<column name="CNUMBER5_2" style="getColumnStyle(row, columnName)"/>
+			</columns>
+		</table>
+	</page>
+	<script><![CDATA[
+	def getRowStyle(row) { 
+		println "getRowStyle(" + row + ")" 
+		return "rowStyle"
+	}
+	def getColumnStyle(row, columnName) {
+		println "getColumnStyle(" + row + "," + columnName + ")"
+		return "style-" + columnName
+	}
+	]]></script>
+</portlet>

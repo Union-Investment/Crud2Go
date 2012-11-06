@@ -1,0 +1,35 @@
+*** Settings ***
+Documentation   Story EAI-803: Als Entwickler möchte ich zur Laufzeit generierte Spalten zu einer Tabelle hinzufügen können
+Force Tags      autor-fha  such-timeouts  UI-192
+
+*** Test Case ***
+
+Ausführen einer Suche mit Zeitlimit führt zu einer Zeitüberschreitung
+	Es existiert ein Portlet mit der XML-Konfiguration 'SUCHE_MIT_TIMEOUT.xml'
+
+	wenn der Text im Eingabefeld 'Die Frage' auf '42' geändert wird
+	und dann der Button 'search' geklickt wird
+
+	dann wird die Meldung 'Die Suchanfrage hat das Zeitlimit überschritten!' angezeigt
+	
+
+Ausführen einer Suche mit Zeitlimit per Script setzbar (aber nicht gesetzt)
+	Es existiert ein Portlet mit der XML-Konfiguration 'SUCHE_MIT_TIMEOUT_PER_SCRIPT.xml'
+
+	wenn der Text im Eingabefeld 'Die Frage' auf '1' geändert wird
+	und dann der Button 'search' geklickt wird
+
+	dann wird die Spalte '42' nicht angezeigt
+	
+Ausführen einer Suche mit Zeitlimit per Script setzbar (und gesetzt)
+	Es existiert ein Portlet mit der XML-Konfiguration 'SUCHE_MIT_TIMEOUT_PER_SCRIPT.xml'
+	
+	wenn der Button 'timeout on' geklickt wird
+	und dann der Text im Eingabefeld 'Die Frage' auf '1' geändert wird
+	und dann der Button 'search' geklickt wird
+	
+	dann wird die Meldung 'Die Suchanfrage hat das Zeitlimit überschritten!' angezeigt
+
+
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

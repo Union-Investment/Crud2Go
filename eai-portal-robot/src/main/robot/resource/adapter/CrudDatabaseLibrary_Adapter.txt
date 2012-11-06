@@ -1,0 +1,5 @@
+*** Settings ***
+Library         de.unioninvestment.eai.portal.robot.CrudDatabaseLibrary  oracle.jdbc.pool.OracleConnectionPoolDataSource  ${LIFERAY_DB_URL}  ${LIFERAY_DB_USER}  ${LIFERAY_DB_PASSWORD}
+
+*** Keywords ***
+

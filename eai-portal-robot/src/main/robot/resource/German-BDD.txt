@@ -1,0 +1,67 @@
+*** Settings ***
+
+
+*** Keywords ***
+Gegeben sei ${keyword}
+	Run Keyword  ${keyword}
+	
+Es existiert ${keyword}
+	Run Keyword  ${keyword}
+	
+Es existieren ${keyword}
+	Run Keyword  ${keyword}
+	
+Und außerdem ${keyword}
+	Run Keyword  ${keyword}
+
+Und weiterhin ${keyword}
+	Run Keyword  ${keyword}
+	
+Und ebenso ${keyword}
+	Run Keyword  ${keyword}
+	
+Und dazu ${keyword}
+	Run Keyword  ${keyword}
+	
+Außerdem ${keyword}
+	Run Keyword  ${keyword}
+
+Weiterhin ${keyword}
+	Run Keyword  ${keyword}
+	
+Ebenso ${keyword}
+	Run Keyword  ${keyword}
+	
+Dazu ${keyword}
+	Run Keyword  ${keyword}
+	
+Und auch ${keyword}
+	Run Keyword  ${keyword}
+	
+Wenn ${keyword}
+	Run Keyword  ${keyword}
+	
+Und dann ${keyword}
+	Run Keyword  ${keyword}
+
+Und danach ${keyword}
+	Run Keyword  ${keyword}
+
+Und dabei ${keyword}
+	Run Keyword  ${keyword}
+
+Dann ${keyword}
+	Run Keyword  ${keyword}
+	
+Und es ${keyword}
+	Run Keyword  ${keyword}
+
+und die ${keyword}
+	Run Keyword  ${keyword}
+
+und das ${keyword}
+	Run Keyword  ${keyword}
+
+und auf ${keyword}
+	Run Keyword  ${keyword}
+

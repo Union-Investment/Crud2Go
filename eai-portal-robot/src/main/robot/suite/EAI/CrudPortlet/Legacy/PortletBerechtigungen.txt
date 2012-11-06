@@ -1,0 +1,64 @@
+*** Settings ***
+Documentation   Story:
+
+*** Test Case ***
+1. Berechtigungslinks auf der Konfigurationsseite
+	[Tags]  EAI-476
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	und dann die XML Konfiguration: 'SECURITY_CONFIG.xml' hochlädt
+	
+	wenn er die Portalseite öffnet
+	und weiterhin die Konfigurationansicht öffnet 
+
+	dann wird der Link 'admin' angezeigt
+	Und dann wird der Link 'benutzer' angezeigt
+	
+	
+2. Berechtigungsdialog für die Pflege der Mitgliedschaft von Liferay Rollen
+	[Tags]  EAI-476
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	und dann die XML Konfiguration: 'SECURITY_CONFIG.xml' hochlädt
+	
+	wenn er die Portalseite öffnet
+	und dann die Konfigurationansicht öffnet 
+	und weiterhin den Dialog Link für die Rolle 'benutzer' auswählt
+	
+	dann der Dialog zur Pflege der Mitgliedschaft für die Rolle 'benutzer' angezeigt
+
+3. Sichtbare Tabelle mit Berechtigung 
+	[Tags]  EAI-476
+	
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein eingeschränkter Benutzer
+	und dann die XML Konfiguration: 'SECURITY_CONFIG.xml' hochlädt
+	# Nur zur Sicherheit, falls die Resource Permission aus irgendeinem Grund
+	# noch in der DB existiert. 
+	und dann die Mitgliedschaft von 'User' auf die Konfigurationsrolle 'admin' hinzugefügt wird
+	
+	Wenn dann er die Portalseite öffnet
+	dann wird Tab mit Namen 'Tab mit Berechtigung' angezeigt
+	
+4. Nicht Sichtbare Tabelle ohne Berechtigung
+	[Tags]  EAI-476  EAI-476-4
+	
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein eingeschränkter Benutzer
+	
+	Wenn dann die XML Konfiguration: 'SECURITY_CONFIG.xml' hochlädt
+	und dann die Mitgliedschaft von 'User' auf die Konfigurationsrolle 'admin' entzogen wird
+	und dann die Mitgliedschaft von 'User' auf die Konfigurationsrolle 'benutzer' hinzugefügt wird
+	
+	Wenn dann er die Portalseite öffnet
+	
+	dann wird Tab mit Namen 'Tab mit Berechtigung' ausgeblendet
+	
+	# Aufräumarbeiten, die nur bei diesem Testfall ausgeführt werden müssen
+	und dann die Mitgliedschaft von 'User' auf die Konfigurationsrolle 'benutzer' entzogen wird
+
+*** Settings ***
+Force Tags      autor-mbo  autor-sse
+Resource        ${RESOURCES}/import/PortletBerechtigungen.txt

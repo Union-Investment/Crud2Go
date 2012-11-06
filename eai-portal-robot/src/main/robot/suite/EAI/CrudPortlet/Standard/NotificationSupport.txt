@@ -1,0 +1,27 @@
+*** Settings ***
+Documentation   Als Entwickler möchte ich aus dem Scripting Warn-, Fehler- und Infomeldungen anzeigen können, um dem Benutzer in entsprechenden Situationen Feedback geben zu können
+
+Force Tags      autor-nwo  notification-support  UI-195
+
+*** Test Case ***
+
+Warnmeldung anziegen
+	Es existiert ein Portlet mit der XML-Konfiguration 'NOTIFICATION_SUPPORT.xml'
+	
+	Wenn der Button 'Warnung' geklickt wird
+	dann wird eine Warnung mit dem Text 'Dies ist eine Warnung!' angezeigt
+
+Fehlermeldung anzeigen
+	Es existiert ein Portlet mit der XML-Konfiguration 'NOTIFICATION_SUPPORT.xml'
+	
+	Wenn der Button 'Fehler' geklickt wird
+	dann wird eine Fehlermeldung mit dem Text 'Dies ist ein Fehler!' angezeigt
+
+Infomeldung anzeigen
+	Es existiert ein Portlet mit der XML-Konfiguration 'NOTIFICATION_SUPPORT.xml'
+	
+	Wenn der Button 'Info' geklickt wird	
+	dann wird eine Tray-Benachrichtigung mit dem Text 'Dies ist eine Info!' angezeigt
+	
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Suche mit Filterzwang und filter-policy NOTHING">
+	<page>
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+			<field name="CNUMBER5_22" title="Number 5/2" input-prompt="Eingabe" />
+			<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+				<select>
+					<query datasource="test"><![CDATA[
+						select 
+							CVARCHAR5_NN as key, 
+							CVARCHAR5_NN as title 
+						from test_crud2
+					]]>
+					</query>
+				</select>
+			</field>
+			<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+				<date display="picker" format="yyyy" />
+			</field>
+			<field name="CNUMBER5_2_NN" title="CNUMBER5">
+				<checkbox checked-value="112" />
+			</field>
+			<field name="CONTAINS" title="TESTDATA"/>
+			<action title="search" id="id1">
+				<search requires-filter="true">
+					<tables>
+						<table id="table" />
+					</tables>
+					<apply-filters>
+						<any>
+							<equals field="CNUMBER5_2" column="CNUMBER5_2" />
+							<equals field="CNUMBER5_22" column="CNUMBER5_2" />
+						</any>
+						<equals field="CVARCHAR5_NN" column="CVARCHAR5_NN" />
+						<equals field="CNUMBER5_2_NN" column="CNUMBER5_2_NN" />
+						<greater-or-equal field="CDATE" column="CTIMESTAMP" />
+						<sql column="CNUMBER5_2"><where>IN (SELECT CNUMBER5_2 FROM test_crud2 WHERE CNUMBER5_2 = $fields.CNUMBER5_2.value)</where></sql>
+						<contains column="TESTDATA" field="CONTAINS"/>
+					</apply-filters>
+				</search>
+			</action>
+			<action title="reset" id="id2"><reset/></action>
+		</form>
+		<table id="table" sortable="true">
+			<database-table datasource="test" tablename="test_crud2" filter-policy="nothing" />
+		</table>
+	</page>
+</portlet>

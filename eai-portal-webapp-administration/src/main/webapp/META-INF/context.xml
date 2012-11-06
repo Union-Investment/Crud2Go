@@ -1,0 +1,8 @@
+<Context path="eai-administration">
+	<ResourceLink name="jdbc/testDs" global="jdbc/testDs" type="javax.sql.DataSource" />
+	<ResourceLink name="jdbc/eaiDs" global="jdbc/eaiDs" type="javax.sql.DataSource" />
+	<ResourceLink name="jdbc/vcladezoneDs" global="jdbc/vcladezoneDs" type="javax.sql.DataSource" />
+	<ResourceLink name="jdbc/ikdatatoolDs" global="jdbc/ikdatatoolDs" type="javax.sql.DataSource" />
+	<ResourceLink name="jdbc/liferayDs" global="jdbc/liferayDs" type="javax.sql.DataSource" />
+	<ResourceLink name="jdbc/MELD_READDs" global="jdbc/MELD_READDs" type="javax.sql.DataSource" />
+</Context>

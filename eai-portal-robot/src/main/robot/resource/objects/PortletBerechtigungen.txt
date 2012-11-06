@@ -1,0 +1,75 @@
+*** Settings ***
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/common-keywords.txt
+
+
+*** Keywords ***
+
+####################################################
+###  Es existiert/existieren / Und weiterhin ... ###
+####################################################
+
+
+
+
+############################
+###  Wenn / Und dann ... ###
+############################
+
+den Dialog Link für die Rolle ${rolle} auswählt
+	Vaadin Click  css=a:contains(${rolle})
+	Wait Until Page Loaded
+	
+##########################
+###  Dann / Und es ... ###
+##########################
+wird der Link ${rolle} angezeigt
+	Page Should Contain Element  css=a:contains(${rolle})
+
+der Dialog zur Pflege der Mitgliedschaft für die Rolle '${rolle}' angezeigt
+	Page Should Contain  ${rolle}
+	Page Should Contain  Owner
+	Page Should Contain Element  css=a:contains('User')
+
+
+wird Tab mit Namen ${Tabtext} angezeigt
+	Wait Until Page Contains Element  css=div.v-captiontext:contains(${Tabtext})
+	
+wird Tab mit Namen ${Tabtext} ausgeblendet
+	Wait Until Page Loaded
+	Page Should Not Contain Element  css=div.v-captiontext:contains(${Tabtext})
+
+wird Zugangsberechtigung für die Liferayrolle '${liferayrolle}' ausgewählt
+	Vaadin Click  xpath=//a[text()='${liferayrolle}']/../../td[2]
+	Sleep  2s
+	Vaadin Click  xpath=xpath=//input[@class='aui-button-input aui-button-input-submit' and @type='submit' and  @value='Save']
+
+die Mitgliedschaft von '${portalrolle}' auf die Konfigurationsrolle '${rolle}' hinzugefügt wird
+	${portletInstanceId} =  Get Text  css=div.crudPortletId
+	Log  ${portletInstanceId}
+	${resourceId} =  Build Resource Id  ${portletInstanceId}  ${rolle}  ${LIFERAY_COMMUNITY_ID}
+	Log  ${resourceId}
+	${resourcePrimaryKey} =  Read Primary Key For Resource Id  ${resourceId}
+	Log  ${resourcePrimaryKey}
+	Set Individual Resource Permission Member  ${resourcePrimaryKey}  ${portalrolle}
+
+die Mitgliedschaft von '${portalrolle}' auf die Konfigurationsrolle '${rolle}' entzogen wird
+	${portletInstanceId} =  Get Text  css=div.crudPortletId
+	Log  ${portletInstanceId}
+	${resourceId} =  Build Resource Id  ${portletInstanceId}  ${rolle}  ${LIFERAY_COMMUNITY_ID}
+	Log  ${resourceId}
+	${resourcePrimaryKey} =  Read Primary Key For Resource Id  ${resourceId}
+	Log  ${resourcePrimaryKey}
+	Delete Individual Resource Permissions  ${resourcePrimaryKey}  ${portalrolle}
+
+##########################
+###  Utility Keywords  ###
+##########################
+
+
+##########################
+###  Setup / Teardown  ###
+##########################

@@ -1,0 +1,22 @@
+*** Settings ***
+Documentation   Story: Als Benutzer möchte ich die Daten einer beliebigen bekannten \
+...				Oracle Datasource ansehen können, um die Daten überprüfen zu können
+...             Abnahme: Beim ersten Öffnen erscheint ein Konfigurationslink
+
+*** Test Case ***
+Verhalten
+	[Tags]  EAI_11
+
+	Es existiert eine Portalseite mit CRUD-Portlet
+	und weiterhin ein Benutzer
+	
+	wenn er die Portalseite öffnet
+	
+	dann wird ein Link mit dem Text 'Das Portlet ist noch nicht konfiguriert' angezeigt
+	
+
+
+*** Settings ***
+Force Tags      autor-cmj  autor-mca
+...				crud-1
+Resource        ${RESOURCES}/import/CrudPortlet.txt

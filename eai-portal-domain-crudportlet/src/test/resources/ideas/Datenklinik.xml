@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<databaseconfig datasource="DefaultDS" title="EAI-Klinik" version="1.0" visible="dbweb-admin,osiris-admin,osiris-mon,eai-clinic-ac,eai-clinic-algo,eai-clinic-atis,eai-clinic-crims,eai-clinic-dms,eai-clinic-dwh,eai-clinic-dipf,eai-clinic-first,eai-clinic-mf,eai-clinic-mo,eai-clinic-mig21,eai-clinic-ora,eai-clinic-qam,eai-clinic-raq,eai-clinic-bea,eai-clinic-pa,eai-clinic-fdwh,eai-clinic-post,eai-clinic-mw" rootRole="eai-clinic-root">
+	<rowConfigure><![CDATA[
+			if (row.getValue("STATE_ID") == "0") {
+			  row.setBackgroundColor("#FFA0C0");
+			}
+			if (row.getValue("SERIALIZATION_TYPE") == "-1") {
+			  row.setBackgroundColor("#AAAAAA");
+			} 
+			]]></rowConfigure>
+	<table pagesize="50" addnew="false" deletable="false" editable="false" name="Errors_Revision" title="Übersicht der aufgetretenen Fehler" tabTitle="Fehlerübersicht">
+		<name>OS_ERROR_REV_MESSAGES</name>
+		<search name="x1">
+			<search name="x2" title="Suche" cols="2">
+				<item name="group" title="Gruppe" type="select" aligntitle="right">
+					<dboption none="Alle" sql="select distinct gr.groupname from os_projects pr
+                        inner join os_error_rev_messages emg on pr.PROJECTNAME = emg.SA_NAME 
+                        left outer join os_projectgroup pg on pr.ID = pg.ID_PROJECT
+                        left outer join os_groups gr on pr.ID_GROUP = gr.ID or pg.id_group=gr.id
+						ORDER BY groupname" text="GROUPNAME" value="GROUPNAME"/>
+				</item>
+				<item name="newErrors" title="Neue Meldungen" type="check" defaultValue="true" aligntitle="right"/>
+				<item name="reprocessedErrors" title="Verarbeitete Meldungen" type="check" defaultValue="false" aligntitle="right"/>
+				<item name="doneErrors" title="Erledigte Meldungen" type="check" defaultValue="false" aligntitle="right"/>
+				<item name="saName" title="Service Assembly" type="select" aligntitle="right">
+					<dboption none="Alle" sql="select distinct SA_NAME from OS_ERROR_REV_MESSAGES order by SA_NAME" text="SA_NAME" value="SA_NAME"/>
+				</item>
+				<item name="messageIdFrom" title="Fehlerid von" type="text"/>
+				<item name="messageIdUntil" title="Fehlerid bis" type="text"/>
+				<item name="errorDateFrom" title="Datum von" calendar="true" type="date" format="dd.MM.yyyy HH:mm:ss"/>
+				<item name="errorDateUntil" title="Datum bis" calendar="true" type="date" format="dd.MM.yyyy HH:mm:ss"/>
+				<item name="errorSubText" title="Fehlermeldung (like)" type="text"/>
+				<action title="Suchen">
+					<execute><![CDATA[
+                    	var where = "1 = 1";
+                    	var sql;
+                    	var comment;
+                    	if (isUserInRole('dbweb-admin') == false and isUserInRole('osiris-admin') == false ){
+							comment = "get possible role from OS_ERROR_REV_ROLE_GROUP_CORR";
+							sql = "select distinct rolename from os_error_rev_role_group_corr";
+							var allRoles = executeSQL(sql);
+							var roleCount = allRoles.length;
+							var i = 0;
+							var rolesCommaSeparated = "";
+							var rolename;
+							while (i lt roleCount){
+								rolename = allRoles[i].getValue('ROLENAME');
+								if (isUserInRole(rolename)){
+									rolesCommaSeparated = rolesCommaSeparated + "'" + rolename + "', ";
+								}
+								i = i + 1;
+							}
+							if (rolesCommaSeparated.length() gt 0){
+								rolesCommaSeparated = rolesCommaSeparated.substring(0, rolesCommaSeparated.length() - 2);
+							} 
+								where = "sa_name in ( SELECT DISTINCT projectname
+									FROM os_projects prj 
+									LEFT OUTER JOIN os_projectgroup pg ON prj.ID = pg.id_project
+									LEFT OUTER JOIN os_groups gr ON prj.id_group = gr.ID OR pg.id_group = gr.ID
+									LEFT OUTER JOIN os_error_rev_role_group_corr CORR ON gr.groupname = CORR.groupname
+									WHERE CORR.rolename IN 
+										  (" + rolesCommaSeparated + "))";
+						}                    	
+                    	
+                    	if (newErrors != "true" and reprocessedErrors != "true" and doneErrors != "true") {
+                    		where = where + " and state_id = 1";
+                    	} else {
+							where = where + " and state_id in (";
+							if (newErrors == "true"){
+								where = where + " 0,";
+							}
+							if (reprocessedErrors == "true"){
+								where = where + " 2, 3,";
+							}
+							if (doneErrors == "true"){
+								where = where + " 4,";
+							}
+							where = where + " 1)";
+						}
+                    	if (messageIdFrom != "" and messageIdUntil != "") {
+                    		where = where + " and message_id between " + messageIdFrom + " and " + messageIdUntil;
+                    	} else if (messageIdFrom != ""){
+                    		where = where + " and message_id >= " + messageIdFrom;
+                    	} else if (messageIdUntil != "") {
+                    		where = where + " and message_id <= " + messageIdUntil;
+                    	}
+                    	if (errorDateFrom != "" and errorDateUntil != "") {
+                    		where = where + " and error_date between to_date('" + errorDateFrom + "', 'DD.MM.YYYY HH24:MI:SS') and to_date('" + errorDateUntil + "', 'DD.MM.YYYY HH24:MI:SS')";
+                    	} else if (errorDateFrom != ""){
+                    		where = where + " and error_date >= to_date('" + errorDateFrom + "', 'DD.MM.YYYY HH24:MI:SS')";
+                    	} else if (errorDateUntil != "") {
+                    		where = where + " and error_date <= to_date(''" + errorDateUntil + "', 'DD.MM.YYYY HH24:MI:SS')";
+                    	}
+                    	if (saName != "") {
+                    		where = where + " and sa_name = '" + saName + "'";
+                    	}
+                    	if (errorSubText != ""){
+							where = where + " and error_desc like '%" + errorSubText + "%'";
+                    	}
+                    	if (group != ""){
+							where = where + " and sa_name in (
+								select distinct projectname 
+								from os_projects prj
+                                left outer join os_projectgroup pg on prj.ID = pg.ID_PROJECT
+								left outer join os_groups gr on prj.ID_GROUP = gr.ID or pg.id_group=gr.id
+								where gr.GROUPNAME = '" + group + "')";
+                    	}
+                    	sql = "SELECT 0 AS chk, '' as rolename, 
+                    			substr(ERROR_DESC, 0, 100) as error_desc_substr,
+								MESSAGE_ID as id_and_msg_content,
+								o.* from OS_ERROR_REV_MESSAGES o where " + where + " order by message_id desc";
+						storeInSession("errorhandler.sql", sql);
+                    	out.println("executing " +  sql);
+                    	return sql;
+					]]></execute>
+				</action>
+			</search>
+		</search>
+		<search name="y1" position="below" border="false">
+			<search name="y2" title="">
+				<action title="Erneut verarbeiten">
+					<execute><![CDATA[
+                    var rows = table.getRowArray();
+					var row;
+					var id = -1;
+					var refrColumn;
+					var sql;
+					out.println("erneut verarbeiten called");
+					
+					for (var i = 0; i < rows.size(); i++) {
+						row = rows.get(i);
+						out.println("checking row " + row.getValue("MESSAGE_ID"));
+						out.println("row.getValue(CHK) = " + row.getValue("CHK"));
+						if(row.getValue("CHK") == 1 and row.getValue("STATE_ID") != 1 and row.getValue("SERIALIZATION_TYPE") != "-1") {
+							sql = "update os_error_rev_messages set state_id = 1, command_id = 1 where message_id = " + row.getValue("MESSAGE_ID");
+							out.println("executing: " + sql);
+							executeUpdate(sql);
+						}
+					}
+                    return retrieveFromSession("errorhandler.sql");
+					]]></execute>
+				</action>
+			</search>
+			<search name="y3" title="">
+				<action title="Als erledigt kennzeichnen">
+					<execute><![CDATA[
+                    var rows = table.getRowArray();
+					var row;
+					var id = -1;
+					var refrColumn;
+					var sql;
+					out.println("loesen called");
+					
+					for (var i = 0; i < rows.size(); i++) {
+						row = rows.get(i);
+						out.println("checking row " + row.getValue("MESSAGE_ID"));
+						out.println("row.getValue(CHK) = " + row.getValue("CHK"));
+						if(row.getValue("CHK") == 1 and row.getValue("STATE_ID") != 4) {
+							sql = "update os_error_rev_messages set state_id = 4 where message_id = " + row.getValue("MESSAGE_ID");
+							out.println("executing: " + sql);
+							executeUpdate(sql);
+						}
+					}
+                    return retrieveFromSession("errorhandler.sql");
+					]]></execute>
+				</action>
+			</search>
+			<search name="y5" title="">
+				<action title="Status aktualisieren">
+					<execute><![CDATA[
+                    var rows = table.getRowArray();
+					var row;
+					var id = -1;
+					var refrColumn;
+					var sql;
+					out.println("Status aktualisieren");
+					
+					for (var i = 0; i < rows.size(); i++) {
+						row = rows.get(i);
+						out.println("checking row " + row.getValue("MESSAGE_ID"));
+						out.println("row.getValue(CHK) = " + row.getValue("CHK"));
+						if(row.getValue("CHK") == 1) {
+							sql = "update os_error_rev_messages set state_id = " + row.getValue("STATE_ID") + " where message_id = " + row.getValue("MESSAGE_ID");
+							out.println("executing: " + sql);
+							executeUpdate(sql);
+						}
+					}
+                    return retrieveFromSession("errorhandler.sql");
+					]]></execute>
+				</action>
+			</search>
+		</search>
+		<columns>
+			<column checkBox="true" checkBoxAll="true" mandatory="true" name="CHK" title="" type="int"/>
+			<column editable="false" mandatory="true" name="MESSAGE_ID" primarykey="true" title="Fehlerid" type="int" inTable="false"/>
+			<column editable="false" name="ID_AND_MSG_CONTENT" title="Fehlerid" type="string" html="true"/>
+			<column editable="false" mandatory="true" name="SA_NAME" title="Service Assembly" type="string" key="MESSAGE_ID" keyValue="MESSAGE_ID" ref="OS_ERROR_REV_MESSAGES2"/>
+			<column mandatory="true" name="STATE_ID" title="Status" type="string" inlineedit="dbweb-admin,osiris-admin">
+				<dboption sql="select STATE_ID, STATE_DESC from OS_ERROR_REV_STATES ORDER BY STATE_ID" value="STATE_ID" text="STATE_DESC"/>
+			</column>
+			<column name="COMMAND_ID" title="Befehl" type="string">
+				<dboption sql="select COMMAND_ID, COMMAND_DESC from OS_ERROR_REV_COMMANDS ORDER BY COMMAND_ID" value="COMMAND_ID" text="COMMAND_DESC"/>
+			</column>
+			<column editable="false" maxlength="255" ignoreOnUpdate="true" name="ERROR_DATE" title="Datum" type="date" format="dd.MM.yyyy HH:mm:ss"/>
+			<column editable="false" ignoreOnUpdate="true" name="ERROR_DESC_SUBSTR" title="Fehler" type="string" html="true"/>
+			<column inTable="false" editable="false" ignoreOnUpdate="true" name="ERROR_DESC" title="Fehler" type="string" multiline="true"/>
+			<column inTable="false" editable="false" ignoreOnUpdate="true" name="ERROR_MESSAGE_CONTENT" title="Nachricht" type="string" multiline="true"/>
+			<column editable="false" mandatory="true" name="PARENT_MESSAGE_ID" title="Ursprungsmeldung" type="int"/>
+			<column editable="false" name="ROLENAME" title="rolename" type="string" inTable="false" visible="false"/>
+			<column editable="false" name="SERIALIZATION_TYPE" title="SERIALIZATION_TYPE" type="int" inTable="false"/>
+		</columns>
+	</table>
+	<table addnew="false" deletable="false" editable="false" name="root" pagesize="30" searchable="false" swap="true" title="Übersicht der aufgetretenen Fehler">
+		<name>OS_ERROR_REV_MESSAGES2</name>
+		<sql> &quot;select * from os_error_rev_messages where message_id = &quot; + keyvalue</sql>
+		<columns>
+			<column name="MESSAGE_ID" title="Fehlerid" type="int"/>
+			<column name="SA_NAME" title="Service Assembly" type="string"/>
+			<column name="ENDPOINT" title="Endpoint" type="string"/>
+			<column name="STATE_ID" title="Status" type="string">
+				<dboption sql="select STATE_ID, STATE_DESC from OS_ERROR_REV_STATES ORDER BY STATE_ID" value="STATE_ID" text="STATE_DESC"/>
+			</column>
+			<column maxlength="20" name="ERROR_DATE" title="Datum" type="date" format="dd.MM.yyyy HH:mm:ss"/>
+			<column name="ERROR_DESC" title="Fehler" type="string" multiline="true"/>
+			<column name="ERROR_MESSAGE_CONTENT" title="Nachricht" type="string" multiline="true"/>
+			<column name="ERROR_MESSAGE_PROPS" title="Properties" type="string" multiline="true"/>
+			<column name="PARENT_MESSAGE_ID" title="Ursprungsmeldung" type="int"/>
+		</columns>
+	</table>
+	<table addnew="dbweb-admin,osiris-admin" deletable="dbweb-admin,osiris-admin" editable="dbweb-admin,osiris-admin" name="root" pagesize="30" searchable="false" title="Retry-Konfiguration" tabTitle="Retry-Konfiguration">
+		<name>OS_ERROR_REV_RETRY</name>
+		<columns>
+			<column editable="true" mandatory="true" name="NAME" title="Error Handler Name" type="string" primarykey="true">
+				<dboption sql="select distinct NAME from OS_ERROR_HANDLER ORDER BY NAME" value="NAME" text="NAME"/>
+			</column>
+			<column editable="true" mandatory="true" name="RETRY_COUNT" title="Retry Count" type="int"/>
+			<column editable="true" mandatory="true" name="RETRY_INTERVAL" title="Retry Interval (ms)" type="int"/>
+		</columns>
+	</table>
+	<table addnew="dbweb-admin,osiris-admin" deletable="false" editable="false" name="root" pagesize="30" searchable="false" title="Übersicht der Retry-Nachrichten" tabTitle="Retry-Übersicht">
+		<name>OS_ERROR_REV_MESSAGES_RETRY</name>
+		<columns>
+			<column editable="false" mandatory="true" name="MESSAGE_ID" primarykey="true" title="Fehlerid" type="int"/>
+			<column editable="false" mandatory="true" name="SA_NAME" title="Service Assembly" type="string" key="MESSAGE_ID" keyValue="MESSAGE_ID" ref="OS_ERROR_REV_MESSAGES_RETRY2"/>
+			<column editable="false" maxlength="255" ignoreOnUpdate="true" name="ERROR_DATE" title="Datum / Fehler" type="date" format="dd.MM.yyyy HH:mm:ss"/>
+			<column editable="false" maxlength="255" ignoreOnUpdate="true" name="REPROCESS_DATE" title="Datum / Reprocess" type="date" format="dd.MM.yyyy HH:mm:ss"/>
+			<column editable="false" ignoreOnUpdate="true" name="ERROR_DESC" title="Fehler" type="string" html="true"/>
+			<column inTable="false" editable="false" ignoreOnUpdate="true" name="ERROR_DESC" title="Fehler" type="string" multiline="true"/>
+			<column inTable="false" editable="false" ignoreOnUpdate="true" name="ERROR_MESSAGE_CONTENT" title="Nachricht" type="string" multiline="true"/>
+			<column editable="false" mandatory="true" name="RETRY" title="Retry-Count" type="int"/>
+		</columns>
+	</table>
+	<table addnew="false" deletable="false" editable="false" name="root" pagesize="30" searchable="false" swap="true" title="Übersicht der Retry-Nachrichten">
+		<name>OS_ERROR_REV_MESSAGES_RETRY2</name>
+		<sql> &quot;select * from os_error_rev_messages_retry where message_id = &quot; + keyvalue</sql>
+		<columns>
+			<column name="MESSAGE_ID" title="Fehlerid" type="int"/>
+			<column name="SA_NAME" title="Service Assembly" type="string"/>
+			<column name="ENDPOINT" title="Endpoint" type="string"/>
+			<column maxlength="20" name="ERROR_DATE" title="Datum" type="date" format="dd.MM.yyyy HH:mm:ss"/>
+			<column name="ERROR_DESC" title="Fehler" type="string" multiline="true"/>
+			<column name="ERROR_MESSAGE_CONTENT" title="Nachricht" type="string" multiline="true"/>
+			<column name="ERROR_MESSAGE_PROPS" title="Properties" type="string" multiline="true"/>
+		</columns>
+	</table>
+	<table addnew="dbweb-admin,osiris-admin" deletable="dbweb-admin,osiris-admin" editable="dbweb-admin,osiris-admin" name="root" pagesize="30" searchable="false" title="Mailbenachrichtigung bei Fehlern" tabTitle="Mailbenachrichtigung">
+		<name>OS_ERROR_REV_GROUPS</name>
+		<columns>
+			<column name="GROUPNAME" title="Gruppe" type="string" primarykey="true">
+				<dboption sql="select distinct groupname from OS_GROUPS ORDER BY groupname" value="GROUPNAME" text="GROUPNAME"/>
+			</column>
+			<column name="MAIL" title="Mailverteiler" type="string"/>
+			<column name="CRON_EXPRESSION" title="Scheduler" type="string"/>
+			<column name="NOTIFY_ON_EACH_ERROR" title="Bei jedem Fehler benachrichtigen" type="int" defaultValue="0">
+				<option text="Ja" value="1"/>
+				<option text="Nein" value="0"/>
+			</column>
+		</columns>
+		<order>GROUPNAME</order>
+	</table>
+	<table addnew="dbweb-admin,osiris-admin" deletable="dbweb-admin,osiris-admin" editable="dbweb-admin,osiris-admin" name="root" pagesize="30" searchable="false" title="Rollenberechtigungen für Projektgruppen" tabTitle="Rollenberechtigungen">
+		<name>OS_ERROR_REV_ROLE_GROUP_CORR</name>
+		<columns>
+			<column name="ROLENAME" title="DBWeb-Rolle" type="string">
+				<dboption sql="select distinct rolename from DBWEB_ROLELIST ORDER BY rolename" value="ROLENAME" text="ROLENAME"/>
+			</column>
+			<column name="GROUPNAME" title="Gruppe" type="string">
+				<dboption sql="select distinct groupname from OS_GROUPS ORDER BY groupname" value="GROUPNAME" text="GROUPNAME"/>
+			</column>
+		</columns>
+		<order>ROLENAME</order>
+	</table>
+</databaseconfig>

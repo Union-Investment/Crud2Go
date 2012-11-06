@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel zum Duplizieren einer Zeile/Hinzufügen einer neuer Zeile mit Vorbelegung mit Query-Backend">
+	<page>
+		<table id="table" row-height="30"
+			onInitialize="setDuplicateButtonVisibility(it, false)" onModeChange="setDuplicateButtonVisibility(it, mode == 'EDIT')">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT
+						ID,
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN
+					 FROM test_crud2
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_CRUD2
+					  (
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN
+					  )
+					  VALUES
+					  (
+					    $row.values.CVARCHAR5_NN,
+					    $row.values.CNUMBER5_2_NN,
+					    $row.values.CDATE_NN,
+					    SYSDATE
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+						CDATE_NN	  = $row.values.CDATE_NN,
+					WHERE ID          = $row.values.ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_CRUD2
+					WHERE ID = $row.values.ID
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true" />
+				<column name="CVARCHAR5_NN" editable="true" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN" hidden="true" />
+			</columns>
+			<action id="duplicate-button" onExecution="duplicateRow(it.table)"
+				title="Zeile duplizieren" />
+		</table>
+	</page>
+	<script>
+	<![CDATA[
+	
+	def setDuplicateButtonVisibility(table, visible) {
+		table.setTableActionVisibility('duplicate-button', visible)
+	}
+	
+	def duplicateRow(table) {
+		if (!table.selection || table.selection.empty) {
+			showPopup "Keine Zeile ausgewählt", "Bitte wählen Sie eine Zeile zum Duplizieren aus." 
+		} else if (table.selection && table.selection.size() > 1) {
+			showPopup "Mehrere Zeilen ausgewählt", "Bitte wählen Sie nur eine Zeile zum Duplizieren aus." 
+		} else {
+			def selectedRow = table.selectedRows[0]
+			table.createNewRow([
+				'CVARCHAR5_NN': selectedRow.values['CVARCHAR5_NN'],
+				'CNUMBER5_2_NN': selectedRow.values['CNUMBER5_2_NN'],
+				'CDATE_NN': selectedRow.values['CDATE_NN']
+			])
+		}
+	}
+	
+	
+	]]>
+	</script>
+</portlet>

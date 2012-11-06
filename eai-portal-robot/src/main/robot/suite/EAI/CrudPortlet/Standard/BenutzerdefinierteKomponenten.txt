@@ -1,0 +1,38 @@
+*** Settings ***
+Documentation   Story: Als Entwickler möchte ich Zeilen/Felder dynamisch schreibschützen können, 
+...				um Fehleingaben zu verhindern
+Force Tags      autor-nwo  
+...				crud-1
+...				EAI-740
+
+*** Test Case ***
+Benutzerdefinierter Dynamischer Button
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'CUSTOM_COMPONENTS.xml'
+
+	und dann den Button 'Klick mich!' klickt
+	
+	dann ist der Button 'Klick mich!' nicht vorhanden
+	und außerdem ist der Button 'geklickt!' vorhanden
+
+
+Benutzerdefinierte Bilder
+	Es existieren Testdaten in TEST_CRUD2
+	
+	wenn das Portlet mit der XML-Konfiguration 'CUSTOM_COMPONENTS.xml' geladen ist
+	
+	dann wird das Bild 'http://www.google.de/logos/2011/noyce11-hp.jpg' angezeigt
+	und außerdem wird das Bild 'http://l.yimg.com/a/i/ww/met/logo/20100909/yahoo_logo_de.png' angezeigt
+
+
+Benutzerdefinierte Labels
+	Es existieren Testdaten in TEST_CRUD2
+	
+	wenn das Portlet mit der XML-Konfiguration 'CUSTOM_COMPONENTS.xml' geladen ist
+	
+	dann wird der Text 'label-1' angezeigt
+	und außerdem wird der Text 'label-2' angezeigt
+	und außerdem wird der Text 'label-3' angezeigt 
+
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

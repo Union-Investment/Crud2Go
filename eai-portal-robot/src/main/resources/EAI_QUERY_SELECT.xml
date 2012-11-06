@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="EAI_QUERY_SELECT">
+	<page>
+		<table>
+			<database-query datasource="test">
+				<query><![CDATA[
+					select * 
+					from (SELECT * FROM test_crud2)
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true"/>
+				<column name="CNUMBER5_2"/>
+			</columns>
+		</table>
+	</page>
+</portlet>

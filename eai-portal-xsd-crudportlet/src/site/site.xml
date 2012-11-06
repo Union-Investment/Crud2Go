@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="eai-portal-xsd-crudportlet">
+  <body>
+	<menu ref="parent"/>
+	<menu ref="modules"/>
+	<menu ref="reports"/>
+  </body>
+</project>
+    

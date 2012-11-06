@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table id="test-table">
+			<database-table datasource="test" tablename="test_crud2" />
+			<action onExecution="addColumn(it.table)" title="Spalte generieren" />
+			<action onExecution="removeColumn(it.table)" title="Generierte Spalte löschen" />
+			<action onExecution="renderOnce(it.table)" title="3 Spalten" />
+			<action onExecution="toggleVisibility(it.table)" title="Sichtbarkeit ändern" />
+		</table>
+	</page>
+	<script><![CDATA[
+		
+		def addColumn(table) {
+			table.addGeneratedColumn('generated', 'generated') { row, builder -> builder.label(value: 'Foo') }
+		}
+		
+		def removeColumn(table) {
+			table.removeGeneratedColumn('generated')
+		}
+		
+		def renderOnce(table) {
+	    	table.renderOnce({
+	    		table.addGeneratedColumn('X1', 'X1') { row, builder -> builder.label(value: 'X1') }
+		    	table.addGeneratedColumn('X2', 'X2') { row, builder -> builder.label(value: 'X2') }
+		    	table.addGeneratedColumn('X3', 'X3') { row, builder -> builder.label(value: 'X3') }
+		    })
+		}
+		
+		def toggleVisibility(table) {
+			def visibleColumns = [
+				'CDATE', 
+				'CNUMBER5_2']
+	    	table.setVisibleColumns(visibleColumns)
+		}
+		
+	]]></script>
+</portlet>
