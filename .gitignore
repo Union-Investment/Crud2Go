@@ -10,3 +10,13 @@ target
 /eai-portal-webapp-administration/src/main/webapp/VAADIN/widgetsets/de.unioninvestment.eai.portal.portlet.widgetset.SofiaWidgetset-deploy
 
 /eai-portal-domain-crudportlet/derby.log
+/settings.gradle
+/eai-portal-domain-crudportlet/build.gradle
+/eai-portal-domain-crudportlet/build
+/.gradle
+/eai-portal-build/.gradle
+/eai-portal-build/build
+/eai-portal-build/build.gradle
+/eai-portal-webapp-administration/build.gradle
+/eai-portal-webapp-administration/build
+/eai-portal-support-vaadin/build
