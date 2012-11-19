@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
 import groovy.lang.Closure;
@@ -67,6 +67,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
@@ -83,6 +84,7 @@ import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
 import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.scripting.ScriptContainerDelegate;
+import de.unioninvestment.eai.portal.support.scripting.ScriptCustomFilterFactory;
 import de.unioninvestment.eai.portal.support.scripting.ScriptFormSQLWhereFactory;
 import de.unioninvestment.eai.portal.support.scripting.SqlProvider;
 import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
@@ -329,16 +331,26 @@ public class ScriptModelBuilder {
 			ScriptFormAction scriptFormAction = buildScriptFormAction(formAction);
 
 			if (formAction.getActionHandler() instanceof SearchFormAction) {
+				SearchFormAction actionHandler = (SearchFormAction) formAction
+						.getActionHandler();
 				SQLWhereFactory whereFactory = new ScriptFormSQLWhereFactory(
 						scriptBuilder.getMainScript(), scriptFormAction);
-				((SearchFormAction) formAction.getActionHandler())
-						.setWhereFactory(whereFactory);
+				actionHandler.setWhereFactory(whereFactory);
+
+				registerCustomFilters(scriptFormAction, actionHandler);
 			}
 
 			populateFormActionExecutionClosure(formAction, scriptFormAction);
 			scriptForm.addAction(scriptFormAction);
 		}
 		return scriptForm;
+	}
+
+	private void registerCustomFilters(ScriptFormAction scriptFormAction,
+			SearchFormAction actionHandler) {
+		CustomFilterFactory filterFactory = new ScriptCustomFilterFactory(
+				scriptBuilder, scriptFormAction);
+		actionHandler.setCustomFilterFactory(filterFactory);
 	}
 
 	private ScriptFormField buildScriptFormField(FormField formField) {

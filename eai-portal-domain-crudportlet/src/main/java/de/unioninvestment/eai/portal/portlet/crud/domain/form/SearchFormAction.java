@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.form;
 
 import java.sql.Timestamp;
@@ -29,6 +29,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.AllFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.AnyFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ComparisonFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ContainsFilterConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.EndsWithFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.EqualsFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
@@ -65,6 +66,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilter;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.EndsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
@@ -91,6 +94,7 @@ public class SearchFormAction implements ActionHandler {
 	private boolean requiresFilter;
 
 	private int timeout = 0;
+	private CustomFilterFactory customFilterFactory;
 
 	/**
 	 * @param actionConfig
@@ -308,6 +312,14 @@ public class SearchFormAction implements ActionHandler {
 				if (subfilters.size() > 0) {
 					result.add(new Not(subfilters));
 				}
+			} else if (config instanceof CustomFilterConfig) {
+				CustomFilterConfig customFilterConfig = (CustomFilterConfig) config;
+				CustomFilter filter = customFilterFactory
+						.createCustomFilter(customFilterConfig);
+				if (filter != null) {
+					result.add(filter);
+				}
+
 			} else if (config instanceof SQLFilterConfig) {
 				SQLFilterConfig sqlFilterConfig = (SQLFilterConfig) config;
 				SQLFilter filter = whereFactory
@@ -447,6 +459,10 @@ public class SearchFormAction implements ActionHandler {
 			}
 			nextElement = panel.findNextElement(Component.class, nextElement);
 		}
+	}
+
+	public void setCustomFilterFactory(CustomFilterFactory filterFactory) {
+		this.customFilterFactory = filterFactory;
 	}
 
 }

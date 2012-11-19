@@ -42,6 +42,7 @@
 						<starts-with column="TESTDATA" field="STARTSWITH"/>
 						<contains column="TESTDATA" field="CONTAINS"/>
 						<ends-with column="TESTDATA" field="ENDSWITH" case-sensitive="true"/>
+						<custom filter="(row.ID % 2) == 1"/>
 					</apply-filters>
 				</search>
 			</action>

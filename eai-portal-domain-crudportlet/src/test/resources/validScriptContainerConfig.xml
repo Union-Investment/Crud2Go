@@ -15,6 +15,7 @@
 							<equals column="CNUMBER5_2_NN" field="CNUMBER5_2_NN"/>
 							<starts-with column="TESTDATA" field="TESTDATA"/>
 							<ends-with column="TESTDATA" field="TESTDATA"/>
+							<custom filter="(row.values.ID%2==1)"/>
 						</any>
 					</apply-filters>
 				</search>

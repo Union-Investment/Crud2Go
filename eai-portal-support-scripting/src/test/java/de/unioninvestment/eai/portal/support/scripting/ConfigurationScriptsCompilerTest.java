@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.support.scripting;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -49,9 +49,12 @@ import org.xml.sax.SAXException;
 
 import com.vaadin.ui.Button;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.AnyFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
@@ -89,7 +92,9 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 
 		compiler.compileAllScripts(portletConfig);
 
-		verify(scriptCompilerMock).compileScript("log.info \"Hello World\"\nlog.debug 'Main-Script executed...'");
+		verify(scriptCompilerMock)
+				.compileScript(
+						"log.info \"Hello World\"\nlog.debug 'Main-Script executed...'");
 	}
 
 	@Test
@@ -110,8 +115,9 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 
 		compiler.compileAllScripts(portletConfig);
 
-		verify(scriptCompilerMock).compileScript(
-				"def aufruf() { println \"aufruf erfolgreich\" }\nlog.debug 'Main-Script executed...'");
+		verify(scriptCompilerMock)
+				.compileScript(
+						"def aufruf() { println \"aufruf erfolgreich\" }\nlog.debug 'Main-Script executed...'");
 		verify(scriptCompilerMock).compileScript("{ it -> aufruf() }");
 		// assertThat(config.getScript().getValue().getClazz(), notNullValue());
 	}
@@ -160,12 +166,12 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		assertThat(getDatabaseQuery(portletConfig).getOnUpdate().getClazz(),
 				notNullValue());
 
-		assertThat(getDatabaseQuery(portletConfig).getInsert().getStatement().getClazz(),
-				notNullValue());
-		assertThat(getDatabaseQuery(portletConfig).getUpdate().getStatement().getClazz(),
-				notNullValue());
-		assertThat(getDatabaseQuery(portletConfig).getDelete().getStatement().getClazz(),
-				notNullValue());
+		assertThat(getDatabaseQuery(portletConfig).getInsert().getStatement()
+				.getClazz(), notNullValue());
+		assertThat(getDatabaseQuery(portletConfig).getUpdate().getStatement()
+				.getClazz(), notNullValue());
+		assertThat(getDatabaseQuery(portletConfig).getDelete().getStatement()
+				.getClazz(), notNullValue());
 
 		assertScriptExecution(portletConfig);
 	}
@@ -184,7 +190,11 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 
 		Script script = portletConfig.getScript().getValue().getClazz()
 				.newInstance();
-		script.getBinding().setVariable("log", LoggerFactory.getLogger(ConfigurationScriptsCompilerTest.class));
+		script.getBinding()
+				.setVariable(
+						"log",
+						LoggerFactory
+								.getLogger(ConfigurationScriptsCompilerTest.class));
 		script.run();
 
 		Script dynamicClosureScript = getDynamicSelect(portletConfig)
@@ -207,33 +217,76 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		PortletConfig portletConfig = createConfiguration("validCustomComponentConfig.xml");
 		new ConfigurationScriptsCompiler(scriptCompiler)
 				.compileAllScripts(portletConfig);
-		
-		ScriptComponentConfig scriptComponentConfig = (ScriptComponentConfig) portletConfig.getPage().getElements().get(0);
-		
-		assertThat(scriptComponentConfig.getGenerator().getClazz(), notNullValue());
+
+		ScriptComponentConfig scriptComponentConfig = (ScriptComponentConfig) portletConfig
+				.getPage().getElements().get(0);
+
+		assertThat(scriptComponentConfig.getGenerator().getClazz(),
+				notNullValue());
 	}
-	
+
 	@Test
-	public void shouldReturnScriptComponentButton() throws JAXBException, InstantiationException, IllegalAccessException {
+	public void shouldCompileCustomFilterScript() throws JAXBException {
+		ScriptCompiler scriptCompiler = new ScriptCompiler();
+		PortletConfig portletConfig = createConfiguration("validSearchConfig.xml");
+		new ConfigurationScriptsCompiler(scriptCompiler)
+				.compileAllScripts(portletConfig);
+
+		FormConfig formConfig = (FormConfig) portletConfig.getPage()
+				.getElements().get(0);
+		FormActionConfig actionConfig = formConfig.getAction().get(0);
+		List<FilterConfig> filters = actionConfig.getSearch().getApplyFilters()
+				.getFilters();
+		CustomFilterConfig customFilterConfig = (CustomFilterConfig) filters
+				.get(filters.size() - 1);
+
+		assertThat(customFilterConfig.getFilter().getClazz(), notNullValue());
+	}
+
+	@Test
+	public void shouldCompileCustomFilterScriptInSubfilters()
+			throws JAXBException {
+		ScriptCompiler scriptCompiler = new ScriptCompiler();
+		PortletConfig portletConfig = createConfiguration("validScriptContainerConfig.xml");
+		new ConfigurationScriptsCompiler(scriptCompiler)
+				.compileAllScripts(portletConfig);
+
+		FormConfig formConfig = (FormConfig) portletConfig.getPage()
+				.getElements().get(0);
+		FormActionConfig actionConfig = formConfig.getAction().get(0);
+		List<FilterConfig> filters = actionConfig.getSearch().getApplyFilters()
+				.getFilters();
+		AnyFilterConfig anyFilterConfig = (AnyFilterConfig) filters.get(0);
+		CustomFilterConfig customFilterConfig = (CustomFilterConfig) anyFilterConfig
+				.getFilters().get(anyFilterConfig.getFilters().size() - 1);
+
+		assertThat(customFilterConfig.getFilter().getClazz(), notNullValue());
+	}
+
+	@Test
+	public void shouldReturnScriptComponentButton() throws JAXBException,
+			InstantiationException, IllegalAccessException {
 		ScriptCompiler scriptCompiler = new ScriptCompiler();
 		PortletConfig portletConfig = createConfiguration("validCustomComponentConfig.xml");
 		new ConfigurationScriptsCompiler(scriptCompiler)
 				.compileAllScripts(portletConfig);
-		
-		ScriptComponentConfig scriptComponentConfig = (ScriptComponentConfig) portletConfig.getPage().getElements().get(0);
-		Script generatorScript = scriptComponentConfig.getGenerator().getClazz().newInstance();
-		
+
+		ScriptComponentConfig scriptComponentConfig = (ScriptComponentConfig) portletConfig
+				.getPage().getElements().get(0);
+		Script generatorScript = scriptComponentConfig.getGenerator()
+				.getClazz().newInstance();
+
 		Closure<?> generatorClosure = (Closure<?>) generatorScript.run();
-		
+
 		Script mainScript = portletConfig.getScript().getValue().getClazz()
 				.newInstance();
 		generatorClosure.setDelegate(mainScript);
-		
+
 		Object result = generatorClosure.call(new VaadinBuilder(null));
-		
+
 		assertThat(result, new InstanceOf(Button.class));
 	}
-	
+
 	@Test
 	public void shouldCompileTableStyleClosures() throws JAXBException,
 			InstantiationException, IllegalAccessException {
@@ -287,7 +340,9 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 			SAXException, ScriptingException {
 
 		PortletConfig portletConfig = createConfiguration("validScriptConfig.xml");
-		when(scriptCompilerMock.compileScript("log.info \"Hello World\"\nlog.debug 'Main-Script executed...'"))
+		when(
+				scriptCompilerMock
+						.compileScript("log.info \"Hello World\"\nlog.debug 'Main-Script executed...'"))
 				.thenThrow(
 						new ScriptingException(null,
 								"portlet.crud.error.compilingScript"));
@@ -330,11 +385,11 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 
 		assertThat(object.toString(), is(datumString));
 	}
-	
+
 	@Test
 	public void shouldCompileStatementClosure() throws JAXBException,
 			InstantiationException, IllegalAccessException {
-		
+
 		PortletConfig portletConfig = createConfiguration("validScriptCrudConfig.xml");
 
 		compiler.compileAllScripts(portletConfig);
@@ -344,20 +399,20 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		verify(scriptCompilerMock).compileScript(contains("doUpdate(row) //"));
 		verify(scriptCompilerMock).compileScript(contains("doDelete(row) //"));
 	}
-	
+
 	@Test
 	public void shouldCompileScriptContainerDelegate() throws JAXBException {
 		PortletConfig portletConfig = createConfiguration("validScriptContainerConfig.xml");
 
 		compiler.compileAllScripts(portletConfig);
-		
-		verify(scriptCompilerMock, times(3)).compileScript(anyString());
+
+		verify(scriptCompilerMock, times(4)).compileScript(anyString());
 	}
-	
+
 	@Test
 	public void shouldCompileSqlStatementGString() throws JAXBException,
 			InstantiationException, IllegalAccessException {
-		
+
 		PortletConfig portletConfig = createConfiguration("validQueryConfig.xml");
 
 		compiler.compileAllScripts(portletConfig);
@@ -396,7 +451,11 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		Script script = portletConfig.getScript().getValue().getClazz()
 				.newInstance();
 		script.getBinding().setVariable("portlet", portletMock);
-		script.getBinding().setVariable("log", LoggerFactory.getLogger(ConfigurationScriptsCompilerTest.class));
+		script.getBinding()
+				.setVariable(
+						"log",
+						LoggerFactory
+								.getLogger(ConfigurationScriptsCompilerTest.class));
 		script.run();
 
 		@SuppressWarnings("unchecked")

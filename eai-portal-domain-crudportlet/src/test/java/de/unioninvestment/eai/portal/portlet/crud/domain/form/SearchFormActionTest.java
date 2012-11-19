@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.form;
 
 import static java.util.Arrays.asList;
@@ -57,6 +57,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.AnyFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ApplyFiltersConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CheckboxConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ContainsFilterConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DateConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.EndsWithFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.EqualsFilterConfig;
@@ -65,6 +66,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GreaterFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GreaterOrEqualFilterConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.IncludeFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.LessFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.LessOrEqualFilterConfig;
@@ -79,6 +81,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessExcep
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TimeoutException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
@@ -97,6 +100,9 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilter;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterMatcher;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.EndsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
@@ -192,6 +198,9 @@ public class SearchFormActionTest {
 
 	@Mock
 	private MultiOptionListFormField multiSelectFormFieldMock;
+
+	@Mock
+	private CustomFilterFactory customFilterFactoryMock;
 
 	@Before
 	public void setUp() {
@@ -471,6 +480,23 @@ public class SearchFormActionTest {
 		verifyFilterByConfiguration(
 				createStartsWithFilter("field1", "column1", false),
 				new StartsWith("column1", "filterValue1", false));
+	}
+
+	@Test
+	public void shouldApplyConfiguredCustomFilter() {
+		searchAction.setCustomFilterFactory(customFilterFactoryMock);
+		CustomFilterMatcher matcher = new CustomFilterMatcher() {
+			@Override
+			public boolean matches(ContainerRow row) {
+				return true;
+			}
+		};
+		CustomFilterConfig customFilterConfig = createCustomFilter();
+		CustomFilter customFilter = new CustomFilter(matcher, false);
+		when(customFilterFactoryMock.createCustomFilter(customFilterConfig))
+				.thenReturn(customFilter);
+
+		verifyFilterByConfiguration(customFilterConfig, customFilter);
 	}
 
 	@Test
@@ -845,6 +871,12 @@ public class SearchFormActionTest {
 		LessFilterConfig filter = new LessFilterConfig();
 		filter.setField(fieldName);
 		filter.setColumn(columnName);
+		return filter;
+	}
+
+	private CustomFilterConfig createCustomFilter() {
+		CustomFilterConfig filter = new CustomFilterConfig();
+		filter.setFilter(new GroovyScript("abcde"));
 		return filter;
 	}
 

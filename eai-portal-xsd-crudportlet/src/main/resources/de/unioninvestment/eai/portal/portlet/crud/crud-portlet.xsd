@@ -823,6 +823,7 @@
 						<element name="sql" type="tns:SQLFilterConfig" />
 						<element name="include-filter" type="tns:IncludeFilterConfig" />
 						<element name="nothing" type="tns:NothingFilterConfig" />
+						<element name="custom" type="tns:CustomFilterConfig" />
 					</choice>
 				</sequence>
 			</extension>
@@ -1027,6 +1028,29 @@
 					<annotation>
 						<documentation>
 							Name der Tabellenspalte
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="CustomFilterConfig">
+		<annotation>
+			<documentation>
+				Custom In-Memory Filter (nicht für Database-Backends
+				geeignet)
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:FilterConfig">
+				<attribute name="filter" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Diese Closure wird für jede Zeile des Backends
+							aufgerufen. Alle Zeilen, für die sie
+							true liefert, werden
+							dargestellt.
 						</documentation>
 					</annotation>
 				</attribute>

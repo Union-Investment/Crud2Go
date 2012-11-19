@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.nio.CharBuffer;
@@ -32,6 +32,9 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.container.GenericVaadin
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilter;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterMatcher;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericItem;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericItemId;
@@ -53,6 +56,33 @@ public class GenericDataContainer extends AbstractDataContainer {
 	private static final long serialVersionUID = 1L;
 	private GenericDelegate delegate;
 	private MetaData metaData;
+
+	/**
+	 * Maps Vaadin Custom filtering to a matcher that gets a
+	 * {@link ContainerRow} instead of a Vaadin {@link Item}.
+	 * 
+	 * @author carsten.mjartan
+	 */
+	private static class CustomFilterMatcherWrapper
+			implements
+			de.unioninvestment.eai.portal.support.vaadin.filter.CustomFilter.Matcher {
+
+		private final GenericDataContainer container;
+		private final CustomFilterMatcher matcher;
+
+		public CustomFilterMatcherWrapper(GenericDataContainer container,
+				CustomFilterMatcher matcher) {
+			this.container = container;
+			this.matcher = matcher;
+		}
+
+		@Override
+		public boolean matches(Object itemId, Item item) {
+			ContainerRow row = container.convertItemToRow(item, false, true);
+			return matcher.matches(row);
+		}
+
+	}
 
 	public GenericDataContainer(Map<String, String> formatPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {
@@ -230,6 +260,21 @@ public class GenericDataContainer extends AbstractDataContainer {
 		}
 
 		return new GenericContainerRowId(rowId, getPrimaryKeyColumns());
+	}
+
+	@Override
+	com.vaadin.data.Container.Filter buildVaadinFilter(Filter filter) {
+		if (filter instanceof CustomFilter) {
+			return buildCustomFilter(filter);
+		} else {
+			return super.buildVaadinFilter(filter);
+		}
+	}
+
+	private com.vaadin.data.Container.Filter buildCustomFilter(Filter filter) {
+		CustomFilter customFilter = (CustomFilter) filter;
+		return new de.unioninvestment.eai.portal.support.vaadin.filter.CustomFilter(
+				new CustomFilterMatcherWrapper(this, customFilter.getMatcher()));
 	}
 
 	/**
