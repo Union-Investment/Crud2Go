@@ -5,7 +5,7 @@
 
 	<groupId>de.uit.eai.portal</groupId>
 	<artifactId>eai-portal-build</artifactId>
-	<version>1.43.0</version>
+	<version>1.44-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Osiris :: Investment :: EAI-Portal-Administration</name>
 
