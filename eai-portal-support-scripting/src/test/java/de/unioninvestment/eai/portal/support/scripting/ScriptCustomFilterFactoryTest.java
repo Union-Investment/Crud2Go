@@ -2,13 +2,15 @@ package de.unioninvestment.eai.portal.support.scripting;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 import groovy.lang.Closure;
-import groovy.lang.Script;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
@@ -36,17 +38,21 @@ public class ScriptCustomFilterFactoryTest {
 
 		CustomFilterConfig config = new CustomFilterConfig();
 		config.setFilter(new GroovyScript("abcde"));
-		Script script = new Script() {
-			@Override
-			public Object run() {
-				return new Closure<Boolean>(ScriptCustomFilterFactoryTest.this) {
-					public Boolean doCall(ScriptRow row) {
-						return true;
-					}
-				};
+		final Closure<Boolean> closure = new Closure<Boolean>(
+				ScriptCustomFilterFactoryTest.this) {
+			public Boolean doCall(ScriptRow row) {
+				return true;
 			}
 		};
-		config.getFilter().setClazz(script.getClass());
+		when(scriptBuilderMock.buildClosure(config.getFilter())).thenAnswer(
+				new Answer<Object>() {
+
+					@Override
+					public Object answer(InvocationOnMock invocation)
+							throws Throwable {
+						return closure;
+					}
+				});
 
 		CustomFilter customFilter = factory.createCustomFilter(config);
 
