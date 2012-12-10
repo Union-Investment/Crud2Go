@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.vaadin.data.Container;
@@ -222,12 +223,14 @@ public class OptionListContainer extends AbstractContainer implements
 	}
 
 	private void createFilteredOptionList() {
+		// this has to be outside the lock to prevent a deadlock situation
+		Map<String, String> newOptions = optionList.getOptions(context);
+
 		synchronized (lock) {
 			boolean unfiltered = !doesFilter();
 			int index = 0;
 			options = new LinkedHashMap<String, Option>();
-			for (Entry<String, String> entry : optionList.getOptions(context)
-					.entrySet()) {
+			for (Entry<String, String> entry : newOptions.entrySet()) {
 				String key = entry.getKey();
 				Option item = new Option(key, entry.getValue(), index++);
 

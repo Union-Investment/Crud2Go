@@ -1,24 +1,25 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
@@ -379,6 +380,65 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		app.removeAddedComponentsFromView();
 
 		verify(viewPageMock).removeComponent(menu);
+
+	}
+
+	@Test
+	public void shouldProvideInformationIfInitializationIsInProgress() {
+
+		assertThat(app.isInitializing(), is(true));
+
+		app.onRequestStart(request, response);
+		app.start(applicationUrl, null, contextMock);
+
+		final PortletConfig portletConfig = new PortletConfig();
+
+		when(configMock.getPortletConfig()).thenAnswer(
+				new Answer<PortletConfig>() {
+					@Override
+					public PortletConfig answer(InvocationOnMock invocation)
+							throws Throwable {
+						assertThat(app.isInitializing(), is(true));
+						return portletConfig;
+					}
+				});
+		when(request.getAttribute(WebKeys.PORTLET_ID)).thenReturn("4711");
+		when(modelBuilderMock.build()).thenAnswer(new Answer<Portlet>() {
+			@Override
+			public Portlet answer(InvocationOnMock invocation) throws Throwable {
+				assertThat(app.isInitializing(), is(true));
+				return portletMock;
+			}
+		});
+
+		when(guiBuilderMock.build(portletMock)).thenAnswer(
+				new Answer<PortletPresenter>() {
+					@Override
+					public PortletPresenter answer(InvocationOnMock invocation)
+							throws Throwable {
+						assertThat(app.isInitializing(), is(true));
+						return portletPresenterMock;
+					}
+
+				});
+		when(portletPresenterMock.getView()).thenReturn(portletViewMock);
+
+		when(
+				scriptModelFactoryMock.getBuilder(any(Portlet.class),
+						any((new HashMap<Object, Object>()).getClass())))
+				.thenAnswer(new Answer<ScriptModelBuilder>() {
+					@Override
+					public ScriptModelBuilder answer(InvocationOnMock invocation)
+							throws Throwable {
+						assertThat(app.isInitializing(), is(true));
+						return scriptModelBuilderMock;
+					}
+				});
+
+		app.refreshViews();
+
+		verify(viewPageMock).addComponent(portletViewMock);
+		assertThat(app.isInitializing(), is(false));
 
 	}
 }

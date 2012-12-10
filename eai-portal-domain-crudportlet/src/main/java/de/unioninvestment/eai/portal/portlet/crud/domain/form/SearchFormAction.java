@@ -51,6 +51,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessExcep
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
@@ -78,6 +79,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudApplication;
+import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.support.NumberFormatter;
 
 /**
@@ -138,11 +141,26 @@ public class SearchFormAction implements ActionHandler {
 			List<Table> tables = findSearchableTables(form);
 
 			for (Table table : tables) {
-				applyFiltersToTable(form, table);
+				if (policyAllowsFiltering(table)) {
+					applyFiltersToTable(form, table);
+				}
 			}
 		} else {
 			throw new BusinessException("portlet.crud.search.filter.mandatory");
 		}
+	}
+
+	private boolean policyAllowsFiltering(Table table) {
+		CrudApplication application = (CrudApplication) PortletApplication
+				.getCurrentApplication();
+		if (application != null && application.isInitializing()) {
+			FilterPolicy policy = table.getContainer().getFilterPolicy();
+			if (policy == FilterPolicy.NOTHING
+					|| policy == FilterPolicy.NOTHING_AT_ALL) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

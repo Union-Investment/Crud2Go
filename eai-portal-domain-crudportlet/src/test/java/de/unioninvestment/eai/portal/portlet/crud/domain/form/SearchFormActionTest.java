@@ -26,7 +26,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -83,6 +86,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxFormField
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
@@ -113,8 +117,42 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudApplication;
+import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 
 public class SearchFormActionTest {
+
+	static class CrudApplicationMock extends PortletApplication implements
+			CrudApplication {
+
+		private boolean initializing;
+
+		public CrudApplicationMock(boolean initializing) {
+			this.initializing = initializing;
+		}
+
+		@Override
+		public boolean isInitializing() {
+			return initializing;
+		}
+
+		@Override
+		public void addToView(com.vaadin.ui.Component component) {
+		}
+
+		@Override
+		public void removeAddedComponentsFromView() {
+		}
+
+		@Override
+		public void init() {
+		}
+
+		public void setInitializing(boolean initializing) {
+			this.initializing = initializing;
+		}
+
+	}
 
 	private SearchFormAction searchAction;
 
@@ -202,6 +240,8 @@ public class SearchFormActionTest {
 	@Mock
 	private CustomFilterFactory customFilterFactoryMock;
 
+	private CrudApplicationMock app;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -217,6 +257,17 @@ public class SearchFormActionTest {
 		formFields = new FormFields(createFormField("field1", "title1",
 				"prompt1", "filterValue1"), selectionFormField);
 		when(formMock.getFields()).thenReturn(formFields);
+
+		// register application with thread
+		app = new CrudApplicationMock(false);
+		app.onRequestStart(null, null);
+
+	}
+
+	@After
+	public void tearDown() {
+		// deregister from thread
+		app.onRequestEnd(null, null);
 	}
 
 	@Test
@@ -410,6 +461,44 @@ public class SearchFormActionTest {
 
 	private Timestamp timestamp(int i, int j, int k) {
 		return new Timestamp(new GregorianCalendar(i, j, k).getTimeInMillis());
+	}
+
+	@Test
+	public void shouldNotFilterOnInitializationIfTableHasANothingPolicy() {
+		mockPageWithFormAndTable();
+
+		formFields = new FormFields(createFormField("field1", "title1",
+				"prompt1", "1.0"));
+		when(formMock.getFields()).thenReturn(formFields);
+		stubContainerColumnType("field1", BigDecimal.class);
+
+		app.setInitializing(true);
+		when(dbContainerMock.getFilterPolicy())
+				.thenReturn(FilterPolicy.NOTHING);
+
+		searchAction.execute(formMock);
+
+		verify(dbContainerMock, never()).replaceFilters(any(List.class),
+				eq(false));
+	}
+
+	@Test
+	public void shouldNotFilterOnInitializationIfTableHasANothingAtAllPolicy() {
+		mockPageWithFormAndTable();
+
+		formFields = new FormFields(createFormField("field1", "title1",
+				"prompt1", "1.0"));
+		when(formMock.getFields()).thenReturn(formFields);
+		stubContainerColumnType("field1", BigDecimal.class);
+
+		app.setInitializing(true);
+		when(dbContainerMock.getFilterPolicy()).thenReturn(
+				FilterPolicy.NOTHING_AT_ALL);
+
+		searchAction.execute(formMock);
+
+		verify(dbContainerMock, never()).replaceFilters(any(List.class),
+				eq(false));
 	}
 
 	@Test

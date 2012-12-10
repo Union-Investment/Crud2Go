@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud;
 
 import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
@@ -60,6 +60,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudApplication;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.DatasourceInfoPresenter;
@@ -90,7 +91,7 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationExcepti
  */
 @Configurable(preConstruction = true, dependencyCheck = true)
 public class CrudPortletApplication extends SpringPortletApplication implements
-		PortletListener, ShowPopupEventHandler {
+		PortletListener, ShowPopupEventHandler, CrudApplication {
 
 	private static final long serialVersionUID = 1L;
 
@@ -136,6 +137,8 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	private Window mainWindow;
 
 	private Set<Component> registeredComponents = new HashSet<Component>();
+
+	private boolean initializing = true;
 
 	/**
 	 * Initialisierung des PortletPresenter.
@@ -254,6 +257,73 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	 * aufgerufen wird.
 	 */
 	public void refreshViews() {
+		try {
+			initializing = true;
+
+			cleanupViews();
+
+			LOG.debug("Loading configuration");
+			Config portletConfig = getConfiguration();
+			if (portletConfig == null) {
+				viewPage.addComponent(new UnconfiguredMessage());
+			} else {
+				initializeModelAndViews(portletConfig);
+			}
+		} catch (BusinessException e) {
+			viewPage.addComponent(new BusinessExceptionMessage(e));
+		} catch (Exception e) {
+			LOG.error("Error refreshing configuration", e);
+			viewPage.addComponent(new BusinessExceptionMessage(
+					"portlet.crud.error.internal"));
+		} finally {
+			initializing = false;
+		}
+	}
+
+	private void initializeModelAndViews(Config portletConfig) {
+		try {
+			String portletId = getPortletId();
+
+			LOG.debug("Building domain model");
+			ModelBuilder modelBuilder = modelFactory.getBuilder(portletConfig);
+			portletDomain = modelBuilder.build();
+
+			LOG.debug("Building scripting model");
+			ScriptModelBuilder scriptModelBuilder = scriptModelFactory
+					.getBuilder(portletDomain,
+							modelBuilder.getModelToConfigMapping());
+
+			scriptModelBuilder.setApplication(this);
+			scriptModelBuilder.build();
+
+			LOG.debug("Building GUI");
+			portletGui = guiBuilder.build(portletDomain);
+
+			viewPage.addComponent(portletGui.getView());
+
+			provideBackButtonFunctionality(portletId);
+
+		} catch (ValidationException ve) {
+			throw new BusinessException(ve.getCode(), ve.getArgs());
+		}
+
+		this.datasourceInfo.setPortletConfig(portletConfig.getPortletConfig());
+	}
+
+	private void provideBackButtonFunctionality(String portletId) {
+		WebBrowser browser = (WebBrowser) mainWindow.getTerminal();
+		if (browser != null && !browser.isIE()) {
+			portletUriFragmentUtility = new PortletUriFragmentUtility(
+					portletDomain, portletId);
+			viewPage.addComponent(portletUriFragmentUtility);
+		} else {
+			LOG.info("Browser not detected or is Internet Explorer. Disabling back button functionality");
+			// ...weil sie zu einem unschönen Refresh des Browsers
+			// führt
+		}
+	}
+
+	private void cleanupViews() {
 		destroyDomain();
 
 		removeAddedComponentsFromView();
@@ -266,60 +336,6 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		editPage.addComponent(configurationPresenter.getView());
 
 		addHiddenPortletId(viewPage);
-
-		try {
-			LOG.debug("Loading configuration");
-			Config portletConfig = getConfiguration();
-			if (portletConfig == null) {
-				viewPage.addComponent(new UnconfiguredMessage());
-			} else {
-				try {
-					String portletId = getPortletId();
-
-					LOG.debug("Building domain model");
-					ModelBuilder modelBuilder = modelFactory
-							.getBuilder(portletConfig);
-					portletDomain = modelBuilder.build();
-
-					LOG.debug("Building scripting model");
-					ScriptModelBuilder scriptModelBuilder = scriptModelFactory
-							.getBuilder(portletDomain,
-									modelBuilder.getModelToConfigMapping());
-
-					scriptModelBuilder.setApplication(this);
-					scriptModelBuilder.build();
-
-					LOG.debug("Building GUI");
-					portletGui = guiBuilder.build(portletDomain);
-
-					viewPage.addComponent(portletGui.getView());
-
-					WebBrowser browser = (WebBrowser) mainWindow.getTerminal();
-					if (browser != null && !browser.isIE()) {
-						portletUriFragmentUtility = new PortletUriFragmentUtility(
-								portletDomain, portletId);
-						viewPage.addComponent(portletUriFragmentUtility);
-					} else {
-						LOG.info("Browser not detected or is Internet Explorer. Disabling back button functionality");
-						// ...weil sie zu einem unschönen Refresh des Browsers
-						// führt
-					}
-
-				} catch (ValidationException ve) {
-					throw new BusinessException(ve.getCode(), ve.getArgs());
-				}
-
-				this.datasourceInfo.setPortletConfig(portletConfig
-						.getPortletConfig());
-			}
-		} catch (BusinessException e) {
-			viewPage.addComponent(new BusinessExceptionMessage(e));
-		} catch (Exception e) {
-			LOG.error("Error refreshing configuration", e);
-			viewPage.addComponent(new BusinessExceptionMessage(
-					"portlet.crud.error.internal"));
-		}
-
 	}
 
 	private void destroyDomain() {
@@ -451,5 +467,9 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	public static CrudPortletApplication getCurrentApplication() {
 		return (CrudPortletApplication) PortletApplication
 				.getCurrentApplication();
+	}
+
+	public boolean isInitializing() {
+		return initializing;
 	}
 }
