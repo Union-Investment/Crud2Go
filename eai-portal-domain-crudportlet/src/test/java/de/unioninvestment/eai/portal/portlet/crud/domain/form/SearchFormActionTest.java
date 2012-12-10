@@ -93,7 +93,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.MultiOptionListFo
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Page;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.QueryOptionList;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.StaticOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
@@ -1236,7 +1236,7 @@ public class SearchFormActionTest {
 	private FormField createSelectFormField(String name, String title,
 			String inputPrompt, String value, Map<String, String> selections) {
 		FormFieldConfig config = createFormFieldConfig(name, title, inputPrompt);
-		QueryOptionList selection = new QueryOptionList(selections);
+		StaticOptionList selection = new StaticOptionList(selections);
 		OptionListFormField field = new OptionListFormField(config, selection);
 		field.setValue(value);
 		return field;

@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import groovy.lang.Closure;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import javax.xml.bind.JAXBException;
 
@@ -61,8 +62,8 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOption
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.NotificationProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ShowPopupProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptPortal;
-import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
 import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
+import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 
@@ -113,6 +114,9 @@ public class ScriptModelBuilderTest extends ModelSupport {
 
 	@Mock
 	private Config configMock;
+
+	@Mock
+	private ExecutorService prefetchExecutorMock;
 
 	@Before
 	public void setUp() throws Exception {
@@ -326,6 +330,8 @@ public class ScriptModelBuilderTest extends ModelSupport {
 
 	@Test
 	public void shouldBuildForm() throws JAXBException {
+		// ignore prefetch operations
+		setPrefetchExecutor(prefetchExecutorMock);
 
 		prepare("validFormConfig.xml");
 
@@ -509,7 +515,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		verify(scriptBuilderMock).addBindingVariable(eq("confirm"),
 				any(ConfirmationDialogProvider.class));
 	}
-	
+
 	@Test
 	public void shouldBindInfoNotificationClosure() throws JAXBException {
 
@@ -519,7 +525,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		verify(scriptBuilderMock).addBindingVariable(eq("showInfo"),
 				any(NotificationProvider.class));
 	}
-	
+
 	@Test
 	public void shouldBindErrorNotificationClosure() throws JAXBException {
 
@@ -529,7 +535,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		verify(scriptBuilderMock).addBindingVariable(eq("showError"),
 				any(NotificationProvider.class));
 	}
-	
+
 	@Test
 	public void shouldBindWarningNotificationClosure() throws JAXBException {
 

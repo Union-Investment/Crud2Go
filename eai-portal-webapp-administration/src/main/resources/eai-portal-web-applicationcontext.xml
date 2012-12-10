@@ -97,8 +97,13 @@
 		</property>
 	</bean>
 
-	<!-- Export Threading -->
+	<!-- Threading -->
 
-	<task:executor id="exportExecutor" pool-size="${portlet.crud.export.executor.poolsize}" />
+	<task:executor id="exportExecutor"
+		pool-size="${portlet.crud.export.executor.poolsize}" />
 
+	<bean id="prefetchExecutor" class="java.util.concurrent.Executors"
+		factory-method="newFixedThreadPool">
+		<constructor-arg value="${portlet.crud.export.executor.poolsize}" />
+	</bean>
 </beans>

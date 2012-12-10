@@ -1959,6 +1959,19 @@
 		</attribute>
 	</complexType>
 
+	<simpleType name="InitializeTypeConfig">
+		<annotation>
+			<documentation>
+				Initializierung einer Optionsliste
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="eager" />
+			<enumeration value="async" />
+			<enumeration value="lazy" />
+		</restriction>
+	</simpleType>
+
 	<complexType name="FormSelectConfig">
 		<annotation>
 			<documentation>
@@ -2015,6 +2028,14 @@
 						<documentation>
 							Angabe der JNDI-DataSource. Pflichtfeld bei
 							Formularen, bei Tabellen optional.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="initialize" type="tns:InitializeTypeConfig"
+					default="eager">
+					<annotation>
+						<documentation>
+							Ladezeitpunkt der Optionsliste
 						</documentation>
 					</annotation>
 				</attribute>

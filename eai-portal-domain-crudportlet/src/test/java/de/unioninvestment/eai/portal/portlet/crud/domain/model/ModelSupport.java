@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static org.mockito.Mockito.mock;
@@ -23,6 +23,8 @@ import static org.mockito.Mockito.mock;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.xml.bind.JAXBException;
 
@@ -51,6 +53,8 @@ public abstract class ModelSupport extends DomainSpringPortletContextTest {
 	protected int defaultSelectWidth = 300;
 
 	private Map<String, Long> resourceIds = new HashMap<String, Long>();
+	private ExecutorService prefetchExecutor = Executors
+			.newSingleThreadExecutor();
 
 	public ModelSupport() {
 		try {
@@ -85,11 +89,9 @@ public abstract class ModelSupport extends DomainSpringPortletContextTest {
 
 	protected ModelBuilder createModelBuilder(PortletConfig configuration) {
 		ModelFactory factory = new ModelFactory(connectionPoolFactory,
-				resetFormAction, fieldValidatorFactory, defaultSelectWidth);
-		ModelBuilder modelBuilder = new ModelBuilder(factory,
-				connectionPoolFactory, resetFormAction, fieldValidatorFactory,
-				defaultSelectWidth, new Config(configuration, resourceIds));
-		return modelBuilder;
+				prefetchExecutor, resetFormAction, fieldValidatorFactory,
+				defaultSelectWidth);
+		return factory.getBuilder(new Config(configuration, resourceIds));
 	}
 
 	protected PortletConfig createConfiguration(String configRessource)
@@ -98,5 +100,9 @@ public abstract class ModelSupport extends DomainSpringPortletContextTest {
 		InputStream stream = ModelSupport.class.getClassLoader()
 				.getResourceAsStream(configRessource);
 		return unmarshaller.unmarshal(stream);
+	}
+
+	protected void setPrefetchExecutor(ExecutorService prefetchExecutor) {
+		this.prefetchExecutor = prefetchExecutor;
 	}
 }

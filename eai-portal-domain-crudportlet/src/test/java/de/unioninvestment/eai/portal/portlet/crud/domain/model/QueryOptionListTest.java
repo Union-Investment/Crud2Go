@@ -1,27 +1,32 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
@@ -31,6 +36,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,11 +50,13 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.jdbc.core.RowMapper;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.InitializeTypeConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.QueryConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 
 public class QueryOptionListTest {
 
@@ -59,23 +70,35 @@ public class QueryOptionListTest {
 
 	private SelectConfig config;
 
+	private String query;
+
+	@Mock
+	private ExecutorService executorMock;
+
+	@Mock
+	private OptionListChangeEventHandler listenerMock;
+
+	@Mock
+	private Future futureMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		config = new SelectConfig();
+
+		query = "Select a as key, b as title from table";
+
+		QueryConfig queryConfig = new QueryConfig();
+		queryConfig.setValue(query);
+		config.setQuery(queryConfig);
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
 	public void shouldSupportQueryForOptions() {
-		String query = "Select a as key, b as title from table";
+		selection = new QueryOptionList(config, connectionPool, executorMock);
+
 		String nullSafeQuery = QueryOptionList.nullSafeQuery(query);
-
-		QueryConfig queryConfig = new QueryConfig();
-		queryConfig.setValue(query);
-		config.setQuery(queryConfig);
-		selection = new QueryOptionList(connectionPool, config);
-
 		doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -111,20 +134,99 @@ public class QueryOptionListTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
+	public void shouldPrefetchOnLoadWithAsyncConfig() {
+		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
+
+		QueryOptionList queryOptionList = new QueryOptionList(config,
+				connectionPool, executorMock);
+
+		verify(executorMock).submit(any(Callable.class));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void shouldPrefetchOnRefreshWithAsyncConfig()
+			throws InterruptedException, ExecutionException {
+		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
+		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
+		QueryOptionList queryOptionList = new QueryOptionList(config,
+				connectionPool, executorMock);
+
+		queryOptionList.refresh();
+
+		verify(executorMock, times(2)).submit(any(Callable.class));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void shouldTakeResultOfFutureOnAsyncCall()
+			throws InterruptedException, ExecutionException {
+		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
+		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
+		final QueryOptionList queryOptionList = new QueryOptionList(config,
+				connectionPool, executorMock);
+
+		when(futureMock.get()).thenAnswer(new Answer<Object>() {
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				queryOptionList.setOptions(singletonMap("FUTURE", "MOCK"));
+				return null;
+			};
+		});
+
+		assertThat(queryOptionList.getOptions(null).get("FUTURE"), is("MOCK"));
+	}
+
+	@Test(expected = TechnicalCrudPortletException.class)
+	@SuppressWarnings("unchecked")
+	public void shouldFailIfFutureFailsWithExecutionException()
+			throws InterruptedException, ExecutionException {
+		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
+		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
+		QueryOptionList queryOptionList = new QueryOptionList(config,
+				connectionPool, executorMock);
+
+		when(futureMock.get()).thenThrow(
+				new ExecutionException(new RuntimeException("Test")));
+
+		queryOptionList.getOptions(null);
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void shouldLoadOptionsSynchronouslyIfFutureIsInterrupted()
+			throws InterruptedException, ExecutionException {
+		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
+		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
+
+		QueryOptionList queryOptionList = new QueryOptionList(config,
+				connectionPool, executorMock) {
+			protected java.util.Map<String, String> loadOptions() {
+				return singletonMap("A", "B");
+			};
+		};
+
+		when(futureMock.get()).thenThrow(new InterruptedException());
+
+		assertThat(queryOptionList.getOptions(null).get("A"), is("B"));
+	}
+
+	@Test
 	public void shouldRefresh() {
 		Map<String, String> options = new HashMap<String, String>();
 		options.put("key", "value");
 
-		QueryOptionList queryOptionList = new QueryOptionList(options);
-		final List<OptionList> result = new ArrayList<OptionList>();
-		queryOptionList
-				.addValueChangeListener(new OptionListChangeEventHandler() {
-					@Override
-					public void onOptionListChange(OptionListChangeEvent event) {
-						result.add(event.getSource());
-					}
-				});
+		QueryOptionList queryOptionList = new QueryOptionList(config,
+				connectionPool, executorMock);
+		queryOptionList.setOptions(options);
 
+		final List<OptionList> result = new ArrayList<OptionList>();
+		queryOptionList.addChangeListener(new OptionListChangeEventHandler() {
+			@Override
+			public void onOptionListChange(OptionListChangeEvent event) {
+				result.add(event.getSource());
+			}
+		});
 
 		queryOptionList.refresh();
 
@@ -132,5 +234,21 @@ public class QueryOptionListTest {
 
 		assertThat(result.size(), is(1));
 		assertThat(storedOptions, nullValue());
+	}
+
+	@Test
+	public void shouldRemoveChangeListener() {
+		Map<String, String> options = new HashMap<String, String>();
+		options.put("key", "value");
+
+		QueryOptionList queryOptionList = new QueryOptionList(config,
+				connectionPool, executorMock);
+		queryOptionList.setOptions(options);
+
+		queryOptionList.addChangeListener(listenerMock);
+		queryOptionList.removeChangeListener(listenerMock);
+		queryOptionList.refresh();
+
+		verifyZeroInteractions(listenerMock);
 	}
 }
