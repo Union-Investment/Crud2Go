@@ -1160,7 +1160,7 @@
 				<attribute name="cache-rate" type="double" default="2.0">
 					<annotation>
 						<documentation>
-							Faktor, der angibt, wieviele Zeilen ueber die
+							Faktor, der angibt, wie viele Zeilen ueber die
 							aktuelle Ansicht hinaus gerendert werden sollen.
 						</documentation>
 					</annotation>
@@ -1201,7 +1201,7 @@
 					<annotation>
 						<documentation>
 							Dieses Closure Event wird aufgerufen, wenn sich
-							min. ein Wert der Zeile sich aendert hat.
+							mind. ein Wert der Zeile geaendert hat.
 						</documentation>
 					</annotation>
 				</attribute>
