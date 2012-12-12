@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
 import java.util.HashSet;
@@ -41,23 +41,21 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColu
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
 /**
  * Repräsentiert eine Tabelle.
  * 
  * @author carsten.mjartan
  */
-public class TablePresenter implements ComponentPresenter, TableView.Presenter,
-		ShowEventHandler<Tab>, Table.Presenter {
+public class TablePresenter extends
+		AbstractComponentPresenter<Table, TableView> implements
+		TableView.Presenter, ShowEventHandler<Tab>, Table.Presenter {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	private static final Logger LOG = LoggerFactory
 			.getLogger(TablePresenter.class);
 
-	private final TableView view;
-	private final Table model;
 	private DataContainer container;
 	private boolean isInitializeView = false;
 
@@ -76,9 +74,8 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 * 
 	 */
 	public TablePresenter(TableView view, Table model) {
-		this.model = model;
-		this.view = view;
-		container = model.getContainer();
+		super(view, model);
+		container = getModel().getContainer();
 	}
 
 	public void setRowEditingFormPresenter(
@@ -90,19 +87,9 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 * Initialisiert die View.
 	 */
 	void initializeView() {
-		view.initialize(this, container, model, model.getPageLength(),
-				model.getCacheRate());
+		getView().initialize(this, container, getModel(),
+				getModel().getPageLength(), getModel().getCacheRate());
 		isInitializeView = true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.support.vaadin.mvp.Presenter#getView()
-	 */
-	@Override
-	public View getView() {
-		return view;
 	}
 
 	/**
@@ -112,7 +99,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public boolean isReadonly() {
-		return !model.isEditable()
+		return !getModel().isEditable()
 				|| (!container.isInsertable() && !container.isUpdateable() && !container
 						.isDeleteable());
 	}
@@ -154,7 +141,8 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public boolean isExcelExport() {
-		return (model.isExport() && model.getExportType().equals("xls"));
+		return (getModel().isExport() && getModel().getExportType().equals(
+				"xls"));
 
 	}
 
@@ -165,7 +153,8 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public boolean isCSVExport() {
-		return (model.isExport() && model.getExportType().equals("csv"));
+		return (getModel().isExport() && getModel().getExportType().equals(
+				"csv"));
 	}
 
 	/**
@@ -194,7 +183,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 				selectionIds.add(rowId);
 			}
 		}
-		model.selectionChange(selectionIds);
+		getModel().selectionChange(selectionIds);
 	}
 
 	/**
@@ -205,7 +194,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	@Override
 	public void doubleClick(Item item) {
 		ContainerRow row = container.convertItemToRow(item, false, true);
-		model.doubleClick(row);
+		getModel().doubleClick(row);
 	}
 
 	/**
@@ -216,7 +205,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public void rowChange(Item containerRow, Map<String, Object> changedValues) {
-		model.rowChange(containerRow, changedValues);
+		getModel().rowChange(containerRow, changedValues);
 
 	}
 
@@ -227,7 +216,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public void doInitialize() {
-		model.doInitialize();
+		getModel().doInitialize();
 	}
 
 	/**
@@ -248,7 +237,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	@Override
 	public void switchMode(Mode mode) {
 		this.currentMode = mode;
-		model.changeMode(currentMode);
+		getModel().changeMode(currentMode);
 	}
 
 	/**
@@ -258,7 +247,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public boolean isFormEditEnabled() {
-		return model.isFormEditEnabled();
+		return getModel().isFormEditEnabled();
 	}
 
 	public Mode getCurrentMode() {
@@ -266,11 +255,11 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	}
 
 	public Item getNextItem() {
-		return view.getNextItem();
+		return getView().getNextItem();
 	}
 
 	public Item getPreviousItem() {
-		return view.getPreviousItem();
+		return getView().getPreviousItem();
 	}
 
 	/**
@@ -281,11 +270,11 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	@Override
 	public void openRowEditingForm() {
 		if (rowEditingFormPresenter != null) {
-			Set<ContainerRowId> selection = model.getSelection();
+			Set<ContainerRowId> selection = getModel().getSelection();
 			if (selection.size() > 0) {
 				ContainerRowId containerRowId = selection.iterator().next();
 
-				ContainerRow containerRow = model.getContainer().getRow(
+				ContainerRow containerRow = getModel().getContainer().getRow(
 						containerRowId, false, false);
 
 				rowEditingFormPresenter.showDialog(containerRow);
@@ -298,7 +287,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 * Verwirft die Änderungen auf der Tabelle.
 	 */
 	public void revertChanges() {
-		view.onRevertChanges();
+		getView().onRevertChanges();
 	}
 
 	/**
@@ -308,13 +297,13 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public ContainerRow createNewRow(Map<String, Object> values) {
-		Object itemId = view.addItemToTable();
+		Object itemId = getView().addItemToTable();
 		ContainerRow newRow = container.getRowByInternalRowId(itemId, false,
 				false);
 		for (Map.Entry<String, Object> entry : values.entrySet()) {
 			newRow.setValue(entry.getKey(), entry.getValue());
 		}
-		view.selectItemForEditing(itemId, true);
+		getView().selectItemForEditing(itemId, true);
 		return newRow;
 	}
 
@@ -328,7 +317,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	public void addGeneratedColumn(String columnName, String columnTitle,
 			ColumnGenerator columnGenerator) {
 		LOG.debug("Adding column [" + columnName + "].");
-		view.addGeneratedColumn(columnName, columnTitle, columnGenerator);
+		getView().addGeneratedColumn(columnName, columnTitle, columnGenerator);
 		generatedColumIds.add(columnName);
 		LOG.debug("Column [" + columnName + "] added.");
 	}
@@ -341,9 +330,9 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	@Override
 	public void removeGeneratedColumn(String columnId) {
 		LOG.debug("Removing column [" + columnId + "].");
-		view.removeGeneratedColumn(columnId);
+		getView().removeGeneratedColumn(columnId);
 		generatedColumIds.remove(columnId);
-		view.recalculateColumnWidths();
+		getView().recalculateColumnWidths();
 		LOG.debug("Column [" + columnId + "] removed.");
 	}
 
@@ -354,10 +343,11 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public void renderOnce(DynamicColumnChanges changes) {
-		boolean tableContentRefreshWasEnabled = view.disableContentRefreshing();
+		boolean tableContentRefreshWasEnabled = getView()
+				.disableContentRefreshing();
 		changes.apply();
 		if (tableContentRefreshWasEnabled) {
-			view.enableContentRefreshing(true);
+			getView().enableContentRefreshing(true);
 		}
 	}
 
@@ -383,7 +373,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 			public void apply() {
 				for (String columnId : generatedColumIds) {
 					LOG.debug("Removing column [" + columnId + "].");
-					view.removeGeneratedColumn(columnId);
+					getView().removeGeneratedColumn(columnId);
 					LOG.debug("Column [" + columnId + "] removed.");
 				}
 				generatedColumIds.clear();
@@ -398,7 +388,7 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public List<String> getVisibleColumns() {
-		return view.getVisibleColumns();
+		return getView().getVisibleColumns();
 	}
 
 	/**
@@ -408,8 +398,8 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 */
 	@Override
 	public void setVisibleColumns(List<String> visibleColumns) {
-		view.setVisibleColumns(visibleColumns);
-		view.recalculateColumnWidths();
+		getView().setVisibleColumns(visibleColumns);
+		getView().recalculateColumnWidths();
 	}
 
 	/**
@@ -423,6 +413,6 @@ public class TablePresenter implements ComponentPresenter, TableView.Presenter,
 	 *            {@code true}: sichtbar, {@code false}: unsichtbar,
 	 */
 	public void setTableActionVisibility(String id, boolean visible) {
-		view.setTableActionVisibility(id, visible);
+		getView().setTableActionVisibility(id, visible);
 	}
 }

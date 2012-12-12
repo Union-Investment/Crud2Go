@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
 import java.text.MessageFormat;
@@ -50,9 +50,10 @@ import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
  * @author Frank Hardy (Codecentric AG)
  */
 @Configurable
-public class DatasourceInfoPresenter implements ComponentPresenter {
+public class DatasourceInfoPresenter extends
+		AbstractComponentPresenter<DatasourceInfos, DatasourceInfoView> {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	private static final Logger LOG = LoggerFactory
 			.getLogger(DatasourceInfoPresenter.class);
@@ -83,16 +84,12 @@ public class DatasourceInfoPresenter implements ComponentPresenter {
 
 	private MBeanServerConnection mbeanServer;
 
-	private final DatasourceInfoView view;
-	private final DatasourceInfos model;
-
 	/**
 	 * Erzeugt eine neue Instanz dieses Presenters.
 	 */
 	public DatasourceInfoPresenter(DatasourceInfoView view,
 			DatasourceInfos model) {
-		this.model = model;
-		this.view = view;
+		super(view, model);
 		findJBossMBeanServer();
 	}
 
@@ -116,11 +113,6 @@ public class DatasourceInfoPresenter implements ComponentPresenter {
 		}
 	}
 
-	@Override
-	public DatasourceInfoView getView() {
-		return this.view;
-	}
-
 	/**
 	 * @param config
 	 *            die Konfiguration.
@@ -142,7 +134,7 @@ public class DatasourceInfoPresenter implements ComponentPresenter {
 
 			this.updateModel(nameCollectingVisitor.getDatasourceNames());
 		} else {
-			this.model.clean();
+			this.getModel().clean();
 		}
 	}
 
@@ -155,11 +147,11 @@ public class DatasourceInfoPresenter implements ComponentPresenter {
 	}
 
 	void updateModel(Set<String> datasourceNames) {
-		this.model.clean();
+		this.getModel().clean();
 
 		for (String dsName : datasourceNames) {
-			this.model.addInfo(this
-					.getDatasourceInfo(new DatasourceInfo(dsName)));
+			this.getModel().addInfo(
+					this.getDatasourceInfo(new DatasourceInfo(dsName)));
 		}
 	}
 

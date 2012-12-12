@@ -16,22 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
+package de.unioninvestment.eai.portal.support.vaadin.groovy;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.Presenter;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
+import com.vaadin.ui.Component
+import com.vaadin.ui.Tree
 
 /**
- * Ein Presenter für eine Komponente.
  * 
- * @author markus.bonsch
+ * 
  * @author Jan Malcomess (codecentric AG)
  */
-public interface ComponentPresenter<C extends Component, V extends View>
-		extends Presenter<V> {
-	/**
-	 * @return The model of the view presented by this <code>Presenter</code>.
-	 */
-	C getModel();
+class TreeFactory extends AbstractComponentFactory {
+
+	@Override
+	Component createComponent() {
+		return new Tree()
+	}
 }

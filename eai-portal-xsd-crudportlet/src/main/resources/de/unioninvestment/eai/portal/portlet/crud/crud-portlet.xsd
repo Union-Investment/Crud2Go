@@ -213,6 +213,17 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="horizontalLayout" type="boolean" default="false">
+					<annotation>
+						<documentation>						
+							Defines, if components within the region are layout out horizontally
+							("true") or vertically ("false"). This setting is optional and "false"
+							by default.
+							Will be ignored when "collapsible" is "true"; in other words: components
+							within a collapsible region can only be layed out vertically. 
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="collapsible" type="boolean" default="false">
 					<annotation>
 						<documentation>
@@ -242,6 +253,19 @@
 					<annotation>
 						<documentation>
 							Groovy Closure
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="expandRatio" type="int" default="0">
+					<annotation>
+						<documentation>
+							The expand ratio determines the amount of available space this component
+	 						takes within a panel/page/region etc. For example, if two components 
+	 						define expand ratios 2 and 1, respectively, then the available space will 
+	 						be distributed 2/3 and 1/3 among the components. If expand ratio is 0 (default)
+	 						or less then the component will not expand. If only one component defines an
+	 						expand ratio, than it will take up all available space regardless of the
+	 						defined value.
 						</documentation>
 					</annotation>
 				</attribute>
@@ -278,6 +302,19 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="expandRatio" type="int" default="0">
+					<annotation>
+						<documentation>
+							The expand ratio determines the amount of available space this component
+	 						takes within a panel/page/region etc. For example, if two components 
+	 						define expand ratios 2 and 1, respectively, then the available space will 
+	 						be distributed 2/3 and 1/3 among the components. If expand ratio is 0 (default)
+	 						or less then the component will not expand. If only one component defines an
+	 						expand ratio, than it will take up all available space regardless of the
+	 						defined value.
+						</documentation>
+					</annotation>
+				</attribute>				
 				<attribute name="generator" type="tns:groovy" use="required">
 					<annotation>
 						<documentation>
@@ -436,6 +473,19 @@
 						<documentation>
 							Referenz auf die Aktion die angestoßen werden soll,
 							wenn sich im Formular etwas ändert.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="expandRatio" type="int" default="0">
+					<annotation>
+						<documentation>
+							The expand ratio determines the amount of available space this component
+	 						takes within a panel/page/region etc. For example, if two components 
+	 						define expand ratios 2 and 1, respectively, then the available space will 
+	 						be distributed 2/3 and 1/3 among the components. If expand ratio is 0 (default)
+	 						or less then the component will not expand. If only one component defines an
+	 						expand ratio, than it will take up all available space regardless of the
+	 						defined value.
 						</documentation>
 					</annotation>
 				</attribute>
@@ -1228,6 +1278,19 @@
 							Zeile
 							entscheiden kann, ob die Zeile editierbar ist oder
 							schreibgeschuetzt.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="expandRatio" type="int" default="0">
+					<annotation>
+						<documentation>
+							The expand ratio determines the amount of available space this component
+	 						takes within a panel/page/region etc. For example, if two components 
+	 						define expand ratios 2 and 1, respectively, then the available space will 
+	 						be distributed 2/3 and 1/3 among the components. If expand ratio is 0 (default)
+	 						or less then the component will not expand. If only one component defines an
+	 						expand ratio, than it will take up all available space regardless of the
+	 						defined value.
 						</documentation>
 					</annotation>
 				</attribute>

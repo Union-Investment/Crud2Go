@@ -16,22 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.Presenter;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
+package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
 /**
- * Ein Presenter für eine Komponente.
+ * Implementation of a <code>{@link RegionView}</code> that lays out its
+ * components horizontally (the <code>{@link DefaultRegionView}</code> does so
+ * vertically).
  * 
- * @author markus.bonsch
  * @author Jan Malcomess (codecentric AG)
+ * @since 1.44
  */
-public interface ComponentPresenter<C extends Component, V extends View>
-		extends Presenter<V> {
+public class HorizontalRegionView extends HorizontalPanelContentView implements
+		RegionView {
+
+	private static final long serialVersionUID = 1L;
+
 	/**
-	 * @return The model of the view presented by this <code>Presenter</code>.
+	 * Constructor.
 	 */
-	C getModel();
+	public HorizontalRegionView() {
+		super(false);
+		this.setStyleName("crudRegion");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setTitle(String title) {
+		this.setCaption(title);
+	}
+
+	/**
+	 * @return The title of this region.
+	 */
+	String getTitle() {
+		return this.getCaption();
+	}
 }

@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
 import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
@@ -50,9 +50,8 @@ import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.crud.validation.ConfigurationUploadValidator;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
 import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.AbstractPresenter;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.Presenter;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
 /**
  * Presenter Object der Crud PortletPresenter Konfiguration (Edit Mode).
@@ -61,15 +60,15 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
  * 
  */
 @Configurable
-public class PortletConfigurationPresenter implements Presenter {
+public class PortletConfigurationPresenter extends
+		AbstractPresenter<PortletConfigurationView> {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	private static final Logger LOG = LoggerFactory
 			.getLogger(PortletConfigurationPresenter.class);
 
 	private ConfigurationReceiver receiver;
-	private PortletConfigurationView view;
 
 	@Autowired
 	private transient ConfigurationService configurationService;
@@ -90,21 +89,16 @@ public class PortletConfigurationPresenter implements Presenter {
 			PortletConfigurationView portletConfigurationView,
 			ConfigurationService configurationService, EventBus eventBus) {
 
-		this.view = portletConfigurationView;
+		super(portletConfigurationView);
 		this.configurationService = configurationService;
 		this.eventBus = eventBus;
 		receiver = new ConfigurationReceiver();
-		view.getUpload().setReceiver(receiver);
-		view.getUpload().addListener(new ConfigUploadFinishedListener());
-		view.getUploadVcsButton().addListener(
+		getView().getUpload().setReceiver(receiver);
+		getView().getUpload().addListener(new ConfigUploadFinishedListener());
+		getView().getUploadVcsButton().addListener(
 				new ConfigUploadVcsFinishedListener());
 
 		initStatus();
-	}
-
-	@Override
-	public View getView() {
-		return view;
 	}
 
 	/**
@@ -135,10 +129,10 @@ public class PortletConfigurationPresenter implements Presenter {
 						app.getCommunityId());
 
 		if (metaData == null) {
-			view.setStatus("portlet.crud.page.status.config.notAvailable");
+			getView().setStatus("portlet.crud.page.status.config.notAvailable");
 
 		} else {
-			view.setStatus("portlet.crud.page.status.config.available",
+			getView().setStatus("portlet.crud.page.status.config.available",
 					metaData.getUser(), metaData.getCreated(),
 					metaData.getFileName());
 		}
@@ -167,11 +161,11 @@ public class PortletConfigurationPresenter implements Presenter {
 				eventBus.fireEvent(new ConfigurationUpdatedEvent());
 
 			} else {
-				view.showNotification(
+				getView().showNotification(
 						getMessage("portlet.crud.page.upload.invalid"),
 						Notification.TYPE_ERROR_MESSAGE);
 			}
-			view.getUpload().setVisible(true);
+			getView().getUpload().setVisible(true);
 		}
 
 		void setValidator(ConfigurationUploadValidator validator) {
@@ -197,7 +191,7 @@ public class PortletConfigurationPresenter implements Presenter {
 		 */
 		@Override
 		public void buttonClick(ClickEvent event) {
-			String vcsUri = (String) view.getUploadVcsUri().getValue();
+			String vcsUri = (String) getView().getUploadVcsUri().getValue();
 			byte[] configValueVcs = null;
 			try {
 				Authenticator.setDefault(new VcsAuthenticator());
@@ -208,12 +202,12 @@ public class PortletConfigurationPresenter implements Presenter {
 					saveConfig(vcsUri, configValueVcs);
 					eventBus.fireEvent(new ConfigurationUpdatedEvent());
 				} else {
-					view.showNotification(
+					getView().showNotification(
 							getMessage("portlet.crud.page.upload.invalid"),
 							Notification.TYPE_ERROR_MESSAGE);
 				}
 			} catch (Exception e) {
-				view.showNotification(
+				getView().showNotification(
 						getMessage("portlet.crud.page.upload.vcs.error", e),
 						Notification.TYPE_ERROR_MESSAGE);
 			}
@@ -296,9 +290,9 @@ public class PortletConfigurationPresenter implements Presenter {
 	 */
 	public void refresh(Portlet portletDomain) {
 		if (portletDomain != null) {
-			view.displaySecurity(portletDomain.getRoles());
+			getView().displaySecurity(portletDomain.getRoles());
 		} else {
-			view.hideSecurity();
+			getView().hideSecurity();
 		}
 	}
 }

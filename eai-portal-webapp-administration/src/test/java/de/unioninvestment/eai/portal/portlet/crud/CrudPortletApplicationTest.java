@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -73,6 +73,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletConfigurationPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PresenterFactory;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PortletConfigurationView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PortletView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BusinessExceptionMessage;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder;
@@ -80,7 +81,6 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFac
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
 public class CrudPortletApplicationTest extends SpringPortletContextTest {
 
@@ -122,7 +122,7 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	@Mock
 	private PortletConfigurationPresenter portletConfigurationPresenterMock;
 	@Mock
-	private View portletConfigurationViewMock;
+	private PortletConfigurationView portletConfigurationViewMock;
 
 	@Mock(name = "viewPage")
 	private VerticalLayout viewPageMock;
