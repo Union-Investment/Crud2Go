@@ -214,7 +214,6 @@ public class OptionListContainer extends AbstractContainer implements
 			if (!initialized) {
 				initialized = true;
 			}
-			fireItemSetChange();
 		}
 	}
 
@@ -256,7 +255,7 @@ public class OptionListContainer extends AbstractContainer implements
 	public void addContainerFilter(Filter filter)
 			throws UnsupportedFilterException {
 		this.filters.add(filter);
-		contentChanged = true;
+		fireItemSetChange();
 	}
 
 	@Override
@@ -265,18 +264,24 @@ public class OptionListContainer extends AbstractContainer implements
 			Filter next = it.next();
 			if (next.equals(filter)) {
 				it.remove();
-				contentChanged = true;
+				fireItemSetChange();
 				return;
 			}
 		}
 	}
 
 	@Override
+	protected void fireItemSetChange() {
+		contentChanged = true;
+		super.fireItemSetChange();
+	}
+
+	@Override
 	public void removeAllContainerFilters() {
 		if (filters.size() > 0) {
-			contentChanged = true;
+			filters.clear();
+			fireItemSetChange();
 		}
-		filters.clear();
 	}
 
 	@Override
@@ -405,7 +410,7 @@ public class OptionListContainer extends AbstractContainer implements
 	public void onOptionListChange(OptionListChangeEvent event) {
 		contentChanged = true;
 		if (event.isInitialized()) {
-			refreshOptionListIfNeeded();
+			fireItemSetChange();
 		}
 	}
 
