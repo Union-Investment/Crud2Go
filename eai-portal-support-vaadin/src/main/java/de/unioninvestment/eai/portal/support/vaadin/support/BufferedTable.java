@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.support.vaadin.support;
 
 import java.util.HashMap;
@@ -78,13 +78,23 @@ public class BufferedTable extends Table {
 	protected void unregisterComponent(Component component) {
 		super.unregisterComponent(component);
 		if (component instanceof Field) {
-			registeredFields.remove(component);
+			Field field = (Field) component;
+			unregisterField(field);
 		} else if (component instanceof Layout) {
 			Field field = getFieldFromLayout((Layout) component);
 			if (field != null) {
-				registeredFields.remove(field);
+				unregisterField(field);
 			}
 		}
+	}
+
+	private void unregisterField(Field field) {
+		registeredFields.remove(field);
+		handleUnregisteredField(field);
+	}
+
+	protected void handleUnregisteredField(Field field) {
+		// default: nothing to do
 	}
 
 	private Field getFieldFromLayout(Layout layout) {
@@ -172,7 +182,7 @@ public class BufferedTable extends Table {
 		}
 	}
 
-	public Set<Field> getRegisteredFields() {
+	Set<Field> getRegisteredFields() {
 		return registeredFields;
 	}
 

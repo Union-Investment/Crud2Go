@@ -1210,7 +1210,7 @@
 				<attribute name="cache-rate" type="double" default="2.0">
 					<annotation>
 						<documentation>
-							Faktor, der angibt, wieviele Zeilen ueber die
+							Faktor, der angibt, wie viele Zeilen ueber die
 							aktuelle Ansicht hinaus gerendert werden sollen.
 						</documentation>
 					</annotation>
@@ -1251,7 +1251,7 @@
 					<annotation>
 						<documentation>
 							Dieses Closure Event wird aufgerufen, wenn sich
-							min. ein Wert der Zeile sich aendert hat.
+							mind. ein Wert der Zeile geaendert hat.
 						</documentation>
 					</annotation>
 				</attribute>
@@ -2022,6 +2022,19 @@
 		</attribute>
 	</complexType>
 
+	<simpleType name="InitializeTypeConfig">
+		<annotation>
+			<documentation>
+				Initializierung einer Optionsliste
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="eager" />
+			<enumeration value="async" />
+			<enumeration value="lazy" />
+		</restriction>
+	</simpleType>
+
 	<complexType name="FormSelectConfig">
 		<annotation>
 			<documentation>
@@ -2078,6 +2091,14 @@
 						<documentation>
 							Angabe der JNDI-DataSource. Pflichtfeld bei
 							Formularen, bei Tabellen optional.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="initialize" type="tns:InitializeTypeConfig"
+					default="eager">
+					<annotation>
+						<documentation>
+							Ladezeitpunkt der Optionsliste
 						</documentation>
 					</annotation>
 				</attribute>

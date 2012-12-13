@@ -332,7 +332,6 @@ public class TablePresenter extends
 		LOG.debug("Removing column [" + columnId + "].");
 		getView().removeGeneratedColumn(columnId);
 		generatedColumIds.remove(columnId);
-		getView().recalculateColumnWidths();
 		LOG.debug("Column [" + columnId + "] removed.");
 	}
 
@@ -399,7 +398,6 @@ public class TablePresenter extends
 	@Override
 	public void setVisibleColumns(List<String> visibleColumns) {
 		getView().setVisibleColumns(visibleColumns);
-		getView().recalculateColumnWidths();
 	}
 
 	/**

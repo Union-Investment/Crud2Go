@@ -169,7 +169,7 @@
 			<dependency>
 				<groupId>org.vaadin.addons</groupId>
 				<artifactId>vaadin-sqlcontainer</artifactId>
-				<version>1.1.ui-patch5</version>
+				<version>1.1.ui-patch6</version>
 			</dependency>
 			<dependency>
 				<groupId>org.vaadin.addons</groupId>
@@ -429,17 +429,6 @@
 		</pluginManagement>
 	</build>
 
-	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://jenkins.d3.uid.de/view/EAI-Portal/</url>
-		<notifiers>
-			<notifier>
-				<type>mail</type>
-				<address>carsten.mjartan@codecentric.de</address>
-			</notifier>
-		</notifiers>
-	</ciManagement>
-
 	<developers>
 		<developer>
 			<id>mjartanc</id>
@@ -483,13 +472,6 @@
 			<timezone>CET</timezone>
 		</developer>
 	</developers>
-
-	<scm>
-		<connection>scm:hg:http://hg.d3.uid.de/eai-portal/</connection>
-		<developerConnection>scm:hg:http://hg.d3.uid.de/eai-portal/
-		</developerConnection>
-		<url>http://hg.d3.uid.de/eai-portal/</url>
-	</scm>
 
 	<reporting>
 		<plugins>

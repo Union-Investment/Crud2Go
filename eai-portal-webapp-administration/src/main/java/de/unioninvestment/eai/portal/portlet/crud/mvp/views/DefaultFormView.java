@@ -1,26 +1,25 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -54,6 +53,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormFields;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.MultiOptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.OptionListContainer;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.FormSelectionContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
@@ -221,8 +221,8 @@ public class DefaultFormView extends Form implements FormView {
 
 		fillOptions(field.getOptionList(), select, new FormSelectionContext(
 				field));
-		addOptionListChangeListener(field, select, new FormSelectionContext(
-				field));
+		// addOptionListChangeListener(field, select, new FormSelectionContext(
+		// field));
 
 		select.setPropertyDataSource(field.getProperty());
 		select.setInvalidAllowed(false);
@@ -237,8 +237,8 @@ public class DefaultFormView extends Form implements FormView {
 
 		fillOptions(field.getOptionList(), select, new FormSelectionContext(
 				field));
-		addOptionListChangeListener(field, select, new FormSelectionContext(
-				field));
+		// addOptionListChangeListener(field, select, new FormSelectionContext(
+		// field));
 
 		select.setMultiSelect(true);
 		select.setPropertyDataSource(field.getListProperty());
@@ -253,12 +253,9 @@ public class DefaultFormView extends Form implements FormView {
 	private void fillOptions(OptionList optionList, AbstractSelect select,
 			FormSelectionContext ctx) {
 		Object currentValue = select.getValue();
-		select.removeAllItems();
-		for (Map.Entry<String, String> entry : optionList.getOptions(ctx)
-				.entrySet()) {
-			select.addItem(entry.getKey());
-			select.setItemCaption(entry.getKey(), entry.getValue());
-		}
+		select.setContainerDataSource(new OptionListContainer(optionList, ctx));
+		select.setItemCaptionMode(Select.ITEM_CAPTION_MODE_PROPERTY);
+		select.setItemCaptionPropertyId("title");
 		reapplyCurrentValue(select, currentValue);
 	}
 
@@ -280,7 +277,7 @@ public class DefaultFormView extends Form implements FormView {
 
 	private void addOptionListChangeListener(OptionListFormField field,
 			final AbstractSelect select, final FormSelectionContext ctx) {
-		field.getOptionList().addValueChangeListener(
+		field.getOptionList().addChangeListener(
 				new OptionListChangeEventHandler() {
 
 					private static final long serialVersionUID = 42L;
