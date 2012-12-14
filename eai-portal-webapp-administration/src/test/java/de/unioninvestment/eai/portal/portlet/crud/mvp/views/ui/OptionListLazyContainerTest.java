@@ -3,6 +3,8 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.LinkedHashMap;
@@ -14,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.vaadin.data.Container.ItemSetChangeEvent;
+import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.util.filter.Compare;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEvent;
@@ -38,6 +42,9 @@ public class OptionListLazyContainerTest {
 	private OptionListContainer container;
 
 	private LinkedHashMap<String, String> options;
+
+	@Mock
+	private ItemSetChangeListener listenerMock;
 
 	@Before
 	public void setUp() {
@@ -101,11 +108,13 @@ public class OptionListLazyContainerTest {
 
 	@Test
 	public void shouldRefreshOnInitializedEvent() {
+		container.addListener(listenerMock);
 		OptionListChangeEvent event = new OptionListChangeEvent(optionListMock,
 				true);
 		container.onOptionListChange(event);
 
-		assertThat(container.contentChanged, is(false));
+		verify(listenerMock).containerItemSetChange(
+				isA(ItemSetChangeEvent.class));
 		assertThat(container.containsId("KEY"), is(true));
 	}
 
