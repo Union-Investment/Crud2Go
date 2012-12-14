@@ -26,7 +26,7 @@ import com.vaadin.ui.HorizontalLayout;
  * out its components vertically).
  * 
  * @author Jan Malcomess (codecentric AG)
- * @since 1.44
+ * @since 1.45
  */
 public class HorizontalPanelContentView extends HorizontalLayout implements
 		PanelContentView {

@@ -24,7 +24,7 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
  * vertically).
  * 
  * @author Jan Malcomess (codecentric AG)
- * @since 1.44
+ * @since 1.45
  */
 public class HorizontalRegionView extends HorizontalPanelContentView implements
 		RegionView {

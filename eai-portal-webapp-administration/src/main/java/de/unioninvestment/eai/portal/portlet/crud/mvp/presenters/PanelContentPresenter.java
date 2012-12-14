@@ -23,10 +23,11 @@ import static java.util.Collections.unmodifiableList;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.vaadin.ui.AbstractOrderedLayout;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Panel;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PanelContentView;
@@ -49,7 +50,7 @@ public class PanelContentPresenter extends
 
 	private static final long serialVersionUID = 2L;
 
-	private List<ComponentPresenter<?, ?>> components = new ArrayList<ComponentPresenter<?, ?>>();
+	private List<ComponentPresenter> components = new ArrayList<ComponentPresenter>();
 
 	/**
 	 * Initialisiert die Seite.
@@ -72,30 +73,36 @@ public class PanelContentPresenter extends
 	 * @param presenter
 	 *            Presenter
 	 */
-	public void addComponent(ComponentPresenter<?, ?> presenter) {
+	public void addComponent(ComponentPresenter presenter) {
 		this.components.add(presenter);
 		View componentToAdd = presenter.getView();
 		getView().addComponent(componentToAdd);
 
-		// Handle ExpandableComponent (since 1.44)
-		if (presenter.getModel() instanceof Component.ExpandableComponent) {
-			int expandRatio = ((Component.ExpandableComponent) presenter
-					.getModel()).getExpandRatio();
-			if (expandRatio > 0) {
-				if (getView() instanceof HorizontalLayout) {
-					HorizontalLayout hLayout = (HorizontalLayout) getView();
-					componentToAdd.setWidth("100%");
-					hLayout.setExpandRatio(componentToAdd, expandRatio);
-				} else if (getView() instanceof VerticalLayout) {
-					VerticalLayout vLayout = (VerticalLayout) getView();
-					componentToAdd.setHeight("100%");
-					vLayout.setExpandRatio(componentToAdd, expandRatio);
-				}
+		// Handle expandRatio (since 1.45)
+		int expandRatio = presenter.getComponentExpandRation();
+		if (expandRatio > 0) {
+			Component view = getView();
+			if (view instanceof com.vaadin.ui.Panel) {
+				view = ((com.vaadin.ui.Panel) view).getContent();
+			}
+			AbstractOrderedLayout layout = null;
+			if (view instanceof HorizontalLayout) {
+				layout = (HorizontalLayout) view;
+				componentToAdd.setWidth("100%");
+			} else if (view instanceof VerticalLayout) {
+				layout = (VerticalLayout) view;
+				componentToAdd.setHeight("100%");
+				layout.setExpandRatio(componentToAdd, expandRatio);
+			} else if (view instanceof AbstractOrderedLayout) {
+				layout = (AbstractOrderedLayout) view;
+			}
+			if (layout != null) {
+				layout.setExpandRatio(componentToAdd, expandRatio);
 			}
 		}
 	}
 
-	List<ComponentPresenter<?, ?>> getComponents() {
+	List<ComponentPresenter> getComponents() {
 		return unmodifiableList(components);
 	}
 }

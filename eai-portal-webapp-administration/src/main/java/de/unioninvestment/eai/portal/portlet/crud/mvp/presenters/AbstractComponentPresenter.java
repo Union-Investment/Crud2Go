@@ -30,10 +30,10 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
  * Convenient base implementation of <code>ComponentPresenter</code>.
  * 
  * @author Jan Malcomess (codecentric AG)
- * @since 1.44
+ * @since 1.45
  */
 public class AbstractComponentPresenter<C extends Component, V extends View>
-		extends AbstractPresenter<V> implements ComponentPresenter<C, V> {
+		extends AbstractPresenter<V> implements ComponentPresenter {
 	/**
 	 * @see Serializable
 	 */
@@ -58,10 +58,22 @@ public class AbstractComponentPresenter<C extends Component, V extends View>
 	}
 
 	/**
+	 * @return The model of the view presented by this
+	 *         <code>ComponentPresenter</code>.
+	 */
+	protected C getModel() {
+		return this.model;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public C getModel() {
-		return this.model;
+	public int getComponentExpandRation() {
+		if (model instanceof Component.ExpandableComponent) {
+			return ((Component.ExpandableComponent) this.model)
+					.getExpandRatio();
+		}
+		return 0;
 	}
 }

@@ -30,7 +30,7 @@ public class CustomComponent extends Component implements
 	/**
 	 * The component's configuration.
 	 * 
-	 * @since 1.44
+	 * @since 1.45
 	 */
 	private final ScriptComponentConfig config;
 
@@ -39,7 +39,7 @@ public class CustomComponent extends Component implements
 	/**
 	 * @param config
 	 *            the component's configuration.
-	 * @since 1.44
+	 * @since 1.45
 	 */
 	public CustomComponent(ScriptComponentConfig config) {
 		this.config = config;
@@ -58,7 +58,7 @@ public class CustomComponent extends Component implements
 	}
 
 	/**
-	 * {@inheritDoc} since 1.44
+	 * {@inheritDoc} since 1.45
 	 */
 	@Override
 	public int getExpandRatio() {

@@ -157,7 +157,7 @@ public class Form extends Component implements Component.ExpandableComponent,
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @since 1.44
+	 * @since 1.45
 	 */
 	@Override
 	public int getExpandRatio() {

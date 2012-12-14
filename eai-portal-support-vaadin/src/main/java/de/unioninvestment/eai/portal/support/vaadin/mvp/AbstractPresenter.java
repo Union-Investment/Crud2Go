@@ -26,9 +26,9 @@ import org.springframework.util.Assert;
  * Convenient base implementation of <code>Presenter</code>.
  * 
  * @author Jan Malcomess (codecentric AG)
- * @since 1.44
+ * @since 1.45
  */
-public abstract class AbstractPresenter<V extends View> implements Presenter<V> {
+public abstract class AbstractPresenter<V extends View> implements Presenter {
 
 	/**
 	 * @see Serializable

@@ -25,10 +25,10 @@ import java.io.Serializable;
  * 
  * @author carsten.mjartan
  */
-public interface Presenter<V extends View> extends Serializable {
+public interface Presenter extends Serializable {
 
 	/**
 	 * @return die vom Presenter gesteuerte View zur Komposition der UI
 	 */
-	V getView();
+	View getView();
 }

@@ -77,7 +77,7 @@ public class Region extends Panel implements Component.ExpandableComponent {
 	/**
 	 * @return <code>true</code> if components within this region are to be
 	 *         layed out horizontally, <code>false</code> if vertically.
-	 * @since 1.44
+	 * @since 1.45
 	 */
 	public boolean isHorizontalLayout() {
 		return this.config.isHorizontalLayout();
@@ -129,7 +129,7 @@ public class Region extends Panel implements Component.ExpandableComponent {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @since 1.44
+	 * @since 1.45
 	 */
 	@Override
 	public int getExpandRatio() {

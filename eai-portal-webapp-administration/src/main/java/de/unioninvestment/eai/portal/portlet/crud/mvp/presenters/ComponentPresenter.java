@@ -18,9 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.Presenter;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
 /**
  * Ein Presenter für eine Komponente.
@@ -28,10 +26,20 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
  * @author markus.bonsch
  * @author Jan Malcomess (codecentric AG)
  */
-public interface ComponentPresenter<C extends Component, V extends View>
-		extends Presenter<V> {
+public interface ComponentPresenter extends Presenter {
 	/**
-	 * @return The model of the view presented by this <code>Presenter</code>.
+	 * The expand ratio determines the amount of available space this
+	 * presenter's component takes. For example, if two components define expand
+	 * ratios 2 and 1, respectively, then the available space will be
+	 * distributed 2/3 and 1/3 among the components. If expand ratio is 0 or
+	 * less then the component will not expand. If only one component defines an
+	 * expand ratio, than it will take up all available space regardless of the
+	 * defined value.
+	 * 
+	 * @return expand ratio defining the relative amount of available space this
+	 *         presenter's component wants to take up. 0 or less to deactivate
+	 *         expansion.
+	 * @since 1.45
 	 */
-	C getModel();
+	int getComponentExpandRation();
 }
