@@ -65,7 +65,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseContainer
 import de.unioninvestment.eai.portal.portlet.crud.scripting.database.ExtendedSql;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptDatabaseQueryDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptSqlContainer;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptDatabaseContainer;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.StatementWrapper;
 import de.unioninvestment.eai.portal.support.scripting.test.commons.ScriptingSpringPortletContextTest;
 
@@ -197,7 +197,7 @@ public class ScriptDatabaseQueryDelegateTest extends
 			throws SQLException {
 
 		when(
-				insertClosureMock.call(any(ScriptSqlContainer.class),
+				insertClosureMock.call(any(ScriptDatabaseContainer.class),
 						any(ScriptRow.class), any(ExtendedSql.class)))
 				.thenThrow(new MissingPropertyException("bla"));
 
@@ -212,7 +212,7 @@ public class ScriptDatabaseQueryDelegateTest extends
 	public void shouldWrapAnyExceptionInAnSqlException() throws SQLException {
 
 		when(
-				insertClosureMock.call(any(ScriptSqlContainer.class),
+				insertClosureMock.call(any(ScriptDatabaseContainer.class),
 						any(ScriptRow.class), any(ExtendedSql.class)))
 				.thenThrow(new RuntimeException("bla"));
 
@@ -245,7 +245,7 @@ public class ScriptDatabaseQueryDelegateTest extends
 	public void shouldInsertANewRowWithSql() throws SQLException {
 
 		when(
-				insertClosureMock.call(any(ScriptSqlContainer.class),
+				insertClosureMock.call(any(ScriptDatabaseContainer.class),
 						rowCaptor.capture(), any(ExtendedSql.class)))
 				.thenReturn(
 						new GStringImpl(new Object[] { 1, "Text" }, INSERT_STMT
@@ -272,7 +272,7 @@ public class ScriptDatabaseQueryDelegateTest extends
 	@Test
 	public void shouldInsertANewRowWithScript() throws SQLException {
 		when(
-				insertClosureMock.call(any(ScriptSqlContainer.class),
+				insertClosureMock.call(any(ScriptDatabaseContainer.class),
 						rowCaptor.capture(), any(ExtendedSql.class)))
 				.thenReturn(1);
 		scriptDatabaseQueryDelegate = new ScriptDatabaseQueryDelegate(
@@ -290,7 +290,7 @@ public class ScriptDatabaseQueryDelegateTest extends
 	@Test
 	public void shouldUpdateAnExistingRowWithSql() throws SQLException {
 		when(
-				updateClosureMock.call(any(ScriptSqlContainer.class),
+				updateClosureMock.call(any(ScriptDatabaseContainer.class),
 						rowCaptor.capture(), any(ExtendedSql.class)))
 				.thenReturn(
 						new GStringImpl(new Object[] { "Text", 1 }, UPDATE_STMT
@@ -319,7 +319,7 @@ public class ScriptDatabaseQueryDelegateTest extends
 	@Test
 	public void shouldUpdateAnExistingRowWithScript() throws SQLException {
 		when(
-				updateClosureMock.call(any(ScriptSqlContainer.class),
+				updateClosureMock.call(any(ScriptDatabaseContainer.class),
 						rowCaptor.capture(), any(ExtendedSql.class)))
 				.thenReturn(1);
 		scriptDatabaseQueryDelegate = new ScriptDatabaseQueryDelegate(

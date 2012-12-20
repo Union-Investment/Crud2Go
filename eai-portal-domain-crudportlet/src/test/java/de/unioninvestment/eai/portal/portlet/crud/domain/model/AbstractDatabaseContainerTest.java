@@ -1,26 +1,27 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.sql.Clob;
@@ -43,6 +45,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.derby.iapi.types.SQLTimestamp;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -51,6 +55,7 @@ import org.mockito.stubbing.Answer;
 import com.vaadin.addon.sqlcontainer.ColumnProperty;
 import com.vaadin.addon.sqlcontainer.RowId;
 import com.vaadin.addon.sqlcontainer.RowItem;
+import com.vaadin.addon.sqlcontainer.SQLContainer;
 import com.vaadin.addon.sqlcontainer.TemporaryRowId;
 import com.vaadin.data.Item;
 
@@ -68,6 +73,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEventHandl
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.EachRowCallback;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.TransactionCallback;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
@@ -86,6 +92,12 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 	@Mock
 	private RowId rowId2Mock;
+
+	@Mock
+	private EachRowCallback eachRowCallbackMock;
+
+	@Captor
+	private ArgumentCaptor<ContainerRow> rowCaptor;
 
 	@Before
 	public void databaseSetUp() {
@@ -664,4 +676,48 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 		assertThat(this.testContainer.queryDelegate.getQueryTimeout(), is(42));
 	}
+
+	@Test
+	public void shouldAllowTraversalOfEachContainerRow() {
+		container.setVaadinContainer(vaadinContainerMock);
+
+		when(vaadinContainerMock.firstItemId()).thenReturn(rowId1Mock);
+		RowItem rowItem1 = new RowItem((SQLContainer) vaadinContainerMock,
+				rowId1Mock, null);
+		when(vaadinContainerMock.getItem(rowId1Mock)).thenReturn(rowItem1);
+
+		when(vaadinContainerMock.nextItemId(rowId1Mock)).thenReturn(rowId2Mock);
+		RowItem rowItem2 = new RowItem((SQLContainer) vaadinContainerMock,
+				rowId2Mock, null);
+		when(vaadinContainerMock.getItem(rowId2Mock)).thenReturn(rowItem2);
+
+		when(vaadinContainerMock.nextItemId(rowId2Mock)).thenReturn(null);
+
+		container.eachRow(eachRowCallbackMock);
+
+		verify(vaadinContainerMock).firstItemId();
+		verify(vaadinContainerMock).nextItemId(rowId1Mock);
+		verify(vaadinContainerMock).nextItemId(rowId2Mock);
+
+		verify(eachRowCallbackMock, times(2)).doWithRow(rowCaptor.capture());
+		List<ContainerRow> allRows = rowCaptor.getAllValues();
+		assertThat(allRows.get(0).getInternalRow(),
+				sameInstance((Item) rowItem1));
+		assertThat(allRows.get(1).getInternalRow(),
+				sameInstance((Item) rowItem2));
+
+	}
+
+	@Test
+	public void shouldDoNothingOnTraversalOfEmptyList() {
+		container.setVaadinContainer(vaadinContainerMock);
+
+		when(vaadinContainerMock.firstItemId()).thenReturn(null);
+
+		container.eachRow(eachRowCallbackMock);
+
+		verify(vaadinContainerMock).firstItemId();
+		verifyZeroInteractions(eachRowCallbackMock);
+	}
+
 }

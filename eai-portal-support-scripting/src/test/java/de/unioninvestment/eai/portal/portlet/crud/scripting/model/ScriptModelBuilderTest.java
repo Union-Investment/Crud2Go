@@ -619,7 +619,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		assertThat(
 				((ScriptTable) scriptPortlet.getPage().getElements().get(0))
 						.getContainer(),
-				instanceOf(ScriptSqlContainer.class));
+				instanceOf(ScriptDatabaseContainer.class));
 	}
 
 	private void prepare(String configFile) throws JAXBException {

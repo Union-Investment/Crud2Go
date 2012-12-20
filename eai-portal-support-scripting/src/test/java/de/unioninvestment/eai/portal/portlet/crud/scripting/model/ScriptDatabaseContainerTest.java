@@ -46,7 +46,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler;
 
-public class ScriptSqlContainerTest {
+public class ScriptDatabaseContainerTest {
 
 	private ScriptCompiler compiler = new ScriptCompiler();
 
@@ -67,7 +67,7 @@ public class ScriptSqlContainerTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		container = new ScriptSqlContainer(databaseContainerMock);
+		container = new ScriptDatabaseContainer(databaseContainerMock);
 	}
 
 	@Test

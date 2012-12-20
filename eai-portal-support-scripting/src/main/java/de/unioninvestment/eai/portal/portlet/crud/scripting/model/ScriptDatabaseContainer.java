@@ -25,13 +25,13 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
  * 
  * @author carsten.mjartan
  */
-public class ScriptSqlContainer extends ScriptContainer {
+public class ScriptDatabaseContainer extends ScriptContainer {
 
 	/**
 	 * @param container
 	 *            die zugehörige Modell-Instanz
 	 */
-	ScriptSqlContainer(DataContainer container) {
+	ScriptDatabaseContainer(DataContainer container) {
 		super(container);
 		initializeEventHandler();
 	}

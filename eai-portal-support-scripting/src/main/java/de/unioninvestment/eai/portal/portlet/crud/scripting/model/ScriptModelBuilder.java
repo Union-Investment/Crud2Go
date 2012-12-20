@@ -47,6 +47,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.AbstractDatabaseContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
@@ -657,8 +658,13 @@ public class ScriptModelBuilder {
 				populateBackendToDataContainer((GenericDataContainer) container);
 				scriptContainer = factory.getScriptContainer(container);
 			}
-		} else {
-			scriptContainer = factory.getScriptSqlContainer(container);
+		} else if (container instanceof AbstractDatabaseContainer) {
+			if (container instanceof DatabaseQueryContainer) {
+				scriptContainer = factory
+						.getScriptDatabaseQueryContainer(container);
+			} else {
+				scriptContainer = factory.getScriptDatabaseContainer(container);
+			}
 		}
 
 		populateOnInsertClosure(container, scriptContainer);
