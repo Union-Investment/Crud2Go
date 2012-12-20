@@ -52,8 +52,8 @@ public class GroovyCategorySpringApplicationPortlet extends
 	static private List<Class> categories = new ArrayList<Class>();
 	static {
 		categories.add(CollectionsCategory.class);
-		categories.add(StringCategory.class);
 		categories.add(GStringCategory.class);
+		categories.add(StringCategory.class);
 	}
 
 	@Override

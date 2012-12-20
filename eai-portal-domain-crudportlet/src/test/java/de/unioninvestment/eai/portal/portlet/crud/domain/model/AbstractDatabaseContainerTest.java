@@ -27,6 +27,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -679,16 +680,21 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 	@Test
 	public void shouldAllowTraversalOfEachContainerRow() {
+		container.queryDelegate = mock(AbstractTimeoutableQueryDelegate.class);
 		container.setVaadinContainer(vaadinContainerMock);
 
 		when(vaadinContainerMock.firstItemId()).thenReturn(rowId1Mock);
+		ColumnProperty property = new ColumnProperty("id", false, false, true,
+				1, Integer.class);
 		RowItem rowItem1 = new RowItem((SQLContainer) vaadinContainerMock,
-				rowId1Mock, null);
+				rowId1Mock, asList(property));
 		when(vaadinContainerMock.getItem(rowId1Mock)).thenReturn(rowItem1);
 
 		when(vaadinContainerMock.nextItemId(rowId1Mock)).thenReturn(rowId2Mock);
+		ColumnProperty property2 = new ColumnProperty("id", false, false, true,
+				1, Integer.class);
 		RowItem rowItem2 = new RowItem((SQLContainer) vaadinContainerMock,
-				rowId2Mock, null);
+				rowId2Mock, asList(property2));
 		when(vaadinContainerMock.getItem(rowId2Mock)).thenReturn(rowItem2);
 
 		when(vaadinContainerMock.nextItemId(rowId2Mock)).thenReturn(null);

@@ -68,11 +68,11 @@ public class GStringCategory {
 	}
 
 	/**
-	 * This Method returns a String that tries to convert an SQL GString to an
-	 * SQL Statement for easier readability (of the audit log).
+	 * This Method tries to convert an SQL GString to an SQL Statement for
+	 * easier readability (of the audit log).
 	 * 
 	 * Functionality mostly copied from GString.toString(). Currently only
-	 * Strings are encapsulated
+	 * String Parameters are encapsulated
 	 * 
 	 * @param gs
 	 *            the input GString
@@ -119,7 +119,8 @@ public class GStringCategory {
 	private static void writeSqlParameter(StringWriter out, Object value)
 			throws IOException {
 
-		if (value instanceof String || value instanceof Reader) {
+		if (value instanceof String || value instanceof GString
+				|| value instanceof Reader) {
 			out.write("'");
 			InvokerHelper.write(out, value);
 			out.write("'");

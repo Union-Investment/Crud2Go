@@ -98,11 +98,13 @@ public class ScriptTableSelection {
 	/**
 	 * Iteriert durch alle Zeilen und führt für jede Zeile den Cosure aus.
 	 * 
-	 * @param c
-	 *            Closure
+	 * Achtung: Bitte nicht mit dem SQL-Backend benutzen, da diese Methode
+	 * zusammen mit Vaadin-Versionen < 6.8.5 ernsthafte Performanceprobleme
+	 * verursacht.
 	 * 
-	 *            Achtung: Bitte nicht mit dem SQL-Backend benutzen, da diese
-	 *            Methode ernsthafte Performanceprobleme verursacht.
+	 * @param c
+	 *            Closure mit einem Parameter { ScriptRow row -> ... }, die für
+	 *            jede selektierte Zeile aufgerufen wird
 	 */
 	public void eachRow(final Closure<?> c) {
 		container.eachRow(collectContainerRowIds(),
