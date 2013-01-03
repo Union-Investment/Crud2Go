@@ -507,6 +507,17 @@
 		</plugins>
 	</reporting>
 
+	<distributionManagement>
+		<repository>
+			<id>Sofia_Release</id>
+			<url>http://nexus.d3.uid.de/content/repositories/Sofia_Release</url>
+		</repository>
+		<snapshotRepository>
+			<id>Sofia_Snapshots</id>
+			<url>http://nexus.d3.uid.de/content/repositories/Sofia_Snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
 	<profiles>
 		<profile>
 			<id>eclipse</id>
