@@ -665,6 +665,9 @@ public class ScriptModelBuilder {
 			} else {
 				scriptContainer = factory.getScriptDatabaseContainer(container);
 			}
+		} else {
+			throw new UnsupportedOperationException("Container of type "
+					+ container.getClass().getName() + " is not supported");
 		}
 
 		populateOnInsertClosure(container, scriptContainer);
