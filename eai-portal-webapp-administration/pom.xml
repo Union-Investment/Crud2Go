@@ -120,6 +120,10 @@
 			<artifactId>vaadin-sqlcontainer</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>cssinject</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.vaadin.addon</groupId>
 			<artifactId>jfreechartwrapper</artifactId>
 		</dependency>

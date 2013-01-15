@@ -178,6 +178,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.vaadin.addons</groupId>
+				<artifactId>cssinject</artifactId>
+				<version>1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.vaadin.addons</groupId>
 				<artifactId>animator</artifactId>
 				<version>1.6.6</version>
 			</dependency>
@@ -517,7 +522,7 @@
 			<url>http://nexus.d3.uid.de/content/repositories/Sofia_Snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
 	<profiles>
 		<profile>
 			<id>eclipse</id>
