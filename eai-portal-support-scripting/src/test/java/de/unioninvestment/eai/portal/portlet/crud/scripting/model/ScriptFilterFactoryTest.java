@@ -196,7 +196,7 @@ public class ScriptFilterFactoryTest {
 	public void shouldbuildDurableAnyFilter() throws InstantiationException,
 			IllegalAccessException {
 		ScriptCompiler compiler = new ScriptCompiler();
-		ScriptContainer container = new ScriptSqlContainer(
+		ScriptContainer container = new ScriptDatabaseContainer(
 				databaseContainerMock);
 
 		Class<Script> compileScript = compiler
@@ -390,7 +390,7 @@ public class ScriptFilterFactoryTest {
 	private void runScript(String script) throws InstantiationException,
 			IllegalAccessException {
 		ScriptCompiler compiler = new ScriptCompiler();
-		ScriptContainer container = new ScriptSqlContainer(
+		ScriptContainer container = new ScriptDatabaseContainer(
 				databaseContainerMock);
 		Class<Script> compileScript = compiler.compileScript(script);
 		Script instance = compileScript.newInstance();

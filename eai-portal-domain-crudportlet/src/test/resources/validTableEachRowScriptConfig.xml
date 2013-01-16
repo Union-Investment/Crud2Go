@@ -4,14 +4,21 @@
 	<page>
 		<table>
 			<database-table datasource="test" tablename="test_crud2" />
-			<action title="Selektions-Werte ausgeben" id="id1" onExecution="showSelection(it.table.selection)" />
-			<action title="Selektion klonen" id="id2" onExecution="cloneSelection(it.table.selection)" />
+			<action id="id1" title="Selektions-Werte ausgeben" onExecution="showSelection(it.table.selection)" />
+			<action id="id2" title="Selektion klonen" onExecution="cloneSelection(it.table.selection)" />
+			<action id="id3" title="Selektions-Werte ausgeben" onExecution="showAll(it.table.container)" />
 		</table>
 	</page>
 	<script><![CDATA[
 	def showSelection(selection) {
 		println 'Iterating through selection ...'
 		selection.eachRow { row ->
+			println row.values
+		}
+	}
+	def showAll(container) {
+		println 'Iterating through all rows ...'
+		container.eachRow { row ->
 			println row.values
 		}
 	}

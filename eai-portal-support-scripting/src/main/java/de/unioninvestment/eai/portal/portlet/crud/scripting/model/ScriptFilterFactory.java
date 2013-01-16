@@ -40,7 +40,7 @@ import de.unioninvestment.eai.portal.support.scripting.ScriptSQLWhereFactory;
 
 /**
  * Liste unterstützter Filter in
- * {@link ScriptSqlContainer#addFilters(groovy.lang.Closure)}.
+ * {@link ScriptDatabaseContainer#addFilters(groovy.lang.Closure)}.
  * 
  * 
  * @author carsten.mjartan

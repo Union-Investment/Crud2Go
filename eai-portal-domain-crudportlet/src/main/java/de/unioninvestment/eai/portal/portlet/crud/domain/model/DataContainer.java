@@ -383,6 +383,17 @@ public interface DataContainer extends Serializable {
 	void eachRow(Set<ContainerRowId> ids, EachRowCallback eachRowCallback);
 
 	/**
+	 * Liest die aktuellen (gefilterten) Tabelleninhalte aus der Datenquelle und
+	 * übergibt sie einer Callback-Methode.
+	 * 
+	 * @param ids
+	 *            die IDs der zu verarbeitenden Zeilen
+	 * @param eachRowCallback
+	 *            das Callback-Objekt
+	 */
+	void eachRow(EachRowCallback eachRowCallback);
+
+	/**
 	 * Gibt eine Tabellenzeile zurück.
 	 * 
 	 * @param rowId
@@ -519,4 +530,5 @@ public interface DataContainer extends Serializable {
 	 * @return the FilterPolicy configuration of the container
 	 */
 	FilterPolicy getFilterPolicy();
+
 }

@@ -1,24 +1,27 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import static java.util.Collections.unmodifiableList;
+
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +33,8 @@ import com.vaadin.addon.sqlcontainer.RowId;
 import com.vaadin.addon.sqlcontainer.RowItem;
 import com.vaadin.addon.sqlcontainer.SQLContainer;
 import com.vaadin.addon.sqlcontainer.TemporaryRowId;
+import com.vaadin.addon.sqlcontainer.query.OrderBy;
+import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQueryEventWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
@@ -45,6 +50,8 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
  * 
  */
 public class DatabaseQueryContainer extends AbstractDatabaseContainer {
+	private static final List<OrderBy> EMPTY_ORDER_BY = unmodifiableList(new LinkedList<OrderBy>());
+
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOG = LoggerFactory
@@ -312,6 +319,24 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 			super.withExportSettings(exportCallback);
 		} finally {
 			getVaadinContainer().setPageLength(pageLength);
+		}
+	}
+
+	public StatementHelper getCurrentQuery(boolean preserveOrder) {
+		// just to initialize if not already done
+		getVaadinContainer();
+
+		if (preserveOrder) {
+			return databaseQueryDelegate.getQueryStatement(0, 0);
+		} else {
+			List<OrderBy> previousOrder = databaseQueryDelegate.getOrderBy();
+			try {
+				databaseQueryDelegate.setOrderBy(EMPTY_ORDER_BY);
+				return databaseQueryDelegate.getQueryStatement(0, 0);
+
+			} finally {
+				databaseQueryDelegate.setOrderBy(previousOrder);
+			}
 		}
 	}
 }
