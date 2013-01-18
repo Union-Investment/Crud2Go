@@ -186,6 +186,18 @@
 						<element name="region" type="tns:RegionConfig" />
 					</choice>
 				</sequence>
+				<attribute name="horizontalLayout" type="boolean" default="false">
+					<annotation>
+						<documentation>						
+							Defines, if components within the panel are layed out horizontally
+							("true") or vertically ("false"). This setting is optional and "false"
+							by default.
+							Will be ignored by region (see RegionConfig below) when "collapsible" is "true"; 
+							in other words: components	within a collapsible region can only be layed 
+							out vertically. 
+						</documentation>
+					</annotation>
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -210,17 +222,6 @@
 						<documentation>
 							Der Text, der in der Titelzeile angezeigt werden
 							soll.
-						</documentation>
-					</annotation>
-				</attribute>
-				<attribute name="horizontalLayout" type="boolean" default="false">
-					<annotation>
-						<documentation>						
-							Defines, if components within the region are layout out horizontally
-							("true") or vertically ("false"). This setting is optional and "false"
-							by default.
-							Will be ignored when "collapsible" is "true"; in other words: components
-							within a collapsible region can only be layed out vertically. 
 						</documentation>
 					</annotation>
 				</attribute>
@@ -280,7 +281,24 @@
 			</documentation>
 		</annotation>
 		<complexContent>
-			<extension base="tns:SecurableConfig" />
+			<extension base="tns:SecurableConfig">
+				<attribute name="width" type="string" use="optional">
+					<annotation>		
+						<documentation>
+							The desired width of the component, usually given in pixels, for 
+							example '150px'.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="height" type="string" use="optional">
+					<annotation>		
+						<documentation>
+							The desired height of the component, usually given in pixels, for 
+							example '150px'.
+						</documentation>
+					</annotation>
+				</attribute>				
+			</extension>
 		</complexContent>
 	</complexType>
 

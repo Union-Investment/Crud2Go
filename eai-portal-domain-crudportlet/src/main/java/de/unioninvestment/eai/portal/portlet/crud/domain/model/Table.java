@@ -49,6 +49,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
  * Modell-Klasse für Tabellen.
  * 
  * @author max.hartmann
+ * @author Jan Malcomess (codecentric AG)
  * 
  */
 public class Table extends Component implements Component.ExpandableComponent,
@@ -266,6 +267,20 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	public String getId() {
 		return config.getId();
+	}
+
+	/**
+	 * @since 1.45
+	 */
+	public String getWidth() {
+		return this.config.getWidth();
+	}
+
+	/**
+	 * @since 1.45
+	 */
+	public String getHeight() {
+		return this.config.getHeight();
 	}
 
 	public RowStyleRenderer getRowStyleRenderer() {

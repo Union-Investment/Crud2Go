@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
@@ -61,7 +61,6 @@ public class Tab extends Panel implements LazyInitializable<Tab> {
 	}
 
 	private static final long serialVersionUID = 1L;
-	private final TabConfig config;
 	private Tabs tabs;
 	private final EventRouter<ShowEventHandler<Tab>, ShowEvent<Tab>> showEventRouter = new EventRouter<ShowEventHandler<Tab>, ShowEvent<Tab>>();
 	private final EventRouter<HideEventHandler<Tab>, HideEvent<Tab>> hideEventRouter = new EventRouter<HideEventHandler<Tab>, HideEvent<Tab>>();
@@ -73,11 +72,11 @@ public class Tab extends Panel implements LazyInitializable<Tab> {
 	 *            Konfiguration der Portlet-Seite
 	 */
 	public Tab(TabConfig config) {
-		this.config = config;
+		super(config);
 	}
 
 	public String getId() {
-		return this.config.getId();
+		return this.getConfig().getId();
 	}
 
 	/**
@@ -97,7 +96,7 @@ public class Tab extends Panel implements LazyInitializable<Tab> {
 	 * @return der Anzeigetitel des Tab
 	 */
 	public String getTitle() {
-		return config.getTitle();
+		return this.getConfig().getTitle();
 	}
 
 	public Tabs getTabs() {
@@ -141,7 +140,7 @@ public class Tab extends Panel implements LazyInitializable<Tab> {
 		HideEvent<Tab> event = new HideEvent<Tab>(this);
 		hideEventRouter.fireEvent(event);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -150,4 +149,11 @@ public class Tab extends Panel implements LazyInitializable<Tab> {
 		getPresenter().attachDialog(dialogId, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected TabConfig getConfig() {
+		return (TabConfig) super.getConfig();
+	}
 }

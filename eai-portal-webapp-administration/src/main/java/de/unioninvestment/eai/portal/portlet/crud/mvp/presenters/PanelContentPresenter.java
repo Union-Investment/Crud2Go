@@ -79,7 +79,7 @@ public class PanelContentPresenter extends
 		getView().addComponent(componentToAdd);
 
 		// Handle expandRatio (since 1.45)
-		int expandRatio = presenter.getComponentExpandRation();
+		int expandRatio = presenter.getComponentExpandRatio();
 		if (expandRatio > 0) {
 			Component view = getView();
 			if (view instanceof com.vaadin.ui.Panel) {
@@ -92,7 +92,6 @@ public class PanelContentPresenter extends
 			} else if (view instanceof VerticalLayout) {
 				layout = (VerticalLayout) view;
 				componentToAdd.setHeight("100%");
-				layout.setExpandRatio(componentToAdd, expandRatio);
 			} else if (view instanceof AbstractOrderedLayout) {
 				layout = (AbstractOrderedLayout) view;
 			}

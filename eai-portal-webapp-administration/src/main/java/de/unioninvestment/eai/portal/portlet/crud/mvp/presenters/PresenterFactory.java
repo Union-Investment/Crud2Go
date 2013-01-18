@@ -111,8 +111,9 @@ public class PresenterFactory {
 	 * @return PanelContentPresenter
 	 */
 	public PanelContentPresenter panelContentPresenter(Panel panel) {
-		return new PanelContentPresenter(
-				viewFactory.panelContentView(panel instanceof Tab), panel);
+		return new PanelContentPresenter(viewFactory.panelContentView(
+				panel instanceof Tab, panel.isHorizontalLayout(),
+				panel.getWidth(), panel.getHeight()), panel);
 	}
 
 	/**
@@ -124,7 +125,9 @@ public class PresenterFactory {
 	 * @return DialogPresenter
 	 */
 	public DialogPresenter dialogPresenter(Dialog dialog) {
-		return new DialogPresenter(viewFactory.panelContentView(false), dialog);
+		return new DialogPresenter(viewFactory.panelContentView(false,
+				dialog.isHorizontalLayout(), dialog.getWidth(),
+				dialog.getHeight()), dialog);
 	}
 
 	/**
@@ -139,13 +142,12 @@ public class PresenterFactory {
 		RegionPresenter presenter = null;
 		if (region.isCollapsible()) {
 			presenter = new CollapsibleRegionPresenter(
-					this.viewFactory.collapsibleRegionView(), region);
-		} else if (region.isHorizontalLayout()) {
-			presenter = new RegionPresenter(
-					this.viewFactory.horizontalRegionView(), region);
+					this.viewFactory.collapsibleRegionView(region.getWidth(),
+							region.getHeight()), region);
 		} else {
-			presenter = new RegionPresenter(this.viewFactory.regionView(),
-					region);
+			presenter = new RegionPresenter(this.viewFactory.regionView(true,
+					region.isHorizontalLayout(), region.getWidth(),
+					region.getHeight()), region);
 		}
 		return presenter;
 	}
@@ -193,7 +195,8 @@ public class PresenterFactory {
 	 * @return Presenter der Tabs
 	 */
 	public TabsPresenter tabsPresenter(Tabs tabs) {
-		return new TabsPresenter(viewFactory.getTabsView(), tabs);
+		return new TabsPresenter(viewFactory.getTabsView(tabs.getWidth(),
+				tabs.getHeight()), tabs);
 	}
 
 	/**
@@ -239,8 +242,9 @@ public class PresenterFactory {
 			Panel parentPanel, String dialogId, Table table,
 			TablePresenter tablePresenter) {
 
-		RowEditingFormView rowEditingFormView = viewFactory
-				.rowEditingFormView(parentPanel instanceof Tab);
+		RowEditingFormView rowEditingFormView = viewFactory.rowEditingFormView(
+				parentPanel instanceof Tab, parentPanel.isHorizontalLayout(),
+				parentPanel.getWidth(), parentPanel.getHeight());
 
 		RowEditingFormPresenter rowEditingFormPresenter = new RowEditingFormPresenter(
 				rowEditingFormView, model, parentPanel, dialogId, table,
@@ -258,7 +262,8 @@ public class PresenterFactory {
 	 */
 	public CustomComponentPresenter customComponentPresenter(
 			CustomComponent customComponent) {
-		return new CustomComponentPresenter(viewFactory.customComponentView(),
+		return new CustomComponentPresenter(viewFactory.customComponentView(
+				customComponent.getWidth(), customComponent.getHeight()),
 				customComponent);
 	}
 }

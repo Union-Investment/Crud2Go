@@ -33,7 +33,8 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.SourceEvent;
 /**
  * Modell für einen Bereich innerhalb einer Seite.
  * 
- * @author Frank Hardy (Codecentric AG)
+ * @author Frank Hardy (codecentric AG)
+ * @author Jan Malcomess (codecentric AG)
  */
 @Configurable
 public class Region extends Panel implements Component.ExpandableComponent {
@@ -42,8 +43,6 @@ public class Region extends Panel implements Component.ExpandableComponent {
 
 	private final EventRouter<ExpandEventHandler, ExpandEvent> expandEventRouter = new EventRouter<ExpandEventHandler, ExpandEvent>();
 	private final EventRouter<CollapseEventHandler, CollapseEvent> collapseEventRouter = new EventRouter<CollapseEventHandler, CollapseEvent>();
-
-	private final RegionConfig config;
 
 	@Autowired
 	private EventBus eventBus;
@@ -57,34 +56,20 @@ public class Region extends Panel implements Component.ExpandableComponent {
 	 *            das entsprechende config-Element aus dem JAXB-Modell.
 	 */
 	public Region(RegionConfig config) {
-		this.config = config;
+		super(config);
 		this.collapsed = config.isCollapsed();
 	}
 
-	/** @return das config element aus dem JAXB Modell. */
-	public RegionConfig getConfig() {
-		return this.config;
-	}
-
 	public String getId() {
-		return this.config.getId();
+		return this.getConfig().getId();
 	}
 
 	public String getTitle() {
-		return this.config.getTitle();
-	}
-
-	/**
-	 * @return <code>true</code> if components within this region are to be
-	 *         layed out horizontally, <code>false</code> if vertically.
-	 * @since 1.45
-	 */
-	public boolean isHorizontalLayout() {
-		return this.config.isHorizontalLayout();
+		return this.getConfig().getTitle();
 	}
 
 	public boolean isCollapsible() {
-		return this.config.isCollapsible();
+		return this.getConfig().isCollapsible();
 	}
 
 	public boolean isCollapsed() {
@@ -92,7 +77,7 @@ public class Region extends Panel implements Component.ExpandableComponent {
 	}
 
 	public void setCollapsed(boolean collapsed) {
-		if (this.config.isCollapsible() && collapsed != this.collapsed) {
+		if (this.getConfig().isCollapsible() && collapsed != this.collapsed) {
 			this.collapsed = collapsed;
 			SourceEvent<?, Region> event = null;
 			if (this.collapsed) {
@@ -133,6 +118,14 @@ public class Region extends Panel implements Component.ExpandableComponent {
 	 */
 	@Override
 	public int getExpandRatio() {
-		return config.getExpandRatio();
+		return getConfig().getExpandRatio();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected RegionConfig getConfig() {
+		return (RegionConfig) super.getConfig();
 	}
 }

@@ -69,7 +69,7 @@ public class AbstractComponentPresenter<C extends Component, V extends View>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getComponentExpandRation() {
+	public int getComponentExpandRatio() {
 		if (model instanceof Component.ExpandableComponent) {
 			return ((Component.ExpandableComponent) this.model)
 					.getExpandRatio();

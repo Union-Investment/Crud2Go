@@ -59,11 +59,22 @@ public class ViewFactory implements Serializable {
 	 * Liefert eine {@link PanelContentView} zurück.
 	 * 
 	 * @param withMargin
-	 *            ob der Margin gesetzt werden soll
+	 *            ob der Margin gesetzt werden soll.
+	 * @param useHorizontalLayout
+	 *            when <code>true</code>, components are layed out horizontally.
+	 *            (@since 1.45).
+	 * @param width
+	 *            The desired width of component (@since 1.45). Defaults to
+	 *            "100%" when not specified.
+	 * @param height
+	 *            The desired height of component (@since 1.45). Defaults to
+	 *            undefined when not specified.
 	 * @return PanelView
 	 */
-	public PanelContentView panelContentView(boolean withMargin) {
-		return new DefaultPanelContentView(withMargin);
+	public PanelContentView panelContentView(boolean withMargin,
+			boolean useHorizontalLayout, String width, String heigth) {
+		return new DefaultPanelContentView(withMargin, useHorizontalLayout,
+				width, heigth);
 	}
 
 	/**
@@ -96,49 +107,82 @@ public class ViewFactory implements Serializable {
 	/**
 	 * Liefert eine {@link TabsView}.
 	 * 
+	 * @param width
+	 *            The desired width of component (@since 1.45). Defaults to
+	 *            "100%" when not specified.
+	 * @param height
+	 *            The desired height of component (@since 1.45). Defaults to
+	 *            undefined when not specified.
 	 * @return eine {@link TabsView}
 	 */
-	public TabsView getTabsView() {
-		return new DefaultTabsView();
+	public TabsView getTabsView(String width, String height) {
+		return new DefaultTabsView(width, height);
 	}
 
 	/**
 	 * @param withMargin
 	 *            ob der Margin gesetzt werden soll
-	 * @param table
-	 *            Tabelle
+	 * @param useHorizontalLayout
+	 *            when <code>true</code>, components are layed out horizontally.
+	 *            (@since 1.45).
+	 * @param width
+	 *            The desired width of component (@since 1.45). Defaults to
+	 *            "100%" when not specified.
+	 * @param height
+	 *            The desired height of component (@since 1.45). Defaults to
+	 *            "100%" when not specified.
 	 * @return die Komponente fürs Editieren im Formularmodus
 	 */
-	public RowEditingFormView rowEditingFormView(boolean withMargin) {
-		return new DefaultRowEditingFormView(withMargin);
+	public RowEditingFormView rowEditingFormView(boolean withMargin,
+			boolean useHorizontalLayout, String width, String height) {
+		return new DefaultRowEditingFormView(withMargin, useHorizontalLayout,
+				width, height);
 	}
 
 	/**
+	 * @param width
+	 *            The desired width of component (@since 1.45). Defaults to
+	 *            "100%" when not specified.
+	 * @param height
+	 *            The desired width of component (@since 1.45). Defaults to
+	 *            undefined when not specified.
 	 * @return das Widget für Custom Components
 	 */
-	public CustomComponentView customComponentView() {
-		return new DefaultCustomComponentView();
+	public CustomComponentView customComponentView(String width, String height) {
+		return new DefaultCustomComponentView(width, height);
 	}
 
 	/**
+	 * @param withMargin
+	 *            ob der Margin gesetzt werden soll. (@since 1.45).
+	 * @param useHorizontalLayout
+	 *            when <code>true</code>, components are layed out horizontally.
+	 *            (@since 1.45).
+	 * @param width
+	 *            The desired width of component (@since 1.45). Defaults to
+	 *            "100%" when not specified.
+	 * @param height
+	 *            The desired height of component (@since 1.45). Defaults to
+	 *            undefined when not specified.
 	 * @return eine Instanz einer Standard Region-View.
 	 */
-	public RegionView regionView() {
-		return new DefaultRegionView();
+	public RegionView regionView(boolean withMargin,
+			boolean useHorizontalLayout, String width, String height) {
+		return new DefaultRegionView(withMargin, useHorizontalLayout, width,
+				height);
 	}
 
 	/**
+	 * @param width
+	 *            The desired width of component (@since 1.45). Defaults to
+	 *            "100%" when not specified.
+	 * @param height
+	 *            The desired height of component (@since 1.45). Defaults to
+	 *            "100%" when not specified.
 	 * @return eine Instanz einer auf- und zuklappbaren Region-View.
 	 */
-	public CollapsibleRegionView collapsibleRegionView() {
-		return new DefaultCollapsibleRegionView();
-	}
-
-	/**
-	 * @return an instance of a <code>RegionView</code> laying out its
-	 *         components horizontally (instead of vertically).
-	 */
-	public HorizontalRegionView horizontalRegionView() {
-		return new HorizontalRegionView();
+	public CollapsibleRegionView collapsibleRegionView(String width,
+			String height) {
+		return new DefaultCollapsibleRegionView(width, height);
 	}
 }

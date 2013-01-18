@@ -41,5 +41,5 @@ public interface ComponentPresenter extends Presenter {
 	 *         expansion.
 	 * @since 1.45
 	 */
-	int getComponentExpandRation();
+	int getComponentExpandRatio();
 }

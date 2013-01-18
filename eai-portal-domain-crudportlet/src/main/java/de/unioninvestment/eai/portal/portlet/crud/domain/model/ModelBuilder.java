@@ -260,7 +260,7 @@ public class ModelBuilder {
 	}
 
 	private Component buildTabs(TabsConfig config) {
-		Tabs tabs = new Tabs();
+		Tabs tabs = new Tabs(config);
 		mappings.put(tabs, config);
 		for (TabConfig tabConfig : config.getTab()) {
 			if (currentUser.hasPermissions(tabConfig, BUILD_ACTION, true)) {
@@ -273,7 +273,7 @@ public class ModelBuilder {
 
 	private Panel createPanelInstance(PanelConfig panelConfig) {
 		if (panelConfig instanceof PageConfig) {
-			return new Page();
+			return new Page((PageConfig) panelConfig);
 		} else if (panelConfig instanceof TabConfig) {
 			TabConfig tabConfig = (TabConfig) panelConfig;
 			Tab tab = new Tab(tabConfig);
@@ -282,8 +282,7 @@ public class ModelBuilder {
 			return tab;
 		} else if (panelConfig instanceof DialogConfig) {
 			DialogConfig dialogConfig = (DialogConfig) panelConfig;
-			Dialog dialog = new Dialog(dialogConfig.getId(),
-					dialogConfig.getBackButtonCaption());
+			Dialog dialog = new Dialog(dialogConfig);
 			mappings.put(dialog, dialogConfig);
 			portlet.addElementById(dialogConfig.getId(), dialog);
 			return dialog;

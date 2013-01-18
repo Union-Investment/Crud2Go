@@ -1,39 +1,52 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.lang.Validate;
+
+import de.unioninvestment.eai.portal.portlet.crud.config.PanelConfig;
 
 /**
  * Model-Klasse für ein abstraktes Panel.
  * 
  * @author markus.bonsch
+ * @author Jan Malcomess (codecentric AG)
  */
-public class Panel extends Component {
+public class Panel extends Component implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Portlet portlet;
 	private List<Component> elements = new ArrayList<Component>();
 
 	private Presenter presenter;
+
+	/**
+	 * The configuration of this Panel.
+	 * 
+	 * @since 1.45.
+	 */
+	private final PanelConfig config;
 
 	/**
 	 * Definiert die Erwartungen des Models an den Presenter.
@@ -63,10 +76,60 @@ public class Panel extends Component {
 	}
 
 	/**
-	 * Konstruktor.
+	 * Constructor.
+	 * 
+	 * @param config
+	 *            The configuration of this Panel. <code>null</code> is not
+	 *            allowed.
+	 * @throws IllegalArgumentException
+	 *             if <code>config == null</code>.
+	 * @since 1.45.
 	 */
-	public Panel() {
-		super();
+	public Panel(PanelConfig config) {
+		Validate.notNull(config);
+		this.config = config;
+	}
+
+	/**
+	 * protected no-argument constructor if no configuration is provided.
+	 * 
+	 * @deprecated This constructor is only available for compatibility to
+	 *             <code>{@link RowEditingFormDialog}</code>.
+	 */
+	protected Panel() {
+		this.config = null;
+	}
+
+	/**
+	 * @return The configuration of this Panel (or Region, Tab, Dialog etc.).
+	 *         <code>null</code> if none was provided during construction.
+	 * @since 1.45.
+	 */
+	protected PanelConfig getConfig() {
+		return this.config;
+	}
+
+	/**
+	 * @return <code>true</code> if components within this region are to be
+	 *         layed out horizontally, <code>false</code> if vertically.
+	 * @since 1.45
+	 */
+	public boolean isHorizontalLayout() {
+		return (this.config == null ? false : this.config.isHorizontalLayout());
+	}
+
+	/**
+	 * @since 1.45
+	 */
+	public String getWidth() {
+		return this.config.getWidth();
+	}
+
+	/**
+	 * @since 1.45
+	 */
+	public String getHeight() {
+		return this.config.getHeight();
 	}
 
 	protected void setPortlet(Portlet portlet) {

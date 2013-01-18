@@ -163,4 +163,18 @@ public class Form extends Component implements Component.ExpandableComponent,
 	public int getExpandRatio() {
 		return config.getExpandRatio();
 	}
+
+	/**
+	 * @since 1.45
+	 */
+	public String getWidth() {
+		return this.config.getWidth();
+	}
+
+	/**
+	 * @since 1.45
+	 */
+	public String getHeight() {
+		return this.config.getHeight();
+	}
 }

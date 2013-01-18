@@ -64,4 +64,18 @@ public class CustomComponent extends Component implements
 	public int getExpandRatio() {
 		return this.config.getExpandRatio();
 	}
+
+	/**
+	 * @since 1.45
+	 */
+	public String getWidth() {
+		return this.config.getWidth();
+	}
+
+	/**
+	 * @since 1.45
+	 */
+	public String getHeight() {
+		return this.config.getHeight();
+	}
 }

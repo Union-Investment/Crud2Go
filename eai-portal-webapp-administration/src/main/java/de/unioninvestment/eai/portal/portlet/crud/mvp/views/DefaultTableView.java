@@ -160,6 +160,15 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		this.container = databaseContainer;
 		this.tableModel = tableModel;
 
+		// @since 1.45
+		if (tableModel.getWidth() != null) {
+			setWidth(tableModel.getWidth());
+		}
+		// @since 1.45
+		if (tableModel.getHeight() != null) {
+			setHeight(tableModel.getHeight());
+		}
+
 		table = new CrudTable(container, tableModel.getColumns(),
 				tableModel.isSortingEnabled());
 		table.disableContentRefreshing();
@@ -184,7 +193,10 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 		initializeTableFieldFactory();
 
+		// since 1.45
+		table.setHeight("100%");
 		addComponent(table);
+		setExpandRatio(table, 1);
 
 		Layout buttonBar = initButtonBar();
 		if (buttonBar.getComponentIterator().hasNext()) {

@@ -91,6 +91,14 @@ public class DefaultFormView extends Form implements FormView {
 	@Override
 	public void initialize(Presenter presenter,
 			de.unioninvestment.eai.portal.portlet.crud.domain.model.Form model) {
+		// @since 1.45
+		if (model.getWidth() != null) {
+			setWidth(model.getWidth());
+		}
+		// @since 1.45
+		if (model.getHeight() != null) {
+			setHeight(model.getHeight());
+		}
 
 		this.presenter = presenter;
 		setValidationVisibleOnCommit(true);
