@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
-	title="Einfaches Beispiel" refresh-on-page-reload="true">
+	title="Einfaches Beispiel" refresh-on-page-reload="false"
+	onReload="log.info 'called onReload()'"
+	onRefresh="log.info 'called onRefresh()'">
 	<page>
 		<table row-height="30">
 			<database-query datasource="test">

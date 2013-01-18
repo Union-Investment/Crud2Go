@@ -9,8 +9,8 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.SourceEvent;
  * 
  * @author carsten.mjartan
  */
-public class PortletRefreshedEvent implements
-		SourceEvent<PortletRefreshedEventHandler, Portlet> {
+public class PortletReloadedEvent implements
+		SourceEvent<PortletReloadedEventHandler, Portlet> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -18,15 +18,15 @@ public class PortletRefreshedEvent implements
 
 	/**
 	 * @param source
-	 *            the refreshed portlet
+	 *            the reloaded portlet
 	 */
-	public PortletRefreshedEvent(Portlet source) {
+	public PortletReloadedEvent(Portlet source) {
 		this.source = source;
 	}
 
 	@Override
-	public void dispatch(PortletRefreshedEventHandler eventHandler) {
-		eventHandler.onPortletRefresh(this);
+	public void dispatch(PortletReloadedEventHandler eventHandler) {
+		eventHandler.onPortletReload(this);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class PortletRefreshedEvent implements
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PortletRefreshedEvent other = (PortletRefreshedEvent) obj;
+		PortletReloadedEvent other = (PortletReloadedEvent) obj;
 		if (source == null) {
 			if (other.source != null)
 				return false;

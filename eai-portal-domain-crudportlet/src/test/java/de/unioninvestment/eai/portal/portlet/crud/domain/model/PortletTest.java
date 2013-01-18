@@ -33,6 +33,8 @@ import org.mockito.MockitoAnnotations;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
 
 public class PortletTest {
 
@@ -47,6 +49,9 @@ public class PortletTest {
 
 	@Mock
 	private PortletRefreshedEventHandler portletRefreshHandlerMock;
+
+	@Mock
+	private PortletReloadedEventHandler portletReloadHandlerMock;
 
 	@Before
 	public void setUp() {
@@ -128,6 +133,16 @@ public class PortletTest {
 
 		verify(portletRefreshHandlerMock).onPortletRefresh(
 				new PortletRefreshedEvent(portlet));
+	}
+
+	@Test
+	public void shouldFireReloadEventOnReload() {
+		portlet.addReloadHandler(portletReloadHandlerMock);
+
+		portlet.handleReload();
+
+		verify(portletReloadHandlerMock).onPortletReload(
+				new PortletReloadedEvent(portlet));
 	}
 
 	@Test

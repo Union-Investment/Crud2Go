@@ -92,6 +92,9 @@ public class ConfigurationScriptsCompiler {
 	}
 
 	private void compileAllClosureScripts(PortletConfig config) {
+		compileClosure(config.getOnReload(), "/onReload");
+		compileClosure(config.getOnRefresh(), "/onRefresh");
+
 		if (config.getTabs() != null) {
 			compileAllClosureScripts(config.getTabs(), "");
 		} else {

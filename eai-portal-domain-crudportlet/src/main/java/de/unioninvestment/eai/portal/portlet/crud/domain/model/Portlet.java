@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 
 /**
@@ -57,6 +59,7 @@ public class Portlet implements Serializable {
 	private final PortletConfig config;
 
 	private EventRouter<PortletRefreshedEventHandler, PortletRefreshedEvent> refreshEventRouter = new EventRouter<PortletRefreshedEventHandler, PortletRefreshedEvent>();
+	private EventRouter<PortletReloadedEventHandler, PortletReloadedEvent> reloadEventRouter = new EventRouter<PortletReloadedEventHandler, PortletReloadedEvent>();
 
 	private Set<Role> roles = new HashSet<Role>();
 
@@ -214,8 +217,14 @@ public class Portlet implements Serializable {
 	 */
 	public void handleReload() {
 		LOG.info("Portlet is reloaded");
+		reloadEventRouter.fireEvent(new PortletReloadedEvent(this));
 		if (config.isRefreshOnPageReload()) {
 			refresh();
 		}
+	}
+
+	public void addReloadHandler(
+			PortletReloadedEventHandler handler) {
+		reloadEventRouter.addHandler(handler);
 	}
 }

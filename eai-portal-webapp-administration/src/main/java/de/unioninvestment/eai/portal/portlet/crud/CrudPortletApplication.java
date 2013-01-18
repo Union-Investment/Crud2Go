@@ -163,6 +163,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 					public void onConfigurationUpdated(
 							ConfigurationUpdatedEvent event) {
 						refreshViews();
+						firstLoad = true;
 						PortletUtils.switchPortletMode(getMainWindow()
 								.getApplication(), PortletMode.VIEW);
 					}
@@ -390,7 +391,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 			}
 			if (firstLoad) {
 				firstLoad = false;
-			} else {
+			} else if (request.getPortletMode() == PortletMode.VIEW) {
 				portletDomain.handleReload();
 			}
 		}

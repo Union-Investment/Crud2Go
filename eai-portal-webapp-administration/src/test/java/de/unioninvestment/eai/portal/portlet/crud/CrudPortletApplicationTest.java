@@ -453,11 +453,33 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	}
 
 	@Test
-	public void shouldInformPortletDomainAboutReloadOnRenderRequest() {
+	public void shouldNotInformPortletDomainAboutReloadOnFirstRenderRequest() {
 		app.initializing = false;
 		app.handleRenderRequest(renderRequestMock, renderResponseMock,
 				windowSpy);
-		verify(portletMock).handleReload();
+		verify(portletMock, never()).handleReload();
+	}
+
+	@Test
+	public void shouldInformPortletDomainAboutReloadOnSecondRenderRequest() {
+		app.initializing = false;
+		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.VIEW);
+		app.handleRenderRequest(renderRequestMock, renderResponseMock,
+				windowSpy);
+		app.handleRenderRequest(renderRequestMock, renderResponseMock,
+				windowSpy);
+		verify(portletMock, times(1)).handleReload();
+	}
+
+	@Test
+	public void shouldNotInformPortletDomainAboutReloadIfPortletModeIsNotVIEW() {
+		app.initializing = false;
+		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.EDIT);
+		app.handleRenderRequest(renderRequestMock, renderResponseMock,
+				windowSpy);
+		app.handleRenderRequest(renderRequestMock, renderResponseMock,
+				windowSpy);
+		verify(portletMock, never()).handleReload();
 	}
 
 	@Test

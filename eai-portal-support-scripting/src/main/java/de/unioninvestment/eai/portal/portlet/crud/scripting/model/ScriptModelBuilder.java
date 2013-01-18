@@ -164,6 +164,11 @@ public class ScriptModelBuilder {
 
 		buildScriptDialogs();
 
+		scriptPortlet.setOnReload(scriptBuilder.buildClosure(config
+				.getOnReload()));
+		scriptPortlet.setOnRefresh(scriptBuilder.buildClosure(config
+				.getOnRefresh()));
+
 		scriptBuilder.addBindingVariable("portal", new ScriptPortal());
 		scriptBuilder.addBindingVariable("portlet", scriptPortlet);
 		scriptBuilder.addBindingVariable("sql",
