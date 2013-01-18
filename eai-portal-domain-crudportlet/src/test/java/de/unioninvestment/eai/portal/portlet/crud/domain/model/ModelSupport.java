@@ -38,6 +38,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.DomainSpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayApplicationMock;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
 public abstract class ModelSupport extends DomainSpringPortletContextTest {
@@ -47,6 +48,7 @@ public abstract class ModelSupport extends DomainSpringPortletContextTest {
 
 	private PortletConfigurationUnmarshaller unmarshaller;
 
+	protected EventBus eventBus;
 	protected ConnectionPoolFactory connectionPoolFactory;
 	protected ResetFormAction resetFormAction;
 	protected FieldValidatorFactory fieldValidatorFactory;
@@ -71,6 +73,7 @@ public abstract class ModelSupport extends DomainSpringPortletContextTest {
 
 	@Before
 	public void initializeDependencies() {
+		eventBus = new EventBus();
 		connectionPoolFactory = mock(ConnectionPoolFactory.class);
 		resetFormAction = mock(ResetFormAction.class);
 		fieldValidatorFactory = mock(FieldValidatorFactory.class);
@@ -91,7 +94,8 @@ public abstract class ModelSupport extends DomainSpringPortletContextTest {
 		ModelFactory factory = new ModelFactory(connectionPoolFactory,
 				prefetchExecutor, resetFormAction, fieldValidatorFactory,
 				defaultSelectWidth);
-		return factory.getBuilder(new Config(configuration, resourceIds));
+		return factory.getBuilder(eventBus, new Config(configuration,
+				resourceIds));
 	}
 
 	protected PortletConfig createConfiguration(String configRessource)

@@ -40,6 +40,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQuery
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
 
 /**
@@ -104,13 +105,14 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 	 * @param pageLength
 	 *            Anzahl der Einträge pro Seite
 	 */
-	public DatabaseQueryContainer(String datasource, String sqlQuery,
+	public DatabaseQueryContainer(EventBus eventBus, String datasource,
+			String sqlQuery,
 			boolean insertable, boolean updateable, boolean deleteable,
 			List<String> primaryKeys, ConnectionPool connectionPool,
 			String currentUsername, Map<String, String> displayPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy,
 			int pageLength, int exportPageLength, Integer sizeValidTimeout) {
-		super(displayPattern, defaultOrder, filterPolicy);
+		super(eventBus, displayPattern, defaultOrder, filterPolicy);
 
 		this.insertable = insertable;
 		this.updateable = updateable;

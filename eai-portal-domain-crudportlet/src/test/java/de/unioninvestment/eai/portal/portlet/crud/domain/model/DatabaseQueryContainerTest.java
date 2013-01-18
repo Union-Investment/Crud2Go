@@ -58,6 +58,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
 
 public class DatabaseQueryContainerTest
@@ -84,10 +85,13 @@ public class DatabaseQueryContainerTest
 	@Mock
 	private DatabaseQueryDelegate databaseQueryDelegateMock;
 
+	@Mock
+	private EventBus eventBus;
+
 	@Override
 	public DatabaseQueryContainer createDataContainer() {
 		DatabaseQueryContainer databaseQueryContainer = new DatabaseQueryContainer(
-				"eai", "select * from test", true, true, true,
+				eventBus, "eai", "select * from test", true, true, true,
 				Arrays.asList("test"), connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0);
 		databaseQueryContainer.setVaadinContainer(vaadinContainerMock);
@@ -105,7 +109,8 @@ public class DatabaseQueryContainerTest
 
 	@Test
 	public void shouldAllowOnlyQuerying() {
-		DatabaseQueryContainer container = new DatabaseQueryContainer("eai",
+		DatabaseQueryContainer container = new DatabaseQueryContainer(eventBus,
+				"eai",
 				"select * from test", false, false, false,
 				Arrays.asList("test"), connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0);
@@ -116,14 +121,16 @@ public class DatabaseQueryContainerTest
 
 	@Test
 	public void shouldAllowEmptyPrimaryKeysIfReadonly() {
-		new DatabaseQueryContainer("eai", "select * from test", false, false,
+		new DatabaseQueryContainer(eventBus, "eai", "select * from test",
+				false, false,
 				false, null, connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0);
 	}
 
 	@Test(expected = BusinessException.class)
 	public void shouldRequirePrimaryKeysForEditing() {
-		new DatabaseQueryContainer("eai", "select * from test", true, false,
+		new DatabaseQueryContainer(eventBus, "eai", "select * from test", true,
+				false,
 				false, null, connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0);
 	}
@@ -137,7 +144,7 @@ public class DatabaseQueryContainerTest
 
 		try {
 			DatabaseQueryContainer container = new DatabaseQueryContainer(
-					"eai", "select * from test", true, true, true,
+					eventBus, "eai", "select * from test", true, true, true,
 					Arrays.asList("test"), connectionPoolMock, "Benutzer",
 					displayPatternMock, orderBys, null, 100, 1000, 0);
 			container.getVaadinContainer();
@@ -158,7 +165,7 @@ public class DatabaseQueryContainerTest
 
 		try {
 			DatabaseQueryContainer container = new DatabaseQueryContainer(
-					"eai", "select * from test", true, true, true,
+					eventBus, "eai", "select * from test", true, true, true,
 					Arrays.asList("test"), connectionPoolMock, "Benutzer",
 					displayPatternMock, orderBys, null, 100, 1000, 0);
 			container.getVaadinContainer();

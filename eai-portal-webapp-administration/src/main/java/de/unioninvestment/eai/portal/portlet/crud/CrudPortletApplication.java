@@ -138,7 +138,8 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 
 	private Set<Component> registeredComponents = new HashSet<Component>();
 
-	private boolean initializing = true;
+	boolean initializing = true;
+	boolean firstLoad = true;
 
 	/**
 	 * Initialisierung des PortletPresenter.
@@ -285,7 +286,8 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 			String portletId = getPortletId();
 
 			LOG.debug("Building domain model");
-			ModelBuilder modelBuilder = modelFactory.getBuilder(portletConfig);
+			ModelBuilder modelBuilder = modelFactory.getBuilder(eventBus,
+					portletConfig);
 			portletDomain = modelBuilder.build();
 
 			LOG.debug("Building scripting model");
@@ -382,8 +384,15 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	 */
 	public void handleRenderRequest(RenderRequest request,
 			RenderResponse response, Window window) {
-		if (portletDomain != null && portletDomain.getTitle() != null) {
-			response.setTitle(portletDomain.getTitle());
+		if (portletDomain != null) {
+			if (portletDomain.getTitle() != null) {
+				response.setTitle(portletDomain.getTitle());
+			}
+			if (firstLoad) {
+				firstLoad = false;
+			} else {
+				portletDomain.handleReload();
+			}
 		}
 		if (portletUriFragmentUtility != null) {
 			portletUriFragmentUtility.setInitialFragment(getMainWindow());

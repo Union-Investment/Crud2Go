@@ -33,6 +33,15 @@
 				</documentation>
 			</annotation>
 		</attribute>
+		<attribute name="refresh-on-page-reload" type="boolean"
+			default="false">
+			<annotation>
+				<documentation>
+					Sollen bei einem Refresh der Seite oder beim
+					zurückwechseln auf das Portlet die Inhalte aktualisiert werden?
+				</documentation>
+			</annotation>
+		</attribute>
 	</complexType>
 
 	<complexType name="ScriptConfig">

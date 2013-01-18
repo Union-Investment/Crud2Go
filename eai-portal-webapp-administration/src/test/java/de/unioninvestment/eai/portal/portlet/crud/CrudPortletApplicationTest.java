@@ -39,6 +39,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.portlet.PortletMode;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -147,6 +149,12 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	@Mock
 	private ThemeDisplay themeDisplayMock;
 
+	@Mock
+	private RenderRequest renderRequestMock;
+
+	@Mock
+	private RenderResponse renderResponseMock;
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		applicationUrl = new URL("http://xxx");
@@ -158,7 +166,9 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		when(settingsMock.getHelpUrl()).thenReturn("http://help.us");
 		when(response.createRenderURL()).thenReturn(
 				new MockPortletURL(new MockPortalContext(), "myurl"));
-		when(modelFactoryMock.getBuilder(isA(Config.class))).thenReturn(
+		when(
+				modelFactoryMock.getBuilder(isA(EventBus.class),
+						isA(Config.class))).thenReturn(
 				modelBuilderMock);
 		when(modelBuilderMock.build()).thenReturn(portletMock);
 
@@ -441,4 +451,20 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		assertThat(app.isInitializing(), is(false));
 
 	}
+
+	@Test
+	public void shouldInformPortletDomainAboutReloadOnRenderRequest() {
+		app.initializing = false;
+		app.handleRenderRequest(renderRequestMock, renderResponseMock,
+				windowSpy);
+		verify(portletMock).handleReload();
+	}
+
+	@Test
+	public void shouldNotInformPortletDomainAboutReloadOnInitializingRenderRequest() {
+		app.handleRenderRequest(renderRequestMock, renderResponseMock,
+				windowSpy);
+		verify(portletMock, never()).handleReload();
+	}
+
 }

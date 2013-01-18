@@ -27,12 +27,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
 /**
@@ -98,8 +100,9 @@ public class ModelFactory {
 	 *            Portletkonfiguration
 	 * @return Model-Builder
 	 */
-	public ModelBuilder getBuilder(Config config) {
-		return new ModelBuilder(this, connectionPoolFactory, prefetchExecutor,
+	public ModelBuilder getBuilder(EventBus eventBus, Config config) {
+		return new ModelBuilder(eventBus, this, connectionPoolFactory,
+				prefetchExecutor,
 				resetFormAction, fieldValidatorFactory, defaultSelectWidth,
 				config);
 	}
@@ -131,14 +134,16 @@ public class ModelFactory {
 	 *            Anzahl der Einträge pro Seite
 	 * @return eine neue Instanz des {@link DatabaseTableContainer}
 	 */
-	public DatabaseTableContainer getDatabaseTableContainer(String datasource,
+	public DatabaseTableContainer getDatabaseTableContainer(EventBus eventBus,
+			String datasource,
 			String tablename, boolean insertable, boolean updateable,
 			boolean deleteable, CurrentUser currentUser,
 			Map<String, String> formatPattern, List<ContainerOrder> orderBys,
 			FilterPolicy filterPolicy, int pagelength, int exportPagelength,
 			int sizeValidTimeout) {
 		ConnectionPool pool = connectionPoolFactory.getPool(datasource);
-		return new DatabaseTableContainer(datasource, tablename, pool,
+		return new DatabaseTableContainer(eventBus, datasource, tablename,
+				pool,
 				insertable, updateable, deleteable, currentUser, formatPattern,
 				orderBys, filterPolicy, pagelength, exportPagelength,
 				sizeValidTimeout);
@@ -172,14 +177,16 @@ public class ModelFactory {
 	 *            Anzahl der Einträge pro Seite
 	 * @return DatabaseQueryContainer
 	 */
-	public DatabaseQueryContainer getDatabaseQueryContainer(String datasource,
+	public DatabaseQueryContainer getDatabaseQueryContainer(EventBus eventBus,
+			String datasource,
 			String query, boolean insertable, boolean updateable,
 			boolean deleteable, List<String> primaryKeys,
 			String currentUsername, Map<String, String> displayPattern,
 			List<ContainerOrder> orderBys, FilterPolicy filterPolicy,
 			int pagelength, int exportPagelength, Integer sizeValidTimeout) {
 		ConnectionPool pool = connectionPoolFactory.getPool(datasource);
-		return new DatabaseQueryContainer(datasource, query, insertable,
+		return new DatabaseQueryContainer(eventBus, datasource, query,
+				insertable,
 				updateable, deleteable, primaryKeys, pool, currentUsername,
 				displayPattern, orderBys, filterPolicy, pagelength,
 				exportPagelength, sizeValidTimeout);
@@ -195,10 +202,18 @@ public class ModelFactory {
 	 * @return den Container
 	 */
 	public GenericDataContainer getGenericDataContainer(
-			Map<String, String> formatPattern,
+			EventBus eventBus, Map<String, String> formatPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {
-		return new GenericDataContainer(formatPattern, defaultOrder,
+		return new GenericDataContainer(eventBus, formatPattern, defaultOrder,
 				filterPolicy);
+	}
+
+	public QueryOptionList getQueryOptionList(EventBus eventBus,
+			SelectConfig config,
+			String datasource) {
+		return new QueryOptionList(config, eventBus,
+				connectionPoolFactory.getPool(datasource),
+				prefetchExecutor);
 	}
 
 }

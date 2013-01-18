@@ -40,6 +40,7 @@ import de.unioninvestment.eai.portal.support.vaadin.container.GenericItem;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericItemId;
 import de.unioninvestment.eai.portal.support.vaadin.container.MetaData;
 import de.unioninvestment.eai.portal.support.vaadin.container.TemporaryItemId;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
  * Repräsentation eines auf generischen Daten basierten Vaadin Containers als
@@ -84,9 +85,10 @@ public class GenericDataContainer extends AbstractDataContainer {
 
 	}
 
-	public GenericDataContainer(Map<String, String> formatPattern,
+	public GenericDataContainer(EventBus eventBus,
+			Map<String, String> formatPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {
-		super(formatPattern, defaultOrder, filterPolicy);
+		super(eventBus, formatPattern, defaultOrder, filterPolicy);
 	}
 
 	@Override

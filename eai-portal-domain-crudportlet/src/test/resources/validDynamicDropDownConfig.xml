@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
-	title="Einfaches Beispiel">
+	title="Einfaches Beispiel" refresh-on-page-reload="true">
 	<page>
 		<table row-height="30">
 			<database-query datasource="test">
