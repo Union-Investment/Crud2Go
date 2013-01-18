@@ -154,6 +154,12 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 
 		refreshViews();
 		registerAsPortletListener();
+	}
+
+	private void initializeEventBus() {
+		// remove old references to domain handlers from the Event Bus
+		eventBus.reset();
+
 		eventBus.addHandler(ShowPopupEvent.class, this);
 		eventBus.addHandler(ConfigurationUpdatedEvent.class,
 				new ConfigurationUpdatedEventHandler() {
@@ -263,6 +269,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 			initializing = true;
 
 			cleanupViews();
+			initializeEventBus();
 
 			LOG.debug("Loading configuration");
 			Config portletConfig = getConfiguration();
