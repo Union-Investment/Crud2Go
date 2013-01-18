@@ -51,3 +51,6 @@ Vaadin Press Enter
 Wait for AJAX calls to complete
 	Wait for condition  var x=false; for (var cl in window.vaadin.clients) x = x || window.vaadin.clients[cl].isActive(); x==false  60s
 	
+JavaScript Attribute should have value  [Arguments]  ${locator}  ${attribute}  ${value}
+	Wait for condition  selenium.browserbot.findElement('${locator}', selenium.browserbot.getCurrentWindow()).${attribute} == ${value}
+	

@@ -339,9 +339,8 @@ hat die Spalte '${SPALTE}' die Breite '${WERT}'
 	${var}  Get Element Attribute  xpath=//table[@class="v-table-table"]//tr[1]//td[${SPALTE}]@style
 	Should Be True  '${var}'=='${WERT}'
 
-hat die Tabellen Zeile die Höhe '${WERT}'
-	${var}  Get Element Attribute  xpath=//table[@class="v-table-table"]//tr//td[1]//div//div@style
-	Should Contain  ${var}  ${WERT}
+hat die Tabellenzeile die Höhe ${WERT} Pixel
+	JavaScript Attribute should have value  xpath=//table[@class="v-table-table"]//tr//td[1]  offsetHeight  ${WERT}
 
 hat die Spalte '${SPALTE}' den Titel '${WERT}'
 	${var}  Get Text  xpath=//div[@class="v-table-header"]//table//tr[1]//td[${SPALTE}]

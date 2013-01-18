@@ -5,7 +5,7 @@
 
 	<groupId>de.uit.eai.portal</groupId>
 	<artifactId>eai-portal-build</artifactId>
-	<version>1.45-SNAPSHOT</version>
+	<version>1.46-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Osiris :: Investment :: EAI-Portal-Administration</name>
 
@@ -175,6 +175,11 @@
 				<groupId>org.vaadin.addons</groupId>
 				<artifactId>confirmdialog</artifactId>
 				<version>1.1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.vaadin.addons</groupId>
+				<artifactId>cssinject</artifactId>
+				<version>1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.vaadin.addons</groupId>
@@ -506,6 +511,17 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<distributionManagement>
+		<repository>
+			<id>Sofia_Release</id>
+			<url>http://nexus.d3.uid.de/content/repositories/Sofia_Release</url>
+		</repository>
+		<snapshotRepository>
+			<id>Sofia_Snapshots</id>
+			<url>http://nexus.d3.uid.de/content/repositories/Sofia_Snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<profiles>
 		<profile>

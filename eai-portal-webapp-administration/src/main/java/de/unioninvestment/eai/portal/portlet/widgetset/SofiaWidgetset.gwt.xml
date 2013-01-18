@@ -13,4 +13,6 @@
     <inherits name="org.vaadin.jouni.animator.AnimatorWidgetset" />
 
     
+
+    <inherits name="org.vaadin.cssinject.Cssinject_addonWidgetset" />
 </module>

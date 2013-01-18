@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>de.uit.eai.portal</groupId>
 		<artifactId>eai-portal-build</artifactId>
-		<version>1.45-SNAPSHOT</version>
+		<version>1.46-SNAPSHOT</version>
 		<relativePath>../eai-portal-build/pom.xml</relativePath>
 	</parent>
 
@@ -118,6 +118,10 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>vaadin-sqlcontainer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>cssinject</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.addon</groupId>

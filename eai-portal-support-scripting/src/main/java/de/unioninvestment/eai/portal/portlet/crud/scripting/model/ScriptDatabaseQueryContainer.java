@@ -23,8 +23,23 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrud
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
 
+/**
+ * Groovy Script Wrapper class for the {@link DatabaseQueryContainer}. Provides
+ * special operations that only work with the query backend.
+ * 
+ * @author carsten.mjartan
+ */
 public class ScriptDatabaseQueryContainer extends ScriptDatabaseContainer {
 
+	/**
+	 * This class acts as dynamic proxy for a {@link PreparedStatement} and
+	 * collects calls of
+	 * {@link StatementHelper#setParameterValuesToStatement(PreparedStatement)}.
+	 * 
+	 * It provides a values list for the Query GString.
+	 * 
+	 * @author carsten.mjartan
+	 */
 	private static final class ParameterInvocationHandler implements
 			InvocationHandler {
 

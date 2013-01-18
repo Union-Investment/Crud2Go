@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
+import org.vaadin.cssinject.CSSInject;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Buffered.SourceException;
@@ -188,6 +189,15 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 		table.addStyleName("crudViewMode");
 		table.addStyleName("crudTable");
+
+		Integer rowHeight = tableModel.getRowHeight();
+		if (rowHeight != null) {
+			table.addStyleName("rowheight" + rowHeight);
+			CSSInject injector = new CSSInject(".v-table-rowheight" + rowHeight
+					+ " .v-table-cell-content { height: " + rowHeight + "px; }");
+			addComponent(injector);
+		}
+
 		table.setPageLength(pageLength);
 		table.setCacheRate(cacheRate);
 
@@ -207,7 +217,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 		updateColumnWidths();
 
-		setColumnGenerator(table, tableModel.getRowHeight());
+		setColumnGenerator(table, rowHeight);
 
 		updateVisibleColumns(false);
 
