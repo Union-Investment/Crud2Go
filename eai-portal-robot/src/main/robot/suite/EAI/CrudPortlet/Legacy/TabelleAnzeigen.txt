@@ -201,7 +201,7 @@ Documentation   Story: Als Benutzer möchte ich die Daten einer beliebigen bekan
 	und dann hat die Spalte '3' die Breite 'width: 224px;'
 
 14. Höhe einer Spalten
-	[Tags]  EAI_13  current
+	[Tags]  EAI_13
 
 	Es existiert eine Portalseite mit CRUD-Portlet
 	und weiterhin ein Benutzer
