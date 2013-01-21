@@ -32,6 +32,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.VolatileOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptFormField;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
  * Modell-Klasse für dynamische Auswahl-Boxen.
@@ -50,19 +51,35 @@ public class DynamicOptionList extends VolatileOptionList {
 	/**
 	 * Konstruktor.
 	 * 
+	 * @param eventBus
+	 *            der Session-EventBus
 	 * @param table
 	 *            Tabelle
 	 * @param closure
 	 *            closure
+	 * @param config
+	 *            die Query-Konfiguration
 	 */
-	public DynamicOptionList(Table table, Closure<?> closure,
+	public DynamicOptionList(EventBus eventBus, Table table,
+			Closure<?> closure,
 			SelectConfig config) {
+		super(eventBus);
 		this.container = table.getContainer();
 		this.optionsClosure = closure;
 		id = config.getId();
 	}
 
-	public DynamicOptionList(Closure<?> closure, SelectConfig config) {
+	/**
+	 * @param eventBus
+	 *            der Session-EventBus
+	 * @param closure
+	 *            closure
+	 * @param config
+	 *            die Query-Konfiguration
+	 */
+	public DynamicOptionList(EventBus eventBus, Closure<?> closure,
+			SelectConfig config) {
+		super(eventBus);
 		this.optionsClosure = closure;
 		id = config.getId();
 	}

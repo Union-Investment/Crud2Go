@@ -34,7 +34,6 @@ import org.springframework.jdbc.core.RowMapper;
 import de.unioninvestment.eai.portal.portlet.crud.config.InitializeTypeConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
@@ -79,6 +78,7 @@ public class QueryOptionList extends VolatileOptionList {
 	public QueryOptionList(SelectConfig config, EventBus eventBus,
 			ConnectionPool connectionPool,
 			ExecutorService asyncExecutor) {
+		super(eventBus);
 		this.connectionPool = connectionPool;
 		this.prefetchExecutor = asyncExecutor;
 
@@ -92,7 +92,6 @@ public class QueryOptionList extends VolatileOptionList {
 		if (prefetched) {
 			startPrefetch();
 		}
-		eventBus.addHandler(PortletRefreshedEvent.class, this);
 	}
 
 	private void startPrefetch() {

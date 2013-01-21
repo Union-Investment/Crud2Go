@@ -211,7 +211,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		when(portletMock.getPage()).thenReturn(null);
 		when(portletMock.getTabs()).thenReturn(null);
 
-		scriptModelBuilder = new ScriptModelBuilder(factoryMock,
+		scriptModelBuilder = new ScriptModelBuilder(eventBus, factoryMock,
 				connectionPoolFactoryMock, userFactoryMock, scriptBuilderMock,
 				portletMock, mappingMock);
 
@@ -628,7 +628,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		modelBuilder = createModelBuilder(portletConfig);
 		portlet = modelBuilder.build();
 		mapping = modelBuilder.getModelToConfigMapping();
-		scriptModelBuilder = new ScriptModelBuilder(factory,
+		scriptModelBuilder = new ScriptModelBuilder(eventBus, factory,
 				connectionPoolFactoryMock, userFactoryMock, scriptBuilderMock,
 				portlet, mapping);
 		scriptModelBuilder.setApplication(applicationMock);

@@ -169,7 +169,7 @@ public class ModelBuilder {
 	 */
 	public Portlet build() {
 
-		portlet = new Portlet(config.getPortletConfig());
+		portlet = new Portlet(eventBus, config.getPortletConfig());
 		mappings.put(portlet, config);
 
 		if (config.getPortletConfig().getRoles() != null) {

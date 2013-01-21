@@ -35,6 +35,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshed
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public class PortletTest {
 
@@ -53,6 +54,8 @@ public class PortletTest {
 	@Mock
 	private PortletReloadedEventHandler portletReloadHandlerMock;
 
+	private EventBus eventBus = new EventBus();
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -60,7 +63,7 @@ public class PortletTest {
 		config = new PortletConfig();
 		config.setTitle("MyTitle");
 
-		portlet = new Portlet(config);
+		portlet = new Portlet(eventBus, config);
 	}
 
 	@Test
@@ -126,7 +129,7 @@ public class PortletTest {
 	@Test
 	public void shouldRefreshOnPageReloadIfConfigured() {
 		config.setRefreshOnPageReload(true);
-		portlet = new Portlet(config);
+		portlet = new Portlet(eventBus, config);
 		portlet.addRefreshHandler(portletRefreshHandlerMock);
 
 		portlet.handleReload();

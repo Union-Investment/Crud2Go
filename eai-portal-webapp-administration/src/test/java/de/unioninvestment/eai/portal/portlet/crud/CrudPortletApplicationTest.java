@@ -295,7 +295,8 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		when(portletPresenterMock.getView()).thenReturn(portletViewMock);
 
 		when(
-				scriptModelFactoryMock.getBuilder(any(Portlet.class),
+				scriptModelFactoryMock.getBuilder(any(EventBus.class),
+						any(Portlet.class),
 						any((new HashMap<Object, Object>()).getClass())))
 				.thenReturn(scriptModelBuilderMock);
 
@@ -434,7 +435,8 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		when(portletPresenterMock.getView()).thenReturn(portletViewMock);
 
 		when(
-				scriptModelFactoryMock.getBuilder(any(Portlet.class),
+				scriptModelFactoryMock.getBuilder(any(EventBus.class),
+						any(Portlet.class),
 						any((new HashMap<Object, Object>()).getClass())))
 				.thenAnswer(new Answer<ScriptModelBuilder>() {
 					@Override

@@ -35,6 +35,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshed
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 
 /**
@@ -58,16 +59,18 @@ public class Portlet implements Serializable {
 	private String title;
 	private final PortletConfig config;
 
-	private EventRouter<PortletRefreshedEventHandler, PortletRefreshedEvent> refreshEventRouter = new EventRouter<PortletRefreshedEventHandler, PortletRefreshedEvent>();
 	private EventRouter<PortletReloadedEventHandler, PortletReloadedEvent> reloadEventRouter = new EventRouter<PortletReloadedEventHandler, PortletReloadedEvent>();
 
 	private Set<Role> roles = new HashSet<Role>();
+
+	private EventBus eventBus;
 
 	/**
 	 * @param config
 	 *            PortletConfig
 	 */
-	public Portlet(PortletConfig config) {
+	public Portlet(EventBus eventBus, PortletConfig config) {
+		this.eventBus = eventBus;
 		this.config = config;
 		this.title = config.getTitle();
 	}
@@ -200,7 +203,7 @@ public class Portlet implements Serializable {
 	 */
 	public void addRefreshHandler(
 			PortletRefreshedEventHandler handler) {
-		refreshEventRouter.addHandler(handler);
+		eventBus.addHandler(PortletRefreshedEvent.class, handler);
 	}
 
 	/**
@@ -208,7 +211,7 @@ public class Portlet implements Serializable {
 	 */
 	public void refresh() {
 		LOG.info("Start refreshing portlet components");
-		refreshEventRouter.fireEvent(new PortletRefreshedEvent(this));
+		eventBus.fireEvent(new PortletRefreshedEvent(this));
 	}
 
 	/**
@@ -223,6 +226,10 @@ public class Portlet implements Serializable {
 		}
 	}
 
+	/**
+	 * @param handler
+	 *            a new handler for custom handling of page reloads
+	 */
 	public void addReloadHandler(
 			PortletReloadedEventHandler handler) {
 		reloadEventRouter.addHandler(handler);

@@ -243,6 +243,13 @@ auf die Hilfe-Seite gewechselt wird
 
 die Konfigurationansicht öffnet
 	Open Portlet Page 'Präferenzen'
+	
+die Dropdown-Daten in der Datenbank geändert werden
+	Execute SQL  UPDATE TEST_CRUD2 SET CVARCHAR5_NN = 'CHGED' WHERE ID = 1	
+
+die Seite neu geladen wird
+	Go To  http://${BASE_URL}${CONTEXT}
+	Wait Until Page Loaded
 
 ##########################
 ###  Dann / Und es ... ###
@@ -442,6 +449,10 @@ werden die Verbindungsdaten zur DataSource 'test' angezeigt
 
 besteht die Auswahl '${wert}' im Formularfeld '${feldname}' weiterhin
 	Textfield Value Should Be  css=.v-formlayout tr:contains('${feldname}') input  ${wert}
+
+enthält das Dropdown einen Eintrag '${titel}'
+	Vaadin Click  css=div.v-filterselect-button
+	Wait Until Page Contains Element  css=div[@id='VAADIN_COMBOBOX_OPTIONLIST']:contains('${titel}')
 
 ##########################
 ###  Utility Keywords  ###

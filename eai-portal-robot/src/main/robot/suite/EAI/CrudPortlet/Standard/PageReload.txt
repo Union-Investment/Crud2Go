@@ -1,0 +1,17 @@
+*** Settings ***
+Documentation   Story UI-507: Automatisches Aktualisieren bei Page Reload
+Force Tags      autor-cmj  UI-507  mantis-5092
+
+*** Test Case ***
+Dropdown ist nach Reload aktualisiert
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'PAGE_RELOAD.xml'
+	und außerdem enthält das Dropdown einen Eintrag '1:TEST1'
+	
+	wenn die Dropdown-Daten in der Datenbank geändert werden
+	und dann die Seite neu geladen wird
+	
+	dann enthält das Dropdown einen Eintrag '1:CHGED'
+	
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

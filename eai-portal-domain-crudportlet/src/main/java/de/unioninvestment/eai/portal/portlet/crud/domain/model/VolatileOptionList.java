@@ -4,6 +4,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChange
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 
 public abstract class VolatileOptionList implements OptionList,
@@ -11,7 +12,12 @@ public abstract class VolatileOptionList implements OptionList,
 
 	private EventRouter<OptionListChangeEventHandler, OptionListChangeEvent> changeEventRouter = new EventRouter<OptionListChangeEventHandler, OptionListChangeEvent>();
 
-	public VolatileOptionList() {
+	/**
+	 * @param eventBus
+	 *            zur Registrierung für {@link PortletRefreshedEvent}.
+	 */
+	public VolatileOptionList(EventBus eventBus) {
+		eventBus.addHandler(PortletRefreshedEvent.class, this);
 	}
 
 	@Override

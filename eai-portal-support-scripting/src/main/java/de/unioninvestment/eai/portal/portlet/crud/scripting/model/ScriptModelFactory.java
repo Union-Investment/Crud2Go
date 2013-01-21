@@ -46,6 +46,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.scripting.ScriptJMXWrapper;
 import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
  * Factory für Script-Modell-Instanzen. Nicht für die Nutzung aus Scripten
@@ -83,10 +84,10 @@ public class ScriptModelFactory {
 	 *            {@link ModelBuilder} geliefert wird.
 	 * @return die Builder-Instanz
 	 */
-	public ScriptModelBuilder getBuilder(Portlet portlet,
+	public ScriptModelBuilder getBuilder(EventBus eventBus, Portlet portlet,
 			Map<Object, Object> modelToConfigMapping) {
-		return new ScriptModelBuilder(this, connectionPoolFactory, userFactory,
-				getScriptBuilder(), portlet, modelToConfigMapping);
+		return new ScriptModelBuilder(eventBus, this, connectionPoolFactory,
+				userFactory, getScriptBuilder(), portlet, modelToConfigMapping);
 	}
 
 	public ScriptBuilder getScriptBuilder() {

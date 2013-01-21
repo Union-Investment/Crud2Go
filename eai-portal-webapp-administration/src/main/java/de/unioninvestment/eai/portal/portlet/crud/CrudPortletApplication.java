@@ -300,7 +300,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 
 			LOG.debug("Building scripting model");
 			ScriptModelBuilder scriptModelBuilder = scriptModelFactory
-					.getBuilder(portletDomain,
+					.getBuilder(eventBus, portletDomain,
 							modelBuilder.getModelToConfigMapping());
 
 			scriptModelBuilder.setApplication(this);
