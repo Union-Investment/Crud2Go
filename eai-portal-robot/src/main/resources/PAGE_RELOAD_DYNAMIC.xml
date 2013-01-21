@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="PAGE_RELOAD" refresh-on-page-reload="true">
+	<page>
+		<form id="myForm">
+			<field name="dropdown">
+				<select>
+					<dynamic options="readOptions()" />
+				</select>
+			</field>
+			<action title="noop" onExecution="" />
+		</form>
+		<table sortable="true">
+			<database-table datasource="test" tablename="TEST_CRUD2" />
+		</table>
+	</page>
+	<script><![CDATA[
+	
+		counter = 0
+	
+		def readOptions() {
+			counter++;
+			return [ "1": "TEST_$counter" ] as LinkedHashMap
+		}
+	
+	]]></script>
+</portlet>
