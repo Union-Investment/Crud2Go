@@ -59,6 +59,11 @@
 			<version>2.6.3-SL28</version>
 		</dependency>
 		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>2.4</version>
@@ -221,7 +226,7 @@
 
 		<BROWSER_PROFILE>firefox</BROWSER_PROFILE>
 		<BROWSER_PROFILE_NAME>firefox</BROWSER_PROFILE_NAME>
-		
+
 		<BASE_URL>localhost:9080</BASE_URL>
 		<CONTEXT>/</CONTEXT>
 		<TESTENV>LOCAL</TESTENV>
