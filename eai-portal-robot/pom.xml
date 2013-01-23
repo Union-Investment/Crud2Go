@@ -216,6 +216,7 @@
 	<properties>
 		<!-- Default: local testing with firefox -->
 		<ROBOT_TESTS_ROOT>${project.basedir}/src/main/robot/suite</ROBOT_TESTS_ROOT>
+		<JBOSS_SERVER_LOG>${env.JBOSS_HOME}/standalone/log/server.log</JBOSS_SERVER_LOG>
 		<ROBOT_TESTS>${ROBOT_TESTS_ROOT}/${ROBOT_TEST_SUITES}</ROBOT_TESTS>
 		<ROBOT_TEST_SUITES>EAI</ROBOT_TEST_SUITES>
 		<ROBOT_SUITE>all</ROBOT_SUITE>
