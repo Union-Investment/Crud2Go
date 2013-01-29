@@ -145,6 +145,8 @@
 						<argument>CONTEXT:${CONTEXT}</argument>
 						<argument>--variable</argument>
 						<argument>BROWSER_PROFILE:${BROWSER_PROFILE}</argument>
+						<argument>--variable</argument>
+						<argument>JBOSS_SERVER_LOG:${JBOSS_SERVER_LOG}</argument>
 
 						<!-- let robot know where our custom keywords are -->
 						<argument>--variable</argument>

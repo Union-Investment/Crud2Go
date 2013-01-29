@@ -3,6 +3,7 @@ Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
 Resource        ${RESOURCES}/objects/common-keywords.txt
 
 
@@ -57,7 +58,9 @@ wurde im FormularFeld '${feldname}' der Eintrag '${wert}' ausgewählt
 	Vaadin Click  css=.v-formlayout tr:contains('${feldname}') div.v-filterselect-button
 	Wait Until Page Contains Element  css=td.gwt-MenuItem:contains('${wert}') span
 	Vaadin Click  css=td.gwt-MenuItem:contains('${wert}') span
-	
+
+das Server-Log wird überwacht
+		
 
 ############################
 ###  Wenn / Und dann ... ###
@@ -250,6 +253,20 @@ die Dropdown-Daten in der Datenbank geändert werden
 die Seite neu geladen wird
 	Go To  http://${BASE_URL}${CONTEXT}
 	Wait Until Page Loaded
+
+im Feld '${feldname}' die Buchstaben '${buchstaben}' eingegeben werden
+# does not work as it doesn't trigger a server side update 
+	Input Text  css=#${feldname} input  ${buchstaben}
+# doesn't work at all (Selenium Bug?):
+#	Call Selenium Api  typeKeys  css=#${feldname} input  ${buchstaben}
+# also doesn't work at all (Selenium Bug?):
+#	${length} =  Get Length  ${buchstaben}
+#    :FOR  ${i}  IN RANGE  ${length}
+#    \	${next} =  Evaluate  ${i}+1
+#    \	${char} =  Get Substring  ${buchstaben}  ${i}  ${next}
+#	\	Call Selenium Api  keyDown  css=#${feldname} input  ${char}
+#	\	Call Selenium Api  keyPress  css=#${feldname} input  ${char}
+#	\	Call Selenium Api  keyUp  css=#${feldname} input  ${char}
 
 ##########################
 ###  Dann / Und es ... ###
@@ -453,6 +470,12 @@ besteht die Auswahl '${wert}' im Formularfeld '${feldname}' weiterhin
 enthält das Dropdown einen Eintrag '${titel}'
 	Vaadin Click  css=div.v-filterselect-button
 	Wait Until Page Contains Element  css=div[@id='VAADIN_COMBOBOX_OPTIONLIST']:contains('${titel}')
+
+existiert im Log kein Eintrag, dass die '${optionList}' geladen wurde
+	Should Not Have Log File Entry  ${JBOSS_SERVER_LOG}  Loading option list '${optionList}'  15
+
+existiert im Log ein Eintrag, dass die '${optionList}' geladen wurde
+	Should Have Log File Entry  ${JBOSS_SERVER_LOG}  Loading option list '${optionList}'  15
 
 ##########################
 ###  Utility Keywords  ###

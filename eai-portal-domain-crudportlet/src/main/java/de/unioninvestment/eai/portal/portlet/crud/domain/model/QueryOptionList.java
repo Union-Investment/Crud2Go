@@ -49,6 +49,8 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
  */
 public class QueryOptionList extends VolatileOptionList {
 
+	private static final long serialVersionUID = 1L;
+
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(QueryOptionList.class);
 
@@ -96,17 +98,22 @@ public class QueryOptionList extends VolatileOptionList {
 
 	private void startPrefetch() {
 		cancelOlderPrefetch();
-		future = prefetchExecutor.submit(new Callable() {
+		future = prefetchExecutor.submit(new Callable<Map<String, String>>() {
 			@Override
-			public Object call() throws Exception {
-				LOGGER.debug("Prefetching option list for Query '{}'", query);
+			public Map<String, String> call() throws Exception {
+				LOGGER.debug("Prefetching option list {}", logId());
 				synchronized (lock) {
 					options = loadOptions();
 					fireChangeEvent(true);
 					return options;
 				}
 			}
+
 		});
+	}
+
+	private String logId() {
+		return id != null ? "'" + id + "'" : "";
 	}
 
 	private void cancelOlderPrefetch() {
@@ -163,7 +170,7 @@ public class QueryOptionList extends VolatileOptionList {
 	}
 
 	protected Map<String, String> loadOptions() {
-		LOGGER.debug("Loading option list for Query '{}'", query);
+		LOGGER.debug("Loading option list {}", logId());
 		long startTime = System.currentTimeMillis();
 
 		String nullSafeQuery = nullSafeQuery(query);
@@ -180,8 +187,8 @@ public class QueryOptionList extends VolatileOptionList {
 				});
 
 		long duration = System.currentTimeMillis() - startTime;
-		LOGGER.debug("Finished loading option list for Query '{}' ({}ms)",
-				query, duration);
+		LOGGER.debug("Finished loading option list {} ({}ms)", logId(),
+				duration);
 		return newOptions;
 	}
 

@@ -1,0 +1,9 @@
+*** Settings ***
+Library         de.unioninvestment.eai.portal.robot.LogfileLibrary
+
+*** Keywords ***
+
+Server-Log wird überwacht
+	Monitor Log File  ${JBOSS_SERVER_LOG}
+
+  
