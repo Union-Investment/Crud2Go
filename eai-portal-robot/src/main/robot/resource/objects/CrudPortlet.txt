@@ -54,6 +54,11 @@ Testdaten für die Default-Sortierung in TEST_CRUD2
 	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (16,12,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
 	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (17,11,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
 
+umfangreiche Testdaten in TEST_CRUD2
+	Initialisiere TEST_CRUD2 Tabelle
+	:FOR  ${i}  IN RANGE  1000
+	\	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (${i},${i},to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'T${i}',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+
 wurde im FormularFeld '${feldname}' der Eintrag '${wert}' ausgewählt
 	Vaadin Click  css=.v-formlayout tr:contains('${feldname}') div.v-filterselect-button
 	Wait Until Page Contains Element  css=td.gwt-MenuItem:contains('${wert}') span
@@ -253,10 +258,14 @@ die Dropdown-Daten in der Datenbank geändert werden
 die Seite neu geladen wird
 	Go To  http://${BASE_URL}${CONTEXT}
 	Wait Until Page Loaded
+	
+die Browserseite vollständig geladen ist
+	Wait Until Page Loaded
+	Wait for AJAX calls to complete
 
 im Feld '${feldname}' die Buchstaben '${buchstaben}' eingegeben werden
 # does not work as it doesn't trigger a server side update 
-	Input Text  css=#${feldname} input  ${buchstaben}
+	Input Text  css=.${feldname} input  ${buchstaben}
 # doesn't work at all (Selenium Bug?):
 #	Call Selenium Api  typeKeys  css=#${feldname} input  ${buchstaben}
 # also doesn't work at all (Selenium Bug?):
@@ -264,10 +273,20 @@ im Feld '${feldname}' die Buchstaben '${buchstaben}' eingegeben werden
 #    :FOR  ${i}  IN RANGE  ${length}
 #    \	${next} =  Evaluate  ${i}+1
 #    \	${char} =  Get Substring  ${buchstaben}  ${i}  ${next}
-#	\	Call Selenium Api  keyDown  css=#${feldname} input  ${char}
-#	\	Call Selenium Api  keyPress  css=#${feldname} input  ${char}
-#	\	Call Selenium Api  keyUp  css=#${feldname} input  ${char}
+#	\	Call Selenium Api  keyDown  css=.${feldname} input  ${char}
+#	\	Call Selenium Api  keyPress  css=.${feldname} input  ${char}
+#	\	Call Selenium Api  keyUp  css=.${feldname} input  ${char}
 
+der Size-Cache-Timeout von ${sekunden} Sekunden abgewartet wird
+	Sleep  ${sekunden}s
+	
+die Tabelle zur Zeile ${zeile} gescrollt wird
+	[Documentation]  Annahme: Es gibt nur einen crudTable, die Zeilenhöhe ist explizit auf 30px eingestellt
+	Page Should Contain Element  css=div.crudTable div.v-scrollable > div:first-child
+	${top} =  Evaluate  ${zeile} * 30
+	Execute JavaScript  window.document.querySelector("div.crudTable div.v-scrollable").scrollTop = ${top}
+	Wait for AJAX calls to complete
+	
 ##########################
 ###  Dann / Und es ... ###
 ##########################
@@ -476,6 +495,12 @@ existiert im Log kein Eintrag, dass die '${optionList}' geladen wurde
 
 existiert im Log ein Eintrag, dass die '${optionList}' geladen wurde
 	Should Have Log File Entry  ${JBOSS_SERVER_LOG}  Loading option list '${optionList}'  15
+
+existiert im Log ein einziger Eintrag zur Ermittlung Anzahl der Tabellenzeilen
+	Should Have Number Of Log File Entries  ${JBOSS_SERVER_LOG}  1  querying database for row count
+
+existiert im Log kein Eintrag zur Ermittlung Anzahl der Tabellenzeilen
+	Should Not Have Log File Entry  ${JBOSS_SERVER_LOG}  querying database for row count  5
 
 ##########################
 ###  Utility Keywords  ###

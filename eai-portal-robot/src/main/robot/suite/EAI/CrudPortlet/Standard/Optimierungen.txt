@@ -38,6 +38,41 @@ Lazy Query-Optionslisten sollen nach Eingabe von Buchstaben geladen werden
 	dann existiert im Log ein Eintrag, dass die 'lazyOptionList' geladen wurde
 
 
+Nach dem Laden wird einmalig die Anzahl der Tabellenzeilen abgefragt
+	[Tags]  author_mjartanc  UI-597
+	
+	Es existieren Testdaten in TEST_CRUD2
+	und das Server-Log wird überwacht
+	und außerdem ein Portlet mit der XML-Konfiguration 'OPTIMIERUNGEN.xml'
+	
+	wenn die Browserseite vollständig geladen ist
+	
+	dann existiert im Log ein einziger Eintrag zur Ermittlung Anzahl der Tabellenzeilen
+
+	
+Beim Scrollen innerhalb einer Container-Page wird Anzahl der Tabellenzeilen nicht abgefragt
+	[Tags]  author_mjartanc  UI-597
+	
+	Es existieren umfangreiche Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'OPTIMIERUNGEN.xml'
+	und das Server-Log wird überwacht
+
+	wenn die Tabelle zur Zeile 50 gescrollt wird
+	
+	dann existiert im Log kein Eintrag zur Ermittlung Anzahl der Tabellenzeilen
+
+Beim Scrollen in die nächste Container-Page wird Anzahl der Tabellenzeilen 1x abgefragt
+	[Tags]  author_mjartanc  UI-597
+	
+	Es existieren umfangreiche Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'OPTIMIERUNGEN.xml'
+	und das Server-Log wird überwacht
+
+	wenn der Size-Cache-Timeout von 10 Sekunden abgewartet wird
+	und dann die Tabelle zur Zeile 150 gescrollt wird
+	
+	dann existiert im Log ein einziger Eintrag zur Ermittlung Anzahl der Tabellenzeilen
+
 	
 *** Settings ***
 Resource        ${RESOURCES}/import/CrudPortlet.txt

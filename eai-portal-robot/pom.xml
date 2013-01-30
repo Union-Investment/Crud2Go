@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>robotframework</groupId>
 			<artifactId>dblibrary</artifactId>
-			<version>1.1-UI</version>
+			<version>2.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.oracle</groupId>

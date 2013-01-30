@@ -134,6 +134,28 @@ public class LogfileLibraryIntegrationTest {
 		}
 	}
 
+	@Test
+	public void shouldSucceedFindingExactNumberOfFindingsInLogfile()
+			throws IOException,
+			InterruptedException {
+		PrintWriter out = new PrintWriter(new FileWriter(TEST_LOGFILE));
+		try {
+			println(out, "first line");
+
+			library.monitorLogFile(TEST_LOGFILE);
+
+			println(out, "second line");
+			println(out, "third line");
+
+			library.shouldHaveNumberOfLogFileEntries(TEST_LOGFILE,
+					2, "line");
+		} finally {
+			library.stopLogFileMonitoring(TEST_LOGFILE);
+			out.close();
+			deleteLogFile();
+		}
+	}
+
 	private void println(PrintWriter out, String string) {
 		out.println(string);
 		out.flush();

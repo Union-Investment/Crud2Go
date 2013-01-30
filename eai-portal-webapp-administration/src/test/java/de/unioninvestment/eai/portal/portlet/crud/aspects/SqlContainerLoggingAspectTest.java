@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.aspects;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -62,7 +62,7 @@ public class SqlContainerLoggingAspectTest {
 
 	@Test
 	public void shouldReturnCorrectReturnValue() throws Throwable {
-		assertThat(aspect.logQueries(pjpMock), is(expectedResult));
+		assertThat(aspect.logResultQueries(pjpMock), is(expectedResult));
 	}
 
 	@Test
@@ -70,14 +70,14 @@ public class SqlContainerLoggingAspectTest {
 		when(loggerMock.isInfoEnabled()).thenReturn(true);
 		when(loggerMock.isDebugEnabled()).thenReturn(true);
 
-		aspect.logQueries(pjpMock);
+		aspect.logResultQueries(pjpMock);
 		verify(pjpMock).proceed();
 		verify(loggerMock).debug("Starting execution");
 	}
 
 	@Test
 	public void shouldLogEndAndDurationOnDebugLevel() throws Throwable {
-		aspect.logQueries(pjpMock);
+		aspect.logResultQueries(pjpMock);
 
 		verify(pjpMock).proceed();
 		verify(loggerMock).debug(matches("Leaving execution \\(\\d+ms\\)"));
@@ -94,7 +94,7 @@ public class SqlContainerLoggingAspectTest {
 				return null;
 			}
 		});
-		aspect.logQueries(pjpMock);
+		aspect.logResultQueries(pjpMock);
 
 		verify(pjpMock).proceed();
 		verify(loggerMock).info(matches("Leaving execution \\(\\d+ms\\)"));
@@ -105,7 +105,7 @@ public class SqlContainerLoggingAspectTest {
 	public void shouldNotLogAnythingBelowInfoLevel() throws Throwable {
 		when(loggerMock.isInfoEnabled()).thenReturn(false);
 
-		aspect.logQueries(pjpMock);
+		aspect.logResultQueries(pjpMock);
 
 		verify(pjpMock).proceed();
 		verify(loggerMock).isInfoEnabled();

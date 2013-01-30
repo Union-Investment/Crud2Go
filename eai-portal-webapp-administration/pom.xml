@@ -301,6 +301,10 @@
 							<groupId>org.vaadin.addons</groupId>
 							<artifactId>vaadin-sqlcontainer</artifactId>
 						</weaveDependency>
+						<weaveDependency>
+							<groupId>de.uit.eai.portal</groupId>
+							<artifactId>eai-portal-domain-crudportlet</artifactId>
+						</weaveDependency>
 					</weaveDependencies>
 					<aspectLibraries>
 						<aspectLibrary>

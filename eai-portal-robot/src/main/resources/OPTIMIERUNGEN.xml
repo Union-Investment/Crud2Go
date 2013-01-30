@@ -15,7 +15,7 @@
 			</field>
 			<action title="refresh" onExecution="resetOptionLists()" />
 		</form>
-		<table id="table">
+		<table id="table" row-height="30">
 			<database-query datasource="test">
 				<query><![CDATA[
 					SELECT * FROM test_crud2

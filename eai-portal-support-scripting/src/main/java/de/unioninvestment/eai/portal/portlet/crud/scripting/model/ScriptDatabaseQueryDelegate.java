@@ -201,7 +201,7 @@ public class ScriptDatabaseQueryDelegate implements DatabaseQueryDelegate {
 		}
 
 		sh.setQueryString(query.toString());
-		LOG.debug("Query Count Statement: " + sh.toString());
+		LOG.debug("Query Index Statement: " + sh.toString());
 		return sh;
 	}
 

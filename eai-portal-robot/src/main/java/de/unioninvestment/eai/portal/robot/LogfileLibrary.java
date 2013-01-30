@@ -40,8 +40,8 @@ public class LogfileLibrary {
 			}
 
 		};
-		Tailer tailer = new Tailer(new File(filename), listener, 1000, true,
-				true);
+		Tailer tailer = new Tailer(new File(filename), listener, retryInterval,
+				true, true);
 		rows.put(filename, new LinkedList<String>());
 		tailers.put(filename, tailer);
 
@@ -62,7 +62,7 @@ public class LogfileLibrary {
 		}
 	}
 
-	public boolean hasLogFileEntry(String filename, String entry) {
+	private boolean hasLogFileEntry(String filename, String entry) {
 		List<String> rowList = rows.get(filename);
 		synchronized (rowList) {
 			for (String row : rowList) {
@@ -72,6 +72,19 @@ public class LogfileLibrary {
 			}
 		}
 		return false;
+	}
+
+	private int countLogFileEntries(String filename, String entry) {
+		List<String> rowList = rows.get(filename);
+		int count = 0;
+		synchronized (rowList) {
+			for (String row : rowList) {
+				if (row.contains(entry)) {
+					count++;
+				}
+			}
+		}
+		return count;
 	}
 
 	public void shouldNotHaveLogFileEntry(String filename, String entry,
@@ -91,6 +104,17 @@ public class LogfileLibrary {
 		if (!found) {
 			throw new IllegalStateException("Entry '" + entry
 					+ "' not found in log file '" + filename + "'");
+		}
+	}
+
+	public void shouldHaveNumberOfLogFileEntries(String filename,
+			int expectedCount,
+			String entry) throws InterruptedException {
+		Thread.sleep(MINIMUM_DELAY_TO_DETECT_CHANGES);
+		int count = countLogFileEntries(filename, entry);
+		if (count != expectedCount) {
+			throw new IllegalStateException("Expected " + expectedCount
+					+ " entries of '" + entry + "', found " + count);
 		}
 	}
 
@@ -118,4 +142,5 @@ public class LogfileLibrary {
 	public void setRetryInterval(long retryInterval) {
 		this.retryInterval = retryInterval;
 	}
+
 }
