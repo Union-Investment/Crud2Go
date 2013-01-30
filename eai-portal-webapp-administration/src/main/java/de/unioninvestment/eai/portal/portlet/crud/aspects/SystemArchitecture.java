@@ -21,6 +21,8 @@ package de.unioninvestment.eai.portal.portlet.crud.aspects;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
+
 /**
  * Aspekt zur Einhaltung der System-Architektur.
  * 
@@ -110,6 +112,9 @@ public class SystemArchitecture {
 		// pointcut specification
 	}
 
+	/**
+	 * In {@link SearchFormAction}
+	 */
 	@Pointcut("within(de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction)")
 	public void inSearchFormAction() {
 		// pointcut specification
