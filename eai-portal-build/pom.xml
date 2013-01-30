@@ -430,6 +430,29 @@
 						</resources>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.pitest</groupId>
+					<artifactId>pitest-maven</artifactId>
+					<version>LATEST</version>
+					<configuration>
+						<targetClasses>
+							<param>de.unioninvestment.eai.portal*</param>
+						</targetClasses>
+						<targetTests>
+							<param>de.unioninvestment.eai.portal*</param>
+						</targetTests>
+						<excludedMethods>
+							<excludedMethod>get*</excludedMethod>
+							<excludedMethod>set*</excludedMethod>
+						</excludedMethods>
+						<excludedClasses>
+							<excludedClass>de.unioninvestment.eai.portal.portlet.crud.mvp.views*</excludedClass>
+							<excludedClass>*DBTest</excludedClass>
+							<excludedClass>*IntegrationTest</excludedClass>
+						</excludedClasses>
+						<maxDependencyDistance>2</maxDependencyDistance>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
