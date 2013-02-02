@@ -22,9 +22,10 @@ import com.vaadin.ui.Component
 import com.vaadin.ui.Tree
 
 /**
- * 
+ * Provides a <code>{@link Tree}</code>-Component.
  * 
  * @author Jan Malcomess (codecentric AG)
+ * @since 1.44
  */
 class TreeFactory extends AbstractComponentFactory {
 
