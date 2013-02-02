@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.io.Serializable;
@@ -32,17 +32,18 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
  * 
  * @author carsten.mjartan
  */
-public abstract class AbstractAction implements Serializable {
+public abstract class AbstractAction<T extends AbstractActionConfig> implements
+		Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Triggers triggers;
+	private final Triggers triggers;
 
 	protected final Portlet portlet;
 
-	private EventRouter<ExecutionEventHandler, ExecutionEvent> executionEventRouter = new EventRouter<ExecutionEventHandler, ExecutionEvent>();
+	private final EventRouter<ExecutionEventHandler, ExecutionEvent> executionEventRouter = new EventRouter<ExecutionEventHandler, ExecutionEvent>();
 
-	private AbstractActionConfig config;
+	private final T config;
 
 	/**
 	 * Konstruktor.
@@ -54,8 +55,7 @@ public abstract class AbstractAction implements Serializable {
 	 * @param config
 	 *            Actionmodel
 	 */
-	public AbstractAction(Portlet portlet, AbstractActionConfig config,
-			Triggers triggers) {
+	public AbstractAction(Portlet portlet, T config, Triggers triggers) {
 		Assert.notNull(portlet, "Portlet-Model required");
 		Assert.notNull(config, "Configuration required");
 
@@ -64,12 +64,20 @@ public abstract class AbstractAction implements Serializable {
 		this.portlet = portlet;
 	}
 
+	/**
+	 * @return the configuration.
+	 * @since 1.46
+	 */
+	protected final T getConfig() {
+		return this.config;
+	}
+
 	public String getId() {
-		return config.getId();
+		return getConfig().getId();
 	}
 
 	public String getTitle() {
-		return config.getTitle();
+		return getConfig().getTitle();
 	}
 
 	/**
@@ -86,7 +94,7 @@ public abstract class AbstractAction implements Serializable {
 
 			Object object = portlet.getElementById(actionId);
 			if (object instanceof AbstractAction) {
-				AbstractAction action = (AbstractAction) object;
+				AbstractAction<?> action = (AbstractAction<?>) object;
 				action.execute();
 			} else {
 				throw new IllegalArgumentException(
