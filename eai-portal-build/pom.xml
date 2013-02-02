@@ -247,6 +247,11 @@
 				<artifactId>portlet-api</artifactId>
 				<version>2.0</version>
 			</dependency>
+			<dependency>
+			    <groupId>net.sf.supercsv</groupId>
+			    <artifactId>super-csv</artifactId>
+			    <version>2.0.1</version>
+			</dependency>
 
 			<dependency>
 				<groupId>xml-apis</groupId>
