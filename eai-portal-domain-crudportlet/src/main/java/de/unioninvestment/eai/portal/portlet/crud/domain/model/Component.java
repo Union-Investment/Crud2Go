@@ -42,12 +42,12 @@ public abstract class Component {
 	 * available space in the layout - that is: space, that is not taken up by
 	 * other components. Expansion depends on the layout the component resides
 	 * in: if vertical (which is most of the time) than expansion happens by
-	 * increasing the components height; if horizontal (currently only possible
-	 * when placed inside a correspondingly configured <code>Region</code>; @see
-	 * <code>{@link Region#isHorizontalLayout()}</code>) then expansion happens
-	 * by increasing the components width.<br>
+	 * increasing the components height; if horizontal (when placed inside a
+	 * correspondingly configured <code>Panel</code> (<code>Region</code> etc.); @see
+	 * <code>{@link Panel#isHorizontalLayout()}</code>) then expansion happens
+	 * by increasing the component's width.<br>
 	 * Please note, because not every component is expandable - for example, it
-	 * makes not sense for a dialog or a page to provide an expand ratio -
+	 * makes no sense for a dialog or a page to provide an expand ratio -
 	 * expandibility has been put into an interface.
 	 * 
 	 * @author Jan Malcomess (codecentric AG)
