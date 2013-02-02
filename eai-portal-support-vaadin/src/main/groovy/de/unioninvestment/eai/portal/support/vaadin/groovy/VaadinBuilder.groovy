@@ -45,5 +45,6 @@ class VaadinBuilder extends FactoryBuilderSupport {
 		registerFactory('chart', new ChartFactory());
 		registerFactory('select', new SelectFactory());
 		registerFactory('tree', new TreeFactory());
+		registerFactory('upload', new UploadFactory());
 	}
 }
