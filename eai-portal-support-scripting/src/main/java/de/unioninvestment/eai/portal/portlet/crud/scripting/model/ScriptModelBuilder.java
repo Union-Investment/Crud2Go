@@ -33,6 +33,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
@@ -57,10 +58,12 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericDataContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.JMXContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Page;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Region;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
@@ -76,9 +79,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ConfirmationDialogProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.NotificationProvider;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ShowPopupProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.events.NewRowDefaultsSetterHandler;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptPortal;
 import de.unioninvestment.eai.portal.support.scripting.DynamicColumnStyleRenderer;
 import de.unioninvestment.eai.portal.support.scripting.DynamicRowStyleRenderer;
 import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
@@ -128,12 +129,14 @@ public class ScriptModelBuilder {
 	 * @param modelToConfigMapping
 	 *            Map mit Config
 	 */
-	public ScriptModelBuilder(EventBus eventBus, ScriptModelFactory factory,
+	public ScriptModelBuilder(
+			ScriptModelFactory factory,
+			EventBus eventBus,
 			ConnectionPoolFactory connectionPoolFactory,
 			UserFactory userFactory, ScriptBuilder scriptBuilder,
 			Portlet portlet, Map<Object, Object> modelToConfigMapping) {
-		this.eventBus = eventBus;
 		this.factory = factory;
+		this.eventBus = eventBus;
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.userFactory = userFactory;
 		this.scriptBuilder = scriptBuilder;
@@ -172,7 +175,7 @@ public class ScriptModelBuilder {
 		scriptPortlet.setOnRefresh(scriptBuilder.buildClosure(config
 				.getOnRefresh()));
 
-		scriptBuilder.addBindingVariable("portal", new ScriptPortal());
+		scriptBuilder.addBindingVariable("portal", factory.getScriptPortal());
 		scriptBuilder.addBindingVariable("portlet", scriptPortlet);
 		scriptBuilder.addBindingVariable("sql",
 				new SqlProvider(scriptBuilder.getMainScript(),
@@ -186,8 +189,9 @@ public class ScriptModelBuilder {
 		ScriptUser scriptUser = factory.getScriptCurrentUser(currentUser);
 		scriptBuilder.addBindingVariable("currentUser", scriptUser);
 
-		scriptBuilder.addBindingVariable("showPopup", new ShowPopupProvider(
-				scriptBuilder.getMainScript()));
+		scriptBuilder.addBindingVariable("showPopup",
+				factory.getPopupProvider(scriptBuilder.getMainScript(),
+						eventBus));
 		scriptBuilder.addBindingVariable("confirm",
 				new ConfirmationDialogProvider(scriptBuilder.getMainScript(),
 						application.getMainWindow()));
@@ -309,7 +313,7 @@ public class ScriptModelBuilder {
 				.get(component);
 		GroovyScript generatorScript = scc.getGenerator();
 		@SuppressWarnings("unchecked")
-		Closure<com.vaadin.ui.Component> generatorClosure = (Closure<com.vaadin.ui.Component>) scriptBuilder
+		Closure<Object> generatorClosure = scriptBuilder
 				.buildClosure(generatorScript);
 		component.setGenerator(new CustomComponentGeneratorImpl(
 				generatorClosure, application));
@@ -381,8 +385,8 @@ public class ScriptModelBuilder {
 			OptionListFormField formField, SelectConfig config) {
 		Closure<?> dynamicSelectionClosure = scriptBuilder.buildClosure(config
 				.getDynamic().getOptions());
-		DynamicOptionList optionList = new DynamicOptionList(eventBus,
-				dynamicSelectionClosure, config);
+		DynamicOptionList optionList = factory.getDynamicOptionList(
+				dynamicSelectionClosure, config, eventBus);
 		formField.setOptionList(optionList);
 	}
 
@@ -436,7 +440,7 @@ public class ScriptModelBuilder {
 		GroovyScript rowEditableScript = tc.getRowEditable();
 		if (rowEditableScript != null
 				&& !Util.isPlainBoolean(rowEditableScript)) {
-			Closure<Boolean> rowEditableClosure = (Closure<Boolean>) scriptBuilder
+			Closure<Object> rowEditableClosure = scriptBuilder
 					.buildClosure(rowEditableScript);
 			table.setRowEditableChecker(new RowEditableCheckerImpl(table,
 					rowEditableClosure));
@@ -448,7 +452,7 @@ public class ScriptModelBuilder {
 				GroovyScript fieldEditableScript = columnConfig.getEditable();
 				if (fieldEditableScript != null
 						&& !Util.isPlainBoolean(fieldEditableScript)) {
-					Closure<Boolean> fieldEditableClosure = (Closure<Boolean>) scriptBuilder
+					Closure<Object> fieldEditableClosure = scriptBuilder
 							.buildClosure(fieldEditableScript);
 					column.setEditableChecker(new FieldEditableCheckerImpl(
 							table, column.getName(), fieldEditableClosure));
@@ -574,9 +578,9 @@ public class ScriptModelBuilder {
 
 					Closure<?> dynamicSelectionClosure = scriptBuilder
 							.buildClosure(dynamicConfig.getOptions());
-					DynamicOptionList optionList = new DynamicOptionList(
-							eventBus, table, dynamicSelectionClosure,
-							columnConfig.getSelect());
+					DynamicOptionList optionList = factory
+							.getDynamicOptionList(dynamicSelectionClosure,
+									columnConfig.getSelect(), table, eventBus);
 					table.getColumns().get(columnConfig.getName())
 							.setOptionList(optionList);
 				}
@@ -616,7 +620,7 @@ public class ScriptModelBuilder {
 			ColumnConfig columnConfig) {
 		GroovyScript generatedColumnsScript = columnConfig.getGenerator();
 
-		Closure<com.vaadin.ui.Component> generatedColumnsClosure = (Closure<com.vaadin.ui.Component>) scriptBuilder
+		Closure<Object> generatedColumnsClosure = scriptBuilder
 				.buildClosure(generatedColumnsScript);
 
 		column.setCustomColumnGenerator(new CustomColumnGeneratorImpl(
@@ -627,7 +631,7 @@ public class ScriptModelBuilder {
 		TableConfig tableConfig = (TableConfig) configs.get(table);
 		if (tableConfig.getRowStyle() != null) {
 			@SuppressWarnings("unchecked")
-			Closure<String> rowStyleClosure = (Closure<String>) scriptBuilder
+			Closure<Object> rowStyleClosure = scriptBuilder
 					.buildClosure(tableConfig.getRowStyle());
 
 			table.setRowStyleRenderer(new DynamicRowStyleRenderer(table,
@@ -640,7 +644,7 @@ public class ScriptModelBuilder {
 				if (columnConfig.getStyle() != null) {
 
 					@SuppressWarnings("unchecked")
-					Closure<String> columnClosure = (Closure<String>) scriptBuilder
+					Closure<Object> columnClosure = scriptBuilder
 							.buildClosure(columnConfig.getStyle());
 
 					DynamicColumnStyleRenderer columnStyleRenderer = new DynamicColumnStyleRenderer(
@@ -656,17 +660,26 @@ public class ScriptModelBuilder {
 	private ScriptContainer buildScriptContainer(DataContainer container) {
 
 		ScriptContainer scriptContainer = null;
-		if (container instanceof GenericDataContainer) {
-			GenericDelegate delegate = ((GenericDataContainer) container)
-					.getDelegate();
-			if (delegate instanceof JmxDelegate) {
-				JmxDelegate jmxDelegate = (JmxDelegate) delegate;
-				scriptContainer = factory.getScriptJmxContainer(container,
-						jmxDelegate);
-			} else {
-				populateBackendToDataContainer((GenericDataContainer) container);
-				scriptContainer = factory.getScriptContainer(container);
-			}
+		if (container instanceof ReSTContainer) {
+			ReSTContainer restContainer = (ReSTContainer) container;
+			ReSTContainerConfig config = (ReSTContainerConfig) configs
+					.get(container);
+			restContainer.setDelegate(factory.getReSTDelegate(config,
+					restContainer,
+					scriptBuilder));
+			scriptContainer = factory.getScriptReSTContainer(restContainer);
+
+		} else if (container instanceof JMXContainer) {
+			GenericDelegate delegate = ((JMXContainer) container).getDelegate();
+			JmxDelegate jmxDelegate = (JmxDelegate) delegate;
+			scriptContainer = factory.getScriptJmxContainer(container,
+					jmxDelegate);
+
+		} else if (container instanceof GenericDataContainer) {
+			// only ScriptContainer left
+			populateBackendToDataContainer((GenericDataContainer) container);
+			scriptContainer = factory.getScriptContainer(container);
+
 		} else if (container instanceof AbstractDatabaseContainer) {
 			if (container instanceof DatabaseQueryContainer) {
 				scriptContainer = factory
@@ -689,13 +702,15 @@ public class ScriptModelBuilder {
 	}
 
 	private void populateBackendToDataContainer(GenericDataContainer container) {
-		GroovyScript delegate = ((ScriptContainerConfig) configs.get(container))
+		GroovyScript delegateScript = ((ScriptContainerConfig) configs
+				.get(container))
 				.getDelegate();
 		@SuppressWarnings("unchecked")
-		Closure<ScriptContainerBackend> delegateClosure = (Closure<ScriptContainerBackend>) scriptBuilder
-				.buildClosure(delegate);
-		container.setDelegate(new ScriptContainerDelegate(delegateClosure
-				.call(), container));
+		Closure<Object> delegateClosure = scriptBuilder
+				.buildClosure(delegateScript);
+		Object delegate = delegateClosure.call();
+		container.setDelegate(new ScriptContainerDelegate(
+				(ScriptContainerBackend) delegate, container));
 	}
 
 	private void populateOnUpdateClosure(DataContainer container,

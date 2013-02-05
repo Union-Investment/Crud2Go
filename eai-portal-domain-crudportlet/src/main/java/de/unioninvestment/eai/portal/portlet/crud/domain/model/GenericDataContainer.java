@@ -85,6 +85,14 @@ public class GenericDataContainer extends AbstractDataContainer {
 
 	}
 
+	/**
+	 * @param eventBus
+	 *            für Events
+	 * @param formatPattern
+	 *            Formatinformationen
+	 * @param defaultOrder
+	 * @param filterPolicy
+	 */
 	public GenericDataContainer(EventBus eventBus,
 			Map<String, String> formatPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {

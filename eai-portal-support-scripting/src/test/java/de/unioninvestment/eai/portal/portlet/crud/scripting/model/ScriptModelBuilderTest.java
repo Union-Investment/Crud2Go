@@ -52,15 +52,18 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryCont
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.ColumnStyleRenderer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.RowStyleRenderer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ConfirmationDialogProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.NotificationProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ShowPopupProvider;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest.ReSTDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptPortal;
 import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
 import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
@@ -118,13 +121,16 @@ public class ScriptModelBuilderTest extends ModelSupport {
 	@Mock
 	private ExecutorService prefetchExecutorMock;
 
+	@Mock
+	private Portal portalMock;
+
 	@Before
 	public void setUp() throws Exception {
 
 		MockitoAnnotations.initMocks(this);
 
 		factory = new ScriptModelFactory(connectionPoolFactoryMock,
-				userFactoryMock);
+				userFactoryMock, portalMock);
 
 		when(scriptBuilderMock.buildClosure(any(GroovyScript.class)))
 				.thenAnswer(new Answer<Object>() {
@@ -211,7 +217,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		when(portletMock.getPage()).thenReturn(null);
 		when(portletMock.getTabs()).thenReturn(null);
 
-		scriptModelBuilder = new ScriptModelBuilder(eventBus, factoryMock,
+		scriptModelBuilder = new ScriptModelBuilder(factoryMock, eventBus,
 				connectionPoolFactoryMock, userFactoryMock, scriptBuilderMock,
 				portletMock, mappingMock);
 
@@ -612,6 +618,17 @@ public class ScriptModelBuilderTest extends ModelSupport {
 	}
 
 	@Test
+	public void shouldBuildRestBackendContainer() throws JAXBException {
+		prepare("validTwitterConfig.xml");
+		ScriptPortlet scriptPortlet = scriptModelBuilder.build();
+
+		assertThat(
+				((ScriptTable) scriptPortlet.getPage().getElements().get(0))
+						.getContainer(),
+				instanceOf(ScriptContainer.class));
+	}
+
+	@Test
 	public void shouldBuildScriptSQLContainer() throws JAXBException {
 		prepare("validConfig.xml");
 		ScriptPortlet scriptPortlet = scriptModelBuilder.build();
@@ -622,16 +639,38 @@ public class ScriptModelBuilderTest extends ModelSupport {
 				instanceOf(ScriptDatabaseContainer.class));
 	}
 
+	@Test
+	public void shouldBuildScriptSQLQueryContainer() throws JAXBException {
+		prepare("validQueryConfig.xml");
+		ScriptPortlet scriptPortlet = scriptModelBuilder.build();
+
+		assertThat(
+				((ScriptTable) scriptPortlet.getPage().getElements().get(0))
+						.getContainer(),
+				instanceOf(ScriptDatabaseQueryContainer.class));
+	}
+
+	@Test
+	public void shouldBindRestContainerToReSTDelegate() throws JAXBException {
+		prepare("validTwitterConfig.xml");
+
+		Table table = (Table) portlet.getPage().getElements().get(0);
+		ReSTContainer container = (ReSTContainer) table.getContainer();
+
+		scriptModelBuilder.build();
+
+		assertThat(container.getDelegate(), instanceOf(ReSTDelegate.class));
+	}
+
 	private void prepare(String configFile) throws JAXBException {
 
 		portletConfig = createConfiguration(configFile);
 		modelBuilder = createModelBuilder(portletConfig);
 		portlet = modelBuilder.build();
 		mapping = modelBuilder.getModelToConfigMapping();
-		scriptModelBuilder = new ScriptModelBuilder(eventBus, factory,
+		scriptModelBuilder = new ScriptModelBuilder(factory, eventBus,
 				connectionPoolFactoryMock, userFactoryMock, scriptBuilderMock,
 				portlet, mapping);
 		scriptModelBuilder.setApplication(applicationMock);
 	}
-
 }

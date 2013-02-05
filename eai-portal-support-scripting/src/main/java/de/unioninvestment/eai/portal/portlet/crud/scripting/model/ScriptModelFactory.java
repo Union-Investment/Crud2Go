@@ -18,11 +18,16 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
+import groovy.lang.Closure;
+import groovy.lang.Script;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
@@ -35,6 +40,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.MultiOptionListFo
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Page;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Region;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
@@ -43,9 +49,15 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOptionList;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ShowPopupProvider;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest.ReSTDelegate;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptPortal;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.scripting.ScriptJMXWrapper;
 import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
+import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
@@ -59,6 +71,7 @@ public class ScriptModelFactory {
 
 	private final ConnectionPoolFactory connectionPoolFactory;
 	private final UserFactory userFactory;
+	private Portal portal;
 
 	/**
 	 * @param connectionPoolFactory
@@ -69,9 +82,10 @@ public class ScriptModelFactory {
 	 */
 	@Autowired
 	public ScriptModelFactory(ConnectionPoolFactory connectionPoolFactory,
-			UserFactory userFactory) {
+			UserFactory userFactory, Portal portal) {
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.userFactory = userFactory;
+		this.portal = portal;
 	}
 
 	/**
@@ -86,7 +100,7 @@ public class ScriptModelFactory {
 	 */
 	public ScriptModelBuilder getBuilder(EventBus eventBus, Portlet portlet,
 			Map<Object, Object> modelToConfigMapping) {
-		return new ScriptModelBuilder(eventBus, this, connectionPoolFactory,
+		return new ScriptModelBuilder(this, eventBus, connectionPoolFactory,
 				userFactory, getScriptBuilder(), portlet, modelToConfigMapping);
 	}
 
@@ -248,5 +262,35 @@ public class ScriptModelFactory {
 
 	public ScriptContainer getScriptContainer(DataContainer container) {
 		return new ScriptContainer(container);
+	}
+
+	public ScriptPortal getScriptPortal() {
+		return new ScriptPortal(portal);
+	}
+
+	public Object getPopupProvider(Script mainScript, EventBus eventBus) {
+		return new ShowPopupProvider(eventBus, mainScript);
+	}
+
+	public DynamicOptionList getDynamicOptionList(
+			Closure<?> dynamicSelectionClosure, SelectConfig config,
+			EventBus eventBus) {
+		return new DynamicOptionList(eventBus, dynamicSelectionClosure, config);
+	}
+
+	public DynamicOptionList getDynamicOptionList(
+			Closure<?> dynamicSelectionClosure, SelectConfig config,
+			Table table, EventBus eventBus) {
+		return new DynamicOptionList(eventBus, table, dynamicSelectionClosure,
+				config);
+	}
+
+	public GenericDelegate getReSTDelegate(ReSTContainerConfig config,
+			ReSTContainer container, ScriptBuilder scriptBuilder) {
+		return new ReSTDelegate(config, container, scriptBuilder);
+	}
+
+	public ScriptContainer getScriptReSTContainer(ReSTContainer restContainer) {
+		return new ScriptContainer(restContainer);
 	}
 }

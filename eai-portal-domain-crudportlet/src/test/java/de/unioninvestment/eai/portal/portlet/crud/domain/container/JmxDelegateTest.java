@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
 import static java.util.Arrays.asList;
@@ -53,6 +53,7 @@ import de.unioninvestment.eai.portal.support.vaadin.container.GenericItem;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericItemId;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericProperty;
 import de.unioninvestment.eai.portal.support.vaadin.container.MetaData;
+import de.unioninvestment.eai.portal.support.vaadin.container.UpdateContext;
 
 public class JmxDelegateTest {
 	@Mock
@@ -63,7 +64,7 @@ public class JmxDelegateTest {
 
 	@Mock
 	private GenericItem itemMock;
-	
+
 	@Mock
 	private GenericProperty propertyMock;
 
@@ -76,8 +77,10 @@ public class JmxDelegateTest {
 	}
 
 	@Test
-	public void shouldReturnNotNullMetaData() throws MalformedObjectNameException, NullPointerException {
-		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock, jmxWrapperMock, new TestUser("testUser"));
+	public void shouldReturnNotNullMetaData()
+			throws MalformedObjectNameException, NullPointerException {
+		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock,
+				jmxWrapperMock, new TestUser("testUser"));
 		MetaData metaData = jmxDelegate.getMetaData();
 		assertThat(metaData, notNullValue());
 	}
@@ -88,7 +91,8 @@ public class JmxDelegateTest {
 		when(jmxContainerConfigMock.getAttribute()).thenReturn(
 				createAttributeList());
 
-		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock, jmxWrapperMock, new TestUser("testUser"));
+		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock,
+				jmxWrapperMock, new TestUser("testUser"));
 		MetaData metaData = jmxDelegate.getMetaData();
 
 		Column column = metaData.getColumns().get(0);
@@ -105,7 +109,8 @@ public class JmxDelegateTest {
 		when(jmxContainerConfigMock.getAttribute()).thenReturn(
 				createAttributeList());
 
-		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock, jmxWrapperMock, new TestUser("testUser"));
+		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock,
+				jmxWrapperMock, new TestUser("testUser"));
 		MetaData metaData = jmxDelegate.getMetaData();
 
 		Column column = metaData.getColumns().get(1);
@@ -122,13 +127,16 @@ public class JmxDelegateTest {
 		when(jmxContainerConfigMock.getAttribute()).thenReturn(
 				createAttributeList());
 
-		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock, jmxWrapperMock, new TestUser("testUser"));
+		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock,
+				jmxWrapperMock, new TestUser("testUser"));
 		jmxDelegate.setQuery("query");
 		jmxDelegate.setJmxWrapper(jmxWrapperMock);
 
 		final Map<String, Map<String, Object>> result = new HashMap<String, Map<String, Object>>();
 		result.put("objectName", new HashMap<String, Object>());
-		when(jmxWrapperMock.query("query", asList("name1"), asList((String)null)))
+		when(
+				jmxWrapperMock.query("query", asList("name1"),
+						asList((String) null)))
 				.thenAnswer(new Answer<Object>() {
 
 					@Override
@@ -136,7 +144,7 @@ public class JmxDelegateTest {
 							throws Throwable {
 						return result;
 					}
-					
+
 				});
 
 		List<Object[]> rows = jmxDelegate.getRows();
@@ -146,56 +154,63 @@ public class JmxDelegateTest {
 	}
 
 	@Test
-	public void shouldReturnOneRowWithGetterScripts() throws IOException, JMException {
-		
+	public void shouldReturnOneRowWithGetterScripts() throws IOException,
+			JMException {
+
 		List<Attribute> createAttributeList = createAttributeList();
 		when(jmxContainerConfigMock.getAttribute()).thenReturn(
 				createAttributeList);
 		createAttributeList.get(0).setServerSideGetter("return 'Test123'");
-		
-		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock, jmxWrapperMock, new TestUser("testUser"));
+
+		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock,
+				jmxWrapperMock, new TestUser("testUser"));
 		jmxDelegate.setQuery("query");
 		jmxDelegate.setJmxWrapper(jmxWrapperMock);
-		
+
 		final Map<String, Map<String, Object>> result = new HashMap<String, Map<String, Object>>();
 		result.put("objectName", new HashMap<String, Object>());
-		when(jmxWrapperMock.query("query", asList("name1"), asList("return 'Test123'")))
-		.thenAnswer(new Answer<Object>() {
-			
-			@Override
-			public Object answer(InvocationOnMock invocation)
-					throws Throwable {
-				return result;
-			}
-			
-		});
-		
+		when(
+				jmxWrapperMock.query("query", asList("name1"),
+						asList("return 'Test123'")))
+				.thenAnswer(new Answer<Object>() {
+
+					@Override
+					public Object answer(InvocationOnMock invocation)
+							throws Throwable {
+						return result;
+					}
+
+				});
+
 		List<Object[]> rows = jmxDelegate.getRows();
-		
+
 		assertThat(rows, notNullValue());
 		assertThat(rows.size(), is(1));
 	}
-	
+
 	@Test
 	public void shouldUpdateAttribute() throws JMException, IOException {
-		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock, jmxWrapperMock, new TestUser("testUser"));
-		
-		when(itemMock.getItemPropertyIds()).thenAnswer(new Answer<Collection<?>>() {
+		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainerConfigMock,
+				jmxWrapperMock, new TestUser("testUser"));
 
-			@Override
-			public Collection<?> answer(InvocationOnMock invocation)
-					throws Throwable {
-				return asList("attribute1");
-			}
-		});
-		when(itemMock.getId()).thenReturn(new GenericItemId(new Object[] {"4711"}));
+		when(itemMock.getItemPropertyIds()).thenAnswer(
+				new Answer<Collection<?>>() {
+
+					@Override
+					public Collection<?> answer(InvocationOnMock invocation)
+							throws Throwable {
+						return asList("attribute1");
+					}
+				});
+		when(itemMock.getId()).thenReturn(
+				new GenericItemId(new Object[] { "4711" }));
 		when(itemMock.getItemProperty("attribute1")).thenReturn(propertyMock);
 		when(propertyMock.isModified()).thenReturn(true);
 		when(propertyMock.getValue()).thenReturn("1");
 		when(jmxWrapperMock.proxyFor("4711")).thenReturn(gMbeanMock);
-		
-		jmxDelegate.update(asList(itemMock));
-		
+
+		jmxDelegate.update(asList(itemMock), new UpdateContext());
+
 		verify(gMbeanMock).setProperty("attribute1", "1");
 	}
 
@@ -205,7 +220,7 @@ public class JmxDelegateTest {
 		attribute1.setName("name1");
 		attribute1.setReadonly(true);
 		attribute1.setRequired(true);
-		attribute1.setType("java.lang.String");
+		attribute1.setType(String.class);
 		attributsliste.add(attribute1);
 
 		return attributsliste;
@@ -214,6 +229,6 @@ public class JmxDelegateTest {
 	@Test
 	public void testExtractMetadataFromConfig()
 	{
-	
+
 	}
 }

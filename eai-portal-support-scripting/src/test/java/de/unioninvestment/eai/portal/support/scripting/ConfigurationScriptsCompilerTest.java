@@ -58,7 +58,10 @@ import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTAttributeConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
@@ -409,6 +412,34 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		compiler.compileAllScripts(portletConfig);
 
 		verify(scriptCompilerMock, times(4)).compileScript(anyString());
+	}
+
+	@Test
+	public void shouldCompileReSTContainerScripts() throws JAXBException {
+		PortletConfig portletConfig = createConfiguration("validReSTContainerFullJsonConfig.xml");
+		when(scriptCompilerMock.compileScript(anyString())).thenReturn(
+				Script.class);
+
+		compiler.compileAllScripts(portletConfig);
+
+		TableConfig tableConfig = (TableConfig) portletConfig.getPage()
+				.getElements().get(0);
+		ReSTContainerConfig container = tableConfig.getRestContainer();
+		List<ReSTAttributeConfig> attributes = container.getQuery()
+				.getAttribute();
+		assertScriptCompiled(container.getQuery().getCollection());
+		assertScriptCompiled(attributes.get(0).getPath());
+		assertScriptCompiled(attributes.get(1).getPath());
+		assertScriptCompiled(attributes.get(2).getPath());
+		assertScriptCompiled(container.getInsert().getValue());
+		assertScriptCompiled(container.getInsert().getUrl());
+		assertScriptCompiled(container.getUpdate().getValue());
+		assertScriptCompiled(container.getUpdate().getUrl());
+		assertScriptCompiled(container.getDelete().getUrl());
+	}
+
+	private void assertScriptCompiled(GroovyScript collection) {
+		assertThat(collection.getClazz(), notNullValue());
 	}
 
 	@Test

@@ -20,7 +20,7 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
 public class ScriptCustomFilterMatcherTest {
 
 	@Mock
-	private Closure<Boolean> closureMock;
+	private Closure<Object> closureMock;
 
 	@Mock
 	private ContainerRow rowMock;

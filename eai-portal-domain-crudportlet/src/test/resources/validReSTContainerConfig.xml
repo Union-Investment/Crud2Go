@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel - Materialsammlung">
+	<page>
+		<table id="material">
+			<rest-container baseUrl="http://localhost:8080/material/rest/">
+				<query url="document">
+					<attribute name="id" type="java.lang.Long" primary-key="true" />
+					<attribute name="title" />
+					<attribute name="fragments" type="java.lang.Long" path="fragments.size()" />
+				</query>
+				<insert url="document"><![CDATA[
+					[
+						title: row.values.title
+					]
+				]]></insert>
+				<update url="document/${row.values.id}"><![CDATA[
+					[
+						title: row.values.title
+					]
+				]]></update>
+				<delete url="document/${row.values.id}"/>
+			</rest-container>
+			<columns>
+				<column name="id" title="ID" primary-key="true" hidden="true" />
+				<column name="title" title="Titel" editable="true" validate="required" />
+				<column name="fragments" title="Fragmente" />
+			</columns>
+		</table>
+	</page>
+</portlet>

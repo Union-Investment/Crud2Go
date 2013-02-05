@@ -208,6 +208,38 @@ public class ModelFactory {
 				filterPolicy);
 	}
 
+	/**
+	 * @param formatPattern
+	 *            Formatierungen nach Spaltennamen.
+	 * @param defaultOrder
+	 *            Default-Sortierung
+	 * @param filterPolicy
+	 *            Art des Filterhandlings
+	 * @return den Container
+	 */
+	public JMXContainer getJmxContainer(EventBus eventBus,
+			Map<String, String> formatPattern,
+			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {
+		return new JMXContainer(eventBus, formatPattern, defaultOrder,
+				filterPolicy);
+	}
+
+	/**
+	 * @param formatPattern
+	 *            Formatierungen nach Spaltennamen.
+	 * @param defaultOrder
+	 *            Default-Sortierung
+	 * @param filterPolicy
+	 *            Art des Filterhandlings
+	 * @return den Container
+	 */
+	public ReSTContainer getReSTContainer(EventBus eventBus,
+			Map<String, String> formatPattern,
+			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {
+		return new ReSTContainer(eventBus, formatPattern, defaultOrder,
+				filterPolicy);
+	}
+
 	public QueryOptionList getQueryOptionList(EventBus eventBus,
 			SelectConfig config,
 			String datasource) {

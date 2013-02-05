@@ -52,7 +52,8 @@
 		<attribute name="onRefresh" type="tns:groovy">
 			<annotation>
 				<documentation>
-					Groovy Closure, die beim Portlet Refresh aufgerufen wird
+					Groovy Closure, die beim Portlet Refresh aufgerufen
+					wird
 				</documentation>
 			</annotation>
 		</attribute>
@@ -1132,6 +1133,7 @@
 						<element name="database-query" type="tns:DatabaseQueryConfig" />
 						<element name="script-container" type="tns:ScriptContainerConfig" />
 						<element name="jmx-container" type="tns:JmxContainerConfig" />
+						<element name="rest-container" type="tns:ReSTContainerConfig" />
 					</choice>
 					<element name="columns" type="tns:ColumnsConfig" minOccurs="0" />
 					<element name="action" type="tns:TableActionConfig"
@@ -1288,6 +1290,20 @@
 			</appinfo>
 			<documentation>
 				Groovyscriptblock
+			</documentation>
+		</annotation>
+		<restriction base="string" />
+	</simpleType>
+
+	<simpleType name="javaClass">
+		<annotation>
+			<appinfo>
+				<jaxb:javaType name="java.lang.Class"
+					parseMethod="de.unioninvestment.eai.portal.portlet.crud.config.converter.JavaClassConverter.parseStringToJavaClass"
+					printMethod="de.unioninvestment.eai.portal.portlet.crud.config.converter.JavaClassConverter.printJavaClass" />
+			</appinfo>
+			<documentation>
+				Java-Klasse
 			</documentation>
 		</annotation>
 		<restriction base="string" />
@@ -1517,7 +1533,7 @@
 									<documentation>Attributsbezeichnung</documentation>
 								</annotation>
 							</attribute>
-							<attribute name="type" type="string" default="java.lang.String">
+							<attribute name="type" type="tns:javaClass" default="java.lang.String">
 								<annotation>
 									<documentation>Datentyp des Attributs</documentation>
 								</annotation>
@@ -1549,6 +1565,188 @@
 			</extension>
 		</complexContent>
 	</complexType>
+
+	<complexType name="ReSTContainerConfig">
+		<annotation>
+			<documentation>
+				Datenquelle ist ein ReST-Service.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ContainerConfig">
+				<sequence>
+					<element name="query" type="tns:ReSTQueryConfig" minOccurs="1"
+						maxOccurs="1" />
+					<element name="insert" type="tns:ReSTInsertConfig"
+						minOccurs="0" maxOccurs="1" />
+					<element name="update" type="tns:ReSTUpdateConfig"
+						minOccurs="0" maxOccurs="1" />
+					<element name="delete" type="tns:ReSTDeleteConfig"
+						minOccurs="0" maxOccurs="1" />
+				</sequence>
+				<attribute name="baseUrl" type="string" use="optional">
+					<annotation>
+						<documentation>Basis-URL des ReST-Services. Falls angegeben, wird
+							diese den 'url'-Angaben vorangestellt
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="format" type="tns:ReSTFormatConfig"
+					default="json">
+					<annotation>
+						<documentation>Format der transportierten Daten</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="charset" type="string" default="UTF-8">
+					<annotation>
+						<documentation>Zeichensatz/Encoding der transportierten Daten
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="ReSTQueryConfig">
+		<annotation>
+			<documentation>
+				Informationen zur Datenabfrage
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="attribute" type="tns:ReSTAttributeConfig"
+				minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+		<attribute name="url" type="string" use="required">
+			<annotation>
+				<documentation>Relativer Pfad oder absolute URL zur Query
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="collection" type="tns:groovy">
+			<annotation>
+				<documentation>Relative oder absolute URL zur Query
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="ReSTInsertConfig">
+		<annotation>
+			<documentation>
+				ReST-Kommunikation für neue Zeilen
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ScriptConfig">
+				<attribute name="url" type="tns:groovy" use="required">
+					<annotation>
+						<documentation>Relativer Pfad oder absolute URL
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="ReSTUpdateConfig">
+		<annotation>
+			<documentation>
+				ReST-Kommunikation für geänderte Zeilen
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ScriptConfig">
+				<attribute name="url" type="tns:groovy" use="required">
+					<annotation>
+						<documentation>Relativer Pfad oder absolute URL
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="ReSTDeleteConfig">
+		<annotation>
+			<documentation>
+				ReST-Kommunikation für gelöschte Zeilen
+			</documentation>
+		</annotation>
+		<attribute name="url" type="tns:groovy" use="required">
+			<annotation>
+				<documentation>Relativer Pfad oder absolute URL
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="ReSTAttributeConfig">
+		<annotation>
+			<documentation>
+				"Feld" des ReST-Containers
+			</documentation>
+		</annotation>
+		<attribute name="name" type="string" use="required">
+			<annotation>
+				<documentation>Attributsbezeichnung</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="type" type="tns:javaClass" default="java.lang.String">
+			<annotation>
+				<documentation>Datentyp des Attributs</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="format" type="string">
+			<annotation>
+				<documentation>Format (für Date: SimpleDateFormat)</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="locale" type="string">
+			<annotation>
+				<documentation>Locale fuer parsen/formatieren</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="path" type="tns:groovy" use="optional">
+			<annotation>
+				<documentation>Attributpfad relativ zur 'collection'-Angabe
+					an der
+					Query. Default: name
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="required" type="boolean" default="false">
+			<annotation>
+				<documentation>Ob das Attribut ein Pflichtfeld ist
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="readonly" type="boolean" default="false">
+			<annotation>
+				<documentation>Ob das Attribut änderbar ist</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="primary-key" type="boolean" default="false">
+			<annotation>
+				<documentation>
+					Gibt an, ob die Tabellenspalte Teil des
+					Primaerschluessels sein soll.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<simpleType name="ReSTFormatConfig">
+		<annotation>
+			<documentation>
+				Unterstuetzte Formate des ReST-Backends
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="json" />
+			<enumeration value="xml" />
+		</restriction>
+	</simpleType>
 
 	<complexType name="StatementConfig">
 		<annotation>
