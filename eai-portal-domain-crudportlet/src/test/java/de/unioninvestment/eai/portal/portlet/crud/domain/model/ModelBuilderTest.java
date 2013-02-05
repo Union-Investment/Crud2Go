@@ -78,6 +78,7 @@ import com.liferay.portal.service.ResourceLocalService;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
@@ -89,6 +90,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayApplicationMock;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationException;
 
@@ -156,6 +158,12 @@ public class ModelBuilderTest {
 
 	private HashMap<String, String> displayPatternMock = new HashMap<String, String>();
 
+	@Mock
+	private EventBus eventBus;
+
+	@Mock
+	private QueryOptionList queryOptionListMock;
+
 	@Before
 	public void setUp() throws Exception {
 
@@ -191,7 +199,8 @@ public class ModelBuilderTest {
 
 	private ModelBuilder createTestBuilder(Config config) {
 
-		return new ModelBuilder(factoryMock, connectionPoolFactoryMock,
+		return new ModelBuilder(eventBus, factoryMock,
+				connectionPoolFactoryMock,
 				prefetchExecutorMock, resetFormActionMock,
 				fieldValidatorFactoryMock, 300, config);
 	}
@@ -203,7 +212,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer(eq("test"),
+				factoryMock.getDatabaseTableContainer(eq(eventBus),
+						eq("test"),
 						eq("test_crud2"), eq(true), eq(true), eq(true),
 						any(CurrentUser.class), any(Map.class),
 						any(List.class), eq(FilterPolicy.ALL), anyInt(),
@@ -211,7 +221,7 @@ public class ModelBuilderTest {
 
 		Portlet build = builder.build();
 
-		verify(factoryMock).getDatabaseTableContainer(eq("test"),
+		verify(factoryMock).getDatabaseTableContainer(eq(eventBus), eq("test"),
 				eq("test_crud2"), eq(true), eq(true), eq(true),
 				any(CurrentUser.class), any(Map.class), any(List.class),
 				eq(FilterPolicy.ALL), anyInt(), anyInt(), anyInt());
@@ -230,7 +240,7 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer(eq("test"),
+				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),
 						eq("test_crud2"), eq(true), eq(true), eq(true),
 						any(CurrentUser.class), any(Map.class),
 						any(List.class), eq(FilterPolicy.ALL), anyInt(),
@@ -238,7 +248,7 @@ public class ModelBuilderTest {
 
 		Portlet build = builder.build();
 
-		verify(factoryMock).getDatabaseTableContainer(eq("test"),
+		verify(factoryMock).getDatabaseTableContainer(eq(eventBus), eq("test"),
 				eq("test_crud2"), eq(true), eq(true), eq(true),
 				any(CurrentUser.class), any(Map.class), any(List.class),
 				eq(FilterPolicy.ALL), anyInt(), anyInt(), anyInt());
@@ -260,13 +270,14 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, orderBys,
 						null, 100, 1000, 10)).thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
-		verify(factoryMock).getDatabaseTableContainer(eq("test"),
+		verify(factoryMock).getDatabaseTableContainer(eq(eventBus), eq("test"),
 				eq("test_crud2"), eq(true), eq(true), eq(true),
 				any(CurrentUser.class), any(Map.class), any(List.class),
 				eq(FilterPolicy.ALL), anyInt(), anyInt(), anyInt());
@@ -284,14 +295,16 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, new TestUser("Benutzer"),
 						displayPatternMock, orderBys, null, 100, 1000, 10))
 				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
-		verify(factoryMock, times(2)).getDatabaseTableContainer(eq("test"),
+		verify(factoryMock, times(2)).getDatabaseTableContainer(eq(eventBus),
+				eq("test"),
 				eq("test_crud2"), eq(true), eq(true), eq(true),
 				any(CurrentUser.class), any(Map.class), any(List.class),
 				eq(FilterPolicy.ALL), anyInt(), anyInt(), anyInt());
@@ -314,7 +327,7 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseQueryContainer(eq("test"),
+				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
 						Mockito.anyString(), eq(false), eq(false), eq(false),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
@@ -338,12 +351,16 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseQueryContainer(eq("test"),
+				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
 						Mockito.anyString(), eq(true), eq(true), eq(true),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
 						anyInt(), anyInt(), anyInt())).thenReturn(
 				queryContainerMock);
+		when(
+				factoryMock.getQueryOptionList(eq(eventBus),
+						isA(SelectConfig.class), eq("test"))).thenReturn(
+				queryOptionListMock);
 
 		when(
 				connectionPoolMock.executeWithJdbcTemplate(Mockito.anyString(),
@@ -381,7 +398,7 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseQueryContainer(eq("test"),
+				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
 						Mockito.anyString(), eq(true), eq(true), eq(true),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
@@ -415,7 +432,7 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseQueryContainer(eq("test"),
+				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
 						Mockito.anyString(), eq(true), eq(true), eq(true),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
@@ -442,7 +459,7 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseQueryContainer(eq("test"),
+				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
 						Mockito.anyString(), eq(false), eq(false), eq(false),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
@@ -491,7 +508,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, orderBys,
 						null, 100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -573,7 +591,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, orderBys,
 						null, 100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -601,13 +620,14 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, orderBys,
 						null, 100, 1000, 10)).thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
-		verify(factoryMock).getDatabaseTableContainer(eq("test"),
+		verify(factoryMock).getDatabaseTableContainer(eq(eventBus), eq("test"),
 				eq("test_crud2"), eq(true), eq(true), eq(true),
 				any(CurrentUser.class), any(Map.class), any(List.class),
 				eq(FilterPolicy.ALL), anyInt(), anyInt(), anyInt());
@@ -624,7 +644,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, orderBys,
 						null, 100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -644,7 +665,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, null, null,
 						100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -663,7 +685,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, null, null,
 						100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -680,7 +703,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, null, null,
 						100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -697,7 +721,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, null, null,
 						100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -713,7 +738,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, null, null,
 						100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -730,7 +756,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, null, null,
 						100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -746,7 +773,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, null, null,
 						100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -763,7 +791,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, null, null,
 						100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -784,7 +813,8 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseTableContainer("test", "test_crud2",
+				factoryMock.getDatabaseTableContainer(eventBus, "test",
+						"test_crud2",
 						true, true, true, null, displayPatternMock, null, null,
 						100, 1000, 10)).thenReturn(tableContainerMock);
 
@@ -804,7 +834,7 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseQueryContainer(eq("test"),
+				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
 						Mockito.anyString(), eq(false), eq(false), eq(false),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
@@ -813,12 +843,12 @@ public class ModelBuilderTest {
 
 		builder.build();
 
-		verify(factoryMock).getDatabaseQueryContainer(eq("test"),
+		verify(factoryMock).getDatabaseQueryContainer(eq(eventBus), eq("test"),
 				Mockito.anyString(), eq(true), eq(true), eq(true),
 				eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 				anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
 				anyInt(), anyInt(), anyInt());
-		verify(factoryMock).getDatabaseQueryContainer(eq("test"),
+		verify(factoryMock).getDatabaseQueryContainer(eq(eventBus), eq("test"),
 				Mockito.anyString(), eq(false), eq(false), eq(false),
 				eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 				anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
@@ -833,7 +863,7 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
 
 		when(
-				factoryMock.getDatabaseTableContainer(eq("test"),
+				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),
 						eq("test_crud2"), anyBoolean(), anyBoolean(),
 						anyBoolean(), Mockito.any(CurrentUser.class), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
@@ -842,7 +872,8 @@ public class ModelBuilderTest {
 
 		builder.build();
 
-		verify(factoryMock, times(4)).getDatabaseTableContainer(eq("test"),
+		verify(factoryMock, times(4)).getDatabaseTableContainer(eq(eventBus),
+				eq("test"),
 				Mockito.anyString(), insertBooleanCaptor.capture(),
 				updateBooleanCaptor.capture(), deleteBooleanCaptor.capture(),
 				Mockito.any(CurrentUser.class), anyMap(),
@@ -990,7 +1021,7 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer(eq("test"),
+				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),
 						eq("test_crud2"), eq(true), eq(true), eq(true),
 						isA(CurrentUser.class), eq(displayPatternMock),
 						eq(orderBys), eq(FilterPolicy.ALL), anyInt(), anyInt(),
@@ -1001,7 +1032,8 @@ public class ModelBuilderTest {
 		Region region = (Region) portlet.getPage().getElements().get(0);
 		assertThat(region, instanceOf(Region.class));
 
-		verify(factoryMock, times(2)).getDatabaseTableContainer(eq("test"),
+		verify(factoryMock, times(2)).getDatabaseTableContainer(eq(eventBus),
+				eq("test"),
 				eq("test_crud2"), eq(true), eq(true), eq(true),
 				isA(CurrentUser.class), eq(displayPatternMock), eq(orderBys),
 				eq(FilterPolicy.ALL), anyInt(), anyInt(), anyInt());

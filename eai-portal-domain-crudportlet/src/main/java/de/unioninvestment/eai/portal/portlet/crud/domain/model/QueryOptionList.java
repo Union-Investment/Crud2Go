@@ -34,10 +34,8 @@ import org.springframework.jdbc.core.RowMapper;
 import de.unioninvestment.eai.portal.portlet.crud.config.InitializeTypeConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
  * 
@@ -49,7 +47,9 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
  * @author carsten.mjartan
  * 
  */
-public class QueryOptionList implements OptionList {
+public class QueryOptionList extends VolatileOptionList {
+
+	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(QueryOptionList.class);
@@ -63,7 +63,6 @@ public class QueryOptionList implements OptionList {
 	private String id;
 	private boolean lazy;
 	private boolean prefetched;
-	private EventRouter<OptionListChangeEventHandler, OptionListChangeEvent> changeEventRouter = new EventRouter<OptionListChangeEventHandler, OptionListChangeEvent>();
 	private final ExecutorService prefetchExecutor;
 
 	/**
@@ -72,13 +71,16 @@ public class QueryOptionList implements OptionList {
 	 * 
 	 * @param config
 	 *            Konfiguration der Auswahl-Box
+	 * @param eventBus
 	 * @param connectionPool
 	 *            Connection-Pool
 	 * @param asyncExecutor
 	 *            executes the prefetch operation, if configured
 	 */
-	public QueryOptionList(SelectConfig config, ConnectionPool connectionPool,
+	public QueryOptionList(SelectConfig config, EventBus eventBus,
+			ConnectionPool connectionPool,
 			ExecutorService asyncExecutor) {
+		super(eventBus);
 		this.connectionPool = connectionPool;
 		this.prefetchExecutor = asyncExecutor;
 
@@ -96,18 +98,22 @@ public class QueryOptionList implements OptionList {
 
 	private void startPrefetch() {
 		cancelOlderPrefetch();
-		future = prefetchExecutor.submit(new Callable() {
+		future = prefetchExecutor.submit(new Callable<Map<String, String>>() {
 			@Override
-			public Object call() throws Exception {
-				LOGGER.debug("Prefetching option list for Query '{}'", query);
+			public Map<String, String> call() throws Exception {
+				LOGGER.debug("Prefetching option list {}", logId());
 				synchronized (lock) {
 					options = loadOptions();
-					changeEventRouter.fireEvent(new OptionListChangeEvent(
-							QueryOptionList.this, true));
+					fireChangeEvent(true);
 					return options;
 				}
 			}
+
 		});
+	}
+
+	private String logId() {
+		return id != null ? "'" + id + "'" : "";
 	}
 
 	private void cancelOlderPrefetch() {
@@ -164,7 +170,7 @@ public class QueryOptionList implements OptionList {
 	}
 
 	protected Map<String, String> loadOptions() {
-		LOGGER.debug("Loading option list for Query '{}'", query);
+		LOGGER.debug("Loading option list {}", logId());
 		long startTime = System.currentTimeMillis();
 
 		String nullSafeQuery = nullSafeQuery(query);
@@ -181,8 +187,8 @@ public class QueryOptionList implements OptionList {
 				});
 
 		long duration = System.currentTimeMillis() - startTime;
-		LOGGER.debug("Finished loading option list for Query '{}' ({}ms)",
-				query, duration);
+		LOGGER.debug("Finished loading option list {} ({}ms)", logId(),
+				duration);
 		return newOptions;
 	}
 
@@ -222,24 +228,13 @@ public class QueryOptionList implements OptionList {
 			if (prefetched) {
 				startPrefetch();
 			} else {
-				changeEventRouter.fireEvent(new OptionListChangeEvent(this,
-						false));
+				fireChangeEvent(false);
 			}
 		}
 	}
 
 	public String getId() {
 		return id;
-	}
-
-	@Override
-	public void addChangeListener(OptionListChangeEventHandler handler) {
-		changeEventRouter.addHandler(handler);
-	}
-
-	@Override
-	public void removeChangeListener(OptionListChangeEventHandler handler) {
-		changeEventRouter.removeHandler(handler);
 	}
 
 	/**
@@ -264,7 +259,11 @@ public class QueryOptionList implements OptionList {
 		this.options = options;
 	}
 
+	/**
+	 * @return if the portlet is configured to be prefetched
+	 */
 	public boolean isPrefetched() {
 		return prefetched;
 	}
+
 }

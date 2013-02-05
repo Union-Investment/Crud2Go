@@ -33,6 +33,29 @@
 				</documentation>
 			</annotation>
 		</attribute>
+		<attribute name="refresh-on-page-reload" type="boolean"
+			default="false">
+			<annotation>
+				<documentation>
+					Sollen bei einem Refresh der Seite oder beim
+					zurückwechseln auf das Portlet die Inhalte aktualisiert werden?
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="onReload" type="tns:groovy">
+			<annotation>
+				<documentation>
+					Groovy Closure, die beim Page Reload aufgerufen wird
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="onRefresh" type="tns:groovy">
+			<annotation>
+				<documentation>
+					Groovy Closure, die beim Portlet Refresh aufgerufen wird
+				</documentation>
+			</annotation>
+		</attribute>
 	</complexType>
 
 	<complexType name="ScriptConfig">

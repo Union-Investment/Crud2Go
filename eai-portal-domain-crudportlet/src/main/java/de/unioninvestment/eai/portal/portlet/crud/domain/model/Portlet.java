@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Collections.unmodifiableSet;
@@ -31,6 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 
 /**
  * Repräsentation das Portlets im Modell.
@@ -51,16 +57,20 @@ public class Portlet implements Serializable {
 	private Map<String, Dialog> dialogsById = new HashMap<String, Dialog>();
 	private Map<String, Region> regionsById = new HashMap<String, Region>();
 	private String title;
-	@SuppressWarnings("unused")
 	private final PortletConfig config;
 
+	private EventRouter<PortletReloadedEventHandler, PortletReloadedEvent> reloadEventRouter = new EventRouter<PortletReloadedEventHandler, PortletReloadedEvent>();
+
 	private Set<Role> roles = new HashSet<Role>();
+
+	private EventBus eventBus;
 
 	/**
 	 * @param config
 	 *            PortletConfig
 	 */
-	public Portlet(PortletConfig config) {
+	public Portlet(EventBus eventBus, PortletConfig config) {
+		this.eventBus = eventBus;
 		this.config = config;
 		this.title = config.getTitle();
 	}
@@ -180,7 +190,48 @@ public class Portlet implements Serializable {
 		this.roles.add(role);
 	}
 
+	/**
+	 * @return die am Portlet konfigurierten Benutzerrollen
+	 */
 	public Set<Role> getRoles() {
 		return unmodifiableSet(this.roles);
+	}
+
+	/**
+	 * @param handler
+	 *            a new handler for Refreshing of portlet components
+	 */
+	public void addRefreshHandler(
+			PortletRefreshedEventHandler handler) {
+		eventBus.addHandler(PortletRefreshedEvent.class, handler);
+	}
+
+	/**
+	 * Triggers a refresh of the data of all portlet components
+	 */
+	public void refresh() {
+		LOG.info("Start refreshing portlet components");
+		eventBus.fireEvent(new PortletRefreshedEvent(this));
+	}
+
+	/**
+	 * Informs the portlet that a page reload is happening. It's up to the
+	 * Portlet configuration if this triggers a refresh.
+	 */
+	public void handleReload() {
+		LOG.info("Portlet is reloaded");
+		reloadEventRouter.fireEvent(new PortletReloadedEvent(this));
+		if (config.isRefreshOnPageReload()) {
+			refresh();
+		}
+	}
+
+	/**
+	 * @param handler
+	 *            a new handler for custom handling of page reloads
+	 */
+	public void addReloadHandler(
+			PortletReloadedEventHandler handler) {
+		reloadEventRouter.addHandler(handler);
 	}
 }

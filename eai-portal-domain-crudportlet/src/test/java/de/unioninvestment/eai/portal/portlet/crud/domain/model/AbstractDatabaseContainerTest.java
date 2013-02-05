@@ -80,6 +80,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 
@@ -100,9 +101,13 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	@Captor
 	private ArgumentCaptor<ContainerRow> rowCaptor;
 
+	@Mock
+	private EventBus eventBus;
+
 	@Before
 	public void databaseSetUp() {
-		testContainer = new TestContainer(editors, vaadinContainerMock,
+		testContainer = new TestContainer(eventBus, editors,
+				vaadinContainerMock,
 				displayPatternMock);
 	}
 
@@ -112,19 +117,20 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 		private final String[] primaryKeys;
 
-		public TestContainer(List<EditorSupport> editors,
+		public TestContainer(EventBus eventBus, List<EditorSupport> editors,
 				SQLContainerEventWrapper container,
 				Map<String, String> displayPattern) {
-			super(displayPattern, null, null);
+			super(eventBus, displayPattern, null, null);
 			primaryKeys = null;
 			super.editors = editors;
 			super.container = container;
 		}
 
-		public TestContainer(String[] primaryKeys, List<EditorSupport> editors,
+		public TestContainer(EventBus eventBus, String[] primaryKeys,
+				List<EditorSupport> editors,
 				Map<String, String> displayPattern,
 				List<ContainerOrder> defaultOrder) {
-			super(displayPattern, defaultOrder, null);
+			super(eventBus, displayPattern, defaultOrder, null);
 			this.primaryKeys = primaryKeys;
 			super.editors = editors;
 		}
@@ -253,7 +259,8 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	public void shouldCallSortOnContainerWithDefaultOrder() {
 		ContainerOrder order1 = new ContainerOrder("ID", true);
 		ContainerOrder order2 = new ContainerOrder("NAME", false);
-		TestContainer container = new TestContainer(new String[] { "ID",
+		TestContainer container = new TestContainer(eventBus, new String[] {
+				"ID",
 				"INDEX", "NAME" }, editors, displayPatternMock, asList(order1,
 				order2));
 
@@ -266,7 +273,8 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	@Test
 	public void shouldNotCallSortOnContainerWithoutDefaultOrder() {
 
-		TestContainer container = new TestContainer(new String[] { "ID",
+		TestContainer container = new TestContainer(eventBus, new String[] {
+				"ID",
 				"INDEX", "NAME" }, editors, displayPatternMock, null);
 
 		container.getVaadinContainer();
@@ -293,7 +301,8 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 	@Test
 	public void shouldConvertRowItemToDatabaseContainerRow() {
-		TestContainer container = new TestContainer(new String[] { "ID",
+		TestContainer container = new TestContainer(eventBus, new String[] {
+				"ID",
 				"INDEX", "NAME" }, editors, displayPatternMock, null);
 		RowId rowId = new RowId(new Object[] { 1, 2, "MY_NAME" });
 		ColumnProperty idProperty = new ColumnProperty("ID", false, false,
@@ -312,7 +321,8 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	@Test
 	public void shouldConvertInternalRowIds() {
 		RowId rowId = new RowId(new Object[] { 1, 2, "MY_NAME" });
-		TestContainer container = new TestContainer(new String[] { "ID",
+		TestContainer container = new TestContainer(eventBus, new String[] {
+				"ID",
 				"INDEX", "NAME" }, editors, displayPatternMock, null);
 
 		ContainerRowId id = container.convertInternalRowId(rowId);
@@ -481,7 +491,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 	@Test(expected = IllegalStateException.class)
 	public void shouldHandleMissingExistingTransaction() throws SQLException {
-		final TestContainer container = new TestContainer(editors,
+		final TestContainer container = new TestContainer(eventBus, editors,
 				vaadinContainerMock, displayPatternMock);
 		container.withExistingTransaction(new TransactionCallback<Object>() {
 			@Override
@@ -508,7 +518,8 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	@Test
 	public void shouldAddNewRow() {
 
-		container = (T) new TestContainer(new String[] { "ID" }, editors,
+		container = (T) new TestContainer(eventBus, new String[] { "ID" },
+				editors,
 				displayPatternMock, null);
 
 		TemporaryRowId rowId = new TemporaryRowId(new Object[] { "ID" });
@@ -535,7 +546,8 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 	@Test
 	public void shouldReturnCachedRowById() {
-		TestContainer container = new TestContainer(new String[] { "ID",
+		TestContainer container = new TestContainer(eventBus, new String[] {
+				"ID",
 				"INDEX", "NAME" }, editors, displayPatternMock, null);
 
 		when(rowId1Mock.getId()).thenReturn(new Object[] { 1 });
@@ -553,7 +565,8 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 	@Test
 	public void shouldReturnRowById() {
-		TestContainer container = new TestContainer(new String[] { "ID",
+		TestContainer container = new TestContainer(eventBus, new String[] {
+				"ID",
 				"INDEX", "NAME" }, editors, displayPatternMock, null);
 
 		when(rowId1Mock.getId()).thenReturn(new Object[] { 1 });

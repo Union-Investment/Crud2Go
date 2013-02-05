@@ -26,15 +26,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.VolatileOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptFormField;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
  * Modell-Klasse für dynamische Auswahl-Boxen.
@@ -42,29 +40,46 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
  * 
  * @author siva.selvarajah
  */
-public class DynamicOptionList implements OptionList {
+public class DynamicOptionList extends VolatileOptionList {
+
+	private static final long serialVersionUID = 1L;
 
 	private DataContainer container;
 	private final Closure<?> optionsClosure;
 	private String id;
-	private EventRouter<OptionListChangeEventHandler, OptionListChangeEvent> changeEventRouter = new EventRouter<OptionListChangeEventHandler, OptionListChangeEvent>();
 
 	/**
 	 * Konstruktor.
 	 * 
+	 * @param eventBus
+	 *            der Session-EventBus
 	 * @param table
 	 *            Tabelle
 	 * @param closure
 	 *            closure
+	 * @param config
+	 *            die Query-Konfiguration
 	 */
-	public DynamicOptionList(Table table, Closure<?> closure,
+	public DynamicOptionList(EventBus eventBus, Table table,
+			Closure<?> closure,
 			SelectConfig config) {
+		super(eventBus);
 		this.container = table.getContainer();
 		this.optionsClosure = closure;
 		id = config.getId();
 	}
 
-	public DynamicOptionList(Closure<?> closure, SelectConfig config) {
+	/**
+	 * @param eventBus
+	 *            der Session-EventBus
+	 * @param closure
+	 *            closure
+	 * @param config
+	 *            die Query-Konfiguration
+	 */
+	public DynamicOptionList(EventBus eventBus, Closure<?> closure,
+			SelectConfig config) {
+		super(eventBus);
 		this.optionsClosure = closure;
 		id = config.getId();
 	}
@@ -110,18 +125,8 @@ public class DynamicOptionList implements OptionList {
 	}
 
 	@Override
-	public void addChangeListener(OptionListChangeEventHandler handler) {
-		changeEventRouter.addHandler(handler);
-	}
-
-	@Override
-	public void removeChangeListener(OptionListChangeEventHandler handler) {
-		changeEventRouter.removeHandler(handler);
-	}
-
-	@Override
 	public void refresh() {
-		changeEventRouter.fireEvent(new OptionListChangeEvent(this, false));
+		fireChangeEvent(false);
 	}
 
 	@Override

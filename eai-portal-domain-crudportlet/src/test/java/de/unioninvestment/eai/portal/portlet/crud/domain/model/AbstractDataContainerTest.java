@@ -82,6 +82,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public abstract class AbstractDataContainerTest<C extends AbstractDataContainer, V extends Ordered> {
 
@@ -122,6 +123,9 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 
 	@Mock
 	private ExportCallback exportMock;
+
+	@Mock
+	private EventBus eventBusMock;
 
 	@Before
 	public final void setUp() {

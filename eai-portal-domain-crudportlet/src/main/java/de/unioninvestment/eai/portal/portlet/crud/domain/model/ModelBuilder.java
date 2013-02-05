@@ -61,7 +61,6 @@ import de.unioninvestment.eai.portal.portlet.crud.config.TriggerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TriggersConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
-import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
@@ -72,6 +71,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidde
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
@@ -124,6 +124,8 @@ public class ModelBuilder {
 
 	private ExecutorService prefetchExecutor;
 
+	private final EventBus eventBus;
+
 	/**
 	 * Konstruktor mit Parameter.
 	 * 
@@ -144,11 +146,12 @@ public class ModelBuilder {
 	 * @param portletId
 	 *            Id des Portlets
 	 */
-	public ModelBuilder(ModelFactory factory,
+	public ModelBuilder(EventBus eventBus, ModelFactory factory,
 			ConnectionPoolFactory connectionPoolFactory,
 			ExecutorService prefetchExecutor, ResetFormAction resetFormAction,
 			FieldValidatorFactory fieldValidatorFactory,
 			int defaultSelectWidth, Config config) {
+		this.eventBus = eventBus;
 		this.factory = factory;
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.prefetchExecutor = prefetchExecutor;
@@ -166,7 +169,7 @@ public class ModelBuilder {
 	 */
 	public Portlet build() {
 
-		portlet = new Portlet(config.getPortletConfig());
+		portlet = new Portlet(eventBus, config.getPortletConfig());
 		mappings.put(portlet, config);
 
 		if (config.getPortletConfig().getRoles() != null) {
@@ -385,7 +388,6 @@ public class ModelBuilder {
 	}
 
 	private OptionList buildOptionList(SelectConfig config, String ds) {
-		ConnectionPool connectionPool = null;
 		if (config.getQuery() != null) {
 			String datasource;
 			if (StringUtils.isEmpty(config.getQuery().getDatasource())) {
@@ -393,9 +395,8 @@ public class ModelBuilder {
 			} else {
 				datasource = config.getQuery().getDatasource();
 			}
-			connectionPool = connectionPoolFactory.getPool(datasource);
-			QueryOptionList queryOptionList = new QueryOptionList(config,
-					connectionPool, prefetchExecutor);
+			QueryOptionList queryOptionList = factory
+					.getQueryOptionList(eventBus, config, datasource);
 
 			String id = config.getId();
 			if (StringUtils.isNotEmpty(id)) {
@@ -676,7 +677,7 @@ public class ModelBuilder {
 		List<ContainerOrder> defaultOrder = getDefaultOrder(jmxContainer);
 
 		GenericDataContainer genericDataContainer = factory
-				.getGenericDataContainer(formatPattern, defaultOrder,
+				.getGenericDataContainer(eventBus, formatPattern, defaultOrder,
 						extractFilterPolicy(jmxContainer));
 
 		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainer, currentUser);
@@ -707,7 +708,8 @@ public class ModelBuilder {
 
 		List<ContainerOrder> defaultOrder = getDefaultOrder(scriptContainer);
 
-		return factory.getGenericDataContainer(formatPattern, defaultOrder,
+		return factory.getGenericDataContainer(eventBus, formatPattern,
+				defaultOrder,
 				extractFilterPolicy(scriptContainer));
 	}
 
@@ -730,7 +732,8 @@ public class ModelBuilder {
 								&& databaseQuery.getDelete().getStatement()
 										.getSource() != null);
 		List<ContainerOrder> orderBys = getDefaultOrder(databaseQuery);
-		return factory.getDatabaseQueryContainer(databaseQuery.getDatasource(),
+		return factory.getDatabaseQueryContainer(eventBus,
+				databaseQuery.getDatasource(),
 				databaseQuery.getQuery(), insertable, updateable, deleteable,
 				primaryKeys, currentUser.getName(), displayPattern, orderBys,
 				extractFilterPolicy(databaseQuery),
@@ -750,7 +753,8 @@ public class ModelBuilder {
 
 		List<ContainerOrder> orderBys = getDefaultOrder(config);
 
-		return factory.getDatabaseTableContainer(config.getDatasource(),
+		return factory.getDatabaseTableContainer(eventBus,
+				config.getDatasource(),
 				config.getTablename(), insertable, updateable, deleteable,
 				currentUser, formatPattern, orderBys,
 				extractFilterPolicy(config), config.getPagelength(),

@@ -57,6 +57,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
@@ -75,6 +77,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith
 import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 
@@ -84,7 +87,8 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
  * @author siva.selvarajah
  */
 @Configurable
-public abstract class AbstractDataContainer implements DataContainer {
+public abstract class AbstractDataContainer implements DataContainer,
+		PortletRefreshedEventHandler {
 
 	private static final long serialVersionUID = 1L;
 
@@ -125,13 +129,15 @@ public abstract class AbstractDataContainer implements DataContainer {
 	 * @param defaultOrder
 	 *            die Default-Sortierung
 	 */
-	public AbstractDataContainer(Map<String, String> displayPattern,
+	public AbstractDataContainer(EventBus eventBus,
+			Map<String, String> displayPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {
 		this.displayPattern = displayPattern;
 		this.defaultOrder = defaultOrder;
 		this.filterPolicy = filterPolicy;
 		clobFields = new HashMap<ContainerRowId, Map<String, ContainerClob>>();
 		blobFields = new HashMap<ContainerRowId, Map<String, ContainerBlob>>();
+		eventBus.addHandler(PortletRefreshedEvent.class, this);
 	}
 
 	/**
@@ -886,6 +892,13 @@ public abstract class AbstractDataContainer implements DataContainer {
 	@Override
 	public FilterPolicy getFilterPolicy() {
 		return filterPolicy;
+	}
+
+	@Override
+	public void onPortletRefresh(PortletRefreshedEvent event) {
+		if (container != null) {
+			refresh();
+		}
 	}
 
 }

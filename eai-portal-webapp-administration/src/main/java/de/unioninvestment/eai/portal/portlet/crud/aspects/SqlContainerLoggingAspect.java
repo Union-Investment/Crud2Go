@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.aspects;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -56,9 +56,14 @@ public class SqlContainerLoggingAspect {
 	 * @throws Throwable
 	 *             bei Fehler
 	 */
-	@Around(value = "execution(* com.vaadin.addon.sqlcontainer.query.QueryDelegate.getCount()) "
-			+ "|| execution(* com.vaadin.addon.sqlcontainer.query.QueryDelegate.getResults(..))")
-	public Object logQueries(ProceedingJoinPoint pjp) throws Throwable {
+	@Around("execution(public * com.vaadin.addon.sqlcontainer.query.QueryDelegate.getCount())")
+	public Object logCountQueries(ProceedingJoinPoint pjp) throws Throwable {
+		LOG.info("querying database for row count");
+		return runAndLogDuration(pjp);
+	}
+
+	@Around("execution(public * com.vaadin.addon.sqlcontainer.query.QueryDelegate.getResults(..))")
+	public Object logResultQueries(ProceedingJoinPoint pjp) throws Throwable {
 		return runAndLogDuration(pjp);
 	}
 
@@ -86,7 +91,7 @@ public class SqlContainerLoggingAspect {
 		}
 	}
 
-	@Around(value = "execution(public * com.vaadin.addon.sqlcontainer.SQLContainer.*(..)) && !execution(public * com.vaadin.addon.sqlcontainer.SQLContainer.getType(..))")
+	@Around("execution(public * com.vaadin.addon.sqlcontainer.SQLContainer.*(..)) && !execution(public * com.vaadin.addon.sqlcontainer.SQLContainer.getType(..))")
 	public Object logContainerCalls(ProceedingJoinPoint pjp) throws Throwable {
 		return runAndLogDuration(pjp);
 	}

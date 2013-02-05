@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
-	title="Einfaches Beispiel" refresh-on-page-reload="false"
-	onReload="log.info 'called onReload()'"
-	onRefresh="log.info 'called onRefresh()'">
+	title="Einfaches Beispiel">
 	<page>
-		<table row-height="30">
+		<form id="form">
+			<field name="EAGER_FIELD" title="EAGER_FIELD">
+				<select id="eagerOptionList">
+					<query datasource="test">select CVARCHAR5_NN as key, CVARCHAR5_NN as title from TEST_CRUD2</query>
+				</select>
+			</field>
+			<field name="LAZY_FIELD" title="LAZY_FIELD">
+				<select id="lazyOptionList">
+					<query datasource="test" initialize="lazy">select CVARCHAR5_NN as key, CVARCHAR5_NN as title from TEST_CRUD2</query>
+				</select>
+			</field>
+			<action title="refresh" onExecution="resetOptionLists()" />
+		</form>
+		<table id="table" row-height="30">
 			<database-query datasource="test">
 				<query><![CDATA[
 					SELECT * FROM test_crud2
@@ -49,43 +60,23 @@
 				]]></delete>
 			</database-query>
 			<columns>
-				<column name="ID" title="ID" primary-key="true"/>
-				<column name="CNUMBER5_2" title="Zahl" editable="true" display-format="#">
-					<select>
-						<dynamic options="createOptionMap(row, columnName)"/>
-					</select>
-				</column>
+				<column name="ID" title="ID" primary-key="true" />
+				<column name="CNUMBER5_2" title="Zahl" editable="true" />
 				<column name="CDATE" editable="false" />
 				<column name="CTIMESTAMP" />
-				<column name="CVARCHAR5_NN" editable="true">
-					<select>
-						<option key="TEST">Test-Umbgebung</option>
-						<option key="PROD">Produktions-Umgebung</option>
-					</select>
-				</column>
+				<column name="CVARCHAR5_NN" editable="true" />
 				<column name="CNUMBER5_2_NN" editable="true" />
-				<column name="CDATE_NN" editable="true">
-					<select> 
-						<query>select to_char(dateCol, 'dd.MM.yyyy') as key , to_char(dateCol, 'dd.MM.yyyy') as title from TEST_CRUD2_DROP_DATE</query>
-					</select>
-				</column>
-				<column name="CTIMESTAMP_NN" hidden="true"/>
-				<column name="TESTDATA" multiline="true" editable="true">
-					<select> 
-						<query>select key , title from TEST_CRUD2_DROP_TEXT</query>
-					</select>
-				</column>
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN" hidden="true" />
+				<column name="TESTDATA" editable="true" width="300"
+					validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt" />
 			</columns>
 		</table>
 	</page>
 	<script><![CDATA[
-		random = new Random()
-		
-		def createOptionMap(row, columnName) {
-			def ret = (1..50).collect { random.nextInt(200-100+1)+100 }
-			def currValue = row.values[columnName]
-			return [currValue] + ret
-		} 
-	]]>
-	</script>
+		def resetOptionLists() {
+			portlet.getElementById('fieldOptionList').refresh()
+			portlet.getElementById('fieldMultiOptionList').refresh()
+		}
+	]]></script>
 </portlet>

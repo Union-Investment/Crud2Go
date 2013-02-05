@@ -182,6 +182,7 @@ public class DefaultFormView extends Form implements FormView {
 
 		datetime.setPropertyDataSource(dff.getTimestampProperty());
 		datetime.setImmediate(true);
+		datetime.addStyleName(field.getName());
 
 		return datetime;
 	}
@@ -194,6 +195,7 @@ public class DefaultFormView extends Form implements FormView {
 		textField.setNullSettingAllowed(true);
 		textField.setNullRepresentation("");
 		textField.setImmediate(true);
+		textField.addStyleName(field.getName());
 		applyInputPrompt(field, textField);
 
 		return textField;
@@ -236,6 +238,7 @@ public class DefaultFormView extends Form implements FormView {
 		select.setInvalidAllowed(false);
 		select.setImmediate(true);
 		select.setMultiSelect(false);
+		select.addStyleName(field.getName());
 
 		return select;
 	}
@@ -254,6 +257,7 @@ public class DefaultFormView extends Form implements FormView {
 		select.setInvalidAllowed(false);
 		select.setImmediate(true);
 		select.setRows(field.getVisibleRows());
+		select.addStyleName(field.getName());
 
 		return select;
 	}
@@ -316,6 +320,8 @@ public class DefaultFormView extends Form implements FormView {
 		checkBoxField.setPropertyDataSource(checkBoxFormField
 				.getCheckboxProperty());
 		checkBoxField.setImmediate(true);
+		checkBoxField.addStyleName(field.getName());
+
 		// addField(field.getName(), checkBoxField);
 		getLayout().addComponent(checkboxLayout);
 

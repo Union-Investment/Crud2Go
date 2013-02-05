@@ -3,6 +3,7 @@ Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
 Resource        ${RESOURCES}/objects/common-keywords.txt
 
 
@@ -53,11 +54,18 @@ Testdaten für die Default-Sortierung in TEST_CRUD2
 	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (16,12,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
 	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (17,11,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
 
+umfangreiche Testdaten in TEST_CRUD2
+	Initialisiere TEST_CRUD2 Tabelle
+	:FOR  ${i}  IN RANGE  1000
+	\	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (${i},${i},to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'T${i}',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
+
 wurde im FormularFeld '${feldname}' der Eintrag '${wert}' ausgewählt
 	Vaadin Click  css=.v-formlayout tr:contains('${feldname}') div.v-filterselect-button
 	Wait Until Page Contains Element  css=td.gwt-MenuItem:contains('${wert}') span
 	Vaadin Click  css=td.gwt-MenuItem:contains('${wert}') span
-	
+
+das Server-Log wird überwacht
+		
 
 ############################
 ###  Wenn / Und dann ... ###
@@ -243,7 +251,42 @@ auf die Hilfe-Seite gewechselt wird
 
 die Konfigurationansicht öffnet
 	Open Portlet Page 'Präferenzen'
+	
+die Dropdown-Daten in der Datenbank geändert werden
+	Execute SQL  UPDATE TEST_CRUD2 SET CVARCHAR5_NN = 'CHGED' WHERE ID = 1	
 
+die Seite neu geladen wird
+	Go To  http://${BASE_URL}${CONTEXT}
+	Wait Until Page Loaded
+	
+die Browserseite vollständig geladen ist
+	Wait Until Page Loaded
+	Wait for AJAX calls to complete
+
+im Feld '${feldname}' die Buchstaben '${buchstaben}' eingegeben werden
+# does not work as it doesn't trigger a server side update 
+	Input Text  css=.${feldname} input  ${buchstaben}
+# doesn't work at all (Selenium Bug?):
+#	Call Selenium Api  typeKeys  css=#${feldname} input  ${buchstaben}
+# also doesn't work at all (Selenium Bug?):
+#	${length} =  Get Length  ${buchstaben}
+#    :FOR  ${i}  IN RANGE  ${length}
+#    \	${next} =  Evaluate  ${i}+1
+#    \	${char} =  Get Substring  ${buchstaben}  ${i}  ${next}
+#	\	Call Selenium Api  keyDown  css=.${feldname} input  ${char}
+#	\	Call Selenium Api  keyPress  css=.${feldname} input  ${char}
+#	\	Call Selenium Api  keyUp  css=.${feldname} input  ${char}
+
+der Size-Cache-Timeout von ${sekunden} Sekunden abgewartet wird
+	Sleep  ${sekunden}s
+	
+die Tabelle zur Zeile ${zeile} gescrollt wird
+	[Documentation]  Annahme: Es gibt nur einen crudTable, die Zeilenhöhe ist explizit auf 30px eingestellt
+	Page Should Contain Element  css=div.crudTable div.v-scrollable > div:first-child
+	${top} =  Evaluate  ${zeile} * 30
+	Execute JavaScript  window.document.querySelector("div.crudTable div.v-scrollable").scrollTop = ${top}
+	Wait for AJAX calls to complete
+	
 ##########################
 ###  Dann / Und es ... ###
 ##########################
@@ -442,6 +485,22 @@ werden die Verbindungsdaten zur DataSource 'test' angezeigt
 
 besteht die Auswahl '${wert}' im Formularfeld '${feldname}' weiterhin
 	Textfield Value Should Be  css=.v-formlayout tr:contains('${feldname}') input  ${wert}
+
+enthält das Dropdown einen Eintrag '${titel}'
+	Vaadin Click  css=div.v-filterselect-button
+	Wait Until Page Contains Element  css=div[@id='VAADIN_COMBOBOX_OPTIONLIST']:contains('${titel}')
+
+existiert im Log kein Eintrag, dass die '${optionList}' geladen wurde
+	Should Not Have Log File Entry  ${JBOSS_SERVER_LOG}  Loading option list '${optionList}'  15
+
+existiert im Log ein Eintrag, dass die '${optionList}' geladen wurde
+	Should Have Log File Entry  ${JBOSS_SERVER_LOG}  Loading option list '${optionList}'  15
+
+existiert im Log ein einziger Eintrag zur Ermittlung Anzahl der Tabellenzeilen
+	Should Have Number Of Log File Entries  ${JBOSS_SERVER_LOG}  1  querying database for row count
+
+existiert im Log kein Eintrag zur Ermittlung Anzahl der Tabellenzeilen
+	Should Not Have Log File Entry  ${JBOSS_SERVER_LOG}  querying database for row count  5
 
 ##########################
 ###  Utility Keywords  ###

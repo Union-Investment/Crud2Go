@@ -141,6 +141,8 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		new ConfigurationScriptsCompiler(scriptCompiler)
 				.compileAllScripts(portletConfig);
 
+		assertThat(portletConfig.getOnRefresh().getClazz(), notNullValue());
+		assertThat(portletConfig.getOnReload().getClazz(), notNullValue());
 		assertThat(getTabs(portletConfig).getOnChange().getClazz(),
 				notNullValue());
 		assertThat(getTab(portletConfig).getOnShow().getClazz(), notNullValue());

@@ -90,6 +90,7 @@ import de.unioninvestment.eai.portal.support.scripting.ScriptFormSQLWhereFactory
 import de.unioninvestment.eai.portal.support.scripting.SqlProvider;
 import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
  * Klasse zur Erstellung der Scripting-Modell-Objektstruktur. Nicht für die
@@ -109,6 +110,7 @@ public class ScriptModelBuilder {
 	private ScriptPortlet scriptPortlet;
 
 	private PortletApplication application;
+	private EventBus eventBus;
 
 	/**
 	 * Konstruktor mit Parameter.
@@ -126,10 +128,11 @@ public class ScriptModelBuilder {
 	 * @param modelToConfigMapping
 	 *            Map mit Config
 	 */
-	public ScriptModelBuilder(ScriptModelFactory factory,
+	public ScriptModelBuilder(EventBus eventBus, ScriptModelFactory factory,
 			ConnectionPoolFactory connectionPoolFactory,
 			UserFactory userFactory, ScriptBuilder scriptBuilder,
 			Portlet portlet, Map<Object, Object> modelToConfigMapping) {
+		this.eventBus = eventBus;
 		this.factory = factory;
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.userFactory = userFactory;
@@ -163,6 +166,11 @@ public class ScriptModelBuilder {
 		}
 
 		buildScriptDialogs();
+
+		scriptPortlet.setOnReload(scriptBuilder.buildClosure(config
+				.getOnReload()));
+		scriptPortlet.setOnRefresh(scriptBuilder.buildClosure(config
+				.getOnRefresh()));
 
 		scriptBuilder.addBindingVariable("portal", new ScriptPortal());
 		scriptBuilder.addBindingVariable("portlet", scriptPortlet);
@@ -373,7 +381,7 @@ public class ScriptModelBuilder {
 			OptionListFormField formField, SelectConfig config) {
 		Closure<?> dynamicSelectionClosure = scriptBuilder.buildClosure(config
 				.getDynamic().getOptions());
-		DynamicOptionList optionList = new DynamicOptionList(
+		DynamicOptionList optionList = new DynamicOptionList(eventBus,
 				dynamicSelectionClosure, config);
 		formField.setOptionList(optionList);
 	}
@@ -566,8 +574,9 @@ public class ScriptModelBuilder {
 
 					Closure<?> dynamicSelectionClosure = scriptBuilder
 							.buildClosure(dynamicConfig.getOptions());
-					DynamicOptionList optionList = new DynamicOptionList(table,
-							dynamicSelectionClosure, columnConfig.getSelect());
+					DynamicOptionList optionList = new DynamicOptionList(
+							eventBus, table, dynamicSelectionClosure,
+							columnConfig.getSelect());
 					table.getColumns().get(columnConfig.getName())
 							.setOptionList(optionList);
 				}
