@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
 import groovy.lang.Closure;
@@ -37,12 +37,21 @@ public class ScriptTableAction {
 	private Closure<?> onExecution;
 
 	/**
+	 * Closure to generate downloadable Content. Will be called on execution.
+	 * 
+	 * @see TableAction#isDownloadAction()
+	 * @since 1.46
+	 * @author Jan Malcomess (codecentric AG)
+	 */
+	private Closure<?> downloadGenerator;
+
+	/**
 	 * Konstruktor mit Parameter.
 	 * 
 	 * @param action
 	 *            Button unterhalb der Tabelle
 	 */
-	ScriptTableAction(TableAction action) {
+	ScriptTableAction(final TableAction action) {
 		this.action = action;
 		action.addExecutionEventListener(new ExecutionEventHandler() {
 			private static final long serialVersionUID = 1L;
@@ -51,6 +60,24 @@ public class ScriptTableAction {
 			public void onExecution(ExecutionEvent event) {
 				if (onExecution != null) {
 					onExecution.call(ScriptTableAction.this);
+				}
+				if (action.isDownloadAction()) {
+					if (downloadGenerator == null) {
+						throw new IllegalStateException(
+								"No download-generator has been provided for the download-action with title '"
+										+ action.getTitle()
+										+ "' and id '"
+										+ action.getId()
+										+ "'. Please provide one in the generator attribute");
+					}
+					if (action.getDownloadActionCallback() == null) {
+						throw new IllegalStateException(
+								"Programming error: no DownloadActionCallback has been provided for the download-action.");
+					}
+					downloadGenerator.call(
+							ScriptTableAction.this,
+							new ScriptDownloadActionCallback(action
+									.getDownloadActionCallback()));
 				}
 			}
 		});
@@ -82,6 +109,10 @@ public class ScriptTableAction {
 		return scriptTable;
 	}
 
+	void setTable(ScriptTable scriptTable) {
+		this.scriptTable = scriptTable;
+	}
+
 	/**
 	 * 
 	 * @return Closure, das beim Betätigen des Tabellenbuttons ausgeführt wird.
@@ -100,8 +131,24 @@ public class ScriptTableAction {
 		this.onExecution = onExecution;
 	}
 
-	void setTable(ScriptTable scriptTable) {
-		this.scriptTable = scriptTable;
+	/**
+	 * @return Closure to generate downloadable Content. Will be called on
+	 *         execution.
+	 * @since 1.46
+	 * @author Jan Malcomess (codecentric AG)
+	 */
+	public Closure<?> getDownloadGenerator() {
+		return downloadGenerator;
 	}
 
+	/**
+	 * @param downloadGenerator
+	 *            Closure to generate downloadable Content. Will be called on
+	 *            execution.
+	 * @since 1.46
+	 * @author Jan Malcomess (codecentric AG)
+	 */
+	public void setDownloadGenerator(Closure<?> downloadGenerator) {
+		this.downloadGenerator = downloadGenerator;
+	}
 }

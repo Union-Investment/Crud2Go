@@ -117,6 +117,9 @@ public interface TableView extends View {
 		 * Gibt zurück, ob der Excel-ExportCallback aktiviert ist.
 		 * 
 		 * @return ob Excel-ExportCallback aktiviert ist
+		 * @deprecated Export capabilities are no longer to be configured using
+		 *             the global attribute, but instead to use special
+		 *             export-actions (@see <code>TableAction</code>).
 		 */
 		public boolean isExcelExport();
 
@@ -124,6 +127,9 @@ public interface TableView extends View {
 		 * Gibt zurück, ob der CSV-ExportCallback aktiviert ist.
 		 * 
 		 * @return ob CSV-ExportCallback aktiviert ist
+		 * @deprecated Export capabilities are no longer to be configured using
+		 *             the global attribute, but instead to use special
+		 *             export-actions  (@see <code>TableAction</code>).
 		 */
 		public boolean isCSVExport();
 

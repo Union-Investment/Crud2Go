@@ -1179,8 +1179,7 @@
 						<element name="jmx-container" type="tns:JmxContainerConfig" />
 					</choice>
 					<element name="columns" type="tns:ColumnsConfig" minOccurs="0" />
-					<element name="action" type="tns:TableActionConfig"
-						minOccurs="0" maxOccurs="unbounded" />
+					<element name="action" type="tns:TableActionConfig"	minOccurs="0" maxOccurs="unbounded" />
 				</sequence>
 				<attribute name="id" type="ID">
 					<annotation>
@@ -1324,7 +1323,31 @@
 		</annotation>
 		<complexContent>
 			<extension base="tns:AbstractActionConfig">
-				<attribute name="onExecution" type="tns:groovy" use="required">
+				<choice minOccurs="0">
+					<element name="export">
+						<complexType>
+							<attribute name="target" type="tns:TableExportType">
+								<annotation>
+									<documentation>
+										Allows export of table-data in a supported format.
+									</documentation>
+								</annotation>
+							</attribute>
+						</complexType>
+					</element>
+					<element name="download">
+						<complexType>
+							<attribute name="generator" type="tns:groovy">
+								<annotation>
+									<documentation>
+										Allows download of generated content (e.g. table-data in a custom format).
+									</documentation>
+								</annotation>
+							</attribute>
+						</complexType>
+					</element>
+				</choice>
+				<attribute name="onExecution" type="tns:groovy">
 					<annotation>
 						<documentation>
 							Groovy Closure
@@ -1333,7 +1356,6 @@
 				</attribute>
 			</extension>
 		</complexContent>
-
 	</complexType>
 
 	<simpleType name="groovy">

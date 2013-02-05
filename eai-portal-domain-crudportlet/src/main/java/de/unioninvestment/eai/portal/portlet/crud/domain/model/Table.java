@@ -501,10 +501,20 @@ public class Table extends Component implements Component.ExpandableComponent,
 		return config.isEditForm();
 	}
 
+	/**
+	 * @return
+	 * @deprecated  Export should no longer be configured globally, but instead use special export-actions.
+	 * @see TableAction
+	 */
 	public boolean isExport() {
 		return config.getExport() != null;
 	}
 
+	/**
+	 * @return
+	 * @deprecated  Export should no longer be configured globally, but instead use special export-actions.
+	 * @see TableAction
+	 */
 	public String getExportType() {
 		return config.getExport().value();
 	}

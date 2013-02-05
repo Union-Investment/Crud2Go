@@ -22,6 +22,7 @@ import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessa
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,11 +71,14 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction.DownloadActionCallback;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.export.CsvExportTask;
+import de.unioninvestment.eai.portal.portlet.crud.export.DownloadExportTask;
 import de.unioninvestment.eai.portal.portlet.crud.export.ExcelExportTask;
 import de.unioninvestment.eai.portal.portlet.crud.export.ExportDialog;
+import de.unioninvestment.eai.portal.portlet.crud.export.ExportTask;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BLobColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudCellStyleGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudFieldFactory;
@@ -362,6 +366,25 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 					@Override
 					public void buttonClick(ClickEvent event) {
 						presenter.callClosure(action);
+
+						if (action.isExportAction()) {
+							switch (action.getExportType()) {
+							case XLS:
+								exportExcelSheet();
+								break;
+							case CSV:
+								exportCSVSheet();
+								break;
+							default:
+								throw new IllegalArgumentException(
+										"Unknown export type '"
+												+ action.getExportType()
+												+ "' set on action with title '"
+												+ action.getTitle()
+												+ "' and id '" + action.getId()
+												+ "'");
+							}
+						}
 					}
 				});
 			}
@@ -740,6 +763,33 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 						"table-action-" + tableActionDummyIdCounter++,
 						actionButton);
 			}
+			if (action.isDownloadAction()) {
+				action.setDownloadActionCallback(new DownloadActionCallback() {
+					/**
+					 * Provides thread- and resource-handling.
+					 */
+					private DownloadExportTask exportTask;
+
+					@Override
+					public void start(String filename, String mimeType) {
+						exportTask = new DownloadExportTask(table
+								.getApplication(), table, tableModel,
+								automaticDownloadIsPossible(), filename,
+								mimeType);
+						executeExport(exportTask);
+					}
+
+					@Override
+					public void updateProgess(float progress) {
+						exportTask.updateProgress(progress);
+					}
+
+					@Override
+					public void finish(InputStream stream) {
+						exportTask.setContent(stream);
+					}
+				});
+			}
 			buttonToTableActionMap.put(actionButton, action);
 			buttonbar.addComponent(actionButton);
 		}
@@ -905,23 +955,19 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void exportCSVSheet() {
-		table.setEnabled(false);
-		boolean automaticDownload = automaticDownloadIsPossible();
-
-		CsvExportTask exportTask = new CsvExportTask(table.getApplication(),
-				table, tableModel, automaticDownload);
-		ExportDialog dialog = new ExportDialog(table, exportTask,
-				automaticDownload);
-		this.getApplication().getMainWindow().addWindow(dialog);
-		exportExecutor.execute(exportTask);
+		executeExport(new CsvExportTask(table.getApplication(), table,
+				tableModel, automaticDownloadIsPossible()));
 	}
 
 	private void exportExcelSheet() {
+		executeExport(new ExcelExportTask(table.getApplication(), table,
+				tableModel, automaticDownloadIsPossible()));
+	}
+
+	private void executeExport(ExportTask exportTask) {
 		table.setEnabled(false);
 		boolean automaticDownload = automaticDownloadIsPossible();
 
-		ExcelExportTask exportTask = new ExcelExportTask(
-				table.getApplication(), table, tableModel, automaticDownload);
 		ExportDialog dialog = new ExportDialog(table, exportTask,
 				automaticDownload);
 		this.getApplication().getMainWindow().addWindow(dialog);

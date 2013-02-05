@@ -219,6 +219,11 @@ public class ConfigurationScriptsCompiler {
 		for (TableActionConfig action : table.getAction()) {
 			compileClosure(action.getOnExecution(), location + "/action[" + i++
 					+ "]/onExecution");
+			if (action.getDownload() != null) {
+				compileClosure(action.getDownload().getGenerator(),
+						"it,export", location + "/action[" + i
+								+ "]/download/generator");
+			}
 		}
 	}
 

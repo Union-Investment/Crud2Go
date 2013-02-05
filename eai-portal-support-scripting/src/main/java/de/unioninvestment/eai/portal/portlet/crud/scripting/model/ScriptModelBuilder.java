@@ -786,9 +786,17 @@ public class ScriptModelBuilder {
 	private void populateTableActionExecutionClosure(TableAction action,
 			ScriptTableAction scriptTableAction) {
 		TableActionConfig tac = (TableActionConfig) configs.get(action);
-		Closure<?> onExecution = scriptBuilder.buildClosure(tac
-				.getOnExecution());
-		scriptTableAction.setOnExecution(onExecution);
+		if (tac.getOnExecution() != null) {
+			Closure<?> onExecution = scriptBuilder.buildClosure(tac
+					.getOnExecution());
+			scriptTableAction.setOnExecution(onExecution);
+		}
+		if (tac.getDownload() != null
+				&& tac.getDownload().getGenerator() != null) {
+			Closure<?> downloadGenerator = scriptBuilder.buildClosure(tac
+					.getDownload().getGenerator());
+			scriptTableAction.setDownloadGenerator(downloadGenerator);
+		}
 	}
 
 	private void populateFormActionExecutionClosure(FormAction action,
