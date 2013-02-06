@@ -39,7 +39,7 @@ public class XmlCreator implements PayloadCreator {
 
 	@Override
 	public String getMimeType() {
-		return "text/xml";
+		return "application/xml";
 	}
 
 	@Override

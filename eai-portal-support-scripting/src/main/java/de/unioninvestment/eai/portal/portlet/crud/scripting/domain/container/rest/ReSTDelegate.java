@@ -120,8 +120,9 @@ public class ReSTDelegate implements GenericDelegate {
 	public List<Object[]> getRows() {
 		HttpGet request = createQueryRequest();
 		try {
+			HttpResponse response = http.execute(request);
+			expectAnyStatusCode(response, HttpStatus.SC_OK);
 
-			HttpResponse response = executeQueryRequest(request);
 			return parser.getRows(response);
 
 		} catch (ClientProtocolException e) {
@@ -139,32 +140,16 @@ public class ReSTDelegate implements GenericDelegate {
 		}
 	}
 
-	/**
-	 * @param request
-	 * @return the response
-	 * @throws IOException
-	 * @throws ClientProtocolException
-	 */
-	private HttpResponse executeQueryRequest(HttpGet request)
-			throws IOException,
-			ClientProtocolException {
-
-		request.addHeader("accept", creator.getMimeType());
-
-		HttpResponse response = http.execute(request);
-		if (response.getStatusLine().getStatusCode() != 200) {
-			// status != 200
-			throw new BusinessException(
-					"portlet.crud.error.rest.wrongStatusCode",
-					response.getStatusLine());
-		}
-		return response;
-	}
-
 	private HttpGet createQueryRequest() {
 		URI uri = createURI(config.getQuery().getUrl());
-		return new HttpGet(uri);
+		HttpGet request = new HttpGet(uri);
 
+		String mimetype = creator.getMimeType();
+		if (config.getMimetype() != null) {
+			mimetype = config.getMimetype();
+		}
+		request.addHeader("Accept", mimetype);
+		return request;
 	}
 
 	private URI createURI(String postfix) {
@@ -220,13 +205,13 @@ public class ReSTDelegate implements GenericDelegate {
 				config.getCharset());
 		URI uri = createURI(item, config.getInsert().getUrl());
 		HttpPost request = new HttpPost(uri);
-		ContentType contentType = ContentType.create(
-				creator.getMimeType(), config.getCharset());
+		ContentType contentType = createContentType();
 		request.setEntity(new ByteArrayEntity(content, contentType));
 
 		try {
 			HttpResponse response = http.execute(request);
-			expectAnyStatusCode(response, HttpStatus.SC_CREATED);
+			expectAnyStatusCode(response, HttpStatus.SC_CREATED,
+					HttpStatus.SC_NO_CONTENT);
 
 		} finally {
 			request.releaseConnection();
@@ -255,8 +240,7 @@ public class ReSTDelegate implements GenericDelegate {
 				config.getCharset());
 		URI uri = createURI(item, config.getUpdate().getUrl());
 		HttpPut request = new HttpPut(uri);
-		ContentType contentType = ContentType.create(
-				creator.getMimeType(), config.getCharset());
+		ContentType contentType = createContentType();
 		request.setEntity(new ByteArrayEntity(content, contentType));
 
 		try {
@@ -267,6 +251,15 @@ public class ReSTDelegate implements GenericDelegate {
 		} finally {
 			request.releaseConnection();
 		}
+	}
+
+	private ContentType createContentType() {
+		String mimetype = creator.getMimeType();
+		if (config.getMimetype() != null) {
+			mimetype = config.getMimetype();
+		}
+		return ContentType.create(
+				mimetype, config.getCharset());
 	}
 
 	private void sendDeleteRequest(GenericItem item)

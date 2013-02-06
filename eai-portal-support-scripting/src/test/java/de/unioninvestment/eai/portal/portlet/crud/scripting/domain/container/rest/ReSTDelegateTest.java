@@ -104,6 +104,8 @@ public class ReSTDelegateTest {
 
 	private ReSTDelegate delegate;
 
+	private ReSTContainerConfig config;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -198,6 +200,40 @@ public class ReSTDelegateTest {
 	}
 
 	@Test
+	public void shouldSendConfiguredMimetypeInAcceptHeader()
+			throws ClientProtocolException, IOException {
+		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
+		config.setMimetype("text/xml");
+		ReSTDelegate delegate = newDelegate(config);
+		assumeValidResponse();
+		when(creatorMock.getMimeType()).thenReturn("application/xml");
+
+		delegate.getRows();
+
+		verify(httpMock).execute(requestCaptor.capture());
+		HttpUriRequest request = requestCaptor.getValue();
+		assertThat(request.getFirstHeader("Accept").getValue(),
+				is("text/xml"));
+	}
+
+	@Test
+	public void shouldSendDefaultMimetypeInAcceptHeader()
+			throws ClientProtocolException, IOException {
+		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
+		config.setMimetype(null);
+		ReSTDelegate delegate = newDelegate(config);
+		assumeValidResponse();
+		when(creatorMock.getMimeType()).thenReturn("application/xml");
+
+		delegate.getRows();
+
+		verify(httpMock).execute(requestCaptor.capture());
+		HttpUriRequest request = requestCaptor.getValue();
+		assertThat(request.getFirstHeader("Accept").getValue(),
+				is("application/xml"));
+	}
+
+	@Test
 	public void shouldConcatBaseUrlAndQueryUrl()
 			throws ClientProtocolException, IOException {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
@@ -269,6 +305,8 @@ public class ReSTDelegateTest {
 			throws ClientProtocolException, IOException {
 
 		// given
+		config = RestTestConfig.readwriteConfig();
+		delegate = newDelegate(config);
 		prepareValidInsertPostRequest();
 
 		// when
@@ -292,6 +330,8 @@ public class ReSTDelegateTest {
 			throws ClientProtocolException, IOException {
 
 		// given
+		config = RestTestConfig.readwriteConfig();
+		delegate = newDelegate(config);
 		prepareValidUpdatePutRequest();
 
 		// when
@@ -311,10 +351,32 @@ public class ReSTDelegateTest {
 	}
 
 	@Test
+	public void shouldSendConfiguredMimetype()
+			throws ClientProtocolException, IOException {
+
+		// given
+		config = RestTestConfig.readwriteConfig();
+		config.setMimetype("text/xml");
+		delegate = newDelegate(config);
+		prepareValidUpdatePutRequest();
+
+		// when
+		delegate.update(asList(itemMock), new UpdateContext());
+
+		// then
+		HttpPut request = capturePutRequest();
+		HttpEntity entity = request.getEntity();
+		assertThat(ContentType.getOrDefault(entity).getMimeType(),
+				is("text/xml"));
+	}
+
+	@Test
 	public void shouldSendDeleteRequestToServer()
 			throws ClientProtocolException, IOException {
 
 		// given
+		config = RestTestConfig.readwriteConfig();
+		delegate = newDelegate(config);
 		prepareValidDeleteRequest();
 
 		// when
@@ -332,6 +394,8 @@ public class ReSTDelegateTest {
 			throws ClientProtocolException, IOException {
 
 		// given
+		config = RestTestConfig.readwriteConfig();
+		delegate = newDelegate(config);
 		prepareValidInsertPostRequest();
 		UpdateContext context = new UpdateContext();
 
@@ -346,6 +410,8 @@ public class ReSTDelegateTest {
 			throws ClientProtocolException, IOException {
 
 		// given
+		config = RestTestConfig.readwriteConfig();
+		delegate = newDelegate(config);
 		prepareValidInsertPostRequest();
 		when(responseMock.getStatusLine()).thenReturn(
 				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
@@ -357,8 +423,6 @@ public class ReSTDelegateTest {
 
 	private void prepareValidInsertPostRequest()
 			throws ClientProtocolException, IOException {
-		ReSTContainerConfig config = RestTestConfig.readwriteConfig();
-		delegate = newDelegate(config);
 
 		// Input for URL
 		when(scriptBuilderMock.buildClosure(config.getInsert().getUrl()))
@@ -388,8 +452,6 @@ public class ReSTDelegateTest {
 
 	private void prepareValidUpdatePutRequest()
 			throws ClientProtocolException, IOException {
-		ReSTContainerConfig config = RestTestConfig.readwriteConfig();
-		delegate = newDelegate(config);
 
 		// Input for URL
 		when(scriptBuilderMock.buildClosure(config.getUpdate().getUrl()))
@@ -419,9 +481,6 @@ public class ReSTDelegateTest {
 
 	private void prepareValidDeleteRequest()
 			throws ClientProtocolException, IOException {
-		ReSTContainerConfig config = RestTestConfig.readwriteConfig();
-		delegate = newDelegate(config);
-
 		// Input for URL
 		when(scriptBuilderMock.buildClosure(config.getDelete().getUrl()))
 				.thenReturn(urlClosureMock);
@@ -498,6 +557,11 @@ public class ReSTDelegateTest {
 		delegate.parser = parserMock;
 		delegate.creator = creatorMock;
 		return delegate;
+	}
+
+	@Test
+	public void executeQueryRequest() {
+
 	}
 
 }

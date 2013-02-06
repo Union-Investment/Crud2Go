@@ -416,7 +416,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 
 	@Test
 	public void shouldCompileReSTContainerScripts() throws JAXBException {
-		PortletConfig portletConfig = createConfiguration("validReSTContainerFullJsonConfig.xml");
+		PortletConfig portletConfig = createConfiguration("validReSTContainerFullXmlConfig.xml");
 		when(scriptCompilerMock.compileScript(anyString())).thenReturn(
 				Script.class);
 

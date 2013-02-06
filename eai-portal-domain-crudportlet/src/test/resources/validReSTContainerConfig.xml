@@ -3,8 +3,8 @@
 	title="Beispiel - Materialsammlung">
 	<page>
 		<table id="material">
-			<rest-container baseUrl="http://localhost:8080/material/rest/">
-				<query url="document">
+			<rest-container baseUrl="http://localhost:8080/material/rest/" >
+				<query url="document" >
 					<attribute name="id" type="java.lang.Long" primary-key="true" />
 					<attribute name="title" />
 					<attribute name="fragments" type="java.lang.Long" path="fragments.size()" />

@@ -36,7 +36,7 @@ public class JsonCreator implements PayloadCreator {
 
 	@Override
 	public String getMimeType() {
-		return "text/json";
+		return "application/json";
 	}
 
 	@Override

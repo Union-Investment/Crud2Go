@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -68,18 +69,27 @@ public abstract class AbstractParser implements PayloadParser {
 		}
 
 		List<Object[]> result = new LinkedList<Object[]>();
+		int counter = 0;
+		int notNullCounter = 0;
 		for (Object entry : (Iterable<?>) collection) {
-			Object[] item = new Object[attributeClosures.length];
-			for (int j = 0; j < item.length; j++) {
-				ReSTAttributeConfig attr = attributes.get(j);
+			if (entry != null) {
+				Object[] item = new Object[attributeClosures.length];
+				for (int j = 0; j < item.length; j++) {
+					ReSTAttributeConfig attr = attributes.get(j);
 
-				Object value = convertValue(callClosureAgainstDelegate(
-						attributeClosures[j], entry));
-				Object formattedValue = parseValue(types[j],
-						attr.getFormat(), locales[j], value);
-				item[j] = formattedValue;
+					Object value = convertValue(callClosureAgainstDelegate(
+							attributeClosures[j], entry));
+					Object formattedValue = parseValue(types[j],
+							attr.getFormat(), locales[j], value);
+					item[j] = formattedValue;
+				}
+				result.add(item);
+				notNullCounter++;
 			}
-			result.add(item);
+			counter++;
+		}
+		if (notNullCounter == 0 && counter > 0) {
+			LOGGER.warn("ReST Collection only contained NULL elements. The collection may be wrong");
 		}
 		return result;
 	}
@@ -117,8 +127,16 @@ public abstract class AbstractParser implements PayloadParser {
 				.getEntity());
 		InputStream stream = response.getEntity().getContent();
 		InputStreamReader reader = new InputStreamReader(stream,
-				contentType.getCharset());
+				getResponseCharset(contentType));
 		return reader;
+	}
+
+	private Charset getResponseCharset(ContentType contentType) {
+		Charset charset = contentType.getCharset();
+		if (charset == null) {
+			charset = Charset.forName(config.getCharset());
+		}
+		return charset;
 	}
 
 	private Locale effectiveLocale(HttpResponse response,
