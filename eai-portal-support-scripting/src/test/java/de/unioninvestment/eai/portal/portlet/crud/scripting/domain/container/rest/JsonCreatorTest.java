@@ -55,7 +55,7 @@ public class JsonCreatorTest {
 	@Test
 	public void shouldReturnJsonMimetype() {
 		JsonCreator creator = newJsonCreator(RestTestConfig.readwriteConfig());
-		assertThat(creator.getMimeType(), is("text/json"));
+		assertThat(creator.getMimeType(), is("application/json"));
 	}
 
 	private JsonCreator newJsonCreator(ReSTContainerConfig config) {
