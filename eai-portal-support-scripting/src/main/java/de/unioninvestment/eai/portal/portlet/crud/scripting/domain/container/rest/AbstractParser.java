@@ -7,10 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +33,8 @@ public abstract class AbstractParser implements PayloadParser {
 
 	private ScriptBuilder scriptBuilder;
 
+	private ValueConverter converter = new ValueConverter();
+
 	protected abstract Object parseData(Reader reader) throws IOException;
 
 	public AbstractParser(ReSTContainerConfig config,
@@ -44,6 +43,9 @@ public abstract class AbstractParser implements PayloadParser {
 		this.scriptBuilder = scriptBuilder;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Object[]> getRows(HttpResponse response)
 			throws IOException {
@@ -77,11 +79,12 @@ public abstract class AbstractParser implements PayloadParser {
 				for (int j = 0; j < item.length; j++) {
 					ReSTAttributeConfig attr = attributes.get(j);
 
-					Object value = convertValue(callClosureAgainstDelegate(
-							attributeClosures[j], entry));
-					Object formattedValue = parseValue(types[j],
-							attr.getFormat(), locales[j], value);
-					item[j] = formattedValue;
+					Object valueFromClosure = callClosureAgainstDelegate(
+							attributeClosures[j], entry);
+					Object unmarshaledValue = unmarshalValue(valueFromClosure);
+					Object convertedValue = converter.convertValue(types[j],
+							attr.getFormat(), locales[j], unmarshaledValue);
+					item[j] = convertedValue;
 				}
 				result.add(item);
 				notNullCounter++;
@@ -94,7 +97,13 @@ public abstract class AbstractParser implements PayloadParser {
 		return result;
 	}
 
-	protected Object convertValue(Object valueReturnedByClosure) {
+	/**
+	 * Parser specific conversion/unmarshaling
+	 * 
+	 * @param valueReturnedByClosure
+	 * @return the unmarshaled value (e.g. a simple Java type)
+	 */
+	protected Object unmarshalValue(Object valueReturnedByClosure) {
 		return valueReturnedByClosure;
 	}
 
@@ -148,38 +157,19 @@ public abstract class AbstractParser implements PayloadParser {
 		return locale;
 	}
 
-	private Object parseValue(Class<?> type, String format, Locale locale,
-			Object value) {
-		if (value == null) {
-			return null;
-		} else if (type == Date.class) {
-			if (value instanceof Date) {
-				return value;
-			} else if (value instanceof Number) {
-				return new Date(((Number) value).longValue());
-			} else if (value instanceof String) {
-				try {
-					return new SimpleDateFormat(format, locale)
-							.parse((String) value);
-				} catch (ParseException e) {
-					throw new IllegalArgumentException(
-							"Cannot convert to date: "
-									+ value, e);
-				}
-			} else {
-				throw new IllegalArgumentException("Cannot convert to date: "
-						+ value);
-			}
-		} else {
-			return value;
-		}
-	}
-
 	protected Object callClosureAgainstDelegate(Closure<?> closure,
 			Object delegate) {
 		closure.setDelegate(delegate);
 		closure.setResolveStrategy(Closure.DELEGATE_ONLY);
 		return closure.call();
+	}
+
+	/**
+	 * @param converter
+	 *            for Testing
+	 */
+	void setConverter(ValueConverter converter) {
+		this.converter = converter;
 	}
 
 }

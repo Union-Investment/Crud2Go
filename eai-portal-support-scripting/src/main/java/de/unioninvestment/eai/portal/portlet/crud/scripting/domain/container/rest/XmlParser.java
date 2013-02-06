@@ -84,7 +84,7 @@ public class XmlParser extends AbstractParser {
 	}
 
 	@Override
-	protected Object convertValue(Object valueReturnedByClosure) {
+	protected Object unmarshalValue(Object valueReturnedByClosure) {
 		if (valueReturnedByClosure instanceof GPathResult) {
 			return ((GPathResult) valueReturnedByClosure).text();
 		} else {
