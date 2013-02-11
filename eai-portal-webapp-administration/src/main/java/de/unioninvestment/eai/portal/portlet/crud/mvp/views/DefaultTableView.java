@@ -111,8 +111,14 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 	private Button revertButton;
 
+	/**
+	 * @deprecated Use {@link TableAction#isExportAction()} instead
+	 */
 	private Button excelExportButton;
 
+	/**
+	 * @deprecated Use {@link TableAction#isExportAction()} instead
+	 */
 	private Button csvExportButton;
 
 	private CrudTable table;

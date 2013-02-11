@@ -119,7 +119,8 @@ public interface TableView extends View {
 		 * @return ob Excel-ExportCallback aktiviert ist
 		 * @deprecated Export capabilities are no longer to be configured using
 		 *             the global attribute, but instead to use special
-		 *             export-actions (@see <code>TableAction</code>).
+		 *             export-actions (@see {@link TableAction#isExportAction()}
+		 *             ).
 		 */
 		public boolean isExcelExport();
 
@@ -129,7 +130,8 @@ public interface TableView extends View {
 		 * @return ob CSV-ExportCallback aktiviert ist
 		 * @deprecated Export capabilities are no longer to be configured using
 		 *             the global attribute, but instead to use special
-		 *             export-actions  (@see <code>TableAction</code>).
+		 *             export-actions (@see {@link TableAction#isExportAction()}
+		 *             ).
 		 */
 		public boolean isCSVExport();
 
