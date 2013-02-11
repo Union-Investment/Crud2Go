@@ -18,9 +18,9 @@
 				label(caption: 'Bitte wählen Sie eine Datei zum Hochladen aus');			
 				upload(buttonCaption: 'Hochladen', receiver: { filename, MIMEType ->
 					return handleUploadReceived(filename, MIMEType)
-				}, onSucceeded: { event ->
+				}, onsuccess: { event ->
 					handleUploadSuceeded(event)
-				}, onFailed: { event ->
+				}, onfailure: { event ->
 					handleUploadFailed(event)
 				});
 			}
