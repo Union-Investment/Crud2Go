@@ -37,6 +37,8 @@ import com.vaadin.ui.HorizontalLayout
 import com.vaadin.ui.Label
 import com.vaadin.ui.Link
 import com.vaadin.ui.Table
+import com.vaadin.ui.Tree
+import com.vaadin.ui.Upload
 import com.vaadin.ui.VerticalLayout
 
 import de.unioninvestment.eai.portal.support.vaadin.PortletApplication
@@ -210,5 +212,28 @@ class VaadinBuilderTest {
 		JFreeChartWrapper chart = builder.chart(width: '100%');
 		assert chart.width == 100f
 		assert chart.widthUnits == Sizeable.UNITS_PERCENTAGE
+	}
+
+	@Test
+	void shouldCreateTreeWithOnvaluechangeHandler() {
+		def isListenerCalled;
+		Tree tree = builder.tree(onvaluechange: { isListenerCalled = true; });
+
+		tree.fireValueChange(true);
+		assert isListenerCalled;
+	}
+
+	@Test
+	void shouldCreateUploadWithListeners() {
+		def isUploadSuccessCalled;
+		def isUploadFailedCalled;
+		Upload upload = builder.upload(onsuccess: {isUploadSuccessCalled = true;}, onfailure: {isUploadFailedCalled = true});
+		assert upload != null
+
+		upload.fireUploadSuccess("", "", 0);
+		assert isUploadSuccessCalled
+
+		upload.fireUploadInterrupted("", "", 0)
+		assert isUploadFailedCalled
 	}
 }

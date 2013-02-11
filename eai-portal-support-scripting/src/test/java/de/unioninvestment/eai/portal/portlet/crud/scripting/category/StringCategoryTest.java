@@ -52,4 +52,23 @@ public class StringCategoryTest {
 		assertThat(asList(gs.getStrings()), equalTo(asList("1,2,3")));
 		assertThat(gs.getValueCount(), is(0));
 	}
+
+	@Test
+	public void shouldReplaceEach() {
+		String str = StringCategory.replaceEach("Lorem Ipsum", new String[] {
+				"L", "I" }, new String[] { "l", "i" });
+		assertThat(str, is("lorem ipsum"));
+	}
+
+	@Test
+	public void shouldCapitalizeFully() {
+		String str = StringCategory.capitalizeFully("this is A test");
+		assertThat(str, is("This Is A Test"));
+	}
+
+	@Test
+	public void shouldDeleteWhitespaces() {
+		String str = StringCategory.deleteWhitespaces("This Is A Test");
+		assertThat(str, is("ThisIsATest"));
+	}
 }
