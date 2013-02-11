@@ -25,7 +25,8 @@ import com.vaadin.ui.Upload.Receiver
 import com.vaadin.ui.Upload.SucceededListener
 
 /**
- * Provides an <code>{@link Upload}</code>-Component.
+ * Provides an <code>{@link Upload}</code>-Component. At minimum, a <code>Receiver</code> has to be provided (see <code>{@link #handleAttributeReceiver(FactoryBuilderSupport, Upload, Closure)}</code>).
+ * 
  * 
  * @author Jan Malcomess (codecentric AG)
  * @since 1.46
@@ -41,11 +42,11 @@ class UploadFactory extends AbstractComponentFactory {
 		component.setReceiver(listener as Receiver)
 	}
 
-	void handleAttributeOnSucceeded(FactoryBuilderSupport builder, Upload component, Closure listener) {
+	void handleAttributeOnsuccess(FactoryBuilderSupport builder, Upload component, Closure listener) {
 		component.addListener(listener as SucceededListener)
 	}
 
-	void handleAttributeOnFailed(FactoryBuilderSupport builder, Upload component, Closure listener) {
+	void handleAttributeOnfailure(FactoryBuilderSupport builder, Upload component, Closure listener) {
 		component.addListener(listener as FailedListener)
 	}
 }
