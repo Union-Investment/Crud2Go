@@ -13,7 +13,12 @@ import com.vaadin.terminal.StreamResource.StreamSource;
 import com.vaadin.ui.Table;
 
 /**
- * 
+ * Export-Task that is intended to be given its download-content asynchronously
+ * - it is not capable of creating any content on its own (like i.e.
+ * <code>ExcelExportTask</code>). The method
+ * <code>TableExport#convertTable()</code> defined in
+ * <code>{@link #createExport()}</code> will poll for content to become
+ * available in <code>{@link #content}</code>.
  * 
  * @author Jan Malcomess
  * @since 1.46
@@ -65,7 +70,7 @@ public class DownloadExportTask extends AbstractTableExportTask implements
 	 */
 	@Override
 	protected TableExport createExport() {
-		return new TableExport(this.vaadinTable) {
+		TableExport result = new TableExport(this.vaadinTable) {
 
 			/**
 			 * @see Serializable
@@ -106,7 +111,7 @@ public class DownloadExportTask extends AbstractTableExportTask implements
 								return DownloadExportTask.this.content;
 							}
 						}, DownloadExportTask.this.filename, app);
-				resource.setMIMEType(DownloadExportTask.this.mimeType);
+				resource.setMIMEType(getMimeType());
 				if (isAutomaticDownload()) {
 					app.getMainWindow().open(resource, exportWindow);
 					return true;
@@ -115,8 +120,10 @@ public class DownloadExportTask extends AbstractTableExportTask implements
 					return true;
 				}
 			}
-
 		};
+		result.setExportWindow("_blank");
+		result.setMimeType(mimeType);
+		return result;
 	}
 
 	/**
