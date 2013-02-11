@@ -503,8 +503,9 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	/**
 	 * @return
-	 * @deprecated  Export should no longer be configured globally, but instead use special export-actions.
-	 * @see TableAction
+	 * @deprecated Export should no longer be configured globally, but instead
+	 *             use special export-actions.
+	 * @see TableAction#isExportAction()
 	 */
 	public boolean isExport() {
 		return config.getExport() != null;
@@ -512,8 +513,9 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	/**
 	 * @return
-	 * @deprecated  Export should no longer be configured globally, but instead use special export-actions.
-	 * @see TableAction
+	 * @deprecated Export should no longer be configured globally, but instead
+	 *             use special export-actions.
+	 * @see TableAction#getExportType()
 	 */
 	public String getExportType() {
 		return config.getExport().value();
