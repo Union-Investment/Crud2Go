@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.support.vaadin.groovy;
 
+import com.vaadin.data.Property.ValueChangeListener
 import com.vaadin.ui.Component
 import com.vaadin.ui.Tree
 
@@ -32,5 +33,9 @@ class TreeFactory extends AbstractComponentFactory {
 	@Override
 	Component createComponent() {
 		return new Tree()
+	}
+
+	void handleAttributeOnvaluechange(FactoryBuilderSupport builder, Tree component, Closure listener) {
+		component.addListener(listener as ValueChangeListener)
 	}
 }
