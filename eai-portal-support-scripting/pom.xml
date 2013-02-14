@@ -11,6 +11,7 @@
 
 	<artifactId>eai-portal-support-scripting</artifactId>
 	<name>Osiris :: Investment :: EAI-Portal-Administration :: Support for Scripting</name>
+	<packaging>jar</packaging>
 
 	<dependencies>
 
@@ -221,12 +222,9 @@
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.1</version>
 				<configuration>
 					<compilerId>groovy-eclipse-compiler</compilerId>
 					<verbose>true</verbose>
-					<source>1.6</source>
-					<target>1.6</target>
 				</configuration>
 				<dependencies>
 					<dependency>

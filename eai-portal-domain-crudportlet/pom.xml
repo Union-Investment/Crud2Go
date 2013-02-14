@@ -11,7 +11,8 @@
 
 	<artifactId>eai-portal-domain-crudportlet</artifactId>
 	<name>Osiris :: Investment :: EAI-Portal-Administration :: CRUD-Portlet Domain</name>
-
+	<packaging>jar</packaging>
+	
 	<dependencies>
 
 		<dependency>
