@@ -297,7 +297,7 @@ public class ConfigurationScriptsCompiler {
 
 	private void compileReSTContainerScripts(ReSTContainerConfig config,
 			String location) {
-		compileClosure(config.getQuery().getCollection(), "", location
+		compileClosure(config.getQuery().getCollection(), location
 				+ "/query/collection");
 		compileReSTAttributeScripts(config.getQuery().getAttribute(), location
 				+ "/query/attributes");

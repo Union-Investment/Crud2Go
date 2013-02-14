@@ -161,7 +161,7 @@ public abstract class AbstractParser implements PayloadParser {
 			Object delegate) {
 		closure.setDelegate(delegate);
 		closure.setResolveStrategy(Closure.DELEGATE_ONLY);
-		return closure.call();
+		return closure.call(delegate);
 	}
 
 	/**

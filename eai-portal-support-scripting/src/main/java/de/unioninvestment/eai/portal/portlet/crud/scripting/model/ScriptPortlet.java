@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
+import static java.util.Collections.unmodifiableMap;
 import groovy.lang.Closure;
 
 import java.util.ArrayList;
@@ -209,5 +210,9 @@ public class ScriptPortlet {
 	 */
 	public void refresh() {
 		portlet.refresh();
+	}
+
+	public Map<String, Object> getElements() {
+		return unmodifiableMap(elementsById);
 	}
 }

@@ -52,6 +52,17 @@ public class ValueConverterTest {
 		assertThat(convertedValue, is(expectedDate));
 	}
 
+	@Test
+	public void shouldReturnDateFromIso8601String() {
+		Object expectedDate = new GregorianCalendar(2013, 02, 13, 13, 42, 01)
+				.getTime();
+
+		Object convertedValue = converter.convertValue(Date.class,
+				"iso8601", Locale.GERMANY, "2013-03-13T13:42:01.000");
+
+		assertThat(convertedValue, is(expectedDate));
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldFailIfDateStringIsNotParsable() {
 		converter.convertValue(Date.class, "dd.MM.yyyy", Locale.GERMAN,

@@ -63,7 +63,7 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ConfirmationD
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.NotificationProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ShowPopupProvider;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest.ReSTDelegate;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest.ReSTDelegateImpl;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptPortal;
 import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
 import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
@@ -607,6 +607,17 @@ public class ScriptModelBuilderTest extends ModelSupport {
 	}
 
 	@Test
+	public void shouldBuildScriptReSTContainer() throws JAXBException {
+		prepare("validReSTContainerConfig.xml");
+		ScriptPortlet scriptPortlet = scriptModelBuilder.build();
+
+		assertThat(
+				((ScriptTable) scriptPortlet.getPage().getElements().get(0))
+						.getContainer(),
+				instanceOf(ScriptReSTContainer.class));
+	}
+
+	@Test
 	public void shouldBuildScriptBackendContainer() throws JAXBException {
 		prepare("validScriptContainerConfig.xml");
 		ScriptPortlet scriptPortlet = scriptModelBuilder.build();
@@ -659,7 +670,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 
 		scriptModelBuilder.build();
 
-		assertThat(container.getDelegate(), instanceOf(ReSTDelegate.class));
+		assertThat(container.getDelegate(), instanceOf(ReSTDelegateImpl.class));
 	}
 
 	private void prepare(String configFile) throws JAXBException {

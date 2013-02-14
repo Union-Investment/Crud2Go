@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel - ReST Scripting">
+	<page>
+		<form id="myForm">
+			<field name="fondsnummer" onValueChange="updateRestUrl(it)">
+				<select>
+					<option key="DU1066">DU1066</option>
+					<option key="DU1067">DU1067</option>
+				</select>
+			</field>
+			<action title="search" />
+		</form>
+		<table id="material">
+			<rest-container baseUrl="http://10.253.129.8:28080/bestands-hub/rest">
+				<query collection="it[0].bestandstitels">
+					<attribute name="id" path="id" type="java.lang.Long"
+						primary-key="true" />
+					<attribute name="uwid" />
+					<attribute name="isin" />
+					<attribute name="name" />
+					<attribute name="kontrahentenIdentifier" />
+					<attribute name="secTyp" />
+					<attribute name="positionIdentifier" />
+					<attribute name="longShortCode" />
+					<attribute name="issueDate" type="java.util.Date" />
+				</query>
+			</rest-container>
+			<columns>
+				<column name="id" title="ID" primary-key="true" hidden="true" />
+				<column name="uwid" title="Titel" validate="required" />
+				<column name="isin" title="isin" />
+				<column name="name" title="name" />
+				<column name="kontrahentenIdentifier" title="kontrahenten-identifier" />
+				<column name="secTyp" title="sec-typ" />
+				<column name="positionIdentifier" title="position-identifier" />
+				<column name="longShortCode" title="long-short-code" />
+				<column name="issueDate" title="issue-date" />
+			</columns>
+		</table>
+	</page>
+	<script>
+		def updateRestUrl(field) {
+			portlet.elements['material'].container.queryUrl = field.value? "/Bestand/?fondsnummer=$field.value" : null
+		}
+	</script>
+</portlet>

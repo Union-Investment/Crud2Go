@@ -675,6 +675,10 @@ public class ScriptModelBuilder {
 			scriptContainer = factory.getScriptJmxContainer(container,
 					jmxDelegate);
 
+		} else if (container instanceof ReSTContainer) {
+			scriptContainer = factory
+					.getScriptReSTContainer((ReSTContainer) container);
+
 		} else if (container instanceof GenericDataContainer) {
 			// only ScriptContainer left
 			populateBackendToDataContainer((GenericDataContainer) container);

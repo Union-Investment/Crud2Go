@@ -2,8 +2,13 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.re
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import javax.xml.bind.DatatypeConverter;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Converts for ReST-Format attributes to match the configured datatypes.
@@ -52,7 +57,7 @@ public class ValueConverter {
 			return new Date(((Number) value).longValue());
 
 		} else if (value instanceof String) {
-			return convertStringToDate(format, locale, value);
+			return convertStringToDate(format, locale, (String) value);
 
 		} else {
 			throw new IllegalArgumentException("Cannot convert to date: "
@@ -61,9 +66,15 @@ public class ValueConverter {
 	}
 
 	private Object convertStringToDate(String format, Locale locale,
-			Object value) {
+			String value) {
 		try {
-			return new SimpleDateFormat(format, locale).parse((String) value);
+			if (StringUtils.equalsIgnoreCase(format, "iso8601")) {
+				Calendar calendar = DatatypeConverter.parseDateTime(value);
+				return calendar.getTime();
+			} else {
+				// SimpleDateFormat
+				return new SimpleDateFormat(format, locale).parse(value);
+			}
 
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(

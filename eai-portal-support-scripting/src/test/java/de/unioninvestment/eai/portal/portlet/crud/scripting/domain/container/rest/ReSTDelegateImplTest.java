@@ -51,7 +51,7 @@ import de.unioninvestment.eai.portal.support.vaadin.container.GenericItemId;
 import de.unioninvestment.eai.portal.support.vaadin.container.MetaData;
 import de.unioninvestment.eai.portal.support.vaadin.container.UpdateContext;
 
-public class ReSTDelegateTest {
+public class ReSTDelegateImplTest {
 
 	private static final String JSON_STRING = "{ { a: 1}, {a: 2}, {a: 3} }";
 
@@ -102,7 +102,7 @@ public class ReSTDelegateTest {
 
 	private byte[] contents;
 
-	private ReSTDelegate delegate;
+	private ReSTDelegateImpl delegate;
 
 	private ReSTContainerConfig config;
 
@@ -113,7 +113,7 @@ public class ReSTDelegateTest {
 
 	@Test
 	public void shouldReturnAttributeAsMetadata() {
-		ReSTDelegate delegate = newDelegate(RestTestConfig.readonlyConfig());
+		ReSTDelegateImpl delegate = newDelegate(RestTestConfig.readonlyConfig());
 
 		MetaData metaData = delegate.getMetaData();
 
@@ -123,7 +123,7 @@ public class ReSTDelegateTest {
 
 	@Test
 	public void shouldBeReadonlyByDefault() {
-		ReSTDelegate delegate = newDelegate(RestTestConfig.readonlyConfig());
+		ReSTDelegateImpl delegate = newDelegate(RestTestConfig.readonlyConfig());
 
 		MetaData metaData = delegate.getMetaData();
 
@@ -136,7 +136,7 @@ public class ReSTDelegateTest {
 	public void shouldAllowInsertIfConfigured() {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
 		config.setInsert(new ReSTInsertConfig());
-		ReSTDelegate delegate = newDelegate(config);
+		ReSTDelegateImpl delegate = newDelegate(config);
 
 		MetaData metaData = delegate.getMetaData();
 
@@ -147,7 +147,7 @@ public class ReSTDelegateTest {
 	public void shouldAllowUpdateIfConfigured() {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
 		config.setUpdate(new ReSTUpdateConfig());
-		ReSTDelegate delegate = newDelegate(config);
+		ReSTDelegateImpl delegate = newDelegate(config);
 
 		MetaData metaData = delegate.getMetaData();
 
@@ -158,7 +158,7 @@ public class ReSTDelegateTest {
 	public void shouldAllowDeleteIfConfigured() {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
 		config.setDelete(new ReSTDeleteConfig());
-		ReSTDelegate delegate = newDelegate(config);
+		ReSTDelegateImpl delegate = newDelegate(config);
 
 		MetaData metaData = delegate.getMetaData();
 
@@ -167,7 +167,7 @@ public class ReSTDelegateTest {
 
 	@Test
 	public void shouldTellThatIsNotTransactional() {
-		ReSTDelegate delegate = newDelegate(RestTestConfig.readonlyConfig());
+		ReSTDelegateImpl delegate = newDelegate(RestTestConfig.readonlyConfig());
 
 		MetaData metaData = delegate.getMetaData();
 
@@ -176,11 +176,24 @@ public class ReSTDelegateTest {
 
 	@Test
 	public void shouldTellThatBackendFilteringIsNotPossible() {
-		ReSTDelegate delegate = newDelegate(RestTestConfig.readonlyConfig());
+		ReSTDelegateImpl delegate = newDelegate(RestTestConfig.readonlyConfig());
 
 		MetaData metaData = delegate.getMetaData();
 
 		assertThat(metaData.isFilterSupported(), is(false));
+	}
+
+	@Test
+	public void shouldReturmEmptyListIfQueryUrlIsNullOrBlank()
+			throws ClientProtocolException, IOException {
+		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
+		config.setBaseUrl("http://test.de/path");
+		config.getQuery().setUrl("");
+		ReSTDelegateImpl delegate = newDelegate(config);
+
+		List<Object[]> result = delegate.getRows();
+
+		assertThat(result.size(), is(0));
 	}
 
 	@Test
@@ -189,7 +202,7 @@ public class ReSTDelegateTest {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
 		config.setBaseUrl(null);
 		config.getQuery().setUrl("http://test.de/path");
-		ReSTDelegate delegate = newDelegate(config);
+		ReSTDelegateImpl delegate = newDelegate(config);
 		assumeValidResponse();
 
 		delegate.getRows();
@@ -204,7 +217,7 @@ public class ReSTDelegateTest {
 			throws ClientProtocolException, IOException {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
 		config.setMimetype("text/xml");
-		ReSTDelegate delegate = newDelegate(config);
+		ReSTDelegateImpl delegate = newDelegate(config);
 		assumeValidResponse();
 		when(creatorMock.getMimeType()).thenReturn("application/xml");
 
@@ -221,7 +234,7 @@ public class ReSTDelegateTest {
 			throws ClientProtocolException, IOException {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
 		config.setMimetype(null);
-		ReSTDelegate delegate = newDelegate(config);
+		ReSTDelegateImpl delegate = newDelegate(config);
 		assumeValidResponse();
 		when(creatorMock.getMimeType()).thenReturn("application/xml");
 
@@ -239,7 +252,7 @@ public class ReSTDelegateTest {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
 		config.setBaseUrl("http://test.de/");
 		config.getQuery().setUrl("path");
-		ReSTDelegate delegate = newDelegate(config);
+		ReSTDelegateImpl delegate = newDelegate(config);
 		assumeValidResponse();
 
 		delegate.getRows();
@@ -249,10 +262,44 @@ public class ReSTDelegateTest {
 				is("http://test.de/path"));
 	}
 
+	@Test
+	public void shouldAllowChangingTheBaseUrlAtRuntime()
+			throws ClientProtocolException, IOException {
+		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
+		config.setBaseUrl("http://test.de/");
+		config.getQuery().setUrl("path");
+		ReSTDelegateImpl delegate = newDelegate(config);
+		delegate.setBaseUrl("http://test.nl/");
+		assumeValidResponse();
+
+		delegate.getRows();
+
+		verify(httpMock).execute(requestCaptor.capture());
+		assertThat(requestCaptor.getValue().getURI().toString(),
+				is("http://test.nl/path"));
+	}
+
+	@Test
+	public void shouldAllowChangingTheQueryUrlAtRuntime()
+			throws ClientProtocolException, IOException {
+		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
+		config.setBaseUrl("http://test.de/");
+		config.getQuery().setUrl("path");
+		ReSTDelegateImpl delegate = newDelegate(config);
+		delegate.setQueryUrl("otherpath");
+		assumeValidResponse();
+
+		delegate.getRows();
+
+		verify(httpMock).execute(requestCaptor.capture());
+		assertThat(requestCaptor.getValue().getURI().toString(),
+				is("http://test.de/otherpath"));
+	}
+
 	@Test(expected = BusinessException.class)
 	public void shouldThrowReadableExceptionOnWrongResultCode()
 			throws ClientProtocolException, IOException {
-		ReSTDelegate delegate = newDelegate(RestTestConfig.readonlyConfig());
+		ReSTDelegateImpl delegate = newDelegate(RestTestConfig.readonlyConfig());
 		assumeInvalidResponse(HttpStatus.NOT_FOUND, "NOT FOUND");
 
 		delegate.getRows();
@@ -262,14 +309,14 @@ public class ReSTDelegateTest {
 	public void shouldThrowConfigurationExceptionIfUrlIsInvalid() {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
 		config.getQuery().setUrl("\\");
-		ReSTDelegate delegate = newDelegate(config);
+		ReSTDelegateImpl delegate = newDelegate(config);
 
 		delegate.getRows();
 	}
 
 	@Test(expected = BusinessException.class)
 	public void shouldThrowReadableExceptionOnIOErrors() throws IOException {
-		ReSTDelegate delegate = newDelegate(RestTestConfig.readonlyConfig());
+		ReSTDelegateImpl delegate = newDelegate(RestTestConfig.readonlyConfig());
 		assumeValidResponse();
 		when(parserMock.getRows(responseMock)).thenThrow(
 				new IOException("Connection problem"));
@@ -280,7 +327,7 @@ public class ReSTDelegateTest {
 	@Test(expected = BusinessException.class)
 	public void shouldThrowReadableExceptionOnProtocolErrors()
 			throws IOException {
-		ReSTDelegate delegate = newDelegate(RestTestConfig.readonlyConfig());
+		ReSTDelegateImpl delegate = newDelegate(RestTestConfig.readonlyConfig());
 		when(httpMock.execute(any(HttpUriRequest.class))).thenThrow(
 				new ClientProtocolException("bla"));
 
@@ -290,7 +337,7 @@ public class ReSTDelegateTest {
 	@Test
 	public void shouldReturnResultFromParser() throws ClientProtocolException,
 			IOException {
-		ReSTDelegate delegate = newDelegate(RestTestConfig.readonlyConfig());
+		ReSTDelegateImpl delegate = newDelegate(RestTestConfig.readonlyConfig());
 		assumeValidResponse();
 		List<Object[]> expectedResult = asList(new Object[2], new Object[2]);
 		when(parserMock.getRows(responseMock)).thenReturn(expectedResult);
@@ -550,18 +597,13 @@ public class ReSTDelegateTest {
 								charset)));
 	}
 
-	private ReSTDelegate newDelegate(ReSTContainerConfig config) {
-		ReSTDelegate delegate = new ReSTDelegate(config, containerMock,
+	private ReSTDelegateImpl newDelegate(ReSTContainerConfig config) {
+		ReSTDelegateImpl delegate = new ReSTDelegateImpl(config, containerMock,
 				scriptBuilderMock);
 		delegate.http = httpMock;
 		delegate.parser = parserMock;
 		delegate.creator = creatorMock;
 		return delegate;
-	}
-
-	@Test
-	public void executeQueryRequest() {
-
 	}
 
 }

@@ -1622,9 +1622,9 @@
 			<element name="attribute" type="tns:ReSTAttributeConfig"
 				minOccurs="1" maxOccurs="unbounded" />
 		</sequence>
-		<attribute name="url" type="string" use="required">
+		<attribute name="url" type="string">
 			<annotation>
-				<documentation>Relativer Pfad oder absolute URL zur Query
+				<documentation>Relativer Pfad oder absolute URL zur Query. Wenn nicht gegeben, werden keine Ergebnisse zurückgeliefert.
 				</documentation>
 			</annotation>
 		</attribute>

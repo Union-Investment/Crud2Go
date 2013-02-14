@@ -19,4 +19,18 @@ public class ReSTContainer extends GenericDataContainer {
 		super(eventBus, formatPattern, defaultOrder, filterPolicy);
 	}
 
+	public void setBaseUrl(String newBaseUrl) {
+		getReSTDelegate().setBaseUrl(newBaseUrl);
+		refresh();
+	}
+
+	public void setQueryUrl(String newQueryUrl) {
+		getReSTDelegate().setQueryUrl(newQueryUrl);
+		refresh();
+	}
+
+	private ReSTDelegate getReSTDelegate() {
+		return (ReSTDelegate) getDelegate();
+	}
+
 }

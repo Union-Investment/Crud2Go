@@ -18,9 +18,12 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import groovy.lang.Closure;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.xml.bind.JAXBException;
@@ -97,5 +100,22 @@ public class ScriptPortletTest {
 	public void shouldDelegateRefresh() {
 		scriptPortlet.refresh();
 		verify(portletMock).refresh();
+	}
+
+	@Test
+	public void shouldProvideElementsAsMap() {
+		Object myElement = new Object();
+		scriptPortlet.addElementById("myId", myElement);
+
+		Map<String, Object> result = scriptPortlet.getElements();
+
+		assertThat(result.get("myId"), sameInstance(myElement));
+	}
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void shouldNotAllowChangesToElementsMap() {
+		Map<String, Object> elements = scriptPortlet.getElements();
+
+		elements.put("not", "allowed");
 	}
 }

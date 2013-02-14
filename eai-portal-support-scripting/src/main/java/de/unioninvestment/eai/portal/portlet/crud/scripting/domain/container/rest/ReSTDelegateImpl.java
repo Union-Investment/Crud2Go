@@ -1,10 +1,14 @@
 package de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest;
 
+import static java.util.Collections.unmodifiableList;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -32,18 +36,20 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrud
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.vaadin.container.Column;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericItem;
 import de.unioninvestment.eai.portal.support.vaadin.container.MetaData;
 import de.unioninvestment.eai.portal.support.vaadin.container.UpdateContext;
 
-public class ReSTDelegate implements GenericDelegate {
+public class ReSTDelegateImpl implements ReSTDelegate {
+
+	private static final List<Object[]> EMPTY_RESULT = unmodifiableList(new LinkedList<Object[]>());
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ReSTDelegate.class);
+			.getLogger(ReSTDelegateImpl.class);
 
 	private ReSTContainerConfig config;
 	private ScriptBuilder scriptBuilder;
@@ -56,7 +62,10 @@ public class ReSTDelegate implements GenericDelegate {
 
 	private ReSTContainer container;
 
-	public ReSTDelegate(ReSTContainerConfig containerConfig,
+	private String baseUrl;
+	private String queryUrl;
+
+	public ReSTDelegateImpl(ReSTContainerConfig containerConfig,
 			ReSTContainer container,
 			ScriptBuilder scriptBuilder) {
 		this.config = containerConfig;
@@ -67,6 +76,8 @@ public class ReSTDelegate implements GenericDelegate {
 		this.parser = createParser();
 		this.creator = createCreator();
 
+		this.baseUrl = config.getBaseUrl();
+		this.queryUrl = config.getQuery().getUrl();
 	}
 
 	private PayloadCreator createCreator() {
@@ -118,6 +129,9 @@ public class ReSTDelegate implements GenericDelegate {
 
 	@Override
 	public List<Object[]> getRows() {
+		if (StringUtils.isBlank(queryUrl)) {
+			return EMPTY_RESULT;
+		}
 		HttpGet request = createQueryRequest();
 		try {
 			HttpResponse response = http.execute(request);
@@ -141,7 +155,7 @@ public class ReSTDelegate implements GenericDelegate {
 	}
 
 	private HttpGet createQueryRequest() {
-		URI uri = createURI(config.getQuery().getUrl());
+		URI uri = createURI(queryUrl);
 		HttpGet request = new HttpGet(uri);
 
 		String mimetype = creator.getMimeType();
@@ -154,8 +168,8 @@ public class ReSTDelegate implements GenericDelegate {
 
 	private URI createURI(String postfix) {
 		String uri = postfix;
-		if (config.getBaseUrl() != null) {
-			uri = config.getBaseUrl() + postfix;
+		if (baseUrl != null) {
+			uri = baseUrl + postfix;
 		}
 		try {
 			return URI.create(uri);
@@ -286,5 +300,13 @@ public class ReSTDelegate implements GenericDelegate {
 		ScriptRow row = new ScriptRow(containerRow);
 		Object postfix = scriptBuilder.buildClosure(uriScript).call(row);
 		return createURI(postfix.toString());
+	}
+
+	public void setBaseUrl(String newBaseUrl) {
+		this.baseUrl = newBaseUrl;
+	}
+
+	public void setQueryUrl(String newQueryUrl) {
+		this.queryUrl = newQueryUrl;
 	}
 }

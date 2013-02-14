@@ -193,7 +193,9 @@ public class AbstractParserTest {
 						.get(1).getPath())).thenReturn(aClosureMock);
 
 		// return values of mocks
-		when(idClosureMock.call()).thenReturn("1", "2");
-		when(aClosureMock.call()).thenReturn("3", "4");
+		when(idClosureMock.call("firstRow")).thenReturn("1");
+		when(aClosureMock.call("firstRow")).thenReturn("3");
+		when(idClosureMock.call("secondRow")).thenReturn("2");
+		when(aClosureMock.call("secondRow")).thenReturn("4");
 	}
 }
