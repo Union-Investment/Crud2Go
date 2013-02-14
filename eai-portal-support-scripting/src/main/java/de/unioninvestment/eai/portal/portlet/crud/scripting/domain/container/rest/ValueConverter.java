@@ -68,7 +68,9 @@ public class ValueConverter {
 	private Object convertStringToDate(String format, Locale locale,
 			String value) {
 		try {
-			if (StringUtils.equalsIgnoreCase(format, "iso8601")) {
+			if (StringUtils.isBlank(value)) {
+				return null;
+			} else if (StringUtils.equalsIgnoreCase(format, "iso8601")) {
 				Calendar calendar = DatatypeConverter.parseDateTime(value);
 				return calendar.getTime();
 			} else {

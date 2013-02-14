@@ -8,6 +8,7 @@
 					<attribute name="isbn" primary-key="true"/>
 					<attribute name="title" />
 					<attribute name="author" />
+					<attribute name="all" type="java.util.Map" path="it" />
 				</query>
 				<insert url="/books"><![CDATA[
 					[
@@ -28,6 +29,7 @@
 				<column name="isbn" title="ID" primary-key="true" />
 				<column name="title" title="Titel" editable="true" validate="required" />
 				<column name="author" title="Autor" editable="true" validate="required"/>
+				<column name="all" title="All" />
 			</columns>
 		</table>
 	</page>

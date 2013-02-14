@@ -31,6 +31,7 @@ import javax.portlet.PortletResponse;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
 
 import de.unioninvestment.eai.portal.portlet.crud.scripting.category.CollectionsCategory;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.category.DateCategory;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.category.GStringCategory;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.category.StringCategory;
 import de.unioninvestment.eai.portal.support.vaadin.SpringApplicationPortlet2;
@@ -54,6 +55,7 @@ public class GroovyCategorySpringApplicationPortlet extends
 		categories.add(CollectionsCategory.class);
 		categories.add(GStringCategory.class);
 		categories.add(StringCategory.class);
+		categories.add(DateCategory.class);
 	}
 
 	@Override

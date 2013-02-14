@@ -43,6 +43,15 @@ public class ValueConverterTest {
 	}
 
 	@Test
+	public void shouldReturnNullDateFromBlankValue() {
+
+		Object convertedValue = converter.convertValue(Date.class,
+				"dd. MMM yyyy", Locale.GERMANY, "");
+
+		assertThat(convertedValue, is(nullValue()));
+	}
+
+	@Test
 	public void shouldReturnDateFromStringUsingFormatAndLocale() {
 		Object expectedDate = new GregorianCalendar(2013, 02, 13).getTime();
 

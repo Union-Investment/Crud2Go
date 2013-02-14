@@ -5,7 +5,7 @@
 		<table id="material">
 			<rest-container baseUrl="http://localhost:9080/crud2go-rest-testserver/rest/library" format="xml">
 				<query url="/books" collection="book">
-					<attribute name="isbn" primary-key="true" path="delegate['@isbn']"/>
+					<attribute name="isbn" primary-key="true" path="it.@isbn"/>
 					<attribute name="title" />
 					<attribute name="author" />
 				</query>
