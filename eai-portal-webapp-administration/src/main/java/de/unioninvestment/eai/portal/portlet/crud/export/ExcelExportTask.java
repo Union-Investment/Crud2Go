@@ -44,6 +44,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 public class ExcelExportTask extends AbstractTableExportTask implements
 		ExportTask {
 
+	private static final String EXCEL_XSLX_MIMETYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
 	/**
 	 * Erweiterung des Excel-Exports um Frontend-Updates.
 	 * 
@@ -160,7 +162,7 @@ public class ExcelExportTask extends AbstractTableExportTask implements
 		ExcelExportWithProgress excelExport = new ExcelExportWithProgress(
 				vaadinTable, wkbk, "ExportCallback", null, getFilename(), false);
 		excelExport.setExportWindow("_blank");
-		excelExport.setMimeType(ExcelExport.EXCEL_MIME_TYPE);
+		excelExport.setMimeType(EXCEL_XSLX_MIMETYPE);
 		excelExport.setRowHeaders(true);
 		excelExport.excludeCollapsedColumns();
 		excelExport.setDoubleDataFormat("#.##0");
