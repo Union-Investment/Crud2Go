@@ -1577,9 +1577,9 @@
 				<sequence>
 					<element name="query" type="tns:ReSTQueryConfig" minOccurs="1"
 						maxOccurs="1" />
-					<element name="insert" type="tns:ReSTInsertConfig"
+					<element name="insert" type="tns:ReSTChangeConfig"
 						minOccurs="0" maxOccurs="1" />
-					<element name="update" type="tns:ReSTUpdateConfig"
+					<element name="update" type="tns:ReSTChangeConfig"
 						minOccurs="0" maxOccurs="1" />
 					<element name="delete" type="tns:ReSTDeleteConfig"
 						minOccurs="0" maxOccurs="1" />
@@ -1636,10 +1636,10 @@
 		</attribute>
 	</complexType>
 
-	<complexType name="ReSTInsertConfig">
+	<complexType name="ReSTChangeConfig">
 		<annotation>
 			<documentation>
-				ReST-Kommunikation für neue Zeilen
+				ReST-Kommunikation für neue/geänderte Zeilen
 			</documentation>
 		</annotation>
 		<complexContent>
@@ -1650,22 +1650,9 @@
 						</documentation>
 					</annotation>
 				</attribute>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<complexType name="ReSTUpdateConfig">
-		<annotation>
-			<documentation>
-				ReST-Kommunikation für geänderte Zeilen
-			</documentation>
-		</annotation>
-		<complexContent>
-			<extension base="tns:ScriptConfig">
-				<attribute name="url" type="tns:groovy" use="required">
+				<attribute name="method" type="tns:ReSTChangeMethodConfig">
 					<annotation>
-						<documentation>Relativer Pfad oder absolute URL
-						</documentation>
+						<documentation>HTTP Methode</documentation>
 					</annotation>
 				</attribute>
 			</extension>
@@ -1750,6 +1737,18 @@
 		<restriction base="string">
 			<enumeration value="json" />
 			<enumeration value="xml" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="ReSTChangeMethodConfig">
+		<annotation>
+			<documentation>
+				HTTP Request-Methode 
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="PUT" />
+			<enumeration value="POST" />
 		</restriction>
 	</simpleType>
 

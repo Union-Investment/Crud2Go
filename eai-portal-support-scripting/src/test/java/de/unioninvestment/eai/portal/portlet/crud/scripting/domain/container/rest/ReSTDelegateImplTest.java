@@ -6,11 +6,13 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import groovy.lang.Closure;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -35,10 +37,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTChangeConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTChangeMethodConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTDeleteConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTInsertConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTUpdateConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.InvalidConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
@@ -135,7 +137,7 @@ public class ReSTDelegateImplTest {
 	@Test
 	public void shouldAllowInsertIfConfigured() {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
-		config.setInsert(new ReSTInsertConfig());
+		config.setInsert(new ReSTChangeConfig());
 		ReSTDelegateImpl delegate = newDelegate(config);
 
 		MetaData metaData = delegate.getMetaData();
@@ -146,7 +148,7 @@ public class ReSTDelegateImplTest {
 	@Test
 	public void shouldAllowUpdateIfConfigured() {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
-		config.setUpdate(new ReSTUpdateConfig());
+		config.setUpdate(new ReSTChangeConfig());
 		ReSTDelegateImpl delegate = newDelegate(config);
 
 		MetaData metaData = delegate.getMetaData();
@@ -354,7 +356,8 @@ public class ReSTDelegateImplTest {
 		// given
 		config = RestTestConfig.readwriteConfig();
 		delegate = newDelegate(config);
-		prepareValidInsertPostRequest();
+		stubValidInsertOperation();
+		stubSuccessfulPostResponse();
 
 		// when
 		delegate.update(asList(itemMock), new UpdateContext());
@@ -373,13 +376,31 @@ public class ReSTDelegateImplTest {
 	}
 
 	@Test
+	public void shouldSendInsertPutRequestIfConfigured()
+			throws ClientProtocolException, IOException {
+		// given
+		config = RestTestConfig.readwriteConfig();
+		config.getInsert().setMethod(ReSTChangeMethodConfig.PUT);
+		delegate = newDelegate(config);
+		stubValidInsertOperation();
+		stubSuccessfulPutResponse();
+
+		// when
+		delegate.update(asList(itemMock), new UpdateContext());
+
+		// then
+		verify(httpMock).execute(isA(HttpPut.class));
+	}
+
+	@Test
 	public void shouldSendUpdatePutRequestToServer()
 			throws ClientProtocolException, IOException {
 
 		// given
 		config = RestTestConfig.readwriteConfig();
 		delegate = newDelegate(config);
-		prepareValidUpdatePutRequest();
+		stubValidUpdateOperation();
+		stubSuccessfulPutResponse();
 
 		// when
 		delegate.update(asList(itemMock), new UpdateContext());
@@ -398,6 +419,23 @@ public class ReSTDelegateImplTest {
 	}
 
 	@Test
+	public void shouldSendUpdatePostRequestIfConfigured()
+			throws ClientProtocolException, IOException {
+		// given
+		config = RestTestConfig.readwriteConfig();
+		config.getUpdate().setMethod(ReSTChangeMethodConfig.POST);
+		delegate = newDelegate(config);
+		stubValidUpdateOperation();
+		stubSuccessfulPostResponse();
+
+		// when
+		delegate.update(asList(itemMock), new UpdateContext());
+
+		// then
+		verify(httpMock).execute(isA(HttpPost.class));
+	}
+
+	@Test
 	public void shouldSendConfiguredMimetype()
 			throws ClientProtocolException, IOException {
 
@@ -405,7 +443,8 @@ public class ReSTDelegateImplTest {
 		config = RestTestConfig.readwriteConfig();
 		config.setMimetype("text/xml");
 		delegate = newDelegate(config);
-		prepareValidUpdatePutRequest();
+		stubValidUpdateOperation();
+		stubSuccessfulPutResponse();
 
 		// when
 		delegate.update(asList(itemMock), new UpdateContext());
@@ -443,7 +482,8 @@ public class ReSTDelegateImplTest {
 		// given
 		config = RestTestConfig.readwriteConfig();
 		delegate = newDelegate(config);
-		prepareValidInsertPostRequest();
+		stubValidInsertOperation();
+		stubSuccessfulPostResponse();
 		UpdateContext context = new UpdateContext();
 
 		// when
@@ -459,7 +499,8 @@ public class ReSTDelegateImplTest {
 		// given
 		config = RestTestConfig.readwriteConfig();
 		delegate = newDelegate(config);
-		prepareValidInsertPostRequest();
+		stubValidInsertOperation();
+		stubSuccessfulPostResponse();
 		when(responseMock.getStatusLine()).thenReturn(
 				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
 						HttpStatus.FORBIDDEN.value(), "FORBIDDEN"));
@@ -468,7 +509,16 @@ public class ReSTDelegateImplTest {
 		delegate.update(asList(itemMock), new UpdateContext());
 	}
 
-	private void prepareValidInsertPostRequest()
+	private void stubSuccessfulPostResponse() throws ClientProtocolException,
+			IOException {
+		when(httpMock.execute(any(HttpUriRequest.class))).thenReturn(
+				responseMock);
+		when(responseMock.getStatusLine()).thenReturn(
+				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
+						201, "CREATED"));
+	}
+
+	private void stubValidInsertOperation()
 			throws ClientProtocolException, IOException {
 
 		// Input for URL
@@ -489,17 +539,9 @@ public class ReSTDelegateImplTest {
 		when(
 				creatorMock.create(itemMock, config.getInsert().getValue(),
 						"UTF-8")).thenReturn(contents);
-
-		when(httpMock.execute(any(HttpUriRequest.class))).thenReturn(
-				responseMock);
-		when(responseMock.getStatusLine()).thenReturn(
-				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
-						201, "CREATED"));
 	}
 
-	private void prepareValidUpdatePutRequest()
-			throws ClientProtocolException, IOException {
-
+	private void stubValidUpdateOperation() throws UnsupportedEncodingException {
 		// Input for URL
 		when(scriptBuilderMock.buildClosure(config.getUpdate().getUrl()))
 				.thenReturn(urlClosureMock);
@@ -518,7 +560,10 @@ public class ReSTDelegateImplTest {
 		when(
 				creatorMock.create(itemMock, config.getUpdate().getValue(),
 						"UTF-8")).thenReturn(contents);
+	}
 
+	private void stubSuccessfulPutResponse() throws IOException,
+			ClientProtocolException {
 		when(httpMock.execute(any(HttpUriRequest.class))).thenReturn(
 				responseMock);
 		when(responseMock.getStatusLine()).thenReturn(

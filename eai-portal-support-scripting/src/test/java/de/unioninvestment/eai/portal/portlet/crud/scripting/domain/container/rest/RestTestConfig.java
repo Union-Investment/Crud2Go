@@ -3,11 +3,10 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.re
 import groovy.lang.GroovyShell;
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTAttributeConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTChangeConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTDeleteConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTInsertConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTQueryConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTUpdateConfig;
 
 public class RestTestConfig {
 
@@ -32,14 +31,14 @@ public class RestTestConfig {
 	public static ReSTContainerConfig readwriteConfig() {
 		ReSTContainerConfig config = readonlyConfig();
 
-		ReSTInsertConfig insert = new ReSTInsertConfig();
+		ReSTChangeConfig insert = new ReSTChangeConfig();
 		insert.setUrl(createGroovyScript("http://test.de/insertpath",
 				"{ -> \"http://test.de/insertpath\" }"));
 		insert.setValue(createGroovyScript("['a': row.values.a ]",
 				"{ row -> ['a': row.values.a ] }"));
 		config.setInsert(insert);
 
-		ReSTUpdateConfig update = new ReSTUpdateConfig();
+		ReSTChangeConfig update = new ReSTChangeConfig();
 		update.setUrl(createGroovyScript("http://test.de/updatepath",
 				"{ -> \"http://test.de/updatepath\" }"));
 		update.setValue(createGroovyScript("['a': row.values.a ]",

@@ -28,6 +28,8 @@ import com.vaadin.data.Container.Filter;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTAttributeConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTChangeConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTChangeMethodConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTFormatConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
@@ -192,10 +194,14 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		try {
 			for (GenericItem item : items) {
 
-				if (item.isNewItem()) {
-					sendInsertPostRequest(item);
-				} else if (item.isModified()) {
-					sendUpdatePutRequest(item);
+				if (item.isNewItem() || item.isModified()) {
+					ReSTChangeConfig changeConfig = findChangeConfig(item);
+					ReSTChangeMethodConfig method = findRequestMethod(item);
+					if (method == ReSTChangeMethodConfig.POST) {
+						sendPostRequest(item, changeConfig);
+					} else {
+						sendPutRequest(item, changeConfig);
+					}
 				} else if (item.isDeleted()) {
 					sendDeleteRequest(item);
 				}
@@ -212,12 +218,35 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		}
 	}
 
-	private void sendInsertPostRequest(GenericItem item) throws IOException,
+	private ReSTChangeConfig findChangeConfig(GenericItem item) {
+		ReSTChangeConfig changeConfig = item.isNewItem() ? config
+				.getInsert() : config.getUpdate();
+		return changeConfig;
+	}
+
+	private ReSTChangeMethodConfig findRequestMethod(GenericItem item) {
+		ReSTChangeMethodConfig method = null;
+		if (item.isNewItem()) {
+			method = config.getInsert().getMethod();
+			if (method == null) {
+				method = ReSTChangeMethodConfig.POST;
+			}
+		} else {
+			method = config.getUpdate().getMethod();
+			if (method == null) {
+				method = ReSTChangeMethodConfig.PUT;
+			}
+		}
+		return method;
+	}
+
+	private void sendPostRequest(GenericItem item,
+			ReSTChangeConfig changeConfig) throws IOException,
 			ClientProtocolException {
 
-		byte[] content = creator.create(item, config.getInsert().getValue(),
+		byte[] content = creator.create(item, changeConfig.getValue(),
 				config.getCharset());
-		URI uri = createURI(item, config.getInsert().getUrl());
+		URI uri = createURI(item, changeConfig.getUrl());
 		HttpPost request = new HttpPost(uri);
 		ContentType contentType = createContentType();
 		request.setEntity(new ByteArrayEntity(content, contentType));
@@ -225,6 +254,27 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		try {
 			HttpResponse response = http.execute(request);
 			expectAnyStatusCode(response, HttpStatus.SC_CREATED,
+					HttpStatus.SC_NO_CONTENT);
+
+		} finally {
+			request.releaseConnection();
+		}
+	}
+
+	private void sendPutRequest(GenericItem item,
+			ReSTChangeConfig changeConfig)
+			throws ClientProtocolException, IOException {
+
+		byte[] content = creator.create(item, changeConfig.getValue(),
+				config.getCharset());
+		URI uri = createURI(item, changeConfig.getUrl());
+		HttpPut request = new HttpPut(uri);
+		ContentType contentType = createContentType();
+		request.setEntity(new ByteArrayEntity(content, contentType));
+
+		try {
+			HttpResponse response = http.execute(request);
+			expectAnyStatusCode(response, HttpStatus.SC_OK,
 					HttpStatus.SC_NO_CONTENT);
 
 		} finally {
@@ -246,25 +296,6 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		throw new BusinessException(
 				"portlet.crud.error.rest.wrongStatus",
 				statusCode, statusLine.getReasonPhrase());
-	}
-
-	private void sendUpdatePutRequest(GenericItem item)
-			throws ClientProtocolException, IOException {
-		byte[] content = creator.create(item, config.getUpdate().getValue(),
-				config.getCharset());
-		URI uri = createURI(item, config.getUpdate().getUrl());
-		HttpPut request = new HttpPut(uri);
-		ContentType contentType = createContentType();
-		request.setEntity(new ByteArrayEntity(content, contentType));
-
-		try {
-			HttpResponse response = http.execute(request);
-			expectAnyStatusCode(response, HttpStatus.SC_OK,
-					HttpStatus.SC_NO_CONTENT);
-
-		} finally {
-			request.releaseConnection();
-		}
 	}
 
 	private ContentType createContentType() {
