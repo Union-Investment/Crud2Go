@@ -357,6 +357,18 @@
 						<source>1.6</source>
 						<target>1.6</target>
 					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>org.codehaus.groovy</groupId>
+							<artifactId>groovy-eclipse-compiler</artifactId>
+							<version>2.7.0-01</version>
+						</dependency>
+						<dependency>
+							<groupId>org.codehaus.groovy</groupId>
+							<artifactId>groovy-eclipse-batch</artifactId>
+							<version>1.8.6-01</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -371,7 +383,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-eclipse-plugin</artifactId>
-					<version>2.7</version>
 					<configuration>
 						<ajdtVersion>none</ajdtVersion>
 						<wtpversion>2.0</wtpversion>
@@ -422,18 +433,6 @@
 				<plugin>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>2.5</version>
-					<configuration>
-						<encoding>UTF-8</encoding>
-						<resources>
-							<resource>
-								<directory>src/main/resources</directory>
-								<encoding>ISO-88591</encoding>
-								<includes>
-									<include>**/*.properties</include>
-								</includes>
-							</resource>
-						</resources>
-					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.pitest</groupId>
