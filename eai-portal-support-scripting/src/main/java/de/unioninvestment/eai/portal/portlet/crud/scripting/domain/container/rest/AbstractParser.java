@@ -1,5 +1,6 @@
 package de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest;
 
+import static java.util.Collections.emptyList;
 import groovy.lang.Closure;
 
 import java.io.IOException;
@@ -7,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -113,16 +113,22 @@ public abstract class AbstractParser implements PayloadParser {
 
 		GroovyScript collectionScript = config.getQuery()
 				.getCollection();
-		if (collectionScript != null && collectionScript.getClazz() != null) {
+		if (collectionScript != null && collectionScript.getSource() != null) {
 			Closure<?> closure = scriptBuilder.buildClosure(collectionScript);
-			collection = callClosureAgainstDelegate(closure, parsedData);
+
+			try {
+				collection = callClosureAgainstDelegate(closure, parsedData);
+			} catch (NullPointerException e) {
+				LOGGER.warn("NPE while querying for ReST collection. Assuming empty collection.");
+				return emptyList();
+			}
 		}
 
 		if (collection instanceof Iterable) {
 			return (Iterable<?>) collection;
 		} else if (collection == null) {
-			LOGGER.info("ReST Collection is null, assuming empty list");
-			return new ArrayList<Object[]>(0);
+			LOGGER.info("ReST Collection is null. Assuming empty collection");
+			return emptyList();
 
 		} else {
 			throw new InvalidConfigurationException(

@@ -73,6 +73,9 @@ public class AbstractParserTest {
 	@Mock
 	private ValueConverter converterMock;
 
+	@Mock
+	private Closure<Object> collectionClosureMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -114,6 +117,33 @@ public class AbstractParserTest {
 
 		assertArrayEquals(new Object[] { "1", "3" }, rows.get(0));
 		assertArrayEquals(new Object[] { "2", "4" }, rows.get(1));
+	}
+
+	@Test
+	public void shouldReturnEmptyListOnNPEWhileRetrievingCollection()
+			throws IOException {
+		// given
+		Iterable<Object> parsedData = asList((Object) "firstRow", "secondRow");
+
+		config = RestTestConfig.readonlyConfig();
+		// add different paths for mocking
+		config.getQuery().setCollection(new GroovyScript("collection"));
+
+		parser = createParser(config, parsedData);
+		when(responseMock.getEntity()).thenReturn(
+				new StringEntity(REQUEST_CONTENT, "UTF-8"));
+
+		// return mock closures for each column
+		when(
+				scriptBuilderMock.buildClosure(config.getQuery()
+						.getCollection())).thenReturn(collectionClosureMock);
+		when(collectionClosureMock.call(parsedData)).thenThrow(
+				new NullPointerException());
+
+		// when
+		List<Object[]> rows = parser.getRows(responseMock);
+
+		assertThat(rows.size(), is(0));
 	}
 
 	@Test
@@ -172,7 +202,6 @@ public class AbstractParserTest {
 	}
 
 	private void prepareForParsingOfRows() throws UnsupportedEncodingException {
-		StringReader reader = new StringReader(REQUEST_CONTENT);
 		Iterable<Object> parsedData = asList((Object) "firstRow", "secondRow");
 
 		config = RestTestConfig.readonlyConfig();
