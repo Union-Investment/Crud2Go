@@ -50,6 +50,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ShowPopupProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest.ReSTDelegateImpl;
@@ -286,8 +287,10 @@ public class ScriptModelFactory {
 	}
 
 	public GenericDelegate getReSTDelegate(ReSTContainerConfig config,
-			ReSTContainer container, ScriptBuilder scriptBuilder) {
-		return new ReSTDelegateImpl(config, container, scriptBuilder);
+			ReSTContainer container, ScriptBuilder scriptBuilder,
+			AuditLogger auditLogger) {
+		return new ReSTDelegateImpl(config, container, scriptBuilder,
+				auditLogger);
 	}
 
 	public ScriptReSTContainer getScriptReSTContainer(ReSTContainer container) {

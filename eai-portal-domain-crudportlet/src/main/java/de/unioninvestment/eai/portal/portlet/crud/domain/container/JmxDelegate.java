@@ -174,10 +174,9 @@ public class JmxDelegate implements GenericDelegate {
 						ObjectName objectName = mbeanProxy.name();
 
 						if (server != null && objectName != null) {
-							auditLogger.audit(server,
-									objectName.getCanonicalName(),
-									propertyID.toString(),
-									itemProperty);
+							auditLogger.auditMBeanPropertyChange(
+									server, objectName.getCanonicalName(),
+									propertyID.toString(), itemProperty);
 						}
 					}
 				}

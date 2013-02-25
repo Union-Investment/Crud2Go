@@ -45,6 +45,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessExcep
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.InvalidConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.vaadin.container.Column;
@@ -107,6 +108,9 @@ public class ReSTDelegateImplTest {
 	private ReSTDelegateImpl delegate;
 
 	private ReSTContainerConfig config;
+
+	@Mock
+	private AuditLogger auditLoggerMock;
 
 	@Before
 	public void setUp() {
@@ -376,6 +380,25 @@ public class ReSTDelegateImplTest {
 	}
 
 	@Test
+	public void shouldAuditPostRequest()
+			throws ClientProtocolException, IOException {
+
+		// given
+		config = RestTestConfig.readwriteConfig();
+		delegate = newDelegate(config);
+		stubValidInsertOperation();
+		stubSuccessfulPostResponse();
+
+		// when
+		delegate.update(asList(itemMock), new UpdateContext());
+
+		// then
+		verify(auditLoggerMock).auditReSTRequest("POST",
+				"http://test.de/insertpath/4711",
+				JSON_STRING, "HTTP/1.1 201 CREATED");
+	}
+
+	@Test
 	public void shouldSendInsertPutRequestIfConfigured()
 			throws ClientProtocolException, IOException {
 		// given
@@ -390,6 +413,26 @@ public class ReSTDelegateImplTest {
 
 		// then
 		verify(httpMock).execute(isA(HttpPut.class));
+	}
+
+	@Test
+	public void shouldAuditPutRequest()
+			throws ClientProtocolException, IOException {
+
+		// given
+		config = RestTestConfig.readwriteConfig();
+		config.getInsert().setMethod(ReSTChangeMethodConfig.PUT);
+		delegate = newDelegate(config);
+		stubValidInsertOperation();
+		stubSuccessfulPutResponse();
+
+		// when
+		delegate.update(asList(itemMock), new UpdateContext());
+
+		// then
+		verify(auditLoggerMock).auditReSTRequest("PUT",
+				"http://test.de/insertpath/4711",
+				JSON_STRING, "HTTP/1.1 200 CREATED");
 	}
 
 	@Test
@@ -473,6 +516,23 @@ public class ReSTDelegateImplTest {
 
 		assertThat(request.getURI().toString(),
 				is("http://test.de/deletepath/4711"));
+	}
+
+	@Test
+	public void shouldAuditDeleteRequest()
+			throws ClientProtocolException, IOException {
+
+		// given
+		config = RestTestConfig.readwriteConfig();
+		delegate = newDelegate(config);
+		prepareValidDeleteRequest();
+
+		// when
+		delegate.update(asList(itemMock), new UpdateContext());
+
+		// then
+		verify(auditLoggerMock).auditReSTRequest("DELETE",
+				"http://test.de/deletepath/4711", "HTTP/1.1 200 DELETED");
 	}
 
 	@Test
@@ -644,7 +704,7 @@ public class ReSTDelegateImplTest {
 
 	private ReSTDelegateImpl newDelegate(ReSTContainerConfig config) {
 		ReSTDelegateImpl delegate = new ReSTDelegateImpl(config, containerMock,
-				scriptBuilderMock);
+				scriptBuilderMock, auditLoggerMock);
 		delegate.http = httpMock;
 		delegate.parser = parserMock;
 		delegate.creator = creatorMock;

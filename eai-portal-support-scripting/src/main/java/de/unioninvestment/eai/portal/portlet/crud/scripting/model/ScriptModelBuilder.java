@@ -75,6 +75,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilt
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ConfirmationDialogProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOptionList;
@@ -112,6 +113,7 @@ public class ScriptModelBuilder {
 
 	private PortletApplication application;
 	private EventBus eventBus;
+	private AuditLogger auditLogger;
 
 	/**
 	 * Konstruktor mit Parameter.
@@ -128,6 +130,7 @@ public class ScriptModelBuilder {
 	 *            Portletmodel
 	 * @param modelToConfigMapping
 	 *            Map mit Config
+	 * @param currentUser
 	 */
 	public ScriptModelBuilder(
 			ScriptModelFactory factory,
@@ -151,6 +154,9 @@ public class ScriptModelBuilder {
 	 * @return Scriptportletmodel
 	 */
 	public ScriptPortlet build() {
+		CurrentUser currentUser = userFactory.getCurrentUser(portlet);
+		auditLogger = new AuditLogger(currentUser);
+
 		PortletConfig config = ((Config) configs.get(portlet))
 				.getPortletConfig();
 		scriptBuilder.registerMainScript(config.getScript());
@@ -185,7 +191,6 @@ public class ScriptModelBuilder {
 		scriptBuilder.addBindingVariable("log",
 				LoggerFactory.getLogger("portlet.crud.scripting.main"));
 
-		CurrentUser currentUser = userFactory.getCurrentUser(portlet);
 		ScriptUser scriptUser = factory.getScriptCurrentUser(currentUser);
 		scriptBuilder.addBindingVariable("currentUser", scriptUser);
 
@@ -207,7 +212,7 @@ public class ScriptModelBuilder {
 				NotificationProvider.Type.INFO));
 
 		scriptBuilder.addBindingVariable("audit", new ScriptAuditLogger(
-				scriptBuilder.getMainScript(), currentUser));
+				scriptBuilder.getMainScript(), auditLogger));
 
 		scriptBuilder.runMainScript();
 
@@ -665,8 +670,7 @@ public class ScriptModelBuilder {
 			ReSTContainerConfig config = (ReSTContainerConfig) configs
 					.get(container);
 			restContainer.setDelegate(factory.getReSTDelegate(config,
-					restContainer,
-					scriptBuilder));
+					restContainer, scriptBuilder, auditLogger));
 			scriptContainer = factory.getScriptReSTContainer(restContainer);
 
 		} else if (container instanceof JMXContainer) {

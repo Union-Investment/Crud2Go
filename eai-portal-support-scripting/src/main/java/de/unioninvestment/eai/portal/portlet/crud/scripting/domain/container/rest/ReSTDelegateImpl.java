@@ -39,6 +39,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerR
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTDelegate;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.vaadin.container.Column;
@@ -67,12 +68,15 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 	private String baseUrl;
 	private String queryUrl;
 
+	private AuditLogger auditLogger;
+
 	public ReSTDelegateImpl(ReSTContainerConfig containerConfig,
 			ReSTContainer container,
-			ScriptBuilder scriptBuilder) {
+			ScriptBuilder scriptBuilder, AuditLogger auditLogger) {
 		this.config = containerConfig;
 		this.container = container;
 		this.scriptBuilder = scriptBuilder;
+		this.auditLogger = auditLogger;
 
 		this.metaData = extractMetaData();
 		this.parser = createParser();
@@ -253,6 +257,11 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 		try {
 			HttpResponse response = http.execute(request);
+
+			auditLogger.auditReSTRequest(request.getMethod(), uri.toString(),
+					new String(content, config.getCharset()),
+					response.getStatusLine().toString());
+
 			expectAnyStatusCode(response, HttpStatus.SC_CREATED,
 					HttpStatus.SC_NO_CONTENT);
 
@@ -274,6 +283,11 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 		try {
 			HttpResponse response = http.execute(request);
+
+			auditLogger.auditReSTRequest(request.getMethod(), uri.toString(),
+					new String(content, config.getCharset()),
+					response.getStatusLine().toString());
+
 			expectAnyStatusCode(response, HttpStatus.SC_OK,
 					HttpStatus.SC_NO_CONTENT);
 
@@ -314,6 +328,10 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 		try {
 			HttpResponse response = http.execute(request);
+
+			auditLogger.auditReSTRequest(request.getMethod(), uri.toString(),
+					response.getStatusLine().toString());
+
 			expectAnyStatusCode(response, HttpStatus.SC_OK,
 					HttpStatus.SC_ACCEPTED, // marked for deletion
 					HttpStatus.SC_NO_CONTENT);
