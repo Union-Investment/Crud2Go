@@ -35,17 +35,30 @@ public abstract class AbstractParser implements PayloadParser {
 
 	private ValueConverter converter = new ValueConverter();
 
+	/**
+	 * To be implemented by subclasses. Should parse the ReST content and return
+	 * a Java Model. (Results of JSONSlurper or XMLSlurper).
+	 * 
+	 * @param reader
+	 *            provides the body content
+	 * @return the model
+	 * @throws IOException
+	 *             propagated from subroutines
+	 */
 	protected abstract Object parseData(Reader reader) throws IOException;
 
+	/**
+	 * @param config
+	 *            the ReST Configuration
+	 * @param scriptBuilder
+	 *            needed for Closure instantation
+	 */
 	public AbstractParser(ReSTContainerConfig config,
 			ScriptBuilder scriptBuilder) {
 		this.config = config;
 		this.scriptBuilder = scriptBuilder;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public List<Object[]> getRows(HttpResponse response)
 			throws IOException {
@@ -107,6 +120,14 @@ public abstract class AbstractParser implements PayloadParser {
 		return valueReturnedByClosure;
 	}
 
+	/**
+	 * Provide a collection from the parsed data, probably by evaluating the
+	 * collection attribute from the configuration.
+	 * 
+	 * @param parsedData
+	 *            the parsed ReST response data
+	 * @return something iterable that maps to table rows
+	 */
 	protected Iterable<?> getCollection(Object parsedData) {
 
 		Object collection = parsedData;
@@ -137,6 +158,13 @@ public abstract class AbstractParser implements PayloadParser {
 		}
 	}
 
+	/**
+	 * @param response
+	 *            the ReST Response
+	 * @return a reader providing the HTTP payload and respecting the response
+	 *         encoding
+	 * @throws IOException
+	 */
 	protected Reader getReader(HttpResponse response) throws IOException {
 		ContentType contentType = ContentType.getOrDefault(response
 				.getEntity());
@@ -163,6 +191,16 @@ public abstract class AbstractParser implements PayloadParser {
 		return locale;
 	}
 
+	/**
+	 * Utility method that configures the given closure to delegate everything
+	 * to a given object
+	 * 
+	 * @param closure
+	 *            the closure to configure and call
+	 * @param delegate
+	 *            the delegate object
+	 * @return the result of the closure
+	 */
 	protected Object callClosureAgainstDelegate(Closure<?> closure,
 			Object delegate) {
 		closure.setDelegate(delegate);

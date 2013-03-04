@@ -21,6 +21,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.InvalidConfig
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 
+/**
+ * Parser for XML.
+ * 
+ * @author carsten.mjartan
+ */
 public class XmlParser extends AbstractParser {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -29,6 +34,12 @@ public class XmlParser extends AbstractParser {
 	private ReSTContainerConfig config;
 	private ScriptBuilder scriptBuilder;
 
+	/**
+	 * @param config
+	 *            the ReST Configuration
+	 * @param scriptBuilder
+	 *            needed for Closure instantation
+	 */
 	public XmlParser(ReSTContainerConfig config, ScriptBuilder scriptBuilder) {
 		super(config, scriptBuilder);
 		this.config = config;
@@ -49,6 +60,7 @@ public class XmlParser extends AbstractParser {
 		}
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Iterable<?> getCollection(Object parsedData) {
 
@@ -56,25 +68,26 @@ public class XmlParser extends AbstractParser {
 
 		GroovyScript collectionScript = config.getQuery()
 				.getCollection();
-		if (collectionScript != null && collectionScript.getClazz() != null) {
+		if (collectionScript != null && collectionScript.getSource() != null) {
 			Closure<?> closure = scriptBuilder.buildClosure(collectionScript);
-			final Object closureResult = callClosureAgainstDelegate(closure,
+			collection = callClosureAgainstDelegate(closure,
 					parsedData);
-			if (closureResult instanceof GPathResult) {
-				collection = new Iterable<Object>() {
-					@Override
-					public Iterator<Object> iterator() {
-						return ((GPathResult) closureResult).iterator();
-					}
-				};
-			}
 		}
-
-		if (collection instanceof Iterable) {
-			return (Iterable<?>) collection;
-		} else if (collection == null) {
+		if (collection == null) {
 			LOGGER.info("ReST Collection is null, assuming empty list");
 			return new ArrayList<Object[]>(0);
+
+		} else if (collection instanceof GPathResult) {
+			final GPathResult result = (GPathResult) collection;
+			return new Iterable<Object>() {
+				@Override
+				public Iterator<Object> iterator() {
+					return result.iterator();
+				}
+			};
+
+		} else if (collection instanceof Iterable) {
+			return (Iterable<?>) collection;
 
 		} else {
 			throw new InvalidConfigurationException(
