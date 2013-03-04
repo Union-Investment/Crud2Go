@@ -5,6 +5,7 @@ import groovy.xml.MarkupBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.UnsupportedCharsetException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,32 +46,42 @@ public class XmlCreator implements PayloadCreator {
 	@Override
 	public byte[] create(GenericItem item, GroovyScript conversionScript,
 			String charset) {
-		Closure<?> closure = scriptBuilder.buildClosure(conversionScript);
 
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		OutputStreamWriter writer = new OutputStreamWriter(byteStream, charset);
-		MarkupBuilder xml = new MarkupBuilder(writer);
-		closure.setDelegate(xml);
-
-		ScriptRow scriptRow = scriptRow(item);
-		closure.call(scriptRow);
-
-		if (LOGGER.isDebugEnabled()) {
-			logXml(byteStream, charset);
-		}
-		return byteStream.toByteArray();
-	}
-
-	private void logXml(ByteArrayOutputStream byteStream, String charset) {
 		try {
-			LOGGER.debug("Generating XML:\n{}",
-					new String(byteStream.toByteArray(), charset));
+			ByteArrayOutputStream byteStream = createBytestream(item,
+					conversionScript, charset);
 
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Generating XML:\n{}",
+						new String(byteStream.toByteArray(), charset));
+			}
+			return byteStream.toByteArray();
+
+		} catch (UnsupportedCharsetException e) {
+			throw new InvalidConfigurationException(
+					"portlet.crud.error.config.rest.unknownEncoding",
+					charset);
 		} catch (UnsupportedEncodingException e) {
 			throw new InvalidConfigurationException(
 					"portlet.crud.error.config.rest.unknownEncoding",
 					charset);
 		}
+	}
+
+	private ByteArrayOutputStream createBytestream(GenericItem item,
+			GroovyScript conversionScript, String charset) {
+
+		Closure<?> closure = scriptBuilder.buildClosure(conversionScript);
+
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		OutputStreamWriter writer = new OutputStreamWriter(byteStream,
+				charset);
+		MarkupBuilder xml = new MarkupBuilder(writer);
+		closure.setDelegate(xml);
+
+		ScriptRow scriptRow = scriptRow(item);
+		closure.call(scriptRow);
+		return byteStream;
 	}
 
 	private ScriptRow scriptRow(GenericItem item) {
