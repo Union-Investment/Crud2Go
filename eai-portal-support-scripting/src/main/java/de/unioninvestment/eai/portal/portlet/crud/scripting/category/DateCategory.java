@@ -24,12 +24,19 @@ import java.util.GregorianCalendar;
 import javax.xml.bind.DatatypeConverter;
 
 /**
- * Erweitert die String Klasse um weitere Methoden.
+ * Erweitert die Date Klasse um weitere Methoden.
  * 
- * @author eugen.melnichuk
+ * @author carsten.mjartan
  */
 public class DateCategory {
 
+	/**
+	 * @param date
+	 *            a date
+	 * @return the ISO8601 conformant string representation
+	 * @throws NullPointerException
+	 *             if date is null
+	 */
 	public static String getIso8601String(Date date) {
 		GregorianCalendar calendar = new GregorianCalendar();
 		calendar.setTime(date);

@@ -52,6 +52,7 @@ public class CustomColumnGeneratorImpl implements CustomColumnGenerator {
 		this.application = application;
 	}
 
+	@Override
 	public Component generate(ContainerRow row) {
 		ScriptRow scriptRow = new ScriptRow(row);
 		Object component = closure.call(scriptRow,

@@ -231,4 +231,9 @@ public class JmxDelegateTest {
 	{
 
 	}
+
+	@Test
+	public void getRows() {
+	
+	}
 }

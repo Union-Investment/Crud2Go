@@ -45,7 +45,7 @@ import de.unioninvestment.eai.portal.support.vaadin.container.MetaData;
 import de.unioninvestment.eai.portal.support.vaadin.container.UpdateContext;
 
 /**
- * Backend-Schnittstelle für {@link ScriptJMXContainer}.
+ * Backend-Implementation für JMX.
  */
 public class JmxDelegate implements GenericDelegate {
 
@@ -66,6 +66,12 @@ public class JmxDelegate implements GenericDelegate {
 
 	private String server;
 
+	/**
+	 * @param jmxContainerConfig
+	 *            the JMX configuration
+	 * @param currentUser
+	 *            the current user needed for auditing
+	 */
 	public JmxDelegate(JmxContainerConfig jmxContainerConfig,
 			CurrentUser currentUser) {
 		metadata = extractMetadataFromConfig(jmxContainerConfig);
@@ -75,6 +81,14 @@ public class JmxDelegate implements GenericDelegate {
 		server = jmxContainerConfig.getServer();
 	}
 
+	/**
+	 * @param jmxContainerConfig
+	 *            the JMX configuration
+	 * @param currentUser
+	 *            the current user needed for auditing
+	 * @param wrapper
+	 *            the wrapper class to be used for JMX communication
+	 */
 	public JmxDelegate(JmxContainerConfig jmxContainerConfig,
 			JMXWrapper wrapper, CurrentUser currentUser) {
 		metadata = extractMetadataFromConfig(jmxContainerConfig);
@@ -187,10 +201,17 @@ public class JmxDelegate implements GenericDelegate {
 		}
 	}
 
+	/**
+	 * @param query
+	 *            the query string to be used for future queries
+	 */
 	public void setQuery(String query) {
 		this.query = query;
 	}
 
+	/**
+	 * @return the current query string
+	 */
 	public String getQuery() {
 		return query;
 	}
@@ -199,10 +220,17 @@ public class JmxDelegate implements GenericDelegate {
 		this.jmxWrapper = jmxWrapper;
 	}
 
+	/**
+	 * @return the JMX wrapper
+	 */
 	public JMXWrapper getJmxWrapper() {
 		return jmxWrapper;
 	}
 
+	/**
+	 * @param server
+	 *            the server name to be used for future JMX operations
+	 */
 	public void setServer(String server) {
 		this.server = server;
 	}
