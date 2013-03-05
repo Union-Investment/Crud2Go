@@ -185,6 +185,16 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- for Groovy Tests -->
+		<dependency>
+			<groupId>org.spockframework</groupId>
+			<artifactId>spock-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -261,7 +271,6 @@
 					</additionalProjectnatures>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
 </project>

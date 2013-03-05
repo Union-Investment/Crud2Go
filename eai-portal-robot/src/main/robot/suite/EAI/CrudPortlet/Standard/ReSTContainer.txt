@@ -1,0 +1,33 @@
+*** Settings ***
+Documentation   Unterstützung von ReST Backends
+Force Tags      autor-mjartanc  rest  UI-577  mantis-5435
+
+*** Test Case ***
+
+Anzeige des Ergebnisses eines ReST-Request
+	Es existiert ein ReST-Service
+	
+	wenn das Portlet mit der XML-Konfiguration 'REST_CONTAINER.xml' geladen ist
+	
+	dann werden in der ersten Zeile die Werte des ReST-Service angezeigt
+
+ReST-POST Insert-Operation
+	Es existiert ein ReST-Service
+	und außerdem ein Portlet mit der XML-Konfiguration 'REST_CONTAINER.xml'
+	
+	wenn eine neue Zeile an den ReST-Service gesendet wird 
+	
+	dann wird die Tabelle mit der neuen Zeile vom ReST-Server abgeholt und angezeigt
+	
+ReST-PUT Update-Operation
+	Es existiert ein ReST-Service
+	und außerdem ein Portlet mit der XML-Konfiguration 'REST_CONTAINER.xml'
+	
+	wenn eine aktualisierte Zeile an den ReST-Service gesendet wird 
+	
+	dann wird die Tabelle mit dem aktualisierten Inhalt vom ReST-Server abgeholt und angezeigt
+	
+
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt
+Test Teardown	Stoppe Rest Server und verarbeite Testergebnis

@@ -361,6 +361,7 @@ Spalte '${SPALTE}' den Wert '${TEXT}'
 	Should Be True  '${var}'=='${TEXT}'
 	
 hat die Spalte '${SPALTE}' in der Zeile '${ZEILE}' den Wert '${TEXT}'
+	Wait for AJAX calls to complete	
 	${var} =  Get Text  css=table.v-table-table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE})
 	Should Be True  '${var}'=='${TEXT}'
 	
