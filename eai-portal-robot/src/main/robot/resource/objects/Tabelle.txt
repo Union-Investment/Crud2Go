@@ -33,6 +33,10 @@ eine aktualisierte Zeile an den ReST-Service gesendet wird
 	Input Text At Column  3  6
 	Switch To Table View Mode
 
+die erste Tabellenzeile gelöscht wird
+	Switch To Table Edit Mode
+	Delete Table Row  1
+
 ##########################
 ###  Dann / Und es ... ###
 ##########################
@@ -52,6 +56,8 @@ wird die Tabelle mit dem aktualisierten Inhalt vom ReST-Server abgeholt und ange
 	Table Cell Should Have Text  1  2  Test3
 	Table Cell Should Have Text  1  3  6
 
+werden keine Tabellenzeilen mehr angezeigt
+	Table Should Have Number Of Rows  0
 
 ##########################
 ###  Utility Keywords  ###
@@ -66,10 +72,18 @@ Switch To Table View Mode
 Insert New Table Row
 	Vaadin Click  css=span.v-button-caption:contains("Neue Zeile")
 
+Delete Current Table Row
+	Vaadin Click  css=span.v-button-caption:contains("Zeile Löschen")
+
 Select Table Row
 	[Arguments]  ${row}
 	Call Selenium Api  mouseDown  css=.v-table-crudTable table.v-table-table tbody tr:nth-child(${row}) td:nth-child(1)  
 	Call Selenium Api  mouseUp    css=.v-table-crudTable table.v-table-table tbody tr:nth-child(${row}) td:nth-child(1)  
+
+Delete Table Row
+	[Arguments]  ${row}
+	Select Table Row  ${row}
+	Delete Current Table Row	
 
 Input Text At Column
 	[Arguments]  ${column}  ${text}
@@ -77,9 +91,14 @@ Input Text At Column
 
 Table Cell Should Have Text
 	[Arguments]  ${row}  ${column}  ${text}
-	Wait for AJAX calls to complete	
+	Wait for AJAX calls to complete
 	${var} =  Get Text  css=.v-table-crudTable table.v-table-table tbody tr:nth-child(${row}) td:nth-child(${column})
 	Should Be True  '${var}'=='${text}'
+
+Table Should Have Number Of Rows
+	[Arguments]  ${expectedNumber}
+	Wait for AJAX calls to complete
+	Xpath Should Match X Times  //table[contains(@class, 'v-table-table')]//tr  ${expectedNumber}
 
 ##########################
 ###  Setup / Teardown  ###

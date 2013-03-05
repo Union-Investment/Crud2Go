@@ -71,7 +71,7 @@ public class RestXmlServerLibrary {
 			response.setStatus(HttpServletResponse.SC_OK);
 			baseRequest.setHandled(true);
 			if (deleted) {
-				response.getWriter().println("[]");
+				response.getWriter().println("<items/>");
 			} else {
 				response.getWriter().println(
 						"<items><item><a>" + dataA
