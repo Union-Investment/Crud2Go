@@ -7,6 +7,7 @@ Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
 Resource        ${RESOURCES}/objects/common-keywords.txt
 
 Library         de.unioninvestment.eai.portal.robot.RestServerLibrary  ${9876}
+Library         de.unioninvestment.eai.portal.robot.RestXmlServerLibrary  ${9876}
 
 
 *** Keywords ***
@@ -17,6 +18,9 @@ Library         de.unioninvestment.eai.portal.robot.RestServerLibrary  ${9876}
 
 ein ReST-Service
 	Start Rest Server
+
+ein ReST-XML-Service
+	Start Rest Xml Server
 	
 ############################
 ###  Wenn / Und dann ... ###
@@ -39,4 +43,5 @@ ein ReST-Service
 	 
 Stoppe Rest Server und verarbeite Testergebnis
 	Stop Rest Server
+	Stop Rest Xml Server
 	Verarbeite Testergebnis

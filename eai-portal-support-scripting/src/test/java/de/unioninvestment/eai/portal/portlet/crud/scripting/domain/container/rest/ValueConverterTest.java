@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -80,11 +81,61 @@ public class ValueConverterTest {
 
 	@Test
 	public void shouldReturnStringFromAnythingUsingToStringMethod() {
-		Object expectedString = "132.3";
-		Object convertedValue = converter.convertValue(String.class, null,
-				null, 132.3);
-
-		assertThat(convertedValue, is(expectedString));
+		expectConversion(String.class, null, null, 132.3, "132.3");
 	}
 
+	@Test
+	public void shouldReturnIntegerFromString() {
+		expectConversion(Integer.class, null, null, "7", 7);
+	}
+
+	@Test
+	public void shouldReturnLongFromString() {
+		expectConversion(Long.class, null, null, "7", 7L);
+	}
+
+	@Test
+	public void shouldReturnDoubleFromString() {
+		expectConversion(Double.class, null, null, "7", 7.0);
+	}
+
+	@Test
+	public void shouldReturnDoubleFromLocalizedString() {
+		expectConversion(Double.class, null, Locale.GERMANY, "7,0", 7.0);
+	}
+
+	@Test
+	public void shouldReturnBigDecimalFromString() {
+		expectConversion(BigDecimal.class, null, null, "7", new BigDecimal("7"));
+	}
+
+	@Test
+	public void shouldReturnBigDecimalFromLocalizedString() {
+		expectConversion(BigDecimal.class, null, Locale.GERMANY, "7,0",
+				new BigDecimal("7.0"));
+	}
+
+	@Test
+	public void shouldReturnBigDecimalFromLocalizedFormattedString() {
+		expectConversion(BigDecimal.class, "'EUR '#,###.##",
+				Locale.GERMANY, "EUR 7.000,00", new BigDecimal("7000.00"));
+	}
+
+	@Test
+	public void shouldReturnBigDecimalFromOtherNumber() {
+		expectConversion(BigDecimal.class, null,
+				null, 7000.0, new BigDecimal("7000.0"));
+	}
+
+	@Test
+	public void shouldReturnDoubleFromInteger() {
+		expectConversion(Double.class, null, null, 7, 7.0);
+	}
+
+	private void expectConversion(Class<?> targetClass, String format,
+			Locale locale, Object sourceValue, Object expectedValue) {
+		Object convertedValue = converter.convertValue(targetClass, format,
+				locale, sourceValue);
+		assertThat(convertedValue, is(expectedValue));
+	}
 }

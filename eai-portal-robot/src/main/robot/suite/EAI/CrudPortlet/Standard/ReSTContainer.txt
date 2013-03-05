@@ -11,6 +11,14 @@ Anzeige des Ergebnisses eines ReST-Request
 	
 	dann werden in der ersten Zeile die Werte des ReST-Service angezeigt
 
+Anzeige des Ergebnisses eines ReST-XML-Request
+	Es existiert ein ReST-XML-Service
+	
+	wenn das Portlet mit der XML-Konfiguration 'REST_XML_CONTAINER.xml' geladen ist
+	
+	dann werden in der ersten Zeile die Werte des ReST-Service angezeigt
+
+
 ReST-POST Insert-Operation
 	Es existiert ein ReST-Service
 	und außerdem ein Portlet mit der XML-Konfiguration 'REST_CONTAINER.xml'
@@ -19,9 +27,25 @@ ReST-POST Insert-Operation
 	
 	dann wird die Tabelle mit der neuen Zeile vom ReST-Server abgeholt und angezeigt
 	
+ReST-POST XML Insert-Operation
+	Es existiert ein ReST-XML-Service
+	und außerdem ein Portlet mit der XML-Konfiguration 'REST_XML_CONTAINER.xml'
+	
+	wenn eine neue Zeile an den ReST-Service gesendet wird 
+	
+	dann wird die Tabelle mit der neuen Zeile vom ReST-Server abgeholt und angezeigt
+	
 ReST-PUT Update-Operation
 	Es existiert ein ReST-Service
 	und außerdem ein Portlet mit der XML-Konfiguration 'REST_CONTAINER.xml'
+	
+	wenn eine aktualisierte Zeile an den ReST-Service gesendet wird 
+	
+	dann wird die Tabelle mit dem aktualisierten Inhalt vom ReST-Server abgeholt und angezeigt
+	
+ReST-PUT XML Update-Operation
+	Es existiert ein ReST-XML-Service
+	und außerdem ein Portlet mit der XML-Konfiguration 'REST_XML_CONTAINER.xml'
 	
 	wenn eine aktualisierte Zeile an den ReST-Service gesendet wird 
 	

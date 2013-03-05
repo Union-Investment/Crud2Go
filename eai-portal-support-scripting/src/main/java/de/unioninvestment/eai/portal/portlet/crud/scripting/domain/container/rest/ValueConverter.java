@@ -18,7 +18,11 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,6 +31,7 @@ import java.util.Locale;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.format.number.NumberFormatter;
 
 /**
  * Converts for ReST-Format attributes to match the configured datatypes.
@@ -61,9 +66,67 @@ public class ValueConverter {
 		} else if (targetClass == Date.class) {
 			return convertValueToDate(format, locale, value);
 
+		} else if (Number.class.isAssignableFrom(targetClass)) {
+			return convertValueToNumber(targetClass, format, locale, value);
+
 		} else {
 			return value;
 		}
+	}
+
+	private Object convertValueToNumber(Class<?> targetClass, String format,
+			Locale locale, Object value) {
+		if (value instanceof String) {
+			return convertStringToValue(targetClass, format, locale,
+					(String) value);
+		} else if (value instanceof Number) {
+			return convertNumberToNumber(targetClass, (Number) value);
+		}
+		throw new IllegalArgumentException("Cannot convert to "
+				+ targetClass.getSimpleName() + ": "
+				+ value + " of type " + value.getClass().getName());
+	}
+
+	private Object convertNumberToNumber(Class<?> targetClass, Number number) {
+		if (targetClass.isAssignableFrom(number.getClass())) {
+			return number;
+		} else if (targetClass == Integer.class) {
+			return number.intValue();
+		} else if (targetClass == Long.class) {
+			return number.longValue();
+		} else if (targetClass == Double.class) {
+			return number.doubleValue();
+		} else if (targetClass == BigDecimal.class) {
+			return new BigDecimal(number.toString());
+		}
+		throw new IllegalArgumentException("Cannot convert to "
+				+ targetClass.getSimpleName() + ": "
+				+ number + " of type " + number.getClass().getName());
+	}
+
+	private Object convertStringToValue(Class<?> targetClass, String format,
+			Locale locale, String value) {
+
+		try {
+			Locale effectiveLocale = locale != null ? locale : Locale.US;
+			NumberFormat nf = new NumberFormatter(format)
+					.getNumberFormat(effectiveLocale);
+			Number number = null;
+			if (targetClass == BigDecimal.class) {
+				((DecimalFormat) nf).setParseBigDecimal(true);
+				number = nf.parse(value, new ParsePosition(0));
+			} else {
+				number = nf.parse(value);
+			}
+			return convertNumberToNumber(targetClass, number);
+
+		} catch (ParseException e) {
+			// continue to exception
+		}
+
+		throw new IllegalArgumentException("Cannot convert to "
+				+ targetClass.getSimpleName() + ": "
+				+ value);
 	}
 
 	private boolean isCompatibleType(Class<?> targetClass, Object value) {
