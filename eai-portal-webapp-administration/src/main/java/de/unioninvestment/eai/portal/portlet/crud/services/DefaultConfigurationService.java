@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.services;
 
 import java.io.IOException;
@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.portlet.PortletPreferences;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
@@ -33,6 +34,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsPasswordConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsUsernameConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
@@ -198,5 +203,54 @@ public class DefaultConfigurationService implements ConfigurationService {
 			throws IOException {
 		InputStream stream = dao.readConfigAsStream(portletId, communityId);
 		return IOUtils.toString(stream, "UTF-8");
+	}
+
+	@Override
+	public boolean isConfigured(Config config,
+			PortletPreferences preferences) {
+		if (config != null) {
+			AuthenticationConfig authentication = config.getPortletConfig()
+					.getAuthentication();
+			if (authentication == null) {
+				return true;
+			} else {
+				return authenticationPreferencesExist(preferences,
+						authentication);
+			}
+		} else {
+			return false;
+		}
+	}
+
+	private boolean authenticationPreferencesExist(
+			PortletPreferences preferences,
+			AuthenticationConfig authentication) {
+		for (AuthenticationRealmConfig realm : authentication
+				.getRealm()) {
+			if (realm.getCredentials() != null) {
+				CredentialsUsernameConfig username = realm
+						.getCredentials().getUsername();
+				if (username != null
+						&& username.getPreferenceKey() != null
+						&& preferenceMissing(preferences,
+								username.getPreferenceKey())) {
+					return false;
+				}
+				CredentialsPasswordConfig password = realm
+						.getCredentials().getPassword();
+				if (password != null
+						&& password.getPreferenceKey() != null
+						&& preferenceMissing(preferences,
+								password.getPreferenceKey())) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean preferenceMissing(PortletPreferences preferences,
+			String preferenceKey) {
+		return preferences.getValue(preferenceKey, null) == null;
 	}
 }

@@ -46,6 +46,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
@@ -287,9 +288,9 @@ public class ScriptModelFactory {
 	}
 
 	public GenericDelegate getReSTDelegate(ReSTContainerConfig config,
-			ReSTContainer container, ScriptBuilder scriptBuilder,
+			ReSTContainer container, Realm realm, ScriptBuilder scriptBuilder,
 			AuditLogger auditLogger) {
-		return new ReSTDelegateImpl(config, container, scriptBuilder,
+		return new ReSTDelegateImpl(config, container, realm, scriptBuilder,
 				auditLogger);
 	}
 

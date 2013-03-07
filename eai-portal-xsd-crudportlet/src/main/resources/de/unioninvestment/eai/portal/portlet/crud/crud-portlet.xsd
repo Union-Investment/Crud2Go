@@ -6,7 +6,16 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
 	elementFormDefault="qualified" jaxb:version="2.0">
 
-	<element name="portlet" type="tns:PortletConfig" />
+	<element name="portlet" type="tns:PortletConfig">
+		<key name="realmName">
+			<selector xpath="authentication/realm" />
+			<field xpath="@name" />
+		</key>
+		<keyref name="realmNameRef" refer="tns:realmName">
+			<selector xpath=".//table/rest-container" />
+			<field xpath="@realm" />
+		</keyref>
+	</element>
 
 	<complexType name="PortletConfig">
 		<annotation>
@@ -17,6 +26,8 @@
 		<sequence>
 			<element name="roles" type="tns:RolesConfig" minOccurs="0"
 				maxOccurs="1" />
+			<element name="authentication" type="tns:AuthenticationConfig"
+				minOccurs="0" maxOccurs="1" />
 			<choice>
 				<element name="page" type="tns:PageConfig" />
 				<element name="tabs" type="tns:TabsConfig" />
@@ -54,6 +65,89 @@
 				<documentation>
 					Groovy Closure, die beim Portlet Refresh aufgerufen
 					wird
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="AuthenticationConfig">
+		<annotation>
+			<documentation>
+				Authentifizierungsinformationen
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="realm" type="tns:AuthenticationRealmConfig"
+				minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<complexType name="AuthenticationRealmConfig">
+		<annotation>
+			<documentation>
+				Authentifizierungsinformationen
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="credentials" type="tns:CredentialsConfig"
+				minOccurs="1" maxOccurs="1" />
+		</sequence>
+		<attribute name="name" type="string" use="required">
+			<annotation>
+				<documentation>
+					Name des Bereichs für die Authentifizierung
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="CredentialsConfig">
+		<annotation>
+			<documentation>
+				Klammer um Authentifizierungsinformationen bestehend
+				aus Username und Passwort.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="username" type="tns:CredentialsUsernameConfig"
+				minOccurs="1" maxOccurs="1" />
+			<element name="password" type="tns:CredentialsPasswordConfig"
+				minOccurs="1" maxOccurs="1" />
+		</sequence>
+	</complexType>
+
+	<complexType name="CredentialsUsernameConfig">
+		<annotation>
+			<documentation>
+				Benutzername
+			</documentation>
+		</annotation>
+		<attribute name="preference-key" type="string" use="required">
+			<annotation>
+				<documentation>
+					Key aus Portlet Preferences
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="CredentialsPasswordConfig">
+		<annotation>
+			<documentation>
+				Passwort
+			</documentation>
+		</annotation>
+		<attribute name="preference-key" type="string" use="required">
+			<annotation>
+				<documentation>
+					Key aus Portlet Preferences
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="encryption-algorithm" type="string">
+			<annotation>
+				<documentation>
+					Key aus Portlet Preferences
 				</documentation>
 			</annotation>
 		</attribute>
@@ -1608,6 +1702,11 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="realm" type="string">
+					<annotation>
+						<documentation>Authentication Realm Name</documentation>
+					</annotation>
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -1624,7 +1723,8 @@
 		</sequence>
 		<attribute name="url" type="string">
 			<annotation>
-				<documentation>Relativer Pfad oder absolute URL zur Query. Wenn nicht gegeben, werden keine Ergebnisse zurückgeliefert.
+				<documentation>Relativer Pfad oder absolute URL zur Query. Wenn
+					nicht gegeben, werden keine Ergebnisse zurückgeliefert.
 				</documentation>
 			</annotation>
 		</attribute>
@@ -1743,7 +1843,7 @@
 	<simpleType name="ReSTChangeMethodConfig">
 		<annotation>
 			<documentation>
-				HTTP Request-Methode 
+				HTTP Request-Methode
 			</documentation>
 		</annotation>
 		<restriction base="string">

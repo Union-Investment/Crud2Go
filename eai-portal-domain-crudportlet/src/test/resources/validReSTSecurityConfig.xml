@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Testkonfiguration für ConfigurationScriptsCompiler - ReST+JSon">
+	<authentication>
+		<realm name="testserver">
+			<credentials>
+				<username preference-key="testserver.username" />
+				<password preference-key="testserver.password" encryption-algorithm="pgp" />
+			</credentials>
+		</realm>
+	</authentication>
+	<page>
+		<table id="material">
+			<rest-container
+				baseUrl="http://localhost:9080/crud2go-rest-testserver/rest/library"
+				realm="testserver">
+				<query url="/books">
+					<attribute name="isbn" primary-key="true" />
+					<attribute name="title" />
+					<attribute name="author" />
+					<attribute name="all" type="java.util.Map" path="it" />
+				</query>
+				<insert url="/books"><![CDATA[
+					[
+						isbn: row.values.isbn,
+						title: row.values.title,
+						author: row.values.author
+					]
+				]]></insert>
+				<update url="/book/${row.values.isbn}"><![CDATA[
+					[
+						title: row.values.title,
+						author: row.values.author
+					]
+				]]></update>
+				<delete url="/book/${row.values.isbn}" />
+			</rest-container>
+			<columns>
+				<column name="isbn" title="ID" primary-key="true" />
+				<column name="title" title="Titel" editable="true" validate="required" />
+				<column name="author" title="Autor" editable="true" validate="required" />
+				<column name="all" title="All" />
+			</columns>
+		</table>
+	</page>
+</portlet>

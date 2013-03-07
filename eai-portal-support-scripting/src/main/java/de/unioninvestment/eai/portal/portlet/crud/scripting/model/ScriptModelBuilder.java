@@ -71,6 +71,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
@@ -669,8 +670,11 @@ public class ScriptModelBuilder {
 			ReSTContainer restContainer = (ReSTContainer) container;
 			ReSTContainerConfig config = (ReSTContainerConfig) configs
 					.get(container);
-			restContainer.setDelegate(factory.getReSTDelegate(config,
-					restContainer, scriptBuilder, auditLogger));
+			Realm realm = config.getRealm() == null ? null :
+					portlet.getAuthenticationRealms().get(config.getRealm());
+			GenericDelegate restDelegate = factory.getReSTDelegate(config,
+					restContainer, realm, scriptBuilder, auditLogger);
+			restContainer.setDelegate(restDelegate);
 			scriptContainer = factory.getScriptReSTContainer(restContainer);
 
 		} else if (container instanceof JMXContainer) {

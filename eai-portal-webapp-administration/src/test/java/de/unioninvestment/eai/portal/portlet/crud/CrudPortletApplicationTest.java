@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -67,6 +68,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 
+import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication.ConfigStatus;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEvent;
@@ -155,6 +157,9 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	@Mock
 	private RenderResponse renderResponseMock;
 
+	@Mock
+	private PortletPreferences preferencesMock;
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		applicationUrl = new URL("http://xxx");
@@ -184,6 +189,7 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 				themeDisplayMock);
 		when(themeDisplayMock.getScopeGroupId()).thenReturn(14008L);
 
+		when(request.getPreferences()).thenReturn(preferencesMock);
 	}
 
 	private void initializeWindowSpy() {
@@ -261,6 +267,9 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		PortletConfig portletConfig = new PortletConfig();
 
 		when(configMock.getPortletConfig()).thenReturn(portletConfig);
+		when(
+				configurationServiceMock.isConfigured(configMock,
+						preferencesMock)).thenReturn(true);
 		when(request.getAttribute(WebKeys.PORTLET_ID)).thenReturn("4711");
 
 		when(modelBuilderMock.build()).thenThrow(new RuntimeException("bla"));
@@ -286,6 +295,9 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		app.start(applicationUrl, null, contextMock);
 
 		PortletConfig portletConfig = new PortletConfig();
+		when(
+				configurationServiceMock.isConfigured(configMock,
+						preferencesMock)).thenReturn(true);
 
 		when(configMock.getPortletConfig()).thenReturn(portletConfig);
 		when(request.getAttribute(WebKeys.PORTLET_ID)).thenReturn("4711");
@@ -335,6 +347,7 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		when(request.getPortletMode()).thenReturn(PortletMode.EDIT);
 		app.handleResourceRequest(request, response, windowSpy);
 		verify(portletConfigurationPresenterMock).refresh(
+				ConfigStatus.NO_CONFIG, null,
 				app.getPortletDomain());
 	}
 
@@ -350,7 +363,7 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 
 		app.handleResourceRequest(request, response, windowSpy);
 		verify(portletConfigurationPresenterMock, never()).refresh(
-				app.getPortletDomain());
+				any(ConfigStatus.class), any(Config.class), any(Portlet.class));
 	}
 
 	@Test
@@ -403,6 +416,9 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		app.start(applicationUrl, null, contextMock);
 
 		final PortletConfig portletConfig = new PortletConfig();
+		when(
+				configurationServiceMock.isConfigured(configMock,
+						preferencesMock)).thenReturn(true);
 
 		when(configMock.getPortletConfig()).thenAnswer(
 				new Answer<PortletConfig>() {

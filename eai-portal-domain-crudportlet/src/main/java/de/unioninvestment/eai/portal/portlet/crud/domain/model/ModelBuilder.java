@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.AbstractActionConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.BinaryConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CheckboxConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
@@ -62,13 +62,13 @@ import de.unioninvestment.eai.portal.portlet.crud.config.TriggerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TriggersConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
-import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction.ActionHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
@@ -105,8 +105,6 @@ public class ModelBuilder {
 
 	private final Config config;
 
-	private final ConnectionPoolFactory connectionPoolFactory;
-
 	private final ResetFormAction resetFormAction;
 
 	private final FieldValidatorFactory fieldValidatorFactory;
@@ -123,19 +121,15 @@ public class ModelBuilder {
 
 	private List<Form> forms = new ArrayList<Form>();
 
-	private ExecutorService prefetchExecutor;
-
 	private final EventBus eventBus;
 
 	/**
 	 * Konstruktor mit Parameter.
 	 * 
+	 * @param eventBus
+	 *            der Event-Bus
 	 * @param factory
 	 *            Model-Factory
-	 * @param connectionPoolFactory
-	 *            ConnectionPool-Factory
-	 * @param prefetchExecutor
-	 *            responsible for prefetching option lists
 	 * @param resetFormAction
 	 *            Resetbutton
 	 * @param fieldValidatorFactory
@@ -144,18 +138,13 @@ public class ModelBuilder {
 	 *            Breite der Selectboxen
 	 * @param config
 	 *            Portlet Konfiguration
-	 * @param portletId
-	 *            Id des Portlets
 	 */
 	public ModelBuilder(EventBus eventBus, ModelFactory factory,
-			ConnectionPoolFactory connectionPoolFactory,
-			ExecutorService prefetchExecutor, ResetFormAction resetFormAction,
+			ResetFormAction resetFormAction,
 			FieldValidatorFactory fieldValidatorFactory,
 			int defaultSelectWidth, Config config) {
 		this.eventBus = eventBus;
 		this.factory = factory;
-		this.connectionPoolFactory = connectionPoolFactory;
-		this.prefetchExecutor = prefetchExecutor;
 		this.resetFormAction = resetFormAction;
 		this.fieldValidatorFactory = fieldValidatorFactory;
 		this.defaultSelectWidth = defaultSelectWidth;
@@ -173,19 +162,8 @@ public class ModelBuilder {
 		portlet = new Portlet(eventBus, config.getPortletConfig());
 		mappings.put(portlet, config);
 
-		if (config.getPortletConfig().getRoles() != null) {
-			LiferayApplication application = LiferayApplication
-					.getCurrentApplication();
-			String portletId = application.getPortletId();
-			long communityId = application.getCommunityId();
-			for (RoleConfig roleConfig : config.getPortletConfig().getRoles()
-					.getRole()) {
-				portlet.addRole(new Role(roleConfig.getName(), config
-						.getRoleResourceIDs().get(
-								portletId + "_" + communityId + "_"
-										+ roleConfig.getName())));
-			}
-		}
+		buildRoles();
+		buildAuthenticationRealms();
 
 		currentUser = new CurrentUser(portlet.getRoles());
 
@@ -201,6 +179,33 @@ public class ModelBuilder {
 		buildDialogs();
 
 		return portlet;
+	}
+
+	private void buildAuthenticationRealms() {
+		if (config.getPortletConfig().getAuthentication() != null) {
+			for (AuthenticationRealmConfig realmConfig : config
+					.getPortletConfig().getAuthentication().getRealm()) {
+
+				Realm realm = factory.getAuthenticationRealm(realmConfig);
+				portlet.addRealm(realmConfig.getName(), realm);
+			}
+		}
+	}
+
+	private void buildRoles() {
+		if (config.getPortletConfig().getRoles() != null) {
+			LiferayApplication application = LiferayApplication
+					.getCurrentApplication();
+			String portletId = application.getPortletId();
+			long communityId = application.getCommunityId();
+			for (RoleConfig roleConfig : config.getPortletConfig().getRoles()
+					.getRole()) {
+				portlet.addRole(new Role(roleConfig.getName(), config
+						.getRoleResourceIDs().get(
+								portletId + "_" + communityId + "_"
+										+ roleConfig.getName())));
+			}
+		}
 	}
 
 	/**

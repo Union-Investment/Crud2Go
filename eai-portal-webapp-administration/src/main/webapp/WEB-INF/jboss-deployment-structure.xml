@@ -5,7 +5,8 @@
 			<module name="de.unioninvestment.configuration" />
 			<module name="com.oracle.ojdbc6" />
 			<module name="com.liferay.portal" />
-			<module name="org.jboss.management.jboss4client"/>
+			<module name="org.jboss.management.jboss4client" />
+			<module name="org.bouncycastle" />
 			<system>
 				<paths>
 					<path name="com/sun/jndi/url/rmi" />

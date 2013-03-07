@@ -22,6 +22,11 @@
 
 		<dependency>
 			<groupId>de.uit.eai.portal</groupId>
+			<artifactId>eai-portal-security</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.uit.eai.portal</groupId>
 			<artifactId>eai-portal-support-vaadin</artifactId>
 		</dependency>
 
