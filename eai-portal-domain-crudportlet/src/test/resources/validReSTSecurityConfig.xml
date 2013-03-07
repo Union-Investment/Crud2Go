@@ -12,18 +12,18 @@
 	</authentication>
 	<page>
 		<table id="material">
-			<rest-container baseUrl="http://localhost:9080/camel-restlet/rest/secureTestlist" realm="testserver">
+			<rest-container
+				baseUrl="http://localhost:9080/camel-restlet/rest/secureTestlist"
+				realm="testserver">
 				<query url="/books">
-					<attribute name="ID" primary-key="true" />
+					<attribute name="ID" type="java.lang.Integer" primary-key="true" />
 					<attribute name="CNUMBER5_2" type="java.lang.Integer" />
-					<attribute name="CDATE" type="java.util.Date" format="yyyy-MM-dd HH:mm:ss.S" />
-					<attribute name="CTIMESTAMP" type="java.util.Date"
-						format="yyyy-MM-dd HH:mm:ss.S" />
+					<attribute name="CDATE" type="java.util.Date" />
+					<attribute name="CTIMESTAMP" type="java.util.Date" />
 					<attribute name="CVARCHAR5_NN" />
 					<attribute name="CNUMBER5_2_NN" type="java.lang.Integer" />
-					<attribute name="CDATE_NN" type="java.util.Date" format="yyyy-MM-dd HH:mm:ss.S" />
-					<attribute name="CTIMESTAMP_NN" type="java.util.Date"
-						format="yyyy-MM-dd HH:mm:ss.S" />
+					<attribute name="CDATE_NN" type="java.util.Date" />
+					<attribute name="CTIMESTAMP_NN" type="java.util.Date" />
 					<attribute name="TESTDATA" />
 				</query>
 			</rest-container>
