@@ -5,41 +5,40 @@
 		<realm name="testserver">
 			<credentials>
 				<username preference-key="testserver.username" />
-				<password preference-key="testserver.password" encryption-algorithm="pgp" />
+				<password preference-key="testserver.password"
+					encryption-algorithm="pgp" />
 			</credentials>
 		</realm>
 	</authentication>
 	<page>
 		<table id="material">
-			<rest-container
-				baseUrl="http://localhost:9080/crud2go-rest-testserver/rest/library"
-				realm="testserver">
+			<rest-container baseUrl="http://localhost:9080/camel-restlet/rest/secureTestlist" realm="testserver">
 				<query url="/books">
-					<attribute name="isbn" primary-key="true" />
-					<attribute name="title" />
-					<attribute name="author" />
-					<attribute name="all" type="java.util.Map" path="it" />
+					<attribute name="ID" primary-key="true" />
+					<attribute name="CNUMBER5_2" type="java.lang.Integer" />
+					<attribute name="CDATE" type="java.util.Date" format="yyyy-MM-dd HH:mm:ss.S" />
+					<attribute name="CTIMESTAMP" type="java.util.Date"
+						format="yyyy-MM-dd HH:mm:ss.S" />
+					<attribute name="CVARCHAR5_NN" />
+					<attribute name="CNUMBER5_2_NN" type="java.lang.Integer" />
+					<attribute name="CDATE_NN" type="java.util.Date" format="yyyy-MM-dd HH:mm:ss.S" />
+					<attribute name="CTIMESTAMP_NN" type="java.util.Date"
+						format="yyyy-MM-dd HH:mm:ss.S" />
+					<attribute name="TESTDATA" />
 				</query>
-				<insert url="/books"><![CDATA[
-					[
-						isbn: row.values.isbn,
-						title: row.values.title,
-						author: row.values.author
-					]
-				]]></insert>
-				<update url="/book/${row.values.isbn}"><![CDATA[
-					[
-						title: row.values.title,
-						author: row.values.author
-					]
-				]]></update>
-				<delete url="/book/${row.values.isbn}" />
 			</rest-container>
 			<columns>
-				<column name="isbn" title="ID" primary-key="true" />
-				<column name="title" title="Titel" editable="true" validate="required" />
-				<column name="author" title="Autor" editable="true" validate="required" />
-				<column name="all" title="All" />
+				<column name="ID" title="ID" primary-key="true" />
+				<column name="CNUMBER5_2" title="Zahl" editable="true" />
+				<column name="CDATE" editable="false" />
+				<column name="CTIMESTAMP" />
+				<column name="CVARCHAR5_NN" editable="true"
+					longtitle="CVARCHAR5 (Pflichtfeld)" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN" hidden="true" />
+				<column name="TESTDATA" editable="true" width="300"
+					validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt" />
 			</columns>
 		</table>
 	</page>
