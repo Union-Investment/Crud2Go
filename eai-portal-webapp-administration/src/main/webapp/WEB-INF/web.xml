@@ -4,13 +4,19 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
 	<context-param>
+		<description>Vaadin production mode</description>
+		<param-name>productionMode</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			classpath*:eai-portal-web-applicationcontext.xml,
 			classpath*:eai-portal-domain-security-applicationcontext.xml
 		</param-value>
 	</context-param>
-	<!-- The Vaadin 'productionMode' parameter can be set by a system property -->
+
 
 	<!-- Listeners -->
 	<listener>

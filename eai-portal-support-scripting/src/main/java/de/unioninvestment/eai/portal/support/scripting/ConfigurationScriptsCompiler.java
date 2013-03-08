@@ -41,6 +41,8 @@ import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.PanelConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTAttributeConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
@@ -214,6 +216,9 @@ public class ConfigurationScriptsCompiler {
 		} else if (table.getScriptContainer() != null) {
 			compileAllClosureScripts(table.getScriptContainer(), location
 					+ "/scriptContainer");
+		} else if (table.getRestContainer() != null) {
+			compileAllClosureScripts(table.getRestContainer(), location
+					+ "/scriptContainer");
 		}
 	}
 
@@ -284,15 +289,54 @@ public class ConfigurationScriptsCompiler {
 		compileClosure(container.getOnUpdate(), "it,row", location
 				+ "/onUpdate");
 		if (container instanceof DatabaseQueryConfig) {
-			DatabaseQueryConfig databaseQueryConfig = (DatabaseQueryConfig) container;
-			compileDatabaseQueryScripts(databaseQueryConfig, location);
+			DatabaseQueryConfig config = (DatabaseQueryConfig) container;
+			compileDatabaseQueryScripts(config, location);
 		} else if (container instanceof ScriptContainerConfig) {
-			ScriptContainerConfig scriptContainerConfig = (ScriptContainerConfig) container;
-			compileDatabaseQueryScripts(scriptContainerConfig, location);
+			ScriptContainerConfig config = (ScriptContainerConfig) container;
+			compileScriptContainerScripts(config, location);
+		} else if (container instanceof ReSTContainerConfig) {
+			ReSTContainerConfig config = (ReSTContainerConfig) container;
+			compileReSTContainerScripts(config, location);
 		}
 	}
 
-	private void compileDatabaseQueryScripts(
+	private void compileReSTContainerScripts(ReSTContainerConfig config,
+			String location) {
+		compileClosure(config.getQuery().getCollection(), location
+				+ "/query/collection");
+		compileReSTAttributeScripts(config.getQuery().getAttribute(), location
+				+ "/query/attributes");
+		if (config.getInsert() != null) {
+			compileGString(config.getInsert().getUrl(), "row", location
+					+ "/insert/url");
+			compileClosure(config.getInsert().getValue(), "row", location
+					+ "/insert/value");
+		}
+		if (config.getUpdate() != null) {
+			compileGString(config.getUpdate().getUrl(), "row", location
+					+ "/update/url");
+			compileClosure(config.getUpdate().getValue(), "row", location
+					+ "/update/value");
+		}
+		if (config.getDelete() != null) {
+			compileGString(config.getDelete().getUrl(), "row", location
+					+ "/delete/url");
+		}
+	}
+
+	private void compileReSTAttributeScripts(
+			List<ReSTAttributeConfig> attributes, String location) {
+		for (ReSTAttributeConfig attribute : attributes) {
+			if (attribute.getPath() == null
+					|| attribute.getPath().getSource() == null) {
+				attribute.setPath(new GroovyScript(attribute.getName()));
+			}
+			compileClosure(attribute.getPath(),
+					location + "[" + attribute.getName() + "]");
+		}
+	}
+
+	private void compileScriptContainerScripts(
 			ScriptContainerConfig scriptContainerConfig, String location) {
 		compileClosure(scriptContainerConfig.getDelegate(), "", location
 				+ "/delegate");

@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.support.vaadin.container;
 
 import static java.util.Arrays.asList;
@@ -24,8 +24,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +42,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.ItemSetChangeEvent;
@@ -172,7 +178,8 @@ public class GenericVaadinContainerTest {
 		container.removeItem(newItem);
 
 		container.commit();
-		verify(delegateMock, never()).update(anyList());
+		verify(delegateMock, never()).update(anyList(),
+				any(UpdateContext.class));
 	}
 
 	@Test
@@ -191,7 +198,8 @@ public class GenericVaadinContainerTest {
 
 		container.commit();
 
-		verify(delegateMock).update(asList(deletedItem));
+		verify(delegateMock).update(eq(asList(deletedItem)),
+				any(UpdateContext.class));
 	}
 
 	@Test
@@ -240,7 +248,8 @@ public class GenericVaadinContainerTest {
 				new Object[] { "3" })), nullValue());
 
 		container.commit();
-		verify(delegateMock, never()).update(anyList());
+		verify(delegateMock, never()).update(anyList(),
+				any(UpdateContext.class));
 	}
 
 	@Test
@@ -250,7 +259,8 @@ public class GenericVaadinContainerTest {
 
 		container.commit();
 
-		verify(delegateMock).update(asList(newItem));
+		verify(delegateMock).update(eq(asList(newItem)),
+				any(UpdateContext.class));
 	}
 
 	@Test
@@ -266,6 +276,26 @@ public class GenericVaadinContainerTest {
 	}
 
 	@Test
+	public void shouldRefreshTheContainerAfterUpdateIfRequestedByDelegate() {
+		reset(delegateMock);
+
+		GenericItemId newItemId = (GenericItemId) container.addItem();
+		doAnswer(new Answer<Object>() {
+			@Override
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				UpdateContext context = (UpdateContext) invocation
+						.getArguments()[1];
+				context.requireRefresh();
+				return null;
+			}
+		}).when(delegateMock).update(any(List.class), any(UpdateContext.class));
+
+		container.commit();
+
+		verify(delegateMock).getRows();
+	}
+
+	@Test
 	public void shouldCallDelegateUpdateWithModifiedItemsOnCommit() {
 		GenericItem changedItem = container
 				.getUnfilteredItem(new GenericItemId(new Object[] { "3" }));
@@ -273,7 +303,8 @@ public class GenericVaadinContainerTest {
 
 		container.commit();
 
-		verify(delegateMock).update(asList(changedItem));
+		verify(delegateMock).update(eq(asList(changedItem)),
+				any(UpdateContext.class));
 	}
 
 	@Test
@@ -301,7 +332,8 @@ public class GenericVaadinContainerTest {
 		container.commit();
 		container.commit();
 
-		verify(delegateMock, times(1)).update(asList(newItem));
+		verify(delegateMock, times(1)).update(eq(asList(newItem)),
+				any(UpdateContext.class));
 	}
 
 	@Test
@@ -313,7 +345,8 @@ public class GenericVaadinContainerTest {
 		container.commit();
 		container.commit();
 
-		verify(delegateMock, times(1)).update(asList(changedItem));
+		verify(delegateMock, times(1)).update(eq(asList(changedItem)),
+				any(UpdateContext.class));
 	}
 
 	@Test
@@ -325,7 +358,8 @@ public class GenericVaadinContainerTest {
 		container.commit();
 		container.commit();
 
-		verify(delegateMock, times(1)).update(asList(deletedItem));
+		verify(delegateMock, times(1)).update(eq(asList(deletedItem)),
+				any(UpdateContext.class));
 	}
 
 	@Test
@@ -343,7 +377,8 @@ public class GenericVaadinContainerTest {
 		container.commit();
 
 		assertThat(container.isModified(), is(false));
-		verify(delegateMock, never()).update(anyList());
+		verify(delegateMock, never()).update(anyList(),
+				any(UpdateContext.class));
 
 		changedItem = container.getUnfilteredItem(new GenericItemId(
 				new Object[] { "3" }));

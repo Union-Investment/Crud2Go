@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Jenkins Jobs">
+	<page>
+		<table id="jenkins">
+			<rest-container format="xml">
+				<query url="http://jenkins.d3.uid.de/api/xml" collection="job">
+					<attribute name="name" primary-key="true"/>
+					<attribute name="url"/>
+					<attribute name="color"/>
+				</query>
+			</rest-container>
+			<columns>
+				<column name="name" title="Name" primary-key="true"/>
+				<column name="url" title="URL" />
+				<column name="color" title="Farbe" />
+			</columns>
+		</table>
+	</page>
+</portlet>

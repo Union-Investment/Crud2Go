@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Testkonfiguration für ReST JSON-Container">
+	<page>
+		<table id="material">
+			<rest-container baseUrl="http://localhost:9876" >
+				<query url="/query">
+					<attribute name="a" primary-key="true" type="java.lang.Integer" />
+					<attribute name="b" />
+					<attribute name="c" type="java.lang.Double"/>
+				</query>
+				<insert url="/insert"><![CDATA[
+					[
+						a: row.values.a,
+						b: row.values.b,
+						c: row.values.c
+					]
+				]]></insert>
+				<update url="/update/${row.id.a}"><![CDATA[
+					[
+						a: row.values.a,
+						b: row.values.b,
+						c: row.values.c
+					]
+				]]></update>
+				<delete url="/delete/${row.id.a}" />
+			</rest-container>
+			<columns>
+				<column name="a" title="A" editable="true" primary-key="true" />
+				<column name="b" title="B" editable="true" />
+				<column name="c" title="C" editable="true" />
+			</columns>
+		</table>
+	</page>
+</portlet>

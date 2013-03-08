@@ -48,6 +48,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.JmxContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.OrderConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.PageConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.PanelConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
@@ -660,6 +661,10 @@ public class ModelBuilder {
 			container = buildScriptContainer(tableConfig.getScriptContainer(),
 					formatPattern);
 			mappings.put(container, tableConfig.getScriptContainer());
+		} else if (tableConfig.getRestContainer() != null) {
+			container = buildReSTContainer(tableConfig.getRestContainer(),
+					formatPattern);
+			mappings.put(container, tableConfig.getRestContainer());
 		} else if (tableConfig.getJmxContainer() != null) {
 			container = buildJmxContainer(tableConfig.getJmxContainer(),
 					formatPattern);
@@ -671,19 +676,33 @@ public class ModelBuilder {
 		return container;
 	}
 
-	private DataContainer buildJmxContainer(JmxContainerConfig jmxContainer,
+	private DataContainer buildReSTContainer(ReSTContainerConfig restContainer,
 			Map<String, String> formatPattern) {
 
-		List<ContainerOrder> defaultOrder = getDefaultOrder(jmxContainer);
+		List<ContainerOrder> defaultOrder = getDefaultOrder(restContainer);
 
-		GenericDataContainer genericDataContainer = factory
-				.getGenericDataContainer(eventBus, formatPattern, defaultOrder,
-						extractFilterPolicy(jmxContainer));
+		ReSTContainer container = factory
+				.getReSTContainer(eventBus, formatPattern, defaultOrder,
+						extractFilterPolicy(restContainer));
 
-		JmxDelegate jmxDelegate = new JmxDelegate(jmxContainer, currentUser);
+		// delegate is unset, will be set in ScriptModelBuilder later
 
-		genericDataContainer.setDelegate(jmxDelegate);
-		return genericDataContainer;
+		return container;
+	}
+
+	private DataContainer buildJmxContainer(JmxContainerConfig config,
+			Map<String, String> formatPattern) {
+
+		List<ContainerOrder> defaultOrder = getDefaultOrder(config);
+
+		JMXContainer jmxContainer = factory
+				.getJmxContainer(eventBus, formatPattern, defaultOrder,
+						extractFilterPolicy(config));
+
+		JmxDelegate jmxDelegate = new JmxDelegate(config, currentUser);
+		jmxContainer.setDelegate(jmxDelegate);
+
+		return jmxContainer;
 	}
 
 	private FilterPolicy extractFilterPolicy(ContainerConfig jmxContainer) {

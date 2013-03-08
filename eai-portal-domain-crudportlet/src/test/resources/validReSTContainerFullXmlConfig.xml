@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Testkonfiguration für ConfigurationScriptsCompiler - ReST+JSon">
+	<page>
+		<table id="material">
+			<rest-container baseUrl="http://localhost:9080/crud2go-rest-testserver/rest/library" format="xml">
+				<query url="/books" collection="book">
+					<attribute name="isbn" primary-key="true" path="it.@isbn"/>
+					<attribute name="title" />
+					<attribute name="author" />
+				</query>
+				<insert url="/books"><![CDATA[
+					book(isbn: row.values.isbn) {						
+						title(row.values.title)
+						author(row.values.author)
+					}
+				]]></insert>
+				<update url="/book/${row.values.isbn}"><![CDATA[
+					book {						
+						title(row.values.title)
+						author(row.values.author)
+					}
+				]]></update>
+				<delete url="/book/${row.values.isbn}"/>
+			</rest-container>
+			<columns>
+				<column name="isbn" title="ID" primary-key="true" />
+				<column name="title" title="Titel" editable="true" validate="required" />
+				<column name="author" title="Autor" editable="true" validate="required"/>
+			</columns>
+		</table>
+	</page>
+</portlet>

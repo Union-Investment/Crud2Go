@@ -1,0 +1,47 @@
+*** Settings ***
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/common-keywords.txt
+
+Library         de.unioninvestment.eai.portal.robot.RestServerLibrary  ${9876}
+Library         de.unioninvestment.eai.portal.robot.RestXmlServerLibrary  ${9876}
+
+
+*** Keywords ***
+
+####################################################
+###  Es existiert/existieren / Und weiterhin ... ###
+####################################################
+
+ein ReST-Service
+	Start Rest Server
+
+ein ReST-XML-Service
+	Start Rest Xml Server
+	
+############################
+###  Wenn / Und dann ... ###
+############################
+
+
+##########################
+###  Dann / Und es ... ###
+##########################
+
+
+##########################
+###  Utility Keywords  ###
+##########################
+
+	
+##########################
+###  Setup / Teardown  ###
+##########################
+	 
+Stoppe Rest Server und verarbeite Testergebnis
+	Stop Rest Server
+	Stop Rest Xml Server
+	Verarbeite Testergebnis

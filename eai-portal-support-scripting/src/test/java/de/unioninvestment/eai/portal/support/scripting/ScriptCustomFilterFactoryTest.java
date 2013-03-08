@@ -9,8 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
@@ -38,22 +36,14 @@ public class ScriptCustomFilterFactoryTest {
 
 		CustomFilterConfig config = new CustomFilterConfig();
 		config.setFilter(new GroovyScript("abcde"));
-		final Closure<Boolean> closure = new Closure<Boolean>(
+		final Closure<Object> closure = new Closure<Object>(
 				ScriptCustomFilterFactoryTest.this) {
-			public Boolean doCall(ScriptRow row) {
+			public Object doCall(ScriptRow row) {
 				return true;
 			}
 		};
-		when(scriptBuilderMock.buildClosure(config.getFilter())).thenAnswer(
-				new Answer<Object>() {
-
-					@Override
-					public Object answer(InvocationOnMock invocation)
-							throws Throwable {
-						return closure;
-					}
-				});
-
+		when(scriptBuilderMock.buildClosure(config.getFilter())).thenReturn(
+				closure);
 		CustomFilter customFilter = factory.createCustomFilter(config);
 
 		assertThat(customFilter.getMatcher(),

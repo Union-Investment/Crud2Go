@@ -21,8 +21,13 @@
 			<portlet-mode>help</portlet-mode>
 		</supports>
 
-		<supported-locale>de</supported-locale>
-		<resource-bundle>de.unioninvestment.eai.portal.portlet.crud.portlet-info</resource-bundle>
+		<!-- Replaced the resource-bundle config by portlet-info, as it causes a bug that prevents hot deployment with jboss 7 -->
+		<portlet-info>
+			<title>Crud2Go</title>
+			<short-title>Crud2Go</short-title>
+		</portlet-info>
+		
+		<!-- <supported-locale>de</supported-locale> <resource-bundle>de.unioninvestment.eai.portal.portlet.crud.portlet-info</resource-bundle> -->
+		
 	</portlet>
-
 </portlet-app>

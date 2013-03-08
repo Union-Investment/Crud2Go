@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
 import groovy.util.GroovyMBean;
@@ -42,9 +42,10 @@ import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericItem;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericProperty;
 import de.unioninvestment.eai.portal.support.vaadin.container.MetaData;
+import de.unioninvestment.eai.portal.support.vaadin.container.UpdateContext;
 
 /**
- * Backend-Schnittstelle für {@link ScriptJMXContainer}.
+ * Backend-Implementation für JMX.
  */
 public class JmxDelegate implements GenericDelegate {
 
@@ -53,27 +54,43 @@ public class JmxDelegate implements GenericDelegate {
 	private JMXWrapper jmxWrapper;
 
 	private String query;
-	
+
 	private static final org.slf4j.Logger LOG = LoggerFactory
 			.getLogger(JmxDelegate.class);
 
 	private List<String> columnNamesWithoutPK;
 
 	private ArrayList<String> getterScripts;
-	
+
 	private AuditLogger auditLogger;
-	
+
 	private String server;
 
-	public JmxDelegate(JmxContainerConfig jmxContainerConfig, CurrentUser currentUser) {
+	/**
+	 * @param jmxContainerConfig
+	 *            the JMX configuration
+	 * @param currentUser
+	 *            the current user needed for auditing
+	 */
+	public JmxDelegate(JmxContainerConfig jmxContainerConfig,
+			CurrentUser currentUser) {
 		metadata = extractMetadataFromConfig(jmxContainerConfig);
 		jmxWrapper = new JMXWrapper(jmxContainerConfig.getServer());
 		query = jmxContainerConfig.getQuery();
 		auditLogger = new AuditLogger(currentUser);
 		server = jmxContainerConfig.getServer();
 	}
-	
-	public JmxDelegate(JmxContainerConfig jmxContainerConfig, JMXWrapper wrapper, CurrentUser currentUser) {
+
+	/**
+	 * @param jmxContainerConfig
+	 *            the JMX configuration
+	 * @param currentUser
+	 *            the current user needed for auditing
+	 * @param wrapper
+	 *            the wrapper class to be used for JMX communication
+	 */
+	public JmxDelegate(JmxContainerConfig jmxContainerConfig,
+			JMXWrapper wrapper, CurrentUser currentUser) {
 		metadata = extractMetadataFromConfig(jmxContainerConfig);
 		jmxWrapper = wrapper;
 		query = jmxContainerConfig.getQuery();
@@ -92,22 +109,19 @@ public class JmxDelegate implements GenericDelegate {
 
 		columnNamesWithoutPK = new ArrayList<String>(attributsliste.size());
 		getterScripts = new ArrayList<String>(attributsliste.size());
-		
+
 		for (Attribute attribute : attributsliste) {
-			try {
-				colums.add(new Column(attribute.getName(), Class
-						.forName(attribute.getType()), attribute.isReadonly() || attribute.getServerSideGetter() != null,
-						attribute.isRequired(), false, null));
-				
-				columnNamesWithoutPK.add(attribute.getName());
-				getterScripts.add(attribute.getServerSideGetter());
-				
-			} catch (ClassNotFoundException e) {
-				LOG.error("error extracting metadata", e);
-				throw new BusinessException(
-						"portlet.crud.error.jmxContainerTypeError",
-						attribute.getType());
-			}
+			colums.add(new Column(
+					attribute.getName(),
+					attribute.getType(),
+					attribute.isReadonly()
+							|| attribute.getServerSideGetter() != null,
+					attribute.isRequired(),
+					false,
+					null));
+
+			columnNamesWithoutPK.add(attribute.getName());
+			getterScripts.add(attribute.getServerSideGetter());
 		}
 
 		MetaData metadata = new MetaData(colums, false, true, false, false,
@@ -124,8 +138,9 @@ public class JmxDelegate implements GenericDelegate {
 	@Override
 	public List<Object[]> getRows() {
 		try {
-			Map<String, ? extends Map<String, ? extends Object>> queryResult = jmxWrapper.query(
-					query, columnNamesWithoutPK, getterScripts);
+			Map<String, ? extends Map<String, ? extends Object>> queryResult = jmxWrapper
+					.query(
+							query, columnNamesWithoutPK, getterScripts);
 
 			List<Object[]> result = new ArrayList<Object[]>();
 
@@ -156,7 +171,7 @@ public class JmxDelegate implements GenericDelegate {
 	}
 
 	@Override
-	public void update(List<GenericItem> items) {
+	public void update(List<GenericItem> items, UpdateContext context) {
 		for (GenericItem item : items) {
 			GroovyMBean mbeanProxy;
 			try {
@@ -169,14 +184,13 @@ public class JmxDelegate implements GenericDelegate {
 					if (itemProperty.isModified()) {
 						mbeanProxy.setProperty(propertyID.toString(),
 								itemProperty.getValue());
-						
+
 						ObjectName objectName = mbeanProxy.name();
-						
+
 						if (server != null && objectName != null) {
-							auditLogger.audit(server, 
-									objectName.getCanonicalName(), 
-									propertyID.toString(), 
-									itemProperty);
+							auditLogger.auditMBeanPropertyChange(
+									server, objectName.getCanonicalName(),
+									propertyID.toString(), itemProperty);
 						}
 					}
 				}
@@ -187,10 +201,17 @@ public class JmxDelegate implements GenericDelegate {
 		}
 	}
 
+	/**
+	 * @param query
+	 *            the query string to be used for future queries
+	 */
 	public void setQuery(String query) {
 		this.query = query;
 	}
 
+	/**
+	 * @return the current query string
+	 */
 	public String getQuery() {
 		return query;
 	}
@@ -199,10 +220,17 @@ public class JmxDelegate implements GenericDelegate {
 		this.jmxWrapper = jmxWrapper;
 	}
 
+	/**
+	 * @return the JMX wrapper
+	 */
 	public JMXWrapper getJmxWrapper() {
 		return jmxWrapper;
 	}
 
+	/**
+	 * @param server
+	 *            the server name to be used for future JMX operations
+	 */
 	public void setServer(String server) {
 		this.server = server;
 	}

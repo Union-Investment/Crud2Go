@@ -15,13 +15,13 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
  */
 public class ScriptCustomFilterMatcher implements CustomFilterMatcher {
 
-	private Closure<Boolean> closure;
+	private Closure<Object> closure;
 
 	/**
 	 * @param closure
 	 *            the Closure to delegate to
 	 */
-	public ScriptCustomFilterMatcher(Closure<Boolean> closure) {
+	public ScriptCustomFilterMatcher(Closure<Object> closure) {
 		Assert.notNull(closure, "Custom Filter Closure is null");
 		this.closure = closure;
 	}

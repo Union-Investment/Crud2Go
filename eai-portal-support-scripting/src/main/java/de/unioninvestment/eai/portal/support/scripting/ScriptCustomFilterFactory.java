@@ -57,7 +57,7 @@ public class ScriptCustomFilterFactory implements CustomFilterFactory {
 	@Override
 	@SuppressWarnings("unchecked")
 	public CustomFilter createCustomFilter(CustomFilterConfig config) {
-		Closure<Boolean> filterClosure = (Closure<Boolean>) scriptBuilder
+		Closure<Object> filterClosure = scriptBuilder
 				.buildClosure(config.getFilter());
 
 		return new CustomFilter(new ScriptCustomFilterMatcher(filterClosure),

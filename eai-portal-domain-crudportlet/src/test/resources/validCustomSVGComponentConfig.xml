@@ -6,7 +6,14 @@
 	</page>
 	<script><![CDATA[
 		def buildSVG(builder) {
-				builder.svgComponent(source: builder.streamResource(stream: {new ByteArrayInputStream(getSvg())},filename: 'pull.svg',mimetype: 'image/svg+xml'),onSvgMessage:{event -> showDetailsPopup(event)});	
+				builder.svgComponent(
+					width: '1000px',
+					height: '1000px',
+					source: builder.streamResource(
+						stream: {new ByteArrayInputStream(getSvg())},
+						filename: 'pull.svg',mimetype: 'image/svg+xml'),
+					onSvgMessage:{event -> showDetailsPopup(event)}
+				);	
 		}
 		
 		def showDetailsPopup(event) {

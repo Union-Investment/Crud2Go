@@ -1,0 +1,107 @@
+*** Settings ***
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/common-keywords.txt
+
+*** Keywords ***
+
+####################################################
+###  Es existiert/existieren / Und weiterhin ... ###
+####################################################
+
+
+############################
+###  Wenn / Und dann ... ###
+############################
+
+eine neue Zeile an den ReST-Service gesendet wird
+	Switch To Table Edit Mode
+	Insert new table row
+	Input Text At Column  1  2
+	Input Text At Column  2  Test2
+	Input Text At Column  3  5
+	Switch To Table View Mode
+	
+eine aktualisierte Zeile an den ReST-Service gesendet wird 
+	Switch To Table Edit Mode
+	Select Table Row  1
+	Input Text At Column  1  3
+	Input Text At Column  2  Test3
+	Input Text At Column  3  6
+	Switch To Table View Mode
+
+die erste Tabellenzeile gelöscht wird
+	Switch To Table Edit Mode
+	Delete Table Row  1
+
+##########################
+###  Dann / Und es ... ###
+##########################
+
+werden in der ersten Zeile die Werte des ReST-Service angezeigt
+	Table Cell Should Have Text  1  1  1
+	Table Cell Should Have Text  1  2  Test
+	Table Cell Should Have Text  1  3  4
+
+wird die Tabelle mit der neuen Zeile vom ReST-Server abgeholt und angezeigt
+	Table Cell Should Have Text  1  1  2
+	Table Cell Should Have Text  1  2  Test2
+	Table Cell Should Have Text  1  3  5
+
+wird die Tabelle mit dem aktualisierten Inhalt vom ReST-Server abgeholt und angezeigt
+	Table Cell Should Have Text  1  1  3
+	Table Cell Should Have Text  1  2  Test3
+	Table Cell Should Have Text  1  3  6
+
+werden keine Tabellenzeilen mehr angezeigt
+	Table Should Have Number Of Rows  0
+
+##########################
+###  Utility Keywords  ###
+##########################
+
+Switch To Table Edit Mode
+	Vaadin Click  css=span.v-button-caption:contains("Editieren")
+
+Switch To Table View Mode
+	Vaadin Click  css=span.v-button-caption:contains("Editieren verlassen")
+	
+Insert New Table Row
+	Vaadin Click  css=span.v-button-caption:contains("Neue Zeile")
+
+Delete Current Table Row
+	Vaadin Click  css=span.v-button-caption:contains("Zeile Löschen")
+
+Select Table Row
+	[Arguments]  ${row}
+	Call Selenium Api  mouseDown  css=.v-table-crudTable table.v-table-table tbody tr:nth-child(${row}) td:nth-child(1)  
+	Call Selenium Api  mouseUp    css=.v-table-crudTable table.v-table-table tbody tr:nth-child(${row}) td:nth-child(1)  
+
+Delete Table Row
+	[Arguments]  ${row}
+	Select Table Row  ${row}
+	Delete Current Table Row	
+
+Input Text At Column
+	[Arguments]  ${column}  ${text}
+	Input Text  css=.v-table-crudTable table.v-table-table tbody td:nth-child(${column}) input  ${text}
+
+Table Cell Should Have Text
+	[Arguments]  ${row}  ${column}  ${text}
+	Wait for AJAX calls to complete
+	${var} =  Get Text  css=.v-table-crudTable table.v-table-table tbody tr:nth-child(${row}) td:nth-child(${column})
+	Should Be True  '${var}'=='${text}'
+
+Table Should Have Number Of Rows
+	[Arguments]  ${expectedNumber}
+	Wait for AJAX calls to complete
+	Xpath Should Match X Times  //table[contains(@class, 'v-table-table')]//tr  ${expectedNumber}
+
+##########################
+###  Setup / Teardown  ###
+##########################
+	 
+	
