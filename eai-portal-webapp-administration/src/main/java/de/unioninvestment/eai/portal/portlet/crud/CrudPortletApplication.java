@@ -184,6 +184,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 							configurationPresenter.refresh(status,
 									portletConfig,
 									portletDomain);
+							configurationPresenter.switchToAuthenticationPreferences();
 						}
 					}
 				});

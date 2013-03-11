@@ -104,4 +104,6 @@ public interface PortletConfigurationView extends View {
 	void hideAuthenticationPreferences();
 
 	void setPresenter(PortletConfigurationView.Presenter presenter);
+
+	void switchToAuthenticationPreferences();
 }

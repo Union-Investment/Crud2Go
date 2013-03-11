@@ -306,6 +306,13 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 	}
 
 	@Override
+	public void switchToAuthenticationPreferences() {
+		if (authenticationPreferencesLayout != null) {
+			tabsheet.setSelectedTab(authenticationPreferencesLayout);
+		}
+	}
+
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}

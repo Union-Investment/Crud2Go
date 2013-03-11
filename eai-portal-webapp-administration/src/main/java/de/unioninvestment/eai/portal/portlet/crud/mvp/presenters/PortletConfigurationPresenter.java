@@ -333,4 +333,8 @@ public class PortletConfigurationPresenter implements Presenter,
 					Notification.TYPE_ERROR_MESSAGE);
 		}
 	}
+
+	public void switchToAuthenticationPreferences() {
+		view.switchToAuthenticationPreferences();
+	}
 }
