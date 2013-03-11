@@ -3,3 +3,5 @@ Resource        ${RESOURCES}/German-BDD.txt
 Resource        ${RESOURCES}/objects/CrudPortlet.txt
 Resource        ${RESOURCES}/objects/Tabelle.txt
 Resource        ${RESOURCES}/objects/ReSTContainer.txt
+Resource        ${RESOURCES}/objects/LiferayPortlet.txt
+Resource        ${RESOURCES}/objects/preferences/Authentication.txt

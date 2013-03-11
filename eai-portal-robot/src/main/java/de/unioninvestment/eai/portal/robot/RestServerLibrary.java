@@ -54,12 +54,34 @@ public class RestServerLibrary {
 				throws IOException, ServletException {
 			if (target.equals("/query")) {
 				handleQuery(baseRequest, request, response);
+			} else if (target.equals("/secureQuery")) {
+				handleSecureQuery(baseRequest, request, response);
 			} else if (target.equals("/insert")) {
 				handleInsert(baseRequest, request, response);
 			} else if (target.equals("/update/1")) {
 				handleUpdate(baseRequest, request, response);
 			} else if (target.equals("/delete/1")) {
 				handleDelete(baseRequest, request, response);
+			}
+		}
+
+		private void handleSecureQuery(Request baseRequest,
+				HttpServletRequest request, HttpServletResponse response)
+				throws IOException {
+			String auth = request.getHeader("Authorization");
+			if (auth == null) {
+				response.addHeader("WWW-Authenticate",
+						"Basic realm=\"RestServerLibrary\"");
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+						"Please login");
+				baseRequest.setHandled(true);
+			} else if (auth.equals("Basic YWRtaW46YWRtaW4=")) {
+				// bas64 of admin:admin
+				handleQuery(baseRequest, request, response);
+			} else {
+				response.sendError(HttpServletResponse.SC_FORBIDDEN,
+						"Wrong login");
+				baseRequest.setHandled(true);
 			}
 		}
 

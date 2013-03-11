@@ -1,0 +1,49 @@
+*** Settings ***
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/common-keywords.txt
+
+
+*** Keywords ***
+
+####################################################
+###  Es existiert/existieren / Und weiterhin ... ###
+####################################################
+
+############################
+###  Wenn / Und dann ... ###
+############################
+
+auf die Hilfe-Seite gewechselt wird
+	Open Portlet Page 'Hilfe'
+
+die Konfigurationansicht öffnet
+	Open Portlet Page 'Präferenzen'
+
+ 
+##########################
+###  Dann / Und es ... ###
+##########################
+
+
+##########################
+###  Utility Keywords  ###
+##########################
+
+Open Portlet Page '${title}'
+	Open Portlet Context Menu
+	Vaadin Click  css=div.lfr-component.lfr-menu-list ul li:contains('${title}') a
+	Wait Until Page Loaded	
+
+Open Portlet Context Menu
+	Vaadin Click  css=div.portlet-boundary_crudportlet_WAR_eaiadministration_ header menu.portlet-topper-toolbar ul li strong a
+	Wait Until Page Contains Element  xpath=//div[@class='lfr-component lfr-menu-list']  2s
+
+	
+##########################
+###  Setup / Teardown  ###
+##########################
+	 

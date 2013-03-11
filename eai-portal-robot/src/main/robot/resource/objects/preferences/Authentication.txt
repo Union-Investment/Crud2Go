@@ -1,0 +1,41 @@
+*** Settings ***
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/common-keywords.txt
+
+
+*** Keywords ***
+
+####################################################
+###  Es existiert/existieren / Und weiterhin ... ###
+####################################################
+
+Authentifizierungseinstellungen für admin:admin
+	
+
+############################
+###  Wenn / Und dann ... ###
+############################
+
+
+##########################
+###  Dann / Und es ... ###
+##########################
+
+
+##########################
+###  Utility Keywords  ###
+##########################
+
+Enter Authentication User
+	[Arguments]  ${preferenceKey}  ${username}
+	# TODO
+	Input Text  css=input.dataSourceName  ${username}
+	
+##########################
+###  Setup / Teardown  ###
+##########################
+	 

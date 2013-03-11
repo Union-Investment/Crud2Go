@@ -246,11 +246,6 @@ mit der Maus im Formular auf den Titel des Feldes '${feld}' gefahren wird
 	Call Selenium Api  mouseOver  css=tr td:contains("${feld}") div span
 	Sleep  2s
 
-auf die Hilfe-Seite gewechselt wird
-	Open Portlet Page 'Hilfe'
-
-die Konfigurationansicht öffnet
-	Open Portlet Page 'Präferenzen'
 	
 die Dropdown-Daten in der Datenbank geändert werden
 	Execute SQL  UPDATE TEST_CRUD2 SET CVARCHAR5_NN = 'CHGED' WHERE ID = 1	
@@ -507,14 +502,6 @@ existiert im Log kein Eintrag zur Ermittlung Anzahl der Tabellenzeilen
 ###  Utility Keywords  ###
 ##########################
 
-Open Portlet Page '${title}'
-	Open Portlet Context Menu
-	Vaadin Click  css=div.lfr-component.lfr-menu-list ul li:contains('${title}') a
-	Wait Until Page Loaded	
-
-Open Portlet Context Menu
-	Vaadin Click  css=div.portlet-boundary_crudportlet_WAR_eaiadministration_ header menu.portlet-topper-toolbar ul li strong a
-	Wait Until Page Contains Element  xpath=//div[@class='lfr-component lfr-menu-list']  2s
 	
 
 Zeile ${zeile} und Spalte ${spalte} einer Tabelle enthält den Text '${text}'

@@ -1,0 +1,17 @@
+*** Settings ***
+Documentation   Unterstützung von ReST Backends
+Force Tags      autor-mjartanc  rest  UI-590  mantis-5524
+
+*** Test Case ***
+
+
+Anzeige des Ergebnisses eines ReST-Request mit Basic Authentication
+	Es existiert ein ReST-Service
+	und außerdem ein Portlet mit der XML-Konfiguration 'REST_SECURITY.xml'
+	und außerdem Authentifizierungseinstellungen für admin:admin	
+	
+
+
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt
+Test Teardown	Stoppe Rest Server und verarbeite Testergebnis
