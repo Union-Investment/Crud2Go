@@ -4,6 +4,7 @@ Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/VaadinWidgets.txt
 Resource        ${RESOURCES}/objects/common-keywords.txt
 
 
@@ -14,12 +15,22 @@ Resource        ${RESOURCES}/objects/common-keywords.txt
 ####################################################
 
 Authentifizierungseinstellungen für admin:admin
-	
+	Open Portlet Preferences Page
+	Select Authentication Preferences
+	Enter Authentication User  test_username  admin
+	Enter Authentication Password  test_password  admin
+	Click Vaadin Button  Einstellungen speichern
 
 ############################
 ###  Wenn / Und dann ... ###
 ############################
 
+falsche ReST-Authentifizierungseinstellungen eingegeben werden
+	Open Portlet Preferences Page
+	Select Authentication Preferences
+	Enter Authentication User  test_username  admin
+	Enter Authentication Password  test_password  wrongPassword
+	Click Vaadin Button  Einstellungen speichern
 
 ##########################
 ###  Dann / Und es ... ###
@@ -32,8 +43,15 @@ Authentifizierungseinstellungen für admin:admin
 
 Enter Authentication User
 	[Arguments]  ${preferenceKey}  ${username}
-	# TODO
-	Input Text  css=input.dataSourceName  ${username}
+	Input Text  css=input.${preferenceKey}  ${username}
+
+Enter Authentication Password
+	[Arguments]  ${preferenceKey}  ${password}
+	Input Text  css=input.${preferenceKey}  ${password}
+
+Select Authentication Preferences
+	Select Vaadin Tab  Authentifizierung
+	
 	
 ##########################
 ###  Setup / Teardown  ###

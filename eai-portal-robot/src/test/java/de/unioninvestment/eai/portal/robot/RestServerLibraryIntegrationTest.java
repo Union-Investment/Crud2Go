@@ -27,6 +27,7 @@ public class RestServerLibraryIntegrationTest {
 
 		RestServerLibrary library = new RestServerLibrary(9876);
 		library.startRestServer();
+		System.in.read();
 		library.stopRestServer();
 	}
 }

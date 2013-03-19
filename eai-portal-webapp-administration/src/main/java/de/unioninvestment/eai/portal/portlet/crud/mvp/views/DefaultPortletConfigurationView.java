@@ -241,6 +241,8 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 								+ " Username",
 								new PreferenceProperty(
 										username.getPreferenceKey()));
+						field.addStyleName(createValidClassName(username
+								.getPreferenceKey()));
 						field.setNullRepresentation("");
 						form.addField(username.getPreferenceKey(), field);
 						hasPreferences = true;
@@ -258,6 +260,8 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 						SecurePasswordField field = new SecurePasswordField(
 								realm.getName() + " Passwort",
 								encryptionFormatter);
+						field.addStyleName(createValidClassName(password
+								.getPreferenceKey()));
 						field.setNullRepresentation("");
 						form.addField(password.getPreferenceKey(), field);
 						hasPreferences = true;
@@ -266,6 +270,10 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 			}
 		}
 		return hasPreferences;
+	}
+
+	private String createValidClassName(String preferenceKey) {
+		return preferenceKey.replaceAll("[^A-Za-z0-9_\\-]", "_");
 	}
 
 	private Form createAuthenticationPreferencesForm() {

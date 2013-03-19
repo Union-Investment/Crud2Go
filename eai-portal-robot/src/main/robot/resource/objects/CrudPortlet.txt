@@ -4,6 +4,7 @@ Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
 Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/VaadinWidgets.txt
 Resource        ${RESOURCES}/objects/common-keywords.txt
 
 
@@ -77,7 +78,7 @@ eine existierende Datasource ${datasource} und Tabelle ${tabelle} angegeben wird
 	Wait Until Page Contains Element  css=input.dataSourceName
 	Input Text  css=input.dataSourceName  ${datasource}
 	Input Text  css=input.tableName  ${tabelle}
-	Click Button  css=span.v-button-caption:contains("Speichern")
+	Click Vaadin Button  Speichern
 	Wait until page contains  Data Source: EAI, Tabelle: ${tabelle}
 	Page Should Contain Element  css=div.v-label:contains("Data Source: EAI, Tabelle: ${tabelle}")  Data Source: EAI, Tabelle: ${tabelle}
 	
@@ -222,8 +223,7 @@ die SVG Grafik anklickt
 	Vaadin Click  id=jep
 
 das Tab '${NAME}' anklickt
-	Call Selenium Api  mouseDown  css=div.v-captiontext:contains("${NAME}")
-	Call Selenium Api  mouseUp  css=div.v-captiontext:contains("${NAME}")
+	Select Vaadin Tab  ${NAME}
 
 der BLOB in Zeile ${ZEILE} heruntergeladen wird
 	Call Selenium Api  click  css=span:contains("Hier runterladen")

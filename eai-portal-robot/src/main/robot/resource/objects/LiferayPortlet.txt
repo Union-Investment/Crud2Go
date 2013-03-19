@@ -28,10 +28,16 @@ die Konfigurationansicht öffnet
 ###  Dann / Und es ... ###
 ##########################
 
+enthält die Seite den Text '${text}'
+	Page Should Contain  ${text}
+
 
 ##########################
 ###  Utility Keywords  ###
 ##########################
+
+Open Portlet Preferences Page
+	Open Portlet Page 'Präferenzen'
 
 Open Portlet Page '${title}'
 	Open Portlet Context Menu
@@ -42,7 +48,7 @@ Open Portlet Context Menu
 	Vaadin Click  css=div.portlet-boundary_crudportlet_WAR_eaiadministration_ header menu.portlet-topper-toolbar ul li strong a
 	Wait Until Page Contains Element  xpath=//div[@class='lfr-component lfr-menu-list']  2s
 
-	
+
 ##########################
 ###  Setup / Teardown  ###
 ##########################
