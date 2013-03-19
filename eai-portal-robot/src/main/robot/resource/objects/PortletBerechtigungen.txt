@@ -19,6 +19,9 @@ Resource        ${RESOURCES}/objects/common-keywords.txt
 ###  Wenn / Und dann ... ###
 ############################
 
+auf die Berechtigungseinstellungen wechselt
+	Select Vaadin Tab  Berechtigungen
+
 den Dialog Link für die Rolle ${rolle} auswählt
 	Vaadin Click  css=a:contains(${rolle})
 	Wait Until Page Loaded
@@ -26,6 +29,7 @@ den Dialog Link für die Rolle ${rolle} auswählt
 ##########################
 ###  Dann / Und es ... ###
 ##########################
+
 wird der Link ${rolle} angezeigt
 	Page Should Contain Element  css=a:contains(${rolle})
 

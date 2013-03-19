@@ -10,7 +10,8 @@ Documentation   Story:
 	und dann die XML Konfiguration: 'SECURITY_CONFIG.xml' hochlädt
 	
 	wenn er die Portalseite öffnet
-	und weiterhin die Konfigurationansicht öffnet 
+	und dann die Konfigurationansicht öffnet
+	und dann auf die Berechtigungseinstellungen wechselt
 
 	dann wird der Link 'admin' angezeigt
 	Und dann wird der Link 'benutzer' angezeigt
@@ -25,6 +26,7 @@ Documentation   Story:
 	
 	wenn er die Portalseite öffnet
 	und dann die Konfigurationansicht öffnet 
+	und dann auf die Berechtigungseinstellungen wechselt
 	und weiterhin den Dialog Link für die Rolle 'benutzer' auswählt
 	
 	dann der Dialog zur Pflege der Mitgliedschaft für die Rolle 'benutzer' angezeigt
