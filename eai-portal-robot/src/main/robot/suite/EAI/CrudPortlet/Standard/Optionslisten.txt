@@ -1,7 +1,7 @@
 *** Settings ***
 
 *** Test Case ***
-Auswahl soll dach refresh einer Optionsliste bestehen bleiben
+Auswahl soll nach refresh einer Optionsliste bestehen bleiben
 	[Tags]  author_mjartanc
 
 	Es existieren Testdaten in TEST_CRUD2

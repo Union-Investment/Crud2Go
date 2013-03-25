@@ -1,0 +1,57 @@
+*** Settings ***
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/common-keywords.txt
+
+*** Keywords ***
+
+####################################################
+###  Es existiert/existieren / Und weiterhin ... ###
+####################################################
+
+wurde im FormularFeld '${feldname}' der Eintrag '${wert}' ausgewählt
+	Select Form Field Value  ${feldname}  ${wert}
+
+wurde im FormularFeld '${feldname}' der Text '${text}' eingegeben
+	Input form field text  ${feldname}  ${text}
+
+
+############################
+###  Wenn / Und dann ... ###
+############################
+
+
+##########################
+###  Dann / Und es ... ###
+##########################
+
+besteht die Auswahl '${wert}' im Formularfeld '${feldname}' weiterhin
+	Form Field Value Should Be  ${feldname}  ${wert}
+
+##########################
+###  Utility Keywords  ###
+##########################
+
+Input form field text 
+	[Arguments]  ${fieldname}  ${text}
+	Input Text  css=.v-formlayout tr:contains('${fieldname}') input  ${text}
+
+Form Field Value Should Be
+	[Arguments]  ${fieldname}  ${value}
+	Textfield Value Should Be  css=.v-formlayout tr:contains('${fieldname}') input  ${value}
+
+Select Form Field Value
+	[Arguments]  ${fieldname}  ${value}
+	Vaadin Click  css=.v-formlayout tr:contains('${fieldname}') div.v-filterselect-button
+	Wait Until Page Contains Element  css=td.gwt-MenuItem:contains('${value}') span
+	Vaadin Click  css=td.gwt-MenuItem:contains('${value}') span
+
+
+##########################
+###  Setup / Teardown  ###
+##########################
+	 
+	

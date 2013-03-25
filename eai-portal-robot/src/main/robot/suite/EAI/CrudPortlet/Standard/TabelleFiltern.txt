@@ -1,0 +1,19 @@
+*** Settings ***
+
+*** Test Case ***
+
+Tabelle mit Oracle-Backend soll über regulären Ausdruck filterbar sein
+	[Tags]  author_mjartanc  UI-596  regexp
+
+	Es existieren Testdaten in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'FILTER.xml'
+	und außerdem wurde im FormularFeld 'CVARCHAR5_NN REGEXP' der Text 'Te.*5' eingegeben   
+	
+	wenn der Button 'Suchen' geklickt wird
+	
+	dann enthält die Tabelle nur eine Zeile mit dem Wert 'TEST5' in der Spalte CVARCHAR5_NN
+
+
+	
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt
