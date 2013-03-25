@@ -1,25 +1,26 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
@@ -49,6 +50,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
@@ -188,6 +190,37 @@ public class ScriptFilterFactoryTest {
 
 		assertThat(filters.size(), is(1));
 		assertThat((Less) filters.get(0), is(new Less("a", "b", true, true)));
+	}
+
+	/*************/
+
+	@Test
+	public void shouldBuildRegExpFilter() {
+		fac.regexp("field", "pattern");
+
+		assertThat(filters.size(), is(1));
+		assertThat((RegExpFilter) filters.get(0), is(new RegExpFilter("field",
+				"pattern", null)));
+	}
+
+	@Test
+	public void shouldBuildRegExpFilterWithModifiers() {
+		fac.regexp(singletonMap("modifiers", (Object) "test"), "field",
+				"pattern");
+
+		assertThat(filters.size(), is(1));
+		assertThat((RegExpFilter) filters.get(0), is(new RegExpFilter("field",
+				"pattern", "test")));
+	}
+
+	@Test
+	public void shouldBuildDurableRegExpFilter() {
+		fac.regexp(singletonMap("durable", (Object) true), "field",
+				"pattern");
+
+		assertThat(filters.size(), is(1));
+		assertThat((RegExpFilter) filters.get(0), is(new RegExpFilter("field",
+				"pattern", null, true)));
 	}
 
 	/*************/

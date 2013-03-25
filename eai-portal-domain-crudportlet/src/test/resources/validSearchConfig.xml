@@ -25,6 +25,7 @@
 			<field name="CONTAINS" title="TESTDATA CONTAINS"/>
 			<field name="STARTSWITH" title="TESTDATA STARTS-WITH"/>
 			<field name="ENDSWITH" title="TESTDATA ENDS-WITH"/>
+			<field name="REGEXP" title="TESTDATA REGEXP"/>
 			<action title="search" id="id1">
 				<search>
 					<tables>
@@ -42,7 +43,7 @@
 						<starts-with column="TESTDATA" field="STARTSWITH"/>
 						<contains column="TESTDATA" field="CONTAINS"/>
 						<ends-with column="TESTDATA" field="ENDSWITH" case-sensitive="true"/>
-						<custom filter="(row.values.ID % 2) == 1"/>
+						<regexp column="TESTDATA" field="REGEXP" modifiers="mn"/>
 					</apply-filters>
 				</search>
 			</action>

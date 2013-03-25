@@ -74,6 +74,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.IncludeFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.LessFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.LessOrEqualFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.NotFilterConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.RegExpFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SQLFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchTableConfig;
@@ -114,6 +115,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
@@ -599,6 +601,13 @@ public class SearchFormActionTest {
 	}
 
 	@Test
+	public void shouldApplyConfiguredRegexpFilter() {
+		verifyFilterByConfiguration(
+				createRegexpFilter("field1", "column1", "i"), new RegExpFilter(
+						"column1", "filterValue1", "i"));
+	}
+
+	@Test
 	public void shouldApplyConfiguredGreaterFilter() {
 		verifyFilterByConfiguration(createGreaterFilter("field1", "column1"),
 				new Greater("column1", "filterValue1", false));
@@ -995,6 +1004,15 @@ public class SearchFormActionTest {
 		filter.setField(fieldName);
 		filter.setColumn(columnName);
 		filter.setCaseSensitive(caseSensitive);
+		return filter;
+	}
+
+	private RegExpFilterConfig createRegexpFilter(String fieldName,
+			String columnName, String modifiers) {
+		RegExpFilterConfig filter = new RegExpFilterConfig();
+		filter.setField(fieldName);
+		filter.setColumn(columnName);
+		filter.setModifiers(modifiers);
 		return filter;
 	}
 

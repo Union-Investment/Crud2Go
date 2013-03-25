@@ -78,6 +78,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.Eac
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.TransactionCallback;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
@@ -461,6 +462,13 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 		shouldAddFilterType(
 				new SQLFilter("NAME", "bla", Arrays.asList((Object) "Test")),
 				de.unioninvestment.eai.portal.support.vaadin.filter.SQLFilter.class);
+	}
+
+	@Test
+	public void shouldAddRegExpFilter() {
+		shouldAddFilterType(
+				new RegExpFilter("NAME", "bla", "i"),
+				de.unioninvestment.eai.portal.support.vaadin.filter.OracleRegExpFilter.class);
 	}
 
 	@Test

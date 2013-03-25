@@ -41,6 +41,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.LessFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.LessOrEqualFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.NotFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.NothingFilterConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.RegExpFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SQLFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchTableConfig;
@@ -76,6 +77,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
@@ -427,6 +429,11 @@ public class SearchFormAction implements ActionHandler {
 		} else if (config instanceof ContainsFilterConfig) {
 			result.add(new Contains(columnName, fieldValue,
 					((ContainsFilterConfig) config).isCaseSensitive()));
+		} else if (config instanceof RegExpFilterConfig) {
+			String valueString = fieldValue == null ? null : fieldValue
+					.toString();
+			result.add(new RegExpFilter(columnName, valueString,
+					((RegExpFilterConfig) config).getModifiers()));
 		} else if (config instanceof NothingFilterConfig) {
 			result.add(new Nothing());
 		} else {

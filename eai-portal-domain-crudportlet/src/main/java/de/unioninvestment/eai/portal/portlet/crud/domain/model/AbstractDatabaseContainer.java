@@ -37,9 +37,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEven
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilterTranslator;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilterTranslator;
+import de.unioninvestment.eai.portal.support.vaadin.filter.OracleRegExpFilterTranslator;
 import de.unioninvestment.eai.portal.support.vaadin.filter.SQLFilterTranslator;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
@@ -54,7 +56,9 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 	private static final long serialVersionUID = 1L;
 
 	static {
+		QueryBuilder.addFilterTranslator(new AdvancedStringFilterTranslator());
 		QueryBuilder.addFilterTranslator(new SQLFilterTranslator());
+		QueryBuilder.addFilterTranslator(new OracleRegExpFilterTranslator());
 		QueryBuilder.addFilterTranslator(new NothingFilterTranslator());
 	}
 
@@ -66,9 +70,6 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 			Map<String, String> displayPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {
 		super(eventBus, displayPattern, defaultOrder, filterPolicy);
-		QueryBuilder.addFilterTranslator(new SQLFilterTranslator());
-		QueryBuilder.addFilterTranslator(new NothingFilterTranslator());
-		QueryBuilder.addFilterTranslator(new AdvancedStringFilterTranslator());
 	}
 
 	@Override
@@ -179,9 +180,18 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 	com.vaadin.data.Container.Filter buildVaadinFilter(Filter filter) {
 		if (filter instanceof SQLFilter) {
 			return buildSQLFilter(filter);
+		} else if (filter instanceof RegExpFilter) {
+			return buildRegExpFilter(filter);
 		} else {
 			return super.buildVaadinFilter(filter);
 		}
+	}
+
+	private com.vaadin.data.Container.Filter buildRegExpFilter(Filter filter) {
+		RegExpFilter sqlFilter = (RegExpFilter) filter;
+		return new de.unioninvestment.eai.portal.support.vaadin.filter.OracleRegExpFilter(
+				sqlFilter.getColumn(), sqlFilter.getPattern(),
+				sqlFilter.getModifiers());
 	}
 
 	private com.vaadin.data.Container.Filter buildSQLFilter(Filter filter) {
