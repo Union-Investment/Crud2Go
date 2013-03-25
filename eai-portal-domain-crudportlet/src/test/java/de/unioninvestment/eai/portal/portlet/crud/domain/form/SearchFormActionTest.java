@@ -306,7 +306,7 @@ public class SearchFormActionTest {
 		verify(dbContainerMock)
 				.replaceFilters(
 						asList((Filter) new StartsWith("field1",
-								"filterValue1", true)), false);
+								"filterValue1", false)), false);
 	}
 
 	@Test
@@ -323,9 +323,12 @@ public class SearchFormActionTest {
 
 		searchAction.execute(formMock);
 
-		verify(dbContainerMock).replaceFilters(
-				asList((Filter) new StartsWith("field1", "filterValue1", true),
-						new StartsWith("field2", "filterValue2", true)), false);
+		verify(dbContainerMock)
+				.replaceFilters(
+						asList((Filter) new StartsWith("field1",
+								"filterValue1", false),
+								new StartsWith("field2", "filterValue2", false)),
+						false);
 	}
 
 	private void stubContainerColumnType(String columnName, final Class<?> type) {

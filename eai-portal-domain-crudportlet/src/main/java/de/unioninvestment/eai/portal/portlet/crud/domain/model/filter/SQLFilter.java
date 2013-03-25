@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.filter;
 
 import static java.util.Collections.unmodifiableList;
@@ -89,25 +89,24 @@ public final class SQLFilter extends Filter {
 				+ ", values=" + values + ", durable=" + durable + "]";
 	}
 
-	@SuppressWarnings("all")
 	@Override
+	@SuppressWarnings("all")
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result + ((column == null) ? 0 : column.hashCode());
 		result = prime * result + ((values == null) ? 0 : values.hashCode());
 		result = prime * result
 				+ ((whereString == null) ? 0 : whereString.hashCode());
-		result = prime * result + (durable ? 1231 : 1237);
 		return result;
 	}
 
-	@SuppressWarnings("all")
 	@Override
+	@SuppressWarnings("all")
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
@@ -126,8 +125,6 @@ public final class SQLFilter extends Filter {
 			if (other.whereString != null)
 				return false;
 		} else if (!whereString.equals(other.whereString))
-			return false;
-		if (durable != other.durable)
 			return false;
 		return true;
 	}

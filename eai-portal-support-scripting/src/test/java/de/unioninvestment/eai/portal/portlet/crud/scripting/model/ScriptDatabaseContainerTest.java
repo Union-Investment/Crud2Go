@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
 import static java.util.Arrays.asList;
@@ -148,7 +148,7 @@ public class ScriptDatabaseContainerTest {
 		runScript("container.addFilters { startsWith 'MYCOL', 'Test' }");
 
 		verify(databaseContainerMock).addFilters(
-				asList((Filter) new StartsWith("MYCOL", "Test", true)));
+				asList((Filter) new StartsWith("MYCOL", "Test", false)));
 	}
 
 	@Test
@@ -158,7 +158,7 @@ public class ScriptDatabaseContainerTest {
 		runScript("container.addFilters { contains 'MYCOL', 'Test' }");
 
 		verify(databaseContainerMock).addFilters(
-				asList((Filter) new Contains("MYCOL", "Test", true)));
+				asList((Filter) new Contains("MYCOL", "Test", false)));
 	}
 
 	@Test
@@ -170,7 +170,7 @@ public class ScriptDatabaseContainerTest {
 		verify(databaseContainerMock).addFilters(
 				asList((Filter) new Any(asList(
 						(Filter) new Equal("MYCOL1", 30), new Equal("MYCOL2",
-								40), new Contains("MYCOL3", "Test", true)))));
+								40), new Contains("MYCOL3", "Test", false)))));
 	}
 
 	@Test
@@ -182,7 +182,7 @@ public class ScriptDatabaseContainerTest {
 		verify(databaseContainerMock).addFilters(
 				asList((Filter) new All(asList(
 						(Filter) new Equal("MYCOL1", 30), new Equal("MYCOL2",
-								40), new Contains("MYCOL3", "Test", true)))));
+								40), new Contains("MYCOL3", "Test", false)))));
 	}
 
 	@Test
