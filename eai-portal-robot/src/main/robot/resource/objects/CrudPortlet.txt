@@ -60,10 +60,6 @@ umfangreiche Testdaten in TEST_CRUD2
 	:FOR  ${i}  IN RANGE  1000
 	\	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (${i},${i},to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'T${i}',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
 
-wurde im FormularFeld '${feldname}' der Eintrag '${wert}' ausgewählt
-	Vaadin Click  css=.v-formlayout tr:contains('${feldname}') div.v-filterselect-button
-	Wait Until Page Contains Element  css=td.gwt-MenuItem:contains('${wert}') span
-	Vaadin Click  css=td.gwt-MenuItem:contains('${wert}') span
 
 das Server-Log wird überwacht
 		
@@ -478,9 +474,6 @@ wird die Liste der DataSources mit dem Eintrag 'test' angezeigt
 werden die Verbindungsdaten zur DataSource 'test' angezeigt
 	Zeile 1 und Spalte 2 einer Tabelle enthält den Text 'XE'
 	Zeile 1 und Spalte 3 einer Tabelle enthält den Text 'test'
-
-besteht die Auswahl '${wert}' im Formularfeld '${feldname}' weiterhin
-	Textfield Value Should Be  css=.v-formlayout tr:contains('${feldname}') input  ${wert}
 
 enthält das Dropdown einen Eintrag '${titel}'
 	Vaadin Click  css=div.v-filterselect-button

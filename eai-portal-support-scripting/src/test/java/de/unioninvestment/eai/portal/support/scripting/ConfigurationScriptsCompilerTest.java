@@ -233,7 +233,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 	@Test
 	public void shouldCompileCustomFilterScript() throws JAXBException {
 		ScriptCompiler scriptCompiler = new ScriptCompiler();
-		PortletConfig portletConfig = createConfiguration("validSearchConfig.xml");
+		PortletConfig portletConfig = createConfiguration("validScriptContainerConfig.xml");
 		new ConfigurationScriptsCompiler(scriptCompiler)
 				.compileAllScripts(portletConfig);
 
@@ -242,8 +242,10 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		FormActionConfig actionConfig = formConfig.getAction().get(0);
 		List<FilterConfig> filters = actionConfig.getSearch().getApplyFilters()
 				.getFilters();
-		CustomFilterConfig customFilterConfig = (CustomFilterConfig) filters
-				.get(filters.size() - 1);
+		List<FilterConfig> nestedFilters = ((AnyFilterConfig) filters.get(0))
+				.getFilters();
+		CustomFilterConfig customFilterConfig = (CustomFilterConfig) nestedFilters
+				.get(nestedFilters.size() - 1);
 
 		assertThat(customFilterConfig.getFilter().getClazz(), notNullValue());
 	}

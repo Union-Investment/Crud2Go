@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<form id="form">
+			<field name="REGEXP" title="CVARCHAR5_NN REGEXP" />
+			<action title="Suchen">
+				<search>
+					<apply-filters>
+						<regexp column="CVARCHAR5_NN" field="REGEXP" modifiers="i" />
+					</apply-filters>
+				</search>
+			</action>
+		</form>
+		<table id="table">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true" />
+				<column name="CNUMBER5_2" title="Zahl" editable="true" />
+				<column name="CDATE" editable="false" />
+				<column name="CTIMESTAMP" />
+				<column name="CVARCHAR5_NN" editable="true" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN" hidden="true" />
+				<column name="TESTDATA" editable="true" width="300" />
+			</columns>
+		</table>
+	</page>
+</portlet>

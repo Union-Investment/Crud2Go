@@ -18,36 +18,32 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.filter;
 
-import static java.util.Collections.unmodifiableList;
-
-import java.util.List;
-
 /**
  * Filterklasse für ein SQL Filter.
  * 
  * @author max.hartmann
  * 
  */
-public final class SQLFilter extends Filter {
+public final class RegExpFilter extends Filter {
 
 	private static final long serialVersionUID = 1L;
 
 	private final String column;
-	private final String whereString;
-	private final List<Object> values;
+	private final String pattern;
+	private final String modifiers;
 
 	/**
-	 * Konstruktor.
+	 * Creates non-durable filter.
 	 * 
 	 * @param column
 	 *            - Spaltenname
-	 * @param whereString
-	 *            - Where-String
-	 * @param values
-	 *            - Werteliste
+	 * @param pattern
+	 *            - Regular Expression
+	 * @param modifiers
+	 *            - Optional Modifiers
 	 */
-	public SQLFilter(String column, String whereString, List<Object> values) {
-		this(column, whereString, values, false);
+	public RegExpFilter(String column, String pattern, String modifiers) {
+		this(column, pattern, modifiers, false);
 	}
 
 	/**
@@ -55,38 +51,31 @@ public final class SQLFilter extends Filter {
 	 * 
 	 * @param column
 	 *            - Spaltenname
-	 * @param whereString
-	 *            - Where-String
-	 * @param values
-	 *            - Werteliste
+	 * @param pattern
+	 *            - Regular Expression
+	 * @param modifiers
+	 *            - Optional Modifiers
 	 * @param durable
 	 *            Ob der Filter permanent gesetzt sein soll
 	 */
-	public SQLFilter(String column, String whereString, List<Object> values,
+	public RegExpFilter(String column, String pattern, String modifiers,
 			boolean durable) {
 		super(durable);
 		this.column = column;
-		this.whereString = whereString;
-		this.values = values;
+		this.pattern = pattern;
+		this.modifiers = modifiers;
 	}
 
 	public String getColumn() {
 		return column;
 	}
 
-	public String getWhereString() {
-		return whereString;
+	public String getPattern() {
+		return pattern;
 	}
 
-	public List<Object> getValues() {
-		return unmodifiableList(values);
-	}
-
-	@SuppressWarnings("all")
-	@Override
-	public String toString() {
-		return "SQLFilter [column=" + column + ", whereString=" + whereString
-				+ ", values=" + values + ", durable=" + durable + "]";
+	public String getModifiers() {
+		return modifiers;
 	}
 
 	@Override
@@ -95,9 +84,9 @@ public final class SQLFilter extends Filter {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((column == null) ? 0 : column.hashCode());
-		result = prime * result + ((values == null) ? 0 : values.hashCode());
 		result = prime * result
-				+ ((whereString == null) ? 0 : whereString.hashCode());
+				+ ((modifiers == null) ? 0 : modifiers.hashCode());
+		result = prime * result + ((pattern == null) ? 0 : pattern.hashCode());
 		return result;
 	}
 
@@ -110,21 +99,21 @@ public final class SQLFilter extends Filter {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SQLFilter other = (SQLFilter) obj;
+		RegExpFilter other = (RegExpFilter) obj;
 		if (column == null) {
 			if (other.column != null)
 				return false;
 		} else if (!column.equals(other.column))
 			return false;
-		if (values == null) {
-			if (other.values != null)
+		if (modifiers == null) {
+			if (other.modifiers != null)
 				return false;
-		} else if (!values.equals(other.values))
+		} else if (!modifiers.equals(other.modifiers))
 			return false;
-		if (whereString == null) {
-			if (other.whereString != null)
+		if (pattern == null) {
+			if (other.pattern != null)
 				return false;
-		} else if (!whereString.equals(other.whereString))
+		} else if (!pattern.equals(other.pattern))
 			return false;
 		return true;
 	}

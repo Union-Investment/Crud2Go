@@ -59,6 +59,11 @@ wird die Tabelle mit dem aktualisierten Inhalt vom ReST-Server abgeholt und ange
 werden keine Tabellenzeilen mehr angezeigt
 	Table Should Have Number Of Rows  0
 
+enthält die Tabelle nur eine Zeile mit dem Wert 'TEST5' in der Spalte CVARCHAR5_NN
+	Table Should Have Number Of Rows  1
+	Table Cell Should Have Text  1  5  TEST5
+	
+
 ##########################
 ###  Utility Keywords  ###
 ##########################

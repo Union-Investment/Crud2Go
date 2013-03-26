@@ -1007,6 +1007,7 @@
 						<element name="all" type="tns:AllFilterConfig" />
 						<element name="not" type="tns:NotFilterConfig" />
 						<element name="sql" type="tns:SQLFilterConfig" />
+						<element name="regexp" type="tns:RegExpFilterConfig" />
 						<element name="include-filter" type="tns:IncludeFilterConfig" />
 						<element name="nothing" type="tns:NothingFilterConfig" />
 						<element name="custom" type="tns:CustomFilterConfig" />
@@ -1202,7 +1203,7 @@
 	<complexType name="SQLFilterConfig">
 		<annotation>
 			<documentation>
-				SQL-Filter
+				SQL-Filter (only for database backends)
 			</documentation>
 		</annotation>
 		<complexContent>
@@ -1214,6 +1215,25 @@
 					<annotation>
 						<documentation>
 							Name der Tabellenspalte
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="RegExpFilterConfig">
+		<annotation>
+			<documentation>
+				Filter for regular expressions (only for database backends)
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComparisonFilterConfig">
+				<attribute name="modifiers" type="string">
+					<annotation>
+						<documentation>
+							match_parameter der regexp_like() methode
 						</documentation>
 					</annotation>
 				</attribute>
