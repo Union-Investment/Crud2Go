@@ -57,6 +57,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerR
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTDelegate;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
@@ -77,7 +78,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 	private MetaData metaData;
 
-	HttpClient http = new DefaultHttpClient();
+	HttpClient httpClient = new DefaultHttpClient();
 	PayloadParser parser;
 	PayloadCreator creator;
 
@@ -88,9 +89,11 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 	private AuditLogger auditLogger;
 
+	private Realm realm;
+
 	public ReSTDelegateImpl(ReSTContainerConfig containerConfig,
 			ReSTContainer container,
-			ScriptBuilder scriptBuilder, AuditLogger auditLogger) {
+			Realm realm, ScriptBuilder scriptBuilder, AuditLogger auditLogger) {
 		this.config = containerConfig;
 		this.container = container;
 		this.scriptBuilder = scriptBuilder;
@@ -102,6 +105,12 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 		this.baseUrl = config.getBaseUrl();
 		this.queryUrl = config.getQuery().getUrl();
+
+		if (realm != null && httpClient instanceof DefaultHttpClient) {
+			// for Testing => DefaultHttpClient cannot be fully mocked due to
+			// final methods
+			realm.applyBasicAuthentication((DefaultHttpClient) httpClient);
+		}
 	}
 
 	private PayloadCreator createCreator() {
@@ -158,7 +167,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		}
 		HttpGet request = createQueryRequest();
 		try {
-			HttpResponse response = http.execute(request);
+			HttpResponse response = httpClient.execute(request);
 			expectAnyStatusCode(response, HttpStatus.SC_OK);
 
 			return parser.getRows(response);
@@ -274,7 +283,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		request.setEntity(new ByteArrayEntity(content, contentType));
 
 		try {
-			HttpResponse response = http.execute(request);
+			HttpResponse response = httpClient.execute(request);
 
 			auditLogger.auditReSTRequest(request.getMethod(), uri.toString(),
 					new String(content, config.getCharset()),
@@ -300,7 +309,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		request.setEntity(new ByteArrayEntity(content, contentType));
 
 		try {
-			HttpResponse response = http.execute(request);
+			HttpResponse response = httpClient.execute(request);
 
 			auditLogger.auditReSTRequest(request.getMethod(), uri.toString(),
 					new String(content, config.getCharset()),
@@ -345,7 +354,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		HttpDelete request = new HttpDelete(uri);
 
 		try {
-			HttpResponse response = http.execute(request);
+			HttpResponse response = httpClient.execute(request);
 
 			auditLogger.auditReSTRequest(request.getMethod(), uri.toString(),
 					response.getStatusLine().toString());

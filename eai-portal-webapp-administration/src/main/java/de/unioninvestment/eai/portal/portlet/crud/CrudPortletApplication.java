@@ -138,8 +138,15 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 
 	private Set<Component> registeredComponents = new HashSet<Component>();
 
+	public enum ConfigStatus {
+		UNKNOWN, NO_CONFIG, UNCONFIGURED, CONFIGURED
+	}
+
+	ConfigStatus status = ConfigStatus.UNKNOWN;
 	boolean initializing = true;
 	boolean firstLoad = true;
+
+	Config portletConfig;
 
 	/**
 	 * Initialisierung des PortletPresenter.
@@ -169,9 +176,16 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 					public void onConfigurationUpdated(
 							ConfigurationUpdatedEvent event) {
 						refreshViews();
-						firstLoad = true;
-						PortletUtils.switchPortletMode(getMainWindow()
-								.getApplication(), PortletMode.VIEW);
+						if (status == ConfigStatus.CONFIGURED) {
+							firstLoad = true;
+							PortletUtils.switchPortletMode(getMainWindow()
+									.getApplication(), PortletMode.VIEW);
+						} else {
+							configurationPresenter.refresh(status,
+									portletConfig,
+									portletDomain);
+							configurationPresenter.switchToAuthenticationPreferences();
+						}
 					}
 				});
 	}
@@ -272,11 +286,13 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 			initializeEventBus();
 
 			LOG.debug("Loading configuration");
-			Config portletConfig = getConfiguration();
-			if (portletConfig == null) {
-				viewPage.addComponent(new UnconfiguredMessage());
-			} else {
+			portletConfig = getConfiguration();
+			status = getConfigStatus(portletConfig);
+
+			if (status == ConfigStatus.CONFIGURED) {
 				initializeModelAndViews(portletConfig);
+			} else {
+				viewPage.addComponent(new UnconfiguredMessage());
 			}
 		} catch (BusinessException e) {
 			viewPage.addComponent(new BusinessExceptionMessage(e));
@@ -286,6 +302,19 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 					"portlet.crud.error.internal"));
 		} finally {
 			initializing = false;
+		}
+	}
+
+	private ConfigStatus getConfigStatus(Config portletConfig) {
+		if (portletConfig == null) {
+			return ConfigStatus.NO_CONFIG;
+		} else {
+			if (configurationService.isConfigured(portletConfig,
+					getCurrentRequest().getPreferences())) {
+				return ConfigStatus.CONFIGURED;
+			} else {
+				return ConfigStatus.UNCONFIGURED;
+			}
 		}
 	}
 
@@ -334,6 +363,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	}
 
 	private void cleanupViews() {
+		dropConfiguration();
 		destroyDomain();
 
 		removeAddedComponentsFromView();
@@ -346,6 +376,14 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		editPage.addComponent(configurationPresenter.getView());
 
 		addHiddenPortletId(viewPage);
+	}
+
+	/**
+	 * Drops reference to PortletConfiguration.
+	 */
+	private void dropConfiguration() {
+		this.portletConfig = null;
+		this.status = ConfigStatus.UNKNOWN;
 	}
 
 	private void destroyDomain() {
@@ -439,7 +477,8 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 			window.setContent(viewPage);
 		} else if (request.getPortletMode() == PortletMode.EDIT) {
 			if (window.getContent() != editPage) {
-				configurationPresenter.refresh(portletDomain);
+				configurationPresenter.refresh(status, portletConfig,
+						portletDomain);
 			}
 			window.setContent(editPage);
 		} else if (request.getPortletMode() == PortletMode.HELP) {

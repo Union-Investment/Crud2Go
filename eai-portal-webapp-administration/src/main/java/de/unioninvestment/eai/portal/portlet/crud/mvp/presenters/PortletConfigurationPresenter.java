@@ -42,6 +42,9 @@ import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Window.Notification;
 
+import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
+import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication.ConfigStatus;
+import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PortletConfigurationView;
@@ -61,9 +64,13 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
  */
 @Configurable
 public class PortletConfigurationPresenter extends
-		AbstractPresenter<PortletConfigurationView> {
+		AbstractPresenter<PortletConfigurationView> implements
+		PortletConfigurationView.Presenter {
 
-	private static final long serialVersionUID = 2L;
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(PortletConfigurationPresenter.class);
+
+	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOG = LoggerFactory
 			.getLogger(PortletConfigurationPresenter.class);
@@ -92,7 +99,8 @@ public class PortletConfigurationPresenter extends
 		super(portletConfigurationView);
 		this.configurationService = configurationService;
 		this.eventBus = eventBus;
-		receiver = new ConfigurationReceiver();
+		this.receiver = new ConfigurationReceiver();
+		getView().setPresenter(this);
 		getView().getUpload().setReceiver(receiver);
 		getView().getUpload().addListener(new ConfigUploadFinishedListener());
 		getView().getUploadVcsButton().addListener(
@@ -285,14 +293,41 @@ public class PortletConfigurationPresenter extends
 	 * Aktualisiert die Ansicht. Die Links zum Ändern der Berechtigungen, werden
 	 * ein- und ausgeblendet.
 	 * 
+	 * @param portletConfig
+	 * @param status
+	 * 
 	 * @param portletDomain
 	 *            Portlet Model
 	 */
-	public void refresh(Portlet portletDomain) {
+	public void refresh(ConfigStatus status, Config portletConfig,
+			Portlet portletDomain) {
 		if (portletDomain != null) {
-			getView().displaySecurity(portletDomain.getRoles());
+			getView().displayRoles(portletDomain.getRoles());
 		} else {
-			getView().hideSecurity();
+			getView().hideRoles();
 		}
+		if (portletConfig != null) {
+			getView().displayAuthenticationPreferences(portletConfig);
+		} else {
+			getView().hideAuthenticationPreferences();
+		}
+	}
+
+	@Override
+	public void storePreferencesAndFireConfigChange() {
+		try {
+			CrudPortletApplication.getCurrentRequest().getPreferences().store();
+			eventBus.fireEvent(new ConfigurationUpdatedEvent());
+
+		} catch (Exception e) {
+			LOGGER.error("Error storing preferences", e);
+			getView().showNotification(
+					getMessage("portlet.crud.error.storingPreferences"),
+					Notification.TYPE_ERROR_MESSAGE);
+		}
+	}
+
+	public void switchToAuthenticationPreferences() {
+		getView().switchToAuthenticationPreferences();
 	}
 }

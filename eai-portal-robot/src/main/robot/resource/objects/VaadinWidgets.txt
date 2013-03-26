@@ -1,0 +1,21 @@
+*** Settings ***
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
+
+
+*** Keywords ***
+
+##########################
+###  Utility Keywords  ###
+##########################
+
+Select Vaadin Tab  
+	[Arguments]  ${tabName}
+	Vaadin Click  css=div.v-tabsheet-tabitem div.v-captiontext:contains("${tabName}")
+
+Click Vaadin Button
+	[Arguments]  ${buttonText}
+	Click Button  css=span.v-button-caption:contains("${buttonText}")

@@ -28,6 +28,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicStatusLine;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessExcep
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.InvalidConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
@@ -111,6 +113,9 @@ public class ReSTDelegateImplTest {
 
 	@Mock
 	private AuditLogger auditLoggerMock;
+
+	@Mock
+	private Realm realmMock;
 
 	@Before
 	public void setUp() {
@@ -569,6 +574,18 @@ public class ReSTDelegateImplTest {
 		delegate.update(asList(itemMock), new UpdateContext());
 	}
 
+	@Test
+	public void shouldApplyBasicAuthIfRealmIsGiven() {
+		config = RestTestConfig.readwriteConfig();
+		config.setRealm("testserver");
+
+		delegate = new ReSTDelegateImpl(config, containerMock,
+				realmMock, scriptBuilderMock, auditLoggerMock);
+
+		verify(realmMock).applyBasicAuthentication(
+				(DefaultHttpClient) delegate.httpClient);
+	}
+
 	private void stubSuccessfulPostResponse() throws ClientProtocolException,
 			IOException {
 		when(httpMock.execute(any(HttpUriRequest.class))).thenReturn(
@@ -704,8 +721,8 @@ public class ReSTDelegateImplTest {
 
 	private ReSTDelegateImpl newDelegate(ReSTContainerConfig config) {
 		ReSTDelegateImpl delegate = new ReSTDelegateImpl(config, containerMock,
-				scriptBuilderMock, auditLoggerMock);
-		delegate.http = httpMock;
+				realmMock, scriptBuilderMock, auditLoggerMock);
+		delegate.httpClient = httpMock;
 		delegate.parser = parserMock;
 		delegate.creator = creatorMock;
 		return delegate;

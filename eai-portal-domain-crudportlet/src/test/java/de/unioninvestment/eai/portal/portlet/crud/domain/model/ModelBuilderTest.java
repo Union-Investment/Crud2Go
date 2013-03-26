@@ -48,7 +48,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -57,6 +56,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -86,6 +86,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessExcep
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
@@ -131,9 +132,6 @@ public class ModelBuilderTest {
 	@Mock
 	private ResourceAction resourceActionMock;
 
-	@Mock
-	private ExecutorService prefetchExecutorMock;
-
 	@Captor
 	ArgumentCaptor<String> insertStringCaptor;
 
@@ -164,6 +162,9 @@ public class ModelBuilderTest {
 	@Mock
 	private QueryOptionList queryOptionListMock;
 
+	@Mock
+	private Realm realmMock;
+
 	@Before
 	public void setUp() throws Exception {
 
@@ -184,6 +185,11 @@ public class ModelBuilderTest {
 				17808L);
 	}
 
+	@After
+	public void tearDown() {
+		applicationMock.onRequestEnd(null, null);
+	}
+
 	private void mockExistingResourceWithTestAction() throws SystemException,
 			PortalException {
 
@@ -200,8 +206,7 @@ public class ModelBuilderTest {
 	private ModelBuilder createTestBuilder(Config config) {
 
 		return new ModelBuilder(eventBus, factoryMock,
-				connectionPoolFactoryMock,
-				prefetchExecutorMock, resetFormActionMock,
+				resetFormActionMock,
 				fieldValidatorFactoryMock, 300, config);
 	}
 
@@ -634,6 +639,23 @@ public class ModelBuilderTest {
 
 		assertThat(((Table) build.getPage().getElements().get(0)).getActions()
 				.get(0).getTitle(), is("Button mit Aktion"));
+	}
+
+	@Test
+	public void shouldCreateAuthenticationRealmFromConfiguration()
+			throws Exception {
+
+		PortletConfig config = createConfiguration("validReSTSecurityConfig.xml");
+		ModelBuilder builder = createTestBuilder(new Config(config, null));
+
+		when(
+				factoryMock.getAuthenticationRealm(config.getAuthentication()
+						.getRealm().get(0))).thenReturn(realmMock);
+
+		Portlet build = builder.build();
+
+		assertThat(build.getAuthenticationRealms().get("testserver"),
+				is(realmMock));
 	}
 
 	@Test

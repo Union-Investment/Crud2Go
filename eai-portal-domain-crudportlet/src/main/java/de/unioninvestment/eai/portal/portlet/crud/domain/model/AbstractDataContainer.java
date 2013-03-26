@@ -124,10 +124,14 @@ public abstract class AbstractDataContainer implements DataContainer,
 	private FilterPolicy filterPolicy;
 
 	/**
+	 * @param eventBus
+	 *            der Event-Bus
 	 * @param displayPattern
 	 *            die Anzeige-Patterns je Spalte
 	 * @param defaultOrder
 	 *            die Default-Sortierung
+	 * @param filterPolicy
+	 *            das gewünschte Filter-Verhalten
 	 */
 	public AbstractDataContainer(EventBus eventBus,
 			Map<String, String> displayPattern,

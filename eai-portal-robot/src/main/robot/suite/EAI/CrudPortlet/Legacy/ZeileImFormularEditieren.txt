@@ -7,6 +7,7 @@ Documentation   Story: Als Anwender möchte ich an Stelle von Inline-Editierung 
 
 	Es existiert eine Portalseite mit CRUD-Portlet
 	und weiterhin ein Benutzer
+	und außerdem Testdaten in TEST_CRUD2
 
 	wenn er die Portalseite öffnet 
 	und dann die XML Konfiguration: 'ROW_FORMULAR_EDIT.xml' hochlädt
@@ -16,7 +17,7 @@ Documentation   Story: Als Anwender möchte ich an Stelle von Inline-Editierung 
 
 	dann hat in der Formedit-Tabelle mit dem HTMLelement '//input' und der Methode Value die Spalte '3' der Zeile '1' den Wert '1'
 	dann hat in der Formedit-Tabelle mit dem HTMLelement '//input' und der Methode Value die Spalte '3' der Zeile '2' den Wert '1'
-	dann hat in der Formedit-Tabelle mit dem HTMLelement '//input' und der Methode Value die Spalte '3' der Zeile '3' den Wert 'TEST'
+	dann hat in der Formedit-Tabelle mit dem HTMLelement '//input' und der Methode Value die Spalte '3' der Zeile '3' den Wert 'TEST1'
 	dann hat in der Formedit-Tabelle mit dem HTMLelement '//textarea' und der Methode Value die Spalte '3' der Zeile '4' den Wert 'Dies ist ein sehr langer Text'
 
 2. Werte ändern und speichern

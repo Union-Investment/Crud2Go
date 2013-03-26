@@ -23,21 +23,25 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ModelFactoryTest {
 
-	@InjectMocks
 	private ModelFactory factory = new ModelFactory();
 
 	@Mock
@@ -51,6 +55,26 @@ public class ModelFactoryTest {
 	@Mock
 	private EventBus eventBus;
 
+	@Mock
+	private AuthenticationRealmConfig realmConfigMock;
+
+	@Mock
+	private ExecutorService prefetchExecutorMock;
+
+	@Mock
+	private ResetFormAction resetFormActionMock;
+
+	@Mock
+	private FieldValidatorFactory fieldValidatorFactoryMock;
+
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		factory = new ModelFactory(connectionPoolFactoryMock,
+				prefetchExecutorMock, resetFormActionMock,
+				fieldValidatorFactoryMock, 20);
+	}
+
 	@Test
 	public void shouldCreateDatabaseTableContainer() {
 		when(connectionPoolFactoryMock.getPool("eai")).thenReturn(
@@ -63,4 +87,5 @@ public class ModelFactoryTest {
 
 		assertThat(container, notNullValue());
 	}
+
 }

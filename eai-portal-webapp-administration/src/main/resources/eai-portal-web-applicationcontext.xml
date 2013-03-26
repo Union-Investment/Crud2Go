@@ -49,6 +49,7 @@
 	</bean>
 
 	<context:component-scan base-package="de.unioninvestment.eai.portal.portlet.crud" />
+	<context:component-scan base-package="de.unioninvestment.crud2go" />
 
 
 	<util:list id="dataTypes">

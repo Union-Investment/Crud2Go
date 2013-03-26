@@ -1,32 +1,35 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.services;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import java.util.Date;
 
+import javax.portlet.PortletPreferences;
 import javax.xml.bind.JAXBException;
 
 import org.junit.Before;
@@ -38,6 +41,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.xml.sax.SAXException;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
@@ -84,6 +88,9 @@ public class DefaultConfigurationServiceTest {
 
 	@Mock
 	private ConfigurationScriptsCompiler compilerMock;
+
+	@Mock
+	private PortletPreferences preferencesMock;
 
 	@Before
 	public void setUp() throws JAXBException, SAXException {
@@ -150,6 +157,70 @@ public class DefaultConfigurationServiceTest {
 		assertNull(service.getConfigurationMetaData("myWindowId", 17002L));
 	}
 
+	@Test
+	public void shouldStateConfiguredIfAuthenticationConfigIsMissing()
+			throws JAXBException, SAXException {
+		InputStream configStream = getClass().getClassLoader()
+				.getResourceAsStream("validConfig.xml");
+		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
+				.unmarshal(configStream);
+		Config config = new Config(portletConfig, null);
+
+		boolean configured = service.isConfigured(config, preferencesMock);
+
+		assertThat(configured, is(true));
+	}
+
+	@Test
+	public void shouldStateUnconfiguredIfAnyUsernameIsMissing()
+			throws JAXBException, SAXException {
+		InputStream configStream = getClass().getClassLoader()
+				.getResourceAsStream("validReSTSecurityConfig.xml");
+		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
+				.unmarshal(configStream);
+		Config config = new Config(portletConfig, null);
+		when(preferencesMock.getValue("testserver.password", null)).thenReturn(
+				"pwd");
+
+		boolean configured = service.isConfigured(config, preferencesMock);
+
+		assertThat(configured, is(false));
+	}
+
+	@Test
+	public void shouldStateUnconfiguredIfAnyPasswordIsMissing()
+			throws JAXBException, SAXException {
+		InputStream configStream = getClass().getClassLoader()
+				.getResourceAsStream("validReSTSecurityConfig.xml");
+		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
+				.unmarshal(configStream);
+		Config config = new Config(portletConfig, null);
+		when(preferencesMock.getValue("testserver.username", null)).thenReturn(
+				"user");
+
+		boolean configured = service.isConfigured(config, preferencesMock);
+
+		assertThat(configured, is(false));
+	}
+
+	@Test
+	public void shouldStateConfiguredIfAllPreferencesHaveText()
+			throws JAXBException, SAXException {
+		InputStream configStream = getClass().getClassLoader()
+				.getResourceAsStream("validReSTSecurityConfig.xml");
+		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
+				.unmarshal(configStream);
+		Config config = new Config(portletConfig, null);
+		when(preferencesMock.getValue("testserver.username", null)).thenReturn(
+				"user");
+		when(preferencesMock.getValue("testserver.password", null)).thenReturn(
+				"pwd");
+
+		boolean configured = service.isConfigured(config, preferencesMock);
+
+		assertThat(configured, is(true));
+	}
+
 	private void createServiceForConfig(String configXml) throws JAXBException,
 			SAXException {
 		final InputStream configXmlStream = getClass().getClassLoader()
@@ -159,4 +230,5 @@ public class DefaultConfigurationServiceTest {
 				configXmlStream);
 		service = new DefaultConfigurationService(dao, compilerMock);
 	}
+
 }

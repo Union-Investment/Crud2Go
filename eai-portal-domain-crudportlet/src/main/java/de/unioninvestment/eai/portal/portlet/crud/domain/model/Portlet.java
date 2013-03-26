@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 
 import java.io.Serializable;
@@ -35,6 +36,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshed
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 
@@ -64,6 +66,8 @@ public class Portlet implements Serializable {
 	private Set<Role> roles = new HashSet<Role>();
 
 	private EventBus eventBus;
+
+	private Map<String, Realm> realms = new HashMap<String, Realm>();
 
 	/**
 	 * @param config
@@ -233,5 +237,13 @@ public class Portlet implements Serializable {
 	public void addReloadHandler(
 			PortletReloadedEventHandler handler) {
 		reloadEventRouter.addHandler(handler);
+	}
+
+	public Map<String, Realm> getAuthenticationRealms() {
+		return unmodifiableMap(realms);
+	}
+
+	void addRealm(String name, Realm realm) {
+		realms.put(name, realm);
 	}
 }

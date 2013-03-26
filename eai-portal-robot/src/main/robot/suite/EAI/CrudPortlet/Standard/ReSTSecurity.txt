@@ -1,0 +1,26 @@
+*** Settings ***
+Documentation   Unterstützung von ReST Backends
+Force Tags      autor-mjartanc  rest  UI-590  mantis-5524
+
+*** Test Case ***
+
+
+Anzeige des Ergebnisses eines ReST-Request mit Basic Authentication
+	Es existiert ein ReST-Service
+	und außerdem ein Portlet mit der XML-Konfiguration 'REST_SECURITY.xml'
+	und außerdem Authentifizierungseinstellungen für admin:admin	
+	
+	dann werden in der ersten Zeile die Werte des ReST-Service angezeigt
+
+Fehlermeldung bei falschen ReST-Authentifizierungsdaten
+	Es existiert ein ReST-Service
+	und außerdem ein Portlet mit der XML-Konfiguration 'REST_SECURITY.xml'
+	
+	wenn falsche ReST-Authentifizierungseinstellungen eingegeben werden 	
+	
+	dann enthält die Seite den Text 'ReST-Server antwortet mit Status 403: Wrong login'
+
+
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt
+Test Teardown	Stoppe Rest Server und verarbeite Testergebnis

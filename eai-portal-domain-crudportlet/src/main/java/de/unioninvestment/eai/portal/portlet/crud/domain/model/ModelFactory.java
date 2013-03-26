@@ -27,12 +27,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import de.unioninvestment.crud2go.spi.security.CryptorFactory;
+import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
@@ -61,6 +64,9 @@ public class ModelFactory {
 	@Autowired
 	@Qualifier("prefetchExecutor")
 	private ExecutorService prefetchExecutor;
+
+	@Autowired
+	private CryptorFactory cryptorFactory;
 
 	/**
 	 * Konstruktor.
@@ -96,20 +102,27 @@ public class ModelFactory {
 	/**
 	 * Gibt einen Model-Builder zurück.
 	 * 
+	 * @param eventBus
+	 *            der Event-Bus
 	 * @param config
 	 *            Portletkonfiguration
 	 * @return Model-Builder
 	 */
 	public ModelBuilder getBuilder(EventBus eventBus, Config config) {
-		return new ModelBuilder(eventBus, this, connectionPoolFactory,
-				prefetchExecutor,
+		return new ModelBuilder(eventBus, this,
 				resetFormAction, fieldValidatorFactory, defaultSelectWidth,
 				config);
+	}
+
+	public Realm getAuthenticationRealm(AuthenticationRealmConfig config) {
+		return new Realm(config, cryptorFactory);
 	}
 
 	/**
 	 * Gibt den Datenbankcontainer zurück.
 	 * 
+	 * @param eventBus
+	 *            der Event-Bus
 	 * @param datasource
 	 *            die DataSource
 	 * @param tablename
@@ -130,8 +143,10 @@ public class ModelFactory {
 	 *            Art des Filterhandlings
 	 * @param sizeValidTimeout
 	 *            Cachttimeout für die Anzahl aller selektierten Einträge
-	 * @param pageLength
+	 * @param pagelength
 	 *            Anzahl der Einträge pro Seite
+	 * @param exportPagelength
+	 *            Anzahl der Einträge pro Seite beim Export
 	 * @return eine neue Instanz des {@link DatabaseTableContainer}
 	 */
 	public DatabaseTableContainer getDatabaseTableContainer(EventBus eventBus,
@@ -151,6 +166,8 @@ public class ModelFactory {
 
 	/**
 	 * 
+	 * @param eventBus
+	 *            der Event-Bus
 	 * @param datasource
 	 *            die DataSource
 	 * @param query
@@ -173,8 +190,10 @@ public class ModelFactory {
 	 *            Art des Filterhandlings
 	 * @param sizeValidTimeout
 	 *            Cachttimeout für die Anzahl aller selektierten Einträge
-	 * @param pageLength
+	 * @param pagelength
 	 *            Anzahl der Einträge pro Seite
+	 * @param exportPagelength
+	 *            Anzahl der Einträge pro Seite beim Export
 	 * @return DatabaseQueryContainer
 	 */
 	public DatabaseQueryContainer getDatabaseQueryContainer(EventBus eventBus,
