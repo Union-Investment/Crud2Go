@@ -94,7 +94,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 					checkboxLayout.setCaption(field.getCaption());
 					field.setCaption(null);
 					checkboxLayout.addComponent(field);
-					addComponent(checkboxLayout);
+					getLayout().addComponent(checkboxLayout);
 				} else {
 					super.attachField(propertyId, field);
 				}
