@@ -2,17 +2,7 @@
 <jboss-deployment-structure>
 	<deployment>
 		<dependencies>
-			<module name="de.unioninvestment.configuration" />
-			<module name="com.oracle.ojdbc6" />
-			<module name="com.liferay.portal" />
-			<module name="org.jboss.management.jboss4client" />
-			<module name="org.bouncycastle" />
-			<system>
-				<paths>
-					<path name="com/sun/jndi/url/rmi" />
-					<path name="com/sun/jndi/rmi/registry" />
-				</paths>
-			</system>
+			<module name="de.unioninvestment.crud2go" />
 		</dependencies>
 	</deployment>
 </jboss-deployment-structure>
