@@ -177,8 +177,9 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 				modelBuilderMock);
 		when(modelBuilderMock.build()).thenReturn(portletMock);
 
-		when(presenterFactoryMock.portletConfigurationPresenter()).thenReturn(
-				portletConfigurationPresenterMock);
+		when(presenterFactoryMock.portletConfigurationPresenter(settingsMock))
+				.thenReturn(
+						portletConfigurationPresenterMock);
 		when(portletConfigurationPresenterMock.getView()).thenReturn(
 				portletConfigurationViewMock);
 		when(portletPresenterMock.getView()).thenReturn(portletViewMock);

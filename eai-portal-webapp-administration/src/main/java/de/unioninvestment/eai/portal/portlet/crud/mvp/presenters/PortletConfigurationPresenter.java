@@ -25,15 +25,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.net.URL;
 
 import javax.portlet.PortletRequest;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.util.StringUtils;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -44,6 +49,7 @@ import com.vaadin.ui.Window.Notification;
 
 import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
 import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication.ConfigStatus;
+import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
@@ -83,6 +89,8 @@ public class PortletConfigurationPresenter extends
 	@Autowired
 	private transient EventBus eventBus;
 
+	private Settings settings;
+
 	/**
 	 * 
 	 * @param portletConfigurationView
@@ -91,14 +99,17 @@ public class PortletConfigurationPresenter extends
 	 *            Service Bean für die Portletkonfiguration.
 	 * @param eventBus
 	 *            für applikationsweites Eventhandler.
+	 * @param settings
 	 */
 	public PortletConfigurationPresenter(
 			PortletConfigurationView portletConfigurationView,
-			ConfigurationService configurationService, EventBus eventBus) {
+			ConfigurationService configurationService, EventBus eventBus,
+			Settings settings) {
 
 		super(portletConfigurationView);
 		this.configurationService = configurationService;
 		this.eventBus = eventBus;
+		this.settings = settings;
 		this.receiver = new ConfigurationReceiver();
 		getView().setPresenter(this);
 		getView().getUpload().setReceiver(receiver);
@@ -202,9 +213,18 @@ public class PortletConfigurationPresenter extends
 			String vcsUri = (String) getView().getUploadVcsUri().getValue();
 			byte[] configValueVcs = null;
 			try {
-				Authenticator.setDefault(new VcsAuthenticator());
-				URL url = new URL(vcsUri);
-				InputStream ins = url.openConnection().getInputStream();
+				DefaultHttpClient httpClient = new DefaultHttpClient();
+				if (StringUtils.hasText(settings.getVcsUser())) {
+					httpClient.getCredentialsProvider().setCredentials(
+							AuthScope.ANY,
+							new UsernamePasswordCredentials(settings
+									.getVcsUser(), settings.getVcsPassword()));
+				}
+
+				HttpGet request = new HttpGet(vcsUri);
+				HttpResponse response = httpClient.execute(request);
+
+				InputStream ins = response.getEntity().getContent();
 				configValueVcs = IOUtils.toByteArray(ins);
 				if (validator.isValid(configValueVcs)) {
 					saveConfig(vcsUri, configValueVcs);

@@ -184,7 +184,8 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 							configurationPresenter.refresh(status,
 									portletConfig,
 									portletDomain);
-							configurationPresenter.switchToAuthenticationPreferences();
+							configurationPresenter
+									.switchToAuthenticationPreferences();
 						}
 					}
 				});
@@ -372,7 +373,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 
 		editPage.removeAllComponents();
 		configurationPresenter = presenterFactory
-				.portletConfigurationPresenter();
+				.portletConfigurationPresenter(settings);
 		editPage.addComponent(configurationPresenter.getView());
 
 		addHiddenPortletId(viewPage);

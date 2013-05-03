@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 
 import de.unioninvestment.eai.portal.portlet.crud.GuiBuilder;
+import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
@@ -202,13 +203,16 @@ public class PresenterFactory {
 	/**
 	 * Liefert eine {@link PortletConfigurationPresenter} zurück.
 	 * 
+	 * @param settings
+	 * 
 	 * 
 	 * @return PortletConfigurationPresenter
 	 */
-	public PortletConfigurationPresenter portletConfigurationPresenter() {
+	public PortletConfigurationPresenter portletConfigurationPresenter(
+			Settings settings) {
 		return new PortletConfigurationPresenter(
 				viewFactory.portletConfigurationView(), configurationService,
-				eventBus);
+				eventBus, settings);
 	}
 
 	void setViewFactory(ViewFactory viewFactory) {

@@ -54,6 +54,7 @@ import com.vaadin.ui.Window.Notification;
 
 import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
 import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication.ConfigStatus;
+import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
@@ -107,6 +108,9 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 	@Mock
 	private PortletPreferences preferencesMock;
 
+	@Mock
+	private Settings settingsMock;
+
 	private static final String testWinId = "2";
 
 	@Before
@@ -135,8 +139,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 				configurationServiceMock.getConfigurationMetaData(testWinId,
 						18004)).thenReturn(null);
 
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		verify(viewMock).setStatus(
 				"portlet.crud.page.status.config.notAvailable");
@@ -155,17 +158,20 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 				configurationServiceMock.getConfigurationMetaData(testWinId,
 						18004L)).thenReturn(metaDataMock);
 
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		verify(viewMock).setStatus("portlet.crud.page.status.config.available",
 				testUser, testDate, null);
 	}
 
+	private PortletConfigurationPresenter createPortletConfigurationPresenter() {
+		return new PortletConfigurationPresenter(
+				viewMock, configurationServiceMock, eventBusMock, settingsMock);
+	}
+
 	@Test
 	public void shouldUpdateValidConfigXML() {
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		ConfigUploadFinishedListener configUploadListener = portletConfigurationPresenter.new ConfigUploadFinishedListener();
 		ConfigurationUploadValidator validator = mock(ConfigurationUploadValidator.class);
@@ -193,8 +199,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 	@Test
 	public void shouldUpdateInvalidConfigXML() {
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		ConfigUploadFinishedListener configUploadListener = portletConfigurationPresenter.new ConfigUploadFinishedListener();
 		ConfigurationUploadValidator validator = mock(ConfigurationUploadValidator.class);
@@ -216,8 +221,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 	@Test
 	public void shouldResetBufferBeforeUpload() {
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		ConfigurationReceiver receiver = portletConfigurationPresenter.new ConfigurationReceiver();
 		receiver.getBaos().write(369);
@@ -231,8 +235,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 	@Test
 	public void shouldUpdateViewWithNewSecurityRolesOnRefresh() {
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		Set<Role> roles = singleton(roleMock);
 		when(portletMock.getRoles()).thenReturn(roles);
@@ -245,8 +248,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 	@Test
 	public void shouldUpdateViewWithNewAuthenticationSheetOnRefresh() {
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		Config config = new Config(new PortletConfig(), singletonMap("a", 1L));
 		portletConfigurationPresenter.refresh(ConfigStatus.UNCONFIGURED,
@@ -258,8 +260,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 	@Test
 	public void shouldInformViewToRemoveSecurityConfig() {
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		portletConfigurationPresenter.refresh(ConfigStatus.NO_CONFIG, null,
 				null);
@@ -269,8 +270,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 	@Test
 	public void shouldStorePreferences() throws ValidatorException, IOException {
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		portletConfigurationPresenter.storePreferencesAndFireConfigChange();
 
@@ -279,8 +279,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 	@Test
 	public void shouldFireConfigChange() throws ValidatorException, IOException {
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
 		portletConfigurationPresenter.storePreferencesAndFireConfigChange();
 
@@ -290,8 +289,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 	@Test
 	public void shouldShowNotificationOnStorageError()
 			throws ValidatorException, IOException {
-		portletConfigurationPresenter = new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock);
+		portletConfigurationPresenter = createPortletConfigurationPresenter();
 		doThrow(new ValidatorException(new RuntimeException(), asList("a")))
 				.when(preferencesMock)
 				.store();
