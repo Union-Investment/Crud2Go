@@ -1,3 +1,8 @@
+-- 
+-- Achtung: Wegen eines Bugs in Liferay werden VARCHAR-Felder existierender Tabellen auf 1/4tel Länge gekürzt.
+-- Daher sollte dieses Script erst nach dem ersten Liferay-Start ausgeführt werden. 
+--
+
 -- Tabelle für Konfigurationen
 CREATE TABLE ADM_CONFIG
 (
@@ -25,7 +30,7 @@ END;
 CREATE TABLE RESOURCEID_PRIMKEY 
 (
   PRIMKEY NUMBER NOT NULL PRIMARY KEY,
-  RESOURCEID VARCHAR2(100 BYTE) NOT NULL UNIQUE
+  RESOURCEID VARCHAR2(100) NOT NULL UNIQUE
 );
 
 CREATE SEQUENCE RESOURCEID_SEQ INCREMENT BY 1 MAXVALUE 999999999999999999999999999 MINVALUE 1 CACHE 20;
