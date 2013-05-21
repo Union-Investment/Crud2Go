@@ -188,7 +188,7 @@ public class TableTest {
 		when(rowIdMock.getId()).thenReturn(new Object[] { 1, 2 });
 		selectionRowId.add(new DatabaseContainerRowId(rowIdMock, asList("ID",
 				"INDEX")));
-		table.selectionChange(selectionRowId);
+		table.changeSelection(selectionRowId);
 
 		verify(selectionChangeListenerMock).onSelectionChange(
 				selectionChangeEventCaptor.capture());

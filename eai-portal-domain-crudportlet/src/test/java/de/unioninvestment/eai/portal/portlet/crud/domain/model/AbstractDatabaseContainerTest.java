@@ -97,6 +97,12 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	private RowId rowId2Mock;
 
 	@Mock
+	private ContainerRowId containerRowId1Mock;
+
+	@Mock
+	private ContainerRowId containerRowId2Mock;
+
+	@Mock
 	private EachRowCallback eachRowCallbackMock;
 
 	@Captor
@@ -108,8 +114,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	@Before
 	public void databaseSetUp() {
 		testContainer = new TestContainer(eventBus, editors,
-				vaadinContainerMock,
-				displayPatternMock);
+				vaadinContainerMock, displayPatternMock);
 	}
 
 	private class TestContainer extends AbstractDatabaseContainer {
@@ -261,9 +266,8 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 		ContainerOrder order1 = new ContainerOrder("ID", true);
 		ContainerOrder order2 = new ContainerOrder("NAME", false);
 		TestContainer container = new TestContainer(eventBus, new String[] {
-				"ID",
-				"INDEX", "NAME" }, editors, displayPatternMock, asList(order1,
-				order2));
+				"ID", "INDEX", "NAME" }, editors, displayPatternMock, asList(
+				order1, order2));
 
 		container.getVaadinContainer();
 
@@ -275,8 +279,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	public void shouldNotCallSortOnContainerWithoutDefaultOrder() {
 
 		TestContainer container = new TestContainer(eventBus, new String[] {
-				"ID",
-				"INDEX", "NAME" }, editors, displayPatternMock, null);
+				"ID", "INDEX", "NAME" }, editors, displayPatternMock, null);
 
 		container.getVaadinContainer();
 
@@ -303,8 +306,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	@Test
 	public void shouldConvertRowItemToDatabaseContainerRow() {
 		TestContainer container = new TestContainer(eventBus, new String[] {
-				"ID",
-				"INDEX", "NAME" }, editors, displayPatternMock, null);
+				"ID", "INDEX", "NAME" }, editors, displayPatternMock, null);
 		RowId rowId = new RowId(new Object[] { 1, 2, "MY_NAME" });
 		ColumnProperty idProperty = new ColumnProperty("ID", false, false,
 				true, "ID", String.class);
@@ -323,8 +325,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	public void shouldConvertInternalRowIds() {
 		RowId rowId = new RowId(new Object[] { 1, 2, "MY_NAME" });
 		TestContainer container = new TestContainer(eventBus, new String[] {
-				"ID",
-				"INDEX", "NAME" }, editors, displayPatternMock, null);
+				"ID", "INDEX", "NAME" }, editors, displayPatternMock, null);
 
 		ContainerRowId id = container.convertInternalRowId(rowId);
 
@@ -527,8 +528,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	public void shouldAddNewRow() {
 
 		container = (T) new TestContainer(eventBus, new String[] { "ID" },
-				editors,
-				displayPatternMock, null);
+				editors, displayPatternMock, null);
 
 		TemporaryRowId rowId = new TemporaryRowId(new Object[] { "ID" });
 		Item row1 = createRow(rowId);
@@ -555,8 +555,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	@Test
 	public void shouldReturnCachedRowById() {
 		TestContainer container = new TestContainer(eventBus, new String[] {
-				"ID",
-				"INDEX", "NAME" }, editors, displayPatternMock, null);
+				"ID", "INDEX", "NAME" }, editors, displayPatternMock, null);
 
 		when(rowId1Mock.getId()).thenReturn(new Object[] { 1 });
 		Item row1 = createRow(rowId1Mock);
@@ -574,8 +573,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	@Test
 	public void shouldReturnRowById() {
 		TestContainer container = new TestContainer(eventBus, new String[] {
-				"ID",
-				"INDEX", "NAME" }, editors, displayPatternMock, null);
+				"ID", "INDEX", "NAME" }, editors, displayPatternMock, null);
 
 		when(rowId1Mock.getId()).thenReturn(new Object[] { 1 });
 		Item row1 = createRow(rowId1Mock);
@@ -745,6 +743,52 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 		verify(vaadinContainerMock).firstItemId();
 		verifyZeroInteractions(eachRowCallbackMock);
+	}
+
+	@Test
+	public void shouldReturnNullAsNextRowIdOnLastRowId() {
+		container.setVaadinContainer(vaadinContainerMock);
+		when(containerRowId1Mock.getInternalId()).thenReturn(rowId1Mock);
+		when(vaadinContainerMock.nextItemId(rowId1Mock)).thenReturn(null);
+
+		ContainerRowId nextRowId = container.nextRowId(containerRowId1Mock);
+
+		assertThat(nextRowId, nullValue());
+	}
+
+	@Test
+	public void shouldReturnNextRowId() {
+		container.setVaadinContainer(vaadinContainerMock);
+		when(containerRowId1Mock.getInternalId()).thenReturn(rowId1Mock);
+		when(vaadinContainerMock.nextItemId(rowId1Mock)).thenReturn(rowId2Mock);
+
+		ContainerRowId nextRowId = container.nextRowId(containerRowId1Mock);
+
+		assertThat(nextRowId.getInternalId(), is((Object) rowId2Mock));
+	}
+
+	@Test
+	public void shouldReturnNullAsPreviousRowIdOnLastRowId() {
+		container.setVaadinContainer(vaadinContainerMock);
+		when(containerRowId1Mock.getInternalId()).thenReturn(rowId1Mock);
+		when(vaadinContainerMock.prevItemId(rowId1Mock)).thenReturn(null);
+
+		ContainerRowId previousRowId = container
+				.previousRowId(containerRowId1Mock);
+
+		assertThat(previousRowId, nullValue());
+	}
+
+	@Test
+	public void shouldReturnPreviousRowId() {
+		container.setVaadinContainer(vaadinContainerMock);
+		when(containerRowId1Mock.getInternalId()).thenReturn(rowId1Mock);
+		when(vaadinContainerMock.prevItemId(rowId1Mock)).thenReturn(rowId2Mock);
+
+		ContainerRowId previousRowId = container
+				.previousRowId(containerRowId1Mock);
+
+		assertThat(previousRowId.getInternalId(), is((Object) rowId2Mock));
 	}
 
 }

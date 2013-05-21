@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
@@ -35,6 +36,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.AbstractTimeoutableQueryDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
@@ -53,12 +55,21 @@ public class DatabaseTableContainerTest
 	@Mock
 	private EventBus eventBus;
 
+	@Mock
+	private AbstractTimeoutableQueryDelegate queryDelegateMock;
+
 	@Override
 	public DatabaseTableContainer createDataContainer() {
-		return new DatabaseTableContainer(eventBus, "eai", "test",
-				connectionPoolMock,
-				true, true, true, new TestUser("Benutzer"), displayPatternMock,
+		DatabaseTableContainer databaseTableContainer = new DatabaseTableContainer(
+				eventBus, "eai", "test", connectionPoolMock, true, true, true,
+				new TestUser("Benutzer"), displayPatternMock,
 				new ArrayList<ContainerOrder>(), null, 100, 1000, 0);
+
+		databaseTableContainer.setQueryDelegate(queryDelegateMock);
+		when(queryDelegateMock.getPrimaryKeyColumns()).thenReturn(
+				asList("test"));
+
+		return databaseTableContainer;
 	}
 
 	@Override

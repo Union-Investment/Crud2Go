@@ -74,20 +74,17 @@ public class CrudFieldFactory implements TableFieldFactory, FormFieldFactory {
 	private boolean createFormFieldForTable = true;
 
 	/**
-	 * @param databaseContainer
-	 *            Datenbankcontainer
 	 * @param vaadinTable
 	 *            die Tabelle
 	 * @param tableColumns
 	 *            Spaltenkonfiguration aus XML
 	 */
 	public CrudFieldFactory(
-			DataContainer databaseContainer,
 			Table vaadinTable,
 			de.unioninvestment.eai.portal.portlet.crud.domain.model.Table modelTable) {
-		this.dataContainer = databaseContainer;
 		this.vaadinTable = vaadinTable;
 		this.modelTable = modelTable;
+		this.dataContainer = modelTable.getContainer();
 	}
 
 	public void setCreateFormFieldForTable(boolean createFormFieldForTable) {

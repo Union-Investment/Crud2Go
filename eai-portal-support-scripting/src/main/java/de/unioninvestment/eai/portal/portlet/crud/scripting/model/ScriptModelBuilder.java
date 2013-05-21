@@ -444,8 +444,7 @@ public class ScriptModelBuilder {
 	private void populateDynamicEditableClosures(Table table) {
 		TableConfig tc = (TableConfig) configs.get(table);
 		GroovyScript rowEditableScript = tc.getRowEditable();
-		if (rowEditableScript != null
-				&& !Util.isPlainBoolean(rowEditableScript)) {
+		if (rowEditableScript != null) {
 			Closure<Object> rowEditableClosure = scriptBuilder
 					.buildClosure(rowEditableScript);
 			table.setRowEditableChecker(new RowEditableCheckerImpl(table,

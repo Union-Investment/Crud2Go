@@ -3,6 +3,7 @@ Documentation   Tests für CRUD-Portlet bei eingeloggtem Standarduser
 
 
 *** Settings ***
+Suite Setup		Erstelle TestUser Table
 Test Setup      Initalisiere CrudPortlet Test
 Test Teardown   Bereinige CrudPortlet Test
 Resource        ${RESOURCES}/import/CrudPortlet.txt

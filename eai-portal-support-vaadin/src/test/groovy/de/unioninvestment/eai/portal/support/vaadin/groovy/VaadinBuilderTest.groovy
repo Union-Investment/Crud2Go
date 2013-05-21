@@ -65,7 +65,7 @@ class VaadinBuilderTest {
 	@Test
 	void shouldCreateButtonWithValueAsID() {
 		def caption = 'caption'
-		Button button = builder.button('myButton');
+		Button button = builder.button('myButton', caption:'Test');
 
 		assert builder.components.myButton == button
 	}
@@ -127,12 +127,12 @@ class VaadinBuilderTest {
 	@Test
 	void shouldCreateStreamResource() {
 		Link link = builder.link( resource: builder.streamResource(
-				stream: {
-					new ByteArrayInputStream("asddas".bytes)
-				},
-				filename: 'abc.txt',
-				mimetype: 'text/plain')
-				)
+		stream: {
+			new ByteArrayInputStream("asddas".bytes)
+		},
+		filename: 'abc.txt',
+		mimetype: 'text/plain')
+		)
 
 		assert link.resource instanceof StreamResource
 		assert link.resource.filename == 'abc.txt'
@@ -143,6 +143,15 @@ class VaadinBuilderTest {
 		Label label = builder.label(caption: 'text');
 
 		assert label.caption == 'text'
+	}
+
+	@Test
+	void shouldCreateLabelWithId() {
+		builder.verticalLayout {
+			label('mylabel', caption: 'text')
+		}
+
+		assert builder.components.mylabel.caption == 'text'
 	}
 
 	@Test
@@ -176,9 +185,9 @@ class VaadinBuilderTest {
 	@Test
 	void shouldCreateTable() {
 		def columns = [
-					"column-1" : { new Label("label-1") },
-					"column-2" : { new Label("label-2") },
-					"column-3" : { new Label("label-3") }]
+			"column-1" : { new Label("label-1") },
+			"column-2" : { new Label("label-2") },
+			"column-3" : { new Label("label-3") }]
 		Table table = builder.table(caption:"table-caption", columns:columns)
 
 		assert table

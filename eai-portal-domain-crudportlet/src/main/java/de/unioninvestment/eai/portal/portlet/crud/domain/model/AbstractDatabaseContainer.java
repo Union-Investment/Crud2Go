@@ -201,4 +201,12 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 				sqlFilter.getValues());
 	}
 
+	/**
+	 * @param queryDelegate
+	 *            for testing
+	 */
+	void setQueryDelegate(AbstractTimeoutableQueryDelegate queryDelegate) {
+		this.queryDelegate = queryDelegate;
+	}
+
 }

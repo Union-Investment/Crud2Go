@@ -146,8 +146,8 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 				true);
 		when(modelTableMock.getContainer()).thenReturn(databaseContainerMock);
 
-		crudTableFieldFactory = new CrudFieldFactory(databaseContainerMock,
-				vaadinTableMock, modelTableMock);
+		crudTableFieldFactory = new CrudFieldFactory(vaadinTableMock,
+				modelTableMock);
 
 		when(databaseContainerMock.convertItemToRow(itemMock, false, true))
 				.thenReturn(rowMock);

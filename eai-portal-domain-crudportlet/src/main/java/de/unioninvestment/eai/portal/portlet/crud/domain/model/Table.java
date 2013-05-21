@@ -355,7 +355,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @param selection
 	 *            die im View geänderte Selektion.
 	 */
-	public void selectionChange(Set<ContainerRowId> selection) {
+	public void changeSelection(Set<ContainerRowId> selection) {
 		LinkedHashSet<ContainerRowId> newSelection = new LinkedHashSet<ContainerRowId>(
 				selection);
 		if (!newSelection.equals(this.selection)) {
@@ -695,6 +695,13 @@ public class Table extends Component implements Component.ExpandableComponent,
 	@Override
 	public int getExpandRatio() {
 		return config.getExpandRatio();
+	}
+
+	/**
+	 * @return the current edit mode
+	 */
+	public Mode getMode() {
+		return mode;
 	}
 
 }

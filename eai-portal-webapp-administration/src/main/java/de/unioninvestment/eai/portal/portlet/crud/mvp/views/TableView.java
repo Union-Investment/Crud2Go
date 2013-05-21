@@ -89,7 +89,7 @@ public interface TableView extends View {
 		 * @param selection
 		 *            Selektionen
 		 */
-		void selectionChange(Set<Object> selection);
+		void changeSelection(Set<Object> selection);
 
 		/**
 		 * 
@@ -172,20 +172,6 @@ public interface TableView extends View {
 	 *            Notification Type
 	 */
 	void showNotification(String msgKey, int notificationType);
-
-	/**
-	 * Zeigt den nächsten Datensatz an.
-	 * 
-	 * @return Nächster Datensatz
-	 */
-	Item getNextItem();
-
-	/**
-	 * Zeigt den vorherigen Datensatz an.
-	 * 
-	 * @return Vorheriger Datensatz
-	 */
-	Item getPreviousItem();
 
 	/**
 	 * Action Methode fuer das Zuruecksetzen von Aenderungen in der
@@ -292,4 +278,12 @@ public interface TableView extends View {
 	 *            unterdrückt).
 	 */
 	void selectItemForEditing(Object itemId, boolean suppressCommit);
+
+	/**
+	 * Update the displayed table selection.
+	 * 
+	 * @param selection
+	 *            the new selection
+	 */
+	void selectionUpdatedExternally(Set<Object> selection);
 }

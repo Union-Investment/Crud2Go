@@ -533,7 +533,7 @@ Formular Editieren Initialisieren
 	Testdaten in TEST_CRUD2
 	
 Initalisiere CrudPortlet Test    
-	Erstelle TestUser Table 
+	Noop
 	
 Auf Hauptseite zurückwechseln
 	Vaadin Click  css=header.portlet-topper a.portlet-icon-back 

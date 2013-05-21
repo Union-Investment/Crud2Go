@@ -63,6 +63,14 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	private Presenter presenter;
 	private Upload upload;
 
+	private Button saveButton;
+	private Button resetButton;
+	private Button deleteButton;
+
+	private Button nextRowButton;
+
+	private Button previousRowButton;
+
 	/**
 	 * Konstruktor.
 	 * 
@@ -113,8 +121,12 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		form.setWriteThrough(false);
 		addComponent(form);
 
-		final Button commitButton = new Button("Speichern");
-		commitButton.addListener(new ClickListener() {
+		HorizontalLayout footerLayout = new HorizontalLayout();
+		footerLayout.setSpacing(true);
+		form.setFooter(footerLayout);
+
+		saveButton = new Button("Speichern");
+		saveButton.addListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -122,9 +134,9 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				DefaultRowEditingFormView.this.presenter.save();
 			}
 		});
-		form.getFooter().addComponent(commitButton);
+		form.getFooter().addComponent(saveButton);
 
-		Button resetButton = new Button("Zurücksetzen");
+		resetButton = new Button("Zurücksetzen");
 		resetButton.addListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -135,7 +147,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		});
 		form.getFooter().addComponent(resetButton);
 
-		Button deleteButton = new Button("Löschen");
+		deleteButton = new Button("Löschen");
 		deleteButton.addListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -146,7 +158,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		});
 		form.getFooter().addComponent(deleteButton);
 
-		Button previousRowButton = new Button("Vorheriger");
+		previousRowButton = new Button("Vorheriger");
 		previousRowButton.addListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -157,7 +169,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		});
 		form.getFooter().addComponent(previousRowButton);
 
-		Button nextRowButton = new Button("Nächster");
+		nextRowButton = new Button("Nächster");
 		nextRowButton.addListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -192,11 +204,17 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	}
 
 	@Override
-	public void displayRow(Item item) {
+	public void displayRow(Item item, boolean editable, boolean deletable) {
 		Assert.notNull(item, "Row cannot be null");
 		form.getLayout().removeAllComponents();
 		form.setItemDataSource(item, presenter.getVisibleFields());
 		presenter.addClobFields(item);
+
+		saveButton.setEnabled(editable);
+		resetButton.setEnabled(editable);
+		deleteButton.setEnabled(deletable);
+		previousRowButton.setEnabled(presenter.hasPreviousRow());
+		nextRowButton.setEnabled(presenter.hasNextRow());
 	}
 
 	@Override

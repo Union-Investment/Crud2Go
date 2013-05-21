@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
 import static java.util.Collections.singleton;
@@ -41,6 +41,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerClob;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Panel;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
@@ -67,6 +68,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	private final Table table;
 	private final TablePresenter tablePresenter;
 	private ContainerRow currentContainerRow;
+	private DataContainer container;
 
 	/**
 	 * Konstruktor.
@@ -93,12 +95,12 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		this.dialogId = dialogId;
 		this.table = table;
 		this.tablePresenter = tablePresenter;
+		this.container = table.getContainer();
 		initialize();
 	}
 
 	private void initialize() {
-		CrudFieldFactory fac = new CrudFieldFactory(table.getContainer(), null,
-				table);
+		CrudFieldFactory fac = new CrudFieldFactory(null, table);
 		ValidationFieldFactoryWrapper validationWrapper = new ValidationFieldFactoryWrapper(
 				table.getContainer(), fac, table.getColumns());
 
@@ -120,18 +122,18 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		ContainerRow containerRow = table.getContainer().convertItemToRow(item,
 				false, true);
 		for (String fieldName : getVisibleFields()) {
-			if (table.getContainer().isCLob(fieldName)) {
-				ContainerClob clob = table.getContainer().getCLob(
-						containerRow.getId(), fieldName);
+			if (container.isCLob(fieldName)) {
+				ContainerClob clob = container.getCLob(containerRow.getId(),
+						fieldName);
 				boolean isReadOnly = isReadOnly(containerRow, fieldName);
 
 				Property property = clob.getPropertyValue();
 				property.setReadOnly(isReadOnly);
 				getView().addClobField(table.getColumns().get(fieldName),
 						property);
-			} else if (table.getContainer().isBLob(fieldName)) {
-				ContainerBlob blob = table.getContainer().getBLob(
-						containerRow.getId(), fieldName);
+			} else if (container.isBLob(fieldName)) {
+				ContainerBlob blob = container.getBLob(containerRow.getId(),
+						fieldName);
 				boolean isReadOnly = isReadOnly(containerRow, fieldName);
 				getView().addBlobField(table.getColumns().get(fieldName), blob,
 						isReadOnly);
@@ -142,14 +144,18 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	private boolean isReadOnly(ContainerRow containerRow, String fieldName) {
 		boolean isReadOnly = containerRow.getFields().get(fieldName)
 				.isReadonly()
-				|| !table.isRowEditable(containerRow);
+				|| isRowReadonly(containerRow);
 
 		return isReadOnly;
 	}
 
+	private boolean isRowReadonly(ContainerRow containerRow) {
+		return !table.isRowEditable(containerRow);
+	}
+
 	@Override
 	public void onDoubleClick(TableDoubleClickEvent event) {
-		if (tablePresenter.getCurrentMode() == Table.Mode.EDIT) {
+		if (table.getMode() == Table.Mode.EDIT) {
 			showDialog(event.getRow());
 		}
 	}
@@ -166,7 +172,9 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 			parentPanel.attachDialog(dialogId);
 
-			getView().displayRow(currentContainerRow.getInternalRow());
+			getView().displayRow(currentContainerRow.getInternalRow(),
+					table.isRowEditable(currentContainerRow),
+					tablePresenter.isDeleteable());
 
 		}
 	}
@@ -191,7 +199,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 			try {
 				fireRowChangeEvent(modifiedColumnNames);
 
-				table.getContainer().commit();
+				container.commit();
 
 				parentPanel.detachDialog();
 
@@ -234,7 +242,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		Map<String, Object> fields = new HashMap<String, Object>();
 
 		for (String fieldName : modifiedFieldNames) {
-			if (table.getContainer().isCLob(fieldName)) {
+			if (container.isCLob(fieldName)) {
 				fields.put(fieldName, null);
 			} else {
 				fields.put(fieldName,
@@ -255,7 +263,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 		for (String fieldName : getVisibleFields()) {
 			if (getView().isFieldModifed(fieldName)) {
-				if (table.getContainer().isCLob(fieldName)) {
+				if (container.isCLob(fieldName)) {
 					fields.add(fieldName);
 				} else {
 					fields.add(fieldName);
@@ -273,17 +281,32 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	@Override
 	public void delete() {
 		ContainerRowId containerRowId = currentContainerRow.getId();
-		table.getContainer().removeRows(singleton(containerRowId));
+		container.removeRows(singleton(containerRowId));
 
 		parentPanel.detachDialog();
 	}
 
 	@Override
-	public boolean nextRow() {
-		Item nextItem = tablePresenter.getNextItem();
+	public boolean hasPreviousRow() {
+		return container.previousRowId(currentContainerRow.getId()) != null;
+	}
 
-		if (nextItem != null) {
-			getView().displayRow(nextItem);
+	@Override
+	public boolean hasNextRow() {
+		return container.nextRowId(currentContainerRow.getId()) != null;
+	}
+
+	@Override
+	public boolean nextRow() {
+		ContainerRowId nextRowId = container.nextRowId(currentContainerRow
+				.getId());
+
+		if (nextRowId != null) {
+			currentContainerRow = container.getRow(nextRowId, false, true);
+			table.changeSelection(singleton(nextRowId));
+			getView().displayRow(currentContainerRow.getInternalRow(),
+					!isRowReadonly(currentContainerRow),
+					container.isDeleteable());
 			return true;
 		}
 		return false;
@@ -291,13 +314,17 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 	@Override
 	public boolean previousRow() {
-		Item nextItem = tablePresenter.getPreviousItem();
+		ContainerRowId previousRowId = container
+				.previousRowId(currentContainerRow.getId());
 
-		if (nextItem != null) {
-			getView().displayRow(nextItem);
+		if (previousRowId != null) {
+			currentContainerRow = container.getRow(previousRowId, false, true);
+			table.changeSelection(singleton(previousRowId));
+			getView().displayRow(currentContainerRow.getInternalRow(),
+					!isRowReadonly(currentContainerRow),
+					container.isDeleteable());
 			return true;
 		}
-
 		return false;
 	}
 

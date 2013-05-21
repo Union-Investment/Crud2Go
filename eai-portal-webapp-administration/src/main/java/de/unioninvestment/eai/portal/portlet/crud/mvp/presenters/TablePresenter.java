@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.data.Item;
 import com.vaadin.ui.Table.ColumnGenerator;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
@@ -49,7 +51,8 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView;
  */
 public class TablePresenter extends
 		AbstractComponentPresenter<Table, TableView> implements
-		TableView.Presenter, ShowEventHandler<Tab>, Table.Presenter {
+		TableView.Presenter, ShowEventHandler<Tab>, Table.Presenter,
+		SelectionEventHandler {
 
 	private static final long serialVersionUID = 2L;
 
@@ -59,11 +62,11 @@ public class TablePresenter extends
 	private DataContainer container;
 	private boolean isInitializeView = false;
 
-	private Mode currentMode = Table.Mode.VIEW;
-
 	private RowEditingFormPresenter rowEditingFormPresenter;
 
 	private Set<String> generatedColumIds = new HashSet<String>();
+
+	private boolean ignoreSelectionEvent = false;
 
 	/**
 	 * @param view
@@ -76,6 +79,7 @@ public class TablePresenter extends
 	public TablePresenter(TableView view, Table model) {
 		super(view, model);
 		container = getModel().getContainer();
+		getModel().addSelectionEventHandler(this);
 	}
 
 	public void setRowEditingFormPresenter(
@@ -146,22 +150,12 @@ public class TablePresenter extends
 
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter#isCSVExport()
-	 */
 	@Override
 	public boolean isCSVExport() {
 		return (getModel().isExport() && getModel().getExportType().equals(
 				"csv"));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowEventHandler#onShow(de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowEvent)
-	 */
 	@Override
 	public void onShow(ShowEvent<Tab> event) {
 		if (!isInitializeView) {
@@ -169,13 +163,21 @@ public class TablePresenter extends
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter#selectionChange(java.util.Set)
-	 */
 	@Override
-	public void selectionChange(Set<Object> selection) {
+	public void changeSelection(Set<Object> selection) {
+		try {
+			ignoreSelectionEvent = true;
+
+			Set<ContainerRowId> selectionIds = convertItemIdsToContainerRowIds(selection);
+			getModel().changeSelection(selectionIds);
+
+		} finally {
+			ignoreSelectionEvent = false;
+		}
+	}
+
+	private Set<ContainerRowId> convertItemIdsToContainerRowIds(
+			Set<Object> selection) {
 		Set<ContainerRowId> selectionIds = new LinkedHashSet<ContainerRowId>();
 		for (Object s : selection) {
 			if (s != null) {
@@ -183,37 +185,39 @@ public class TablePresenter extends
 				selectionIds.add(rowId);
 			}
 		}
-		getModel().selectionChange(selectionIds);
+		return selectionIds;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter#doubleClick(com.vaadin.data.Item)
-	 */
+	@Override
+	public void onSelectionChange(SelectionEvent event) {
+		if (!ignoreSelectionEvent) {
+			Set<Object> selection = convertContainerRowIdsToItemIds(event
+					.getSelection());
+			getView().selectionUpdatedExternally(selection);
+		}
+	}
+
+	private Set<Object> convertContainerRowIdsToItemIds(
+			Set<ContainerRowId> selection) {
+		HashSet<Object> results = new HashSet<Object>(selection.size() * 2);
+		for (ContainerRowId id : selection) {
+			results.add(id.getInternalId());
+		}
+		return results;
+	}
+
 	@Override
 	public void doubleClick(Item item) {
 		ContainerRow row = container.convertItemToRow(item, false, true);
 		getModel().doubleClick(row);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter#rowChange(com.vaadin.data.Item,
-	 *      java.util.Map)
-	 */
 	@Override
 	public void rowChange(Item containerRow, Map<String, Object> changedValues) {
 		getModel().rowChange(containerRow, changedValues);
 
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter#doInitialize()
-	 */
 	@Override
 	public void doInitialize() {
 		getModel().doInitialize();
@@ -236,8 +240,7 @@ public class TablePresenter extends
 	 */
 	@Override
 	public void switchMode(Mode mode) {
-		this.currentMode = mode;
-		getModel().changeMode(currentMode);
+		getModel().changeMode(mode);
 	}
 
 	/**
@@ -251,22 +254,9 @@ public class TablePresenter extends
 	}
 
 	public Mode getCurrentMode() {
-		return this.currentMode;
+		return getModel().getMode();
 	}
 
-	public Item getNextItem() {
-		return getView().getNextItem();
-	}
-
-	public Item getPreviousItem() {
-		return getView().getPreviousItem();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter#openRowEditingForm()
-	 */
 	@Override
 	public void openRowEditingForm() {
 		if (rowEditingFormPresenter != null) {
@@ -290,11 +280,6 @@ public class TablePresenter extends
 		getView().onRevertChanges();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Presenter#createNewRow(java.util.Map)
-	 */
 	@Override
 	public ContainerRow createNewRow(Map<String, Object> values) {
 		Object itemId = getView().addItemToTable();
@@ -307,13 +292,6 @@ public class TablePresenter extends
 		return newRow;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Presenter#addGeneratedColumn(java.lang.String,
-	 *      com.vaadin.ui.Table.ColumnGenerator)
-	 */
-	@Override
 	public void addGeneratedColumn(String columnName, String columnTitle,
 			ColumnGenerator columnGenerator) {
 		LOG.debug("Adding column [" + columnName + "].");
@@ -322,11 +300,6 @@ public class TablePresenter extends
 		LOG.debug("Column [" + columnName + "] added.");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Presenter#removeGeneratedColumn(java.lang.String)
-	 */
 	@Override
 	public void removeGeneratedColumn(String columnId) {
 		LOG.debug("Removing column [" + columnId + "].");
@@ -335,11 +308,6 @@ public class TablePresenter extends
 		LOG.debug("Column [" + columnId + "] removed.");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Presenter#renderOnce(de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges)
-	 */
 	@Override
 	public void renderOnce(DynamicColumnChanges changes) {
 		boolean tableContentRefreshWasEnabled = getView()
@@ -350,21 +318,11 @@ public class TablePresenter extends
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Presenter#hasGeneratedColumn(java.lang.String)
-	 */
 	@Override
 	public boolean hasGeneratedColumn(String id) {
 		return generatedColumIds.contains(id);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Presenter#clearAllGeneratedColumns()
-	 */
 	@Override
 	public void clearAllGeneratedColumns() {
 		renderOnce(new DynamicColumnChanges() {
@@ -380,21 +338,11 @@ public class TablePresenter extends
 		});
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Presenter#getVisibleColumns()
-	 */
 	@Override
 	public List<String> getVisibleColumns() {
 		return getView().getVisibleColumns();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Presenter#setVisibleColumns(java.util.List)
-	 */
 	@Override
 	public void setVisibleColumns(List<String> visibleColumns) {
 		getView().setVisibleColumns(visibleColumns);

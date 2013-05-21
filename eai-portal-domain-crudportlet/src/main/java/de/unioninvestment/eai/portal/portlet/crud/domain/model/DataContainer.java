@@ -243,6 +243,26 @@ public interface DataContainer extends Serializable {
 	List<ContainerRowId> getRowIds();
 
 	/**
+	 * Liefert die vorherige Zeile.
+	 * 
+	 * @param currentRowId
+	 *            die aktuelle Zeile
+	 * @return die vorhergehende Zeile gemäß aktueller Sortierung oder
+	 *         <code>null</code>, falls es keine vorherige Zeile gibt
+	 */
+	ContainerRowId previousRowId(ContainerRowId currentRowId);
+
+	/**
+	 * Liefert die nächste Zeile.
+	 * 
+	 * @param currentRowId
+	 *            die aktuelle Zeile
+	 * @return die nächste Zeile gemäß aktueller Sortierung oder
+	 *         <code>null</code>, falls es keine nächste Zeile gibt
+	 */
+	ContainerRowId nextRowId(ContainerRowId currentRowId);
+
+	/**
 	 * Startet ggf. eine neue Transaktion und führt die im callback übergebene
 	 * Methode auf. Eine bestehende Benutzertransaktion wird vorher committed.
 	 * 

@@ -20,3 +20,12 @@ target
 /eai-portal-webapp-administration/build.gradle
 /eai-portal-webapp-administration/build
 /eai-portal-support-vaadin/build
+/eai-portal-build/eai-portal-build.iml
+/eai-portal-domain-crudportlet/eai-portal-domain-crudportlet (1).iml
+/eai-portal-robot/eai-portal-robot (1).iml
+/eai-portal-security/eai-portal-security.iml
+/eai-portal-support-scripting/eai-portal-support-scripting.iml
+/eai-portal-support-vaadin/eai-portal-support-vaadin.iml
+/eai-portal-webapp-administration/eai-portal-webapp-administration.iml
+/eai-portal-xsd-crudportlet/eai-portal-xsd-crudportlet.iml
+/.idea

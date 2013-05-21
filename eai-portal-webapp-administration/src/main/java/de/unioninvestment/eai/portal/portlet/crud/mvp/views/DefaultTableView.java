@@ -23,12 +23,10 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -398,8 +396,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void initializeTableFieldFactory() {
-		CrudFieldFactory fieldFactory = new CrudFieldFactory(container, table,
-				tableModel);
+		CrudFieldFactory fieldFactory = new CrudFieldFactory(table, tableModel);
 
 		fieldFactory.setCreateFormFieldForTable(!presenter.isFormEditEnabled());
 
@@ -511,13 +508,13 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 				rollbackSelection();
 			} else {
 				updateUncommittedItemId(selection);
-				presenter.selectionChange(selection);
+				presenter.changeSelection(selection);
 			}
 
 			table.enableContentRefreshing(true);
 		} else {
 			applySelection(selection);
-			presenter.selectionChange(selection);
+			presenter.changeSelection(selection);
 			if (inEditMode() && !presenter.isFormEditEnabled()
 					&& isSingleSelection(selection)) {
 				table.refreshRowCache();
@@ -986,24 +983,14 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		return browser != null && !browser.isIE();
 	}
 
-	private String createFilenameTime() {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
-		return sdf.format(new Date());
-	}
-
 	@Override
-	public Item getNextItem() {
-		Object currentItemId = getcurrentItemId();
-		if (currentItemId != null) {
-			Object nextItemId = table.nextItemId(currentItemId);
-
-			if (nextItemId != null) {
-				table.setValue(singleton(nextItemId));
-				return table.getItem(nextItemId);
-			}
+	public void selectionUpdatedExternally(Set<Object> selection) {
+		if (tableModel.isFormEditEnabled()) {
+			table.setValue(selection);
+		} else {
+			throw new UnsupportedOperationException(
+					"Currently only implemented to be used from inside form-edit dialog");
 		}
-
-		return currentItemId != null ? table.getItem(currentItemId) : null;
 	}
 
 	private Object getcurrentItemId() {
@@ -1015,21 +1002,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		}
 
 		return null;
-	}
-
-	@Override
-	public Item getPreviousItem() {
-		Object currentItemId = getcurrentItemId();
-		if (currentItemId != null) {
-			Object nextItemId = table.prevItemId(currentItemId);
-
-			if (nextItemId != null) {
-				table.setValue(singleton(nextItemId));
-				return table.getItem(nextItemId);
-			}
-		}
-
-		return currentItemId != null ? table.getItem(currentItemId) : null;
 	}
 
 	/**

@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.format.number.NumberFormatter;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Container.Ordered;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.filter.And;
@@ -393,6 +394,20 @@ public abstract class AbstractDataContainer implements DataContainer,
 			result.add(convertInternalRowId(o));
 		}
 		return result;
+	}
+
+	@Override
+	public ContainerRowId previousRowId(ContainerRowId currentRowId) {
+		Object itemId = currentRowId.getInternalId();
+		Object prevItemId = ((Indexed) getVaadinContainer()).prevItemId(itemId);
+		return prevItemId == null ? null : convertInternalRowId(prevItemId);
+	}
+
+	@Override
+	public ContainerRowId nextRowId(ContainerRowId currentRowId) {
+		Object itemId = currentRowId.getInternalId();
+		Object nextItemId = ((Indexed) getVaadinContainer()).nextItemId(itemId);
+		return nextItemId == null ? null : convertInternalRowId(nextItemId);
 	}
 
 	@Override
