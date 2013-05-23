@@ -201,8 +201,11 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		Integer rowHeight = tableModel.getRowHeight();
 		if (rowHeight != null) {
 			table.addStyleName("rowheight" + rowHeight);
-			CSSInject injector = new CSSInject(".v-table-rowheight" + rowHeight
-					+ " .v-table-cell-content { height: " + rowHeight + "px; }");
+			String css = ".v-table-rowheight" + rowHeight
+					+ " .v-table-cell-content { height: " + rowHeight + "px; }";
+			css += "div.crudTable td div.v-table-cell-wrapper { max-height: "
+					+ rowHeight + "px; }";
+			CSSInject injector = new CSSInject(css);
 			addComponent(injector);
 		}
 

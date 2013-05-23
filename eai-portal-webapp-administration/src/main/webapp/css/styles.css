@@ -7,6 +7,17 @@ div.crudTable .v-csslayout .v-caption {
 	display: none;
 }
 
+/* Fixed height table cells */
+
+div.crudTable td div.v-table-cell-wrapper {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block;
+}
+
 /* Gefärbter Hintergrund EDIT-Mode */
 
 div.crudEditMode tr.v-table-row {
@@ -38,10 +49,6 @@ div.crudEditMode tbody tr.v-table-row-odd.v-selected td {
 /*deaktiviert den uppercase column header*/
 .v-table-header { 
 	text-transform: none; 
-}
-
-.v-table-cell-wrapper {
-	white-space: normal;
 }
 
 .wordwrap {
