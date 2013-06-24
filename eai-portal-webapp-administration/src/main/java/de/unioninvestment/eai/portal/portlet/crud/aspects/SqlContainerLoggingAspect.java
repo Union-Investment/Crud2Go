@@ -50,8 +50,6 @@ public class SqlContainerLoggingAspect {
 	/**
 	 * @param pjp
 	 *            die eigentlich aufgerufene Methode
-	 * @param windowId
-	 *            die WindowID des aktuellen Portlets
 	 * @return eine gecachete oder neu gelesene PortletConfig Instanz
 	 * @throws Throwable
 	 *             bei Fehler

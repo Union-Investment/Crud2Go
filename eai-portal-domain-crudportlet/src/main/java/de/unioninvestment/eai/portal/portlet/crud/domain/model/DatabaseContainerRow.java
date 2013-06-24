@@ -57,9 +57,6 @@ public class DatabaseContainerRow extends ContainerRow {
 	 *            SpaltenId
 	 * @param container
 	 *            DatabaseContainer
-	 * 
-	 * @param changedFields
-	 *            Liste alle felder, die sich geändert haben
 	 */
 	public DatabaseContainerRow(RowItem rowItem, DatabaseContainerRowId id,
 			DataContainer container, boolean transactional, boolean immutable) {

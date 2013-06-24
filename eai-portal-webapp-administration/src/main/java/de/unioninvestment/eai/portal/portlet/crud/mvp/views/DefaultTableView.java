@@ -156,9 +156,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView#initialize(de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter,
-	 *      de.unioninvestment.eai.portal.portlet.crud.domain.model.Table,
-	 *      de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseContainer)
+	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView#initialize(de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter, de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer, de.unioninvestment.eai.portal.portlet.crud.domain.model.Table, int, double)
 	 */
 	@Override
 	public void initialize(TableView.Presenter presenter,
@@ -1010,8 +1008,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView#addGeneratedColumn(java.lang.String,
-	 *      com.vaadin.ui.Table.ColumnGenerator)
+	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView#addGeneratedColumn(String, String, com.vaadin.ui.Table.ColumnGenerator)
 	 */
 	@Override
 	public void addGeneratedColumn(String id, String title,
