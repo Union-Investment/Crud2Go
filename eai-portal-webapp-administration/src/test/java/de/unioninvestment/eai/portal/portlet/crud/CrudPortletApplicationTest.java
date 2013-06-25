@@ -36,6 +36,7 @@ import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.portlet.PortletMode;
@@ -59,8 +60,9 @@ import org.vaadin.peter.contextmenu.ContextMenu;
 
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.vaadin.service.ApplicationContext;
 import com.vaadin.terminal.Terminal.ErrorEvent;
+import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
+import com.vaadin.terminal.gwt.server.WebBrowser;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Label;
@@ -100,7 +102,7 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	@Mock
 	private ResourceRequest request;
 	@Mock
-	private ApplicationContext contextMock;
+	private PortletApplicationContext2 contextMock;
 	@Mock
 	private Settings settingsMock;
 	@Mock
@@ -160,6 +162,9 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	@Mock
 	private PortletPreferences preferencesMock;
 
+	@Mock
+	private WebBrowser browserMock;
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		applicationUrl = new URL("http://xxx");
@@ -173,13 +178,11 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 				new MockPortletURL(new MockPortalContext(), "myurl"));
 		when(
 				modelFactoryMock.getBuilder(isA(EventBus.class),
-						isA(Config.class))).thenReturn(
-				modelBuilderMock);
+						isA(Config.class))).thenReturn(modelBuilderMock);
 		when(modelBuilderMock.build()).thenReturn(portletMock);
 
 		when(presenterFactoryMock.portletConfigurationPresenter(settingsMock))
-				.thenReturn(
-						portletConfigurationPresenterMock);
+				.thenReturn(portletConfigurationPresenterMock);
 		when(portletConfigurationPresenterMock.getView()).thenReturn(
 				portletConfigurationViewMock);
 		when(portletPresenterMock.getView()).thenReturn(portletViewMock);
@@ -191,6 +194,9 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		when(themeDisplayMock.getScopeGroupId()).thenReturn(14008L);
 
 		when(request.getPreferences()).thenReturn(preferencesMock);
+
+		when(contextMock.getBrowser()).thenReturn(browserMock);
+		when(browserMock.getLocale()).thenReturn(Locale.GERMANY);
 	}
 
 	private void initializeWindowSpy() {
@@ -221,6 +227,13 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 					}
 				});
 		when(principalMock.getName()).thenReturn("carsten");
+	}
+
+	@Test
+	public void shouldApplyPreferredBrowserLocale() {
+		app.start(applicationUrl, null, contextMock);
+
+		assertThat(app.getLocale(), is(Locale.GERMANY));
 	}
 
 	@Test
@@ -268,9 +281,8 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		PortletConfig portletConfig = new PortletConfig();
 
 		when(configMock.getPortletConfig()).thenReturn(portletConfig);
-		when(
-				configurationServiceMock.isConfigured(configMock,
-						preferencesMock)).thenReturn(true);
+		when(configurationServiceMock.isConfigured(configMock, preferencesMock))
+				.thenReturn(true);
 		when(request.getAttribute(WebKeys.PORTLET_ID)).thenReturn("4711");
 
 		when(modelBuilderMock.build()).thenThrow(new RuntimeException("bla"));
@@ -296,9 +308,8 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		app.start(applicationUrl, null, contextMock);
 
 		PortletConfig portletConfig = new PortletConfig();
-		when(
-				configurationServiceMock.isConfigured(configMock,
-						preferencesMock)).thenReturn(true);
+		when(configurationServiceMock.isConfigured(configMock, preferencesMock))
+				.thenReturn(true);
 
 		when(configMock.getPortletConfig()).thenReturn(portletConfig);
 		when(request.getAttribute(WebKeys.PORTLET_ID)).thenReturn("4711");
@@ -348,8 +359,7 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		when(request.getPortletMode()).thenReturn(PortletMode.EDIT);
 		app.handleResourceRequest(request, response, windowSpy);
 		verify(portletConfigurationPresenterMock).refresh(
-				ConfigStatus.NO_CONFIG, null,
-				app.getPortletDomain());
+				ConfigStatus.NO_CONFIG, null, app.getPortletDomain());
 	}
 
 	@Test
@@ -417,9 +427,8 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		app.start(applicationUrl, null, contextMock);
 
 		final PortletConfig portletConfig = new PortletConfig();
-		when(
-				configurationServiceMock.isConfigured(configMock,
-						preferencesMock)).thenReturn(true);
+		when(configurationServiceMock.isConfigured(configMock, preferencesMock))
+				.thenReturn(true);
 
 		when(configMock.getPortletConfig()).thenAnswer(
 				new Answer<PortletConfig>() {

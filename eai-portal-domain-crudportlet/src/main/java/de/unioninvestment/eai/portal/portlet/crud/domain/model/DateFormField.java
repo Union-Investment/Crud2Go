@@ -22,7 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.util.DateUtils;
+import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
 import de.unioninvestment.eai.portal.support.vaadin.support.TimestampConverter;
 
 /**

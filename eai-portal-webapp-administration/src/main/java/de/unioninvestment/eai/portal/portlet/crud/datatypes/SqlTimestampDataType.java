@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.datatypes;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.Format;
 
 import com.vaadin.data.Property;
@@ -31,8 +32,8 @@ import com.vaadin.ui.TextField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.DatePickerSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.SelectSupport;
-import de.unioninvestment.eai.portal.portlet.crud.domain.util.DateUtils;
-import de.unioninvestment.eai.portal.support.vaadin.support.DateCleanupConverter;
+import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
+import de.unioninvestment.eai.portal.support.vaadin.support.DateToTimestampTranslator;
 import de.unioninvestment.eai.portal.support.vaadin.support.FormattedSelect;
 import de.unioninvestment.eai.portal.support.vaadin.support.FormattedTextField;
 import de.unioninvestment.eai.portal.support.vaadin.support.TimestampFormatter;
@@ -102,7 +103,8 @@ public class SqlTimestampDataType implements DisplaySupport, EditorSupport,
 	public PopupDateField createDatePicker(Class<?> type, Object propertyId,
 			String inputPrompt, String format) {
 		int resolution = DateUtils.getResolution(format);
-		DateCleanupConverter translator = new DateCleanupConverter(resolution);
+		DateToTimestampTranslator translator = new DateToTimestampTranslator(
+				resolution);
 		PopupDateField field = new TranslatedDateField(translator);
 		field.setInputPrompt(inputPrompt);
 		if (format != null) {
@@ -114,7 +116,7 @@ public class SqlTimestampDataType implements DisplaySupport, EditorSupport,
 
 	@Override
 	public PropertyFormatter createFormatter(Class<?> type, Format format) {
-		return new TimestampFormatter();
+		return new TimestampFormatter((DateFormat) format);
 	}
 
 }

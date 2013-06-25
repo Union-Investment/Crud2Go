@@ -18,19 +18,21 @@
  */
 package de.unioninvestment.eai.portal.support.vaadin.support;
 
-import java.util.Calendar;
+import java.sql.Timestamp;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.vaadin.addon.propertytranslator.PropertyTranslator;
 
+import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
+
 /**
- * Formatierung und Parsing von SQL Timestamps. Wird als Wrapper um eine
- * entsprechende PropertyDataSource verwendet.
+ * Konvertieren von Dates nach Timestamps unter Bereinigung gemäß der
+ * angegebenen <code>resolution</code>. Wird als Wrapper um eine entsprechende
+ * PropertyDataSource verwendet.
  * 
  * @author carsten.mjartan
  */
-public class DateCleanupConverter extends PropertyTranslator {
+public class DateToTimestampTranslator extends PropertyTranslator {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,7 +42,7 @@ public class DateCleanupConverter extends PropertyTranslator {
 	 * @param resolution
 	 *            Calendar Konstante für kleinste Einheit im Datum
 	 */
-	public DateCleanupConverter(int resolution) {
+	public DateToTimestampTranslator(int resolution) {
 		this.resolution = resolution;
 	}
 
@@ -56,27 +58,12 @@ public class DateCleanupConverter extends PropertyTranslator {
 
 	@Override
 	public Object translateToDatasource(Object value) throws Exception {
-		GregorianCalendar calendar = new GregorianCalendar();
-		calendar.setTime((Date) value);
-		switch (resolution) {
-		case Calendar.YEAR:
-			calendar.set(Calendar.MONTH, 0);
-		case Calendar.MONTH:
-			calendar.set(Calendar.DAY_OF_MONTH, 1);
-		case Calendar.DAY_OF_MONTH:
-			calendar.set(Calendar.HOUR_OF_DAY, 0);
-		case Calendar.HOUR:
-		case Calendar.HOUR_OF_DAY:
-			calendar.set(Calendar.MINUTE, 0);
-		case Calendar.MINUTE:
-			calendar.set(Calendar.SECOND, 0);
-		case Calendar.SECOND:
-			calendar.set(Calendar.MILLISECOND, 0);
-			break;
-		default:
-			return value;
+		if (value == null) {
+			return null;
+		} else {
+			Date cleanedDate = DateUtils.cleanup((Date) value, resolution);
+			return new Timestamp(cleanedDate.getTime());
 		}
-		return calendar.getTime();
 	}
 
 }

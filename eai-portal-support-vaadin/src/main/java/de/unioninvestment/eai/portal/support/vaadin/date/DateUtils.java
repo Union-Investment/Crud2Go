@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.domain.util;
+package de.unioninvestment.eai.portal.support.vaadin.date;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -119,6 +119,30 @@ public class DateUtils {
 		}
 
 		return cal.getTime();
+	}
+
+	public static Date cleanup(Date input, int resolution) {
+		GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTime(input);
+		switch (resolution) {
+		case Calendar.YEAR:
+			calendar.set(Calendar.MONTH, 0);
+		case Calendar.MONTH:
+			calendar.set(Calendar.DAY_OF_MONTH, 1);
+		case Calendar.DAY_OF_MONTH:
+			calendar.set(Calendar.HOUR_OF_DAY, 0);
+		case Calendar.HOUR:
+		case Calendar.HOUR_OF_DAY:
+			calendar.set(Calendar.MINUTE, 0);
+		case Calendar.MINUTE:
+			calendar.set(Calendar.SECOND, 0);
+		case Calendar.SECOND:
+			calendar.set(Calendar.MILLISECOND, 0);
+			break;
+		default:
+			return input;
+		}
+		return calendar.getTime();
 	}
 
 }

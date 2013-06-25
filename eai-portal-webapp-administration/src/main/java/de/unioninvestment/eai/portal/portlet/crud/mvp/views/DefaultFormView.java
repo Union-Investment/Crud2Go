@@ -52,9 +52,9 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormFields;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.MultiOptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.util.DateUtils;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.OptionListContainer;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.FormSelectionContext;
+import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 

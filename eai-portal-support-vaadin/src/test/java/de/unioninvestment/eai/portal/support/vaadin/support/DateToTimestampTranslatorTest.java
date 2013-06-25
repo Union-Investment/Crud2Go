@@ -18,16 +18,19 @@
  */
 package de.unioninvestment.eai.portal.support.vaadin.support;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.junit.Test;
 
-public class DateCleanupConverterTest {
+public class DateToTimestampTranslatorTest {
 
 	@Test
 	public void shouldRemoveDetailPart() throws Exception {
@@ -56,8 +59,9 @@ public class DateCleanupConverterTest {
 
 	private void assertCleanup(int resolution, Date oldDate, Date newDate)
 			throws Exception {
-		DateCleanupConverter converter = new DateCleanupConverter(resolution);
+		DateToTimestampTranslator converter = new DateToTimestampTranslator(
+				resolution);
 		assertThat(converter.translateToDatasource(oldDate),
-				is((Object) newDate));
+				allOf(instanceOf(Timestamp.class), equalTo((Object) newDate)));
 	}
 }
