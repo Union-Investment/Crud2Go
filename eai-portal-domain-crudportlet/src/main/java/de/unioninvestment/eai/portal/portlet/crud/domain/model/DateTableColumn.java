@@ -18,6 +18,8 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
+
 /**
  * 
  * Checkbox Modelobjekt für die Tabelleneditierung.
@@ -25,57 +27,39 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
  * @author markus.bonsch
  * 
  */
-public class CheckBoxTableColumn extends TableColumn {
+public class DateTableColumn extends TableColumn {
 
 	private static final long serialVersionUID = 1L;
 
-	private String checkedValue;
-	private String uncheckedValue;
+	private DateDisplayType dateDisplayType;
 
 	public static class Builder extends TableColumn.Init<Builder> {
-		private String checkedValue;
-		private String uncheckedValue;
+		private DateDisplayType dateDisplayType;
 
 		@Override
 		protected Builder self() {
 			return this;
 		}
 
-		public Builder checkedValue(String checkedValue) {
-			this.checkedValue = checkedValue;
-			return self();
-		}
-
-		public Builder uncheckedValue(String uncheckedValue) {
-			this.uncheckedValue = uncheckedValue;
+		public Builder dateDisplayType(DateDisplayType dateDisplayType) {
+			this.dateDisplayType = dateDisplayType;
 			return self();
 		}
 
 		@Override
-		public CheckBoxTableColumn build() {
-			return new CheckBoxTableColumn(this);
+		public DateTableColumn build() {
+			return new DateTableColumn(this);
 		}
 
 	}
 
-	public CheckBoxTableColumn(Builder builder) {
+	public DateTableColumn(Builder builder) {
 		super(builder);
-		this.checkedValue = builder.checkedValue;
-		this.uncheckedValue = builder.uncheckedValue;
+		this.dateDisplayType = builder.dateDisplayType;
 	}
 
-	/**
-	 * @return den Wert für den Checked-Zustand
-	 */
-	public String getCheckedValue() {
-		return checkedValue;
-	}
-
-	/**
-	 * @return den Wert für den Unchecked-Zustand
-	 */
-	public String getUncheckedValue() {
-		return uncheckedValue;
+	public DateDisplayType getDateDisplayType() {
+		return dateDisplayType;
 	}
 
 }

@@ -21,31 +21,19 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.CheckboxConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
 
-public class CheckBoxTableColumnTest {
-
-	private CheckBoxTableColumn boxTableColumn;
-
-	@Mock
-	private CheckboxConfig checkboxConfigMock;
-
-	@Before
-	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-		boxTableColumn = new CheckBoxTableColumn.Builder().name("test")
-				.checkedValue("true").uncheckedValue("false").build();
-	}
+public class DateTableColumnTest {
 
 	@Test
-	public void shouldGetCheckedAndUncheckedValue() {
-		assertThat(boxTableColumn.getCheckedValue(), is("true"));
-		assertThat(boxTableColumn.getUncheckedValue(), is("false"));
-	}
+	public void shouldBuildCorrectly() {
+		DateTableColumn column = new DateTableColumn.Builder() //
+				.name("Test") //
+				.dateDisplayType(DateDisplayType.INPUT) //
+				.build();
 
+		assertThat(column.getDateDisplayType(), is(DateDisplayType.INPUT));
+	}
 }

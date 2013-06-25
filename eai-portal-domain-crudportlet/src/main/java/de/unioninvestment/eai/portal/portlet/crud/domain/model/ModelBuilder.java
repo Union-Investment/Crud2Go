@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import de.unioninvestment.eai.portal.portlet.crud.config.AbstractActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.BinaryConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CheckboxConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ComponentConfig;
@@ -68,6 +67,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction.ActionHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Init;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
@@ -401,8 +401,8 @@ public class ModelBuilder {
 			} else {
 				datasource = config.getQuery().getDatasource();
 			}
-			QueryOptionList queryOptionList = factory
-					.getQueryOptionList(eventBus, config, datasource);
+			QueryOptionList queryOptionList = factory.getQueryOptionList(
+					eventBus, config, datasource);
 
 			String id = config.getId();
 			if (StringUtils.isNotEmpty(id)) {
@@ -573,18 +573,6 @@ public class ModelBuilder {
 				}
 			}
 
-			CheckBoxTableColumn checkBox = null;
-
-			if (c.getCheckbox() != null) {
-				try {
-					checkBox = buildCheckBox(c.getCheckbox());
-				} catch (Exception e) {
-					LOG.warn(
-							"Fehler beim erzeugen einer Checkbox für die Spalte: "
-									+ c.getName(), e);
-				}
-			}
-
 			Hidden hs = Hidden.valueOf(c.getHidden().toString());
 			if (!currentUser.hasPermissions(c, DISPLAY_ACTION, true)) {
 				hs = Hidden.TRUE;
@@ -606,11 +594,41 @@ public class ModelBuilder {
 
 			Class<?> generatedType = classOfGeneratedType(c.getGeneratedType());
 
-			TableColumn tableColumn = new TableColumn(c.getName(),
-					c.getTitle(), c.getLongtitle(), hs, isEditable,
-					c.isPrimaryKey(), c.isMultiline(), c.getRows(), width,
-					c.getInputPrompt(), validators, optionList, checkBox,
-					c.getDisplayFormat(), fileMetadata, generatedType);
+			// Build
+
+			Init<?> builder = null;
+
+			if (c.getCheckbox() != null) {
+				CheckBoxTableColumn.Builder checkboxBuilder = new CheckBoxTableColumn.Builder();
+				checkboxBuilder //
+						.checkedValue(c.getCheckbox().getCheckedValue()) //
+						.uncheckedValue(c.getCheckbox().getUncheckedValue());
+				builder = checkboxBuilder;
+			} else if (c.getDate() != null) {
+				DateTableColumn.Builder dateBuilder = new DateTableColumn.Builder();
+				dateBuilder.dateDisplayType(c.getDate().getDisplay());
+				builder = dateBuilder;
+			} else {
+				builder = new TableColumn.Builder();
+			}
+
+			TableColumn tableColumn = builder //
+					.name(c.getName()) //
+					.title(c.getTitle()) //
+					.longTitle(c.getLongtitle()) //
+					.hiddenStatus(hs) //
+					.editableDefault(isEditable) //
+					.primaryKey(c.isPrimaryKey()) //
+					.multiline(c.isMultiline()) //
+					.rows(c.getRows()) //
+					.width(width) //
+					.inputPrompt(c.getInputPrompt()) //
+					.validators(validators) //
+					.optionList(optionList) //
+					.displayFormat(c.getDisplayFormat()) //
+					.fileMetadata(fileMetadata) //
+					.generatedType(generatedType) //
+					.build();
 
 			mappings.put(tableColumn, c);
 
@@ -639,10 +657,6 @@ public class ModelBuilder {
 					binary.getMaxFileSize());
 		}
 		return null;
-	}
-
-	private CheckBoxTableColumn buildCheckBox(CheckboxConfig checkboxConfig) {
-		return new CheckBoxTableColumn(checkboxConfig);
 	}
 
 	private DataContainer buildContainer(TableConfig tableConfig,
@@ -700,9 +714,8 @@ public class ModelBuilder {
 
 		List<ContainerOrder> defaultOrder = getDefaultOrder(config);
 
-		JMXContainer jmxContainer = factory
-				.getJmxContainer(eventBus, formatPattern, defaultOrder,
-						extractFilterPolicy(config));
+		JMXContainer jmxContainer = factory.getJmxContainer(eventBus,
+				formatPattern, defaultOrder, extractFilterPolicy(config));
 
 		JmxDelegate jmxDelegate = new JmxDelegate(config, currentUser);
 		jmxContainer.setDelegate(jmxDelegate);
@@ -733,8 +746,7 @@ public class ModelBuilder {
 		List<ContainerOrder> defaultOrder = getDefaultOrder(scriptContainer);
 
 		return factory.getGenericDataContainer(eventBus, formatPattern,
-				defaultOrder,
-				extractFilterPolicy(scriptContainer));
+				defaultOrder, extractFilterPolicy(scriptContainer));
 	}
 
 	private DataContainer buildQueryContainer(
@@ -757,9 +769,9 @@ public class ModelBuilder {
 										.getSource() != null);
 		List<ContainerOrder> orderBys = getDefaultOrder(databaseQuery);
 		return factory.getDatabaseQueryContainer(eventBus,
-				databaseQuery.getDatasource(),
-				databaseQuery.getQuery(), insertable, updateable, deleteable,
-				primaryKeys, currentUser.getName(), displayPattern, orderBys,
+				databaseQuery.getDatasource(), databaseQuery.getQuery(),
+				insertable, updateable, deleteable, primaryKeys,
+				currentUser.getName(), displayPattern, orderBys,
 				extractFilterPolicy(databaseQuery),
 				databaseQuery.getPagelength(),
 				databaseQuery.getExportPagelength(),
@@ -778,9 +790,8 @@ public class ModelBuilder {
 		List<ContainerOrder> orderBys = getDefaultOrder(config);
 
 		return factory.getDatabaseTableContainer(eventBus,
-				config.getDatasource(),
-				config.getTablename(), insertable, updateable, deleteable,
-				currentUser, formatPattern, orderBys,
+				config.getDatasource(), config.getTablename(), insertable,
+				updateable, deleteable, currentUser, formatPattern, orderBys,
 				extractFilterPolicy(config), config.getPagelength(),
 				config.getExportPagelength(), config.getSizeValid());
 	}

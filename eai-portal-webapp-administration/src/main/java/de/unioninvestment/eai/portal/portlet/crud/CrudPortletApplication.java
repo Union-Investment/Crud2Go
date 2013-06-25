@@ -154,6 +154,9 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	 */
 	@Override
 	public void doInit() {
+
+		applyBrowserLocale();
+
 		helpPage = initializeHelpPage();
 		mainWindow = new Window(getMessage("portlet.crud.window.name"));
 		mainWindow.setContent(viewPage);
@@ -161,6 +164,11 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 
 		refreshViews();
 		registerAsPortletListener();
+	}
+
+	private void applyBrowserLocale() {
+		setLocale(((PortletApplicationContext2) getContext()).getBrowser()
+				.getLocale());
 	}
 
 	private void initializeEventBus() {
@@ -182,8 +190,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 									.getApplication(), PortletMode.VIEW);
 						} else {
 							configurationPresenter.refresh(status,
-									portletConfig,
-									portletDomain);
+									portletConfig, portletDomain);
 							configurationPresenter
 									.switchToAuthenticationPreferences();
 						}

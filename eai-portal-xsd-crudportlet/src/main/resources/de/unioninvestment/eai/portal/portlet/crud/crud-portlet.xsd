@@ -306,13 +306,21 @@
 				</sequence>
 				<attribute name="horizontalLayout" type="boolean" default="false">
 					<annotation>
-						<documentation>						
-							Defines, if components within the panel are layed out horizontally
-							("true") or vertically ("false"). This setting is optional and "false"
+						<documentation>
+							Defines, if components within the panel are layed
+							out horizontally
+							("true") or vertically ("false"). This setting is
+							optional and
+							"false"
 							by default.
-							Will be ignored by region (see RegionConfig below) when "collapsible" is "true"; 
-							in other words: components	within a collapsible region can only be layed 
-							out vertically. 
+							Will be ignored by region (see
+							RegionConfig
+							below) when "collapsible" is "true";
+							in other words:
+							components within a collapsible region can only be
+							layed
+							out
+							vertically.
 						</documentation>
 					</annotation>
 				</attribute>
@@ -378,13 +386,24 @@
 				<attribute name="expandRatio" type="int" default="0">
 					<annotation>
 						<documentation>
-							The expand ratio determines the amount of available space this component
-	 						takes within a panel/page/region etc. For example, if two components 
-	 						define expand ratios 2 and 1, respectively, then the available space will 
-	 						be distributed 2/3 and 1/3 among the components. If expand ratio is 0 (default)
-	 						or less then the component will not expand. If only one component defines an
-	 						expand ratio, than it will take up all available space regardless of the
-	 						defined value.
+							The expand ratio determines the amount of available
+							space this component
+							takes within a panel/page/region etc. For
+							example, if two components
+							define expand ratios 2 and 1,
+							respectively, then the available
+							space will
+							be distributed 2/3 and
+							1/3 among the components. If expand ratio is
+							0 (default)
+							or less
+							then the component will not expand. If only one component
+							defines
+							an
+							expand ratio, than it will take up all available space
+							regardless of
+							the
+							defined value.
 						</documentation>
 					</annotation>
 				</attribute>
@@ -401,21 +420,23 @@
 		<complexContent>
 			<extension base="tns:SecurableConfig">
 				<attribute name="width" type="string" use="optional">
-					<annotation>		
+					<annotation>
 						<documentation>
-							The desired width of the component, usually given in pixels, for 
+							The desired width of the component, usually given
+							in pixels, for
 							example '150px'.
 						</documentation>
 					</annotation>
 				</attribute>
 				<attribute name="height" type="string" use="optional">
-					<annotation>		
+					<annotation>
 						<documentation>
-							The desired height of the component, usually given in pixels, for 
+							The desired height of the component, usually given
+							in pixels, for
 							example '150px'.
 						</documentation>
 					</annotation>
-				</attribute>				
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -441,16 +462,27 @@
 				<attribute name="expandRatio" type="int" default="0">
 					<annotation>
 						<documentation>
-							The expand ratio determines the amount of available space this component
-	 						takes within a panel/page/region etc. For example, if two components 
-	 						define expand ratios 2 and 1, respectively, then the available space will 
-	 						be distributed 2/3 and 1/3 among the components. If expand ratio is 0 (default)
-	 						or less then the component will not expand. If only one component defines an
-	 						expand ratio, than it will take up all available space regardless of the
-	 						defined value.
+							The expand ratio determines the amount of available
+							space this component
+							takes within a panel/page/region etc. For
+							example, if two components
+							define expand ratios 2 and 1,
+							respectively, then the available
+							space will
+							be distributed 2/3 and
+							1/3 among the components. If expand ratio is
+							0 (default)
+							or less
+							then the component will not expand. If only one component
+							defines
+							an
+							expand ratio, than it will take up all available space
+							regardless of
+							the
+							defined value.
 						</documentation>
 					</annotation>
-				</attribute>				
+				</attribute>
 				<attribute name="generator" type="tns:groovy" use="required">
 					<annotation>
 						<documentation>
@@ -615,13 +647,24 @@
 				<attribute name="expandRatio" type="int" default="0">
 					<annotation>
 						<documentation>
-							The expand ratio determines the amount of available space this component
-	 						takes within a panel/page/region etc. For example, if two components 
-	 						define expand ratios 2 and 1, respectively, then the available space will 
-	 						be distributed 2/3 and 1/3 among the components. If expand ratio is 0 (default)
-	 						or less then the component will not expand. If only one component defines an
-	 						expand ratio, than it will take up all available space regardless of the
-	 						defined value.
+							The expand ratio determines the amount of available
+							space this component
+							takes within a panel/page/region etc. For
+							example, if two components
+							define expand ratios 2 and 1,
+							respectively, then the available
+							space will
+							be distributed 2/3 and
+							1/3 among the components. If expand ratio is
+							0 (default)
+							or less
+							then the component will not expand. If only one component
+							defines
+							an
+							expand ratio, than it will take up all available space
+							regardless of
+							the
+							defined value.
 						</documentation>
 					</annotation>
 				</attribute>
@@ -1225,7 +1268,8 @@
 	<complexType name="RegExpFilterConfig">
 		<annotation>
 			<documentation>
-				Filter for regular expressions (only for database backends)
+				Filter for regular expressions (only for database
+				backends)
 			</documentation>
 		</annotation>
 		<complexContent>
@@ -1318,7 +1362,8 @@
 						<element name="rest-container" type="tns:ReSTContainerConfig" />
 					</choice>
 					<element name="columns" type="tns:ColumnsConfig" minOccurs="0" />
-					<element name="action" type="tns:TableActionConfig"	minOccurs="0" maxOccurs="unbounded" />
+					<element name="action" type="tns:TableActionConfig"
+						minOccurs="0" maxOccurs="unbounded" />
 				</sequence>
 				<attribute name="id" type="ID">
 					<annotation>
@@ -1440,13 +1485,24 @@
 				<attribute name="expandRatio" type="int" default="0">
 					<annotation>
 						<documentation>
-							The expand ratio determines the amount of available space this component
-	 						takes within a panel/page/region etc. For example, if two components 
-	 						define expand ratios 2 and 1, respectively, then the available space will 
-	 						be distributed 2/3 and 1/3 among the components. If expand ratio is 0 (default)
-	 						or less then the component will not expand. If only one component defines an
-	 						expand ratio, than it will take up all available space regardless of the
-	 						defined value.
+							The expand ratio determines the amount of available
+							space this component
+							takes within a panel/page/region etc. For
+							example, if two components
+							define expand ratios 2 and 1,
+							respectively, then the available
+							space will
+							be distributed 2/3 and
+							1/3 among the components. If expand ratio is
+							0 (default)
+							or less
+							then the component will not expand. If only one component
+							defines
+							an
+							expand ratio, than it will take up all available space
+							regardless of
+							the
+							defined value.
 						</documentation>
 					</annotation>
 				</attribute>
@@ -1468,7 +1524,8 @@
 							<attribute name="target" type="tns:TableExportType">
 								<annotation>
 									<documentation>
-										Allows export of table-data in a supported format.
+										Allows export of table-data in a supported
+										format.
 									</documentation>
 								</annotation>
 							</attribute>
@@ -1479,7 +1536,8 @@
 							<attribute name="generator" type="tns:groovy">
 								<annotation>
 									<documentation>
-										Allows download of generated content (e.g. table-data in a custom format).
+										Allows download of generated content (e.g.
+										table-data in a custom format).
 									</documentation>
 								</annotation>
 							</attribute>
@@ -2055,8 +2113,14 @@
 						<element minOccurs="0" maxOccurs="1" name="checkbox"
 							type="tns:CheckboxConfig">
 							<annotation>
-								<documentation>Folgenden Aktionen koennen mit Berechtigungen
-									hinterlegt werden: all,edit,display
+								<documentation>Die Spalte wird als Checkbox angezeigt
+								</documentation>
+							</annotation>
+						</element>
+						<element minOccurs="0" maxOccurs="1" name="date"
+							type="tns:DateColumnConfig">
+							<annotation>
+								<documentation>Die Spalte ist ein Datum
 								</documentation>
 							</annotation>
 						</element>
@@ -2224,6 +2288,22 @@
 				</attribute>
 			</extension>
 		</complexContent>
+	</complexType>
+
+	<complexType name="DateColumnConfig">
+		<annotation>
+			<documentation>
+				Datumsfeld
+			</documentation>
+		</annotation>
+		<attribute name="display" type="tns:DateDisplayType"
+			default="picker">
+			<annotation>
+				<documentation>
+					Datumseingabetyp
+				</documentation>
+			</annotation>
+		</attribute>
 	</complexType>
 
 	<simpleType name="FilterPolicyConfig">

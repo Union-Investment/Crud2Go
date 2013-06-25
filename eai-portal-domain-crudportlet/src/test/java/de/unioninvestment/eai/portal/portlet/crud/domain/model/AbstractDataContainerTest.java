@@ -38,10 +38,13 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.sql.SQLTimeoutException;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -413,6 +416,25 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 
 		NumberFormat format = (NumberFormat) container.getFormat("testCol");
 		assertThat(format.format(123123l), is("123,123.00"));
+	}
+
+	@Test
+	public void shouldGetCustomDateFormat() {
+		container.setVaadinContainer(vaadinContainerMock);
+		when(vaadinContainerMock.getType(anyString())).thenAnswer(
+				new Answer<Class<Date>>() {
+					@Override
+					public Class<Date> answer(InvocationOnMock invocation)
+							throws Throwable {
+						return Date.class;
+					}
+				});
+		when(displayPatternMock.get(anyString()))
+				.thenReturn("dd.MM.yyyy HH:mm");
+
+		DateFormat format = (DateFormat) container.getFormat("testCol");
+		assertThat(format.format(new GregorianCalendar(2013, 5, 25, 8, 31)
+				.getTime()), is("25.06.2013 08:31"));
 	}
 
 	@Test

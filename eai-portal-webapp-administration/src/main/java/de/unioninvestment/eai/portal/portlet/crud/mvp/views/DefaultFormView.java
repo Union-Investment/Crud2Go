@@ -18,7 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.Set;
 
@@ -53,6 +52,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormFields;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.MultiOptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
+import de.unioninvestment.eai.portal.portlet.crud.domain.util.DateUtils;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.OptionListContainer;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.FormSelectionContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
@@ -159,26 +159,8 @@ public class DefaultFormView extends Form implements FormView {
 
 		datetime.setValue(dff.getDefaultValue());
 
-		switch (dff.getResolution()) {
-		case Calendar.SECOND:
-			datetime.setResolution(PopupDateField.RESOLUTION_SEC);
-			break;
-		case Calendar.MINUTE:
-			datetime.setResolution(PopupDateField.RESOLUTION_MIN);
-			break;
-		case Calendar.HOUR_OF_DAY:
-			datetime.setResolution(PopupDateField.RESOLUTION_HOUR);
-			break;
-		case Calendar.DAY_OF_MONTH:
-			datetime.setResolution(PopupDateField.RESOLUTION_DAY);
-			break;
-		case Calendar.MONTH:
-			datetime.setResolution(PopupDateField.RESOLUTION_MONTH);
-			break;
-		case Calendar.YEAR:
-			datetime.setResolution(PopupDateField.RESOLUTION_YEAR);
-			break;
-		}
+		datetime.setResolution(DateUtils.getVaadinResolution(dff
+				.getResolution()));
 
 		datetime.setPropertyDataSource(dff.getTimestampProperty());
 		datetime.setImmediate(true);

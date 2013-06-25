@@ -31,6 +31,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
 
 public class TableColumnsTest {
@@ -41,6 +42,7 @@ public class TableColumnsTest {
 	private TableColumn column4;
 	private List<TableColumn> columnsList;
 	private TableColumns tableColumns;
+	private DateTableColumn column5;
 
 	@Before
 	public void setUp() {
@@ -69,7 +71,9 @@ public class TableColumnsTest {
 				.longTitle("Long Title 4").hiddenStatus(Hidden.IN_FORM)
 				.editableDefault(true).primaryKey(false).multiline(true)
 				.width(100).inputPrompt("prompt1").build();
-		columnsList = asList(column1, column2, column3, column4);
+		column5 = new DateTableColumn.Builder().name("name5")
+				.dateDisplayType(DateDisplayType.INPUT).build();
+		columnsList = asList(column1, column2, column3, column4, column5);
 		tableColumns = new TableColumns(columnsList);
 	}
 
@@ -80,6 +84,7 @@ public class TableColumnsTest {
 		assertThat(it.next(), is(column2));
 		assertThat(it.next(), is(column3));
 		assertThat(it.next(), is(column4));
+		assertThat(it.next(), is((TableColumn) column5));
 		assertThat(it.hasNext(), is(false));
 	}
 
@@ -91,7 +96,7 @@ public class TableColumnsTest {
 	@Test
 	public void shouldReturnOrderedListOfAllNames() {
 		assertThat(tableColumns.getAllNames(),
-				is(asList("name1", "name2", "name3", "name4")));
+				is(asList("name1", "name2", "name3", "name4", "name5")));
 	}
 
 	@Test
@@ -102,13 +107,13 @@ public class TableColumnsTest {
 	@Test
 	public void shouldReturnVisibleNamesForTable() {
 		assertThat(tableColumns.getVisibleNamesForTable(),
-				is(asList("name1", "name4")));
+				is(asList("name1", "name4", "name5")));
 	}
 
 	@Test
 	public void shouldReturnVisibleNamesForForm() {
 		assertThat(tableColumns.getVisibleNamesForForm(),
-				is(asList("name1", "name2")));
+				is(asList("name1", "name2", "name5")));
 	}
 
 	@Test
@@ -147,7 +152,6 @@ public class TableColumnsTest {
 	public void shouldReturnMultilineFlagByName() {
 		assertThat(tableColumns.isMultiline("name2"), is(false));
 		assertThat(tableColumns.isMultiline("name3"), is(true));
-		assertThat(tableColumns.isMultiline("unknownName"), is(false));
 	}
 
 	@Test
@@ -161,11 +165,20 @@ public class TableColumnsTest {
 	public void shouldReturnDropdownFlagByName() {
 		assertThat(tableColumns.isDropdown("name2"), is(true));
 		assertThat(tableColumns.isDropdown("name3"), is(false));
-		assertThat(tableColumns.isDropdown("unknownName"), is(false));
 	}
 
 	@Test
 	public void shouldReturnDropdownSelections() {
 		assertThat(tableColumns.getDropdownSelections("name1"), is(nullValue()));
+	}
+
+	@Test
+	public void shouldReturnTrueForDate() {
+		assertThat(tableColumns.isDate("name5"), is(true));
+	}
+
+	@Test
+	public void shouldReturnFalseForNonDate() {
+		assertThat(tableColumns.isDate("name4"), is(false));
 	}
 }

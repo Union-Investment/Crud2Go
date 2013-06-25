@@ -144,6 +144,10 @@
 			<artifactId>contextmenu</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.vaadin.addon</groupId>
+			<artifactId>propertytranslator</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
@@ -184,8 +188,8 @@
 			<artifactId>poi-ooxml</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>net.sf.supercsv</groupId>
-		    <artifactId>super-csv</artifactId>
+			<groupId>net.sf.supercsv</groupId>
+			<artifactId>super-csv</artifactId>
 		</dependency>
 
 		<!-- Provided by app server -->

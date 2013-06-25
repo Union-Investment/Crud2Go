@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.io.Serializable;
@@ -46,10 +46,9 @@ public class TableColumn implements Serializable {
 	private boolean primaryKey;
 	private Integer width;
 	private String inputPrompt;
-	private String displayFormat;
+	protected String displayFormat;
 	private OptionList optionList;
 	private FileMetadata fileMetadata;
-	private CheckBoxTableColumn checkBox;
 
 	private List<FieldValidator> validators;
 
@@ -71,70 +70,13 @@ public class TableColumn implements Serializable {
 	}
 
 	/**
-	 * @param name
-	 *            der Name
-	 * @param title
-	 *            der im Header anzuzeigende Titel
-	 * @param longtitle
-	 *            der im Header bzw. Detailformular als Tooltip anzuzeigende
-	 *            Text
-	 * @param hiddenStatus
-	 *            Sichtbarkeit der Spalte
-	 * @param editableDefault
-	 *            Default-Wert der von {@link #isEditable(ContainerRow)}
-	 *            zurückgegeben wird falls kein {@link RowEditableChecker}
-	 *            gesetzt ist.
-	 * @param primaryKey
-	 *            <code>true</code>, falls die Spalte zum Primärschlüssel gehört
-	 * @param width
-	 *            optionale Breite der Spalte in Pixeln
-	 * @param multiline
-	 *            <code>true</code>, falls die Tabellenzelle mehrzeilige Anzeige
-	 *            und Eingabe unterstützen soll
-	 * @param rows
-	 *            Anzahl Zeilen
-	 * @param inputPrompt
-	 *            optionaler Anzeigetext bei leerem Eingabefeld
-	 * @param validators
-	 *            Liste von Validatoren
-	 * @param optionList
-	 *            Selection
-	 * @param checkbox
-	 *            Checkboxmodel
-	 * 
-	 */
-	public TableColumn(String name, String title, String longtitle,
-			Hidden hiddenStatus, boolean editableDefault, boolean primaryKey,
-			boolean multiline, Integer rows, Integer width, String inputPrompt,
-			List<FieldValidator> validators, OptionList optionList,
-			CheckBoxTableColumn checkbox, String displayFormat,
-			FileMetadata fileMetadata, Class<?> generatedType) {
-		this.name = name;
-		Assert.notNull(name, "TableColumn.name is mandatory");
-		this.longTitle = longtitle;
-		this.title = title;
-		this.hiddenStatus = hiddenStatus;
-		this.editableDefault = editableDefault;
-		this.primaryKey = primaryKey;
-		this.multiline = multiline;
-		this.rows = rows;
-		this.inputPrompt = inputPrompt;
-		this.validators = validators;
-		this.optionList = optionList;
-		this.width = width;
-		this.checkBox = checkbox;
-		this.displayFormat = displayFormat;
-		this.fileMetadata = fileMetadata;
-		this.generatedType = generatedType;
-	}
-
-	/**
 	 * @param builder
 	 *            Builder-Klasse
 	 */
-	private TableColumn(Builder builder) {
+	protected TableColumn(Init<?> builder) {
 		this.name = builder.name;
 		Assert.notNull(name, "TableColumn.name is mandatory");
+
 		this.title = builder.title;
 		this.longTitle = builder.longTitle;
 		this.hiddenStatus = builder.hiddenStatus;
@@ -147,7 +89,6 @@ public class TableColumn implements Serializable {
 		this.displayFormat = builder.displayFormat;
 		this.optionList = builder.optionList;
 		this.fileMetadata = builder.fileMetadata;
-		this.checkBox = builder.checkBox;
 		this.validators = builder.validators;
 		this.columnStyleRenderer = builder.columnStyleRenderer;
 		this.editableChecker = builder.editableChecker;
@@ -235,14 +176,6 @@ public class TableColumn implements Serializable {
 	}
 
 	/**
-	 * @return <code>true</code>, wenn die Spalte als Checkbox dargestellt
-	 *         werden soll
-	 */
-	public boolean isCheckable() {
-		return checkBox != null;
-	}
-
-	/**
 	 * @return <code>true</code>, wenn die Eingabe als Dropdown-Select-Box
 	 *         erfolgen soll
 	 */
@@ -255,13 +188,6 @@ public class TableColumn implements Serializable {
 	 */
 	public OptionList getOptionList() {
 		return optionList;
-	}
-
-	/**
-	 * @return die Checkboxdaten
-	 */
-	public CheckBoxTableColumn getCheckBox() {
-		return checkBox;
 	}
 
 	/**
@@ -365,209 +291,211 @@ public class TableColumn implements Serializable {
 	 * Builder-Klasse für {@link TableColumn}.
 	 * 
 	 * @author carsten.mjartan
+	 * 
+	 *         For Pattern, see: <a href=
+	 *         "https://weblogs.java.net/blog/emcmanus/archive/2010/10/25/using-builder-pattern-subclasses"
+	 *         >this</a>
 	 */
+	public static class Builder extends Init<Builder> {
+		@Override
+		protected Builder self() {
+			return this;
+		}
+	}
+
 	@SuppressWarnings("all")
-	public static class Builder {
-		private String name;
-		private String title;
-		private String longTitle;
-		private Hidden hiddenStatus = Hidden.FALSE;
-		private boolean editableDefault = false;
-		private boolean multiline = false;
-		private Integer rows;
-		private boolean primaryKey = false;
-		private Integer width;
-		private String inputPrompt;
-		private String displayFormat;
-		private OptionList optionList;
-		private FileMetadata fileMetadata;
-		private CheckBoxTableColumn checkBox;
-		private List<FieldValidator> validators;
-		private ColumnStyleRenderer columnStyleRenderer;
-		private FieldEditableChecker editableChecker;
-		private CustomColumnGenerator customColumnGenerator;
-		private GeneratedValueGenerator generatedValueGenerator;
-		private Class<?> generatedType;
+	public static abstract class Init<T extends Init<T>> {
+		protected String name;
+		protected String title;
+		protected String longTitle;
+		protected Hidden hiddenStatus = Hidden.FALSE;
+		protected boolean editableDefault = false;
+		protected boolean multiline = false;
+		protected Integer rows;
+		protected boolean primaryKey = false;
+		protected Integer width;
+		protected String inputPrompt;
+		protected String displayFormat;
+		protected OptionList optionList;
+		protected FileMetadata fileMetadata;
+		protected List<FieldValidator> validators;
+		protected ColumnStyleRenderer columnStyleRenderer;
+		protected FieldEditableChecker editableChecker;
+		protected CustomColumnGenerator customColumnGenerator;
+		protected GeneratedValueGenerator generatedValueGenerator;
+		protected Class<?> generatedType;
+
+		protected abstract T self();
 
 		/**
 		 * @param name
 		 * @return den builder
 		 */
-		public Builder name(String name) {
+		public T name(String name) {
 			this.name = name;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param title
 		 * @return den builder
 		 */
-		public Builder title(String title) {
+		public T title(String title) {
 			this.title = title;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param longTitle
 		 * @return den builder
 		 */
-		public Builder longTitle(String longTitle) {
+		public T longTitle(String longTitle) {
 			this.longTitle = longTitle;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param hiddenStatus
 		 * @return den builder
 		 */
-		public Builder hiddenStatus(Hidden hiddenStatus) {
+		public T hiddenStatus(Hidden hiddenStatus) {
 			this.hiddenStatus = hiddenStatus;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param editableDefault
 		 * @return den builder
 		 */
-		public Builder editableDefault(boolean editableDefault) {
+		public T editableDefault(boolean editableDefault) {
 			this.editableDefault = editableDefault;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param multiline
 		 * @return den builder
 		 */
-		public Builder multiline(boolean multiline) {
+		public T multiline(boolean multiline) {
 			this.multiline = multiline;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param rows
 		 * @return den builder
 		 */
-		public Builder rows(Integer rows) {
+		public T rows(Integer rows) {
 			this.rows = rows;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param primaryKey
 		 * @return den builder
 		 */
-		public Builder primaryKey(boolean primaryKey) {
+		public T primaryKey(boolean primaryKey) {
 			this.primaryKey = primaryKey;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param width
 		 * @return den builder
 		 */
-		public Builder width(Integer width) {
+		public T width(Integer width) {
 			this.width = width;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param inputPrompt
 		 * @return den builder
 		 */
-		public Builder inputPrompt(String inputPrompt) {
+		public T inputPrompt(String inputPrompt) {
 			this.inputPrompt = inputPrompt;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param displayFormat
 		 * @return den builder
 		 */
-		public Builder displayFormat(String displayFormat) {
+		public T displayFormat(String displayFormat) {
 			this.displayFormat = displayFormat;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param optionList
 		 * @return den builder
 		 */
-		public Builder optionList(OptionList optionList) {
+		public T optionList(OptionList optionList) {
 			this.optionList = optionList;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param fileMetadata
 		 * @return den builder
 		 */
-		public Builder fileMetadata(FileMetadata fileMetadata) {
+		public T fileMetadata(FileMetadata fileMetadata) {
 			this.fileMetadata = fileMetadata;
-			return this;
-		}
-
-		/**
-		 * @param checkBox
-		 * @return den builder
-		 */
-		public Builder checkBox(CheckBoxTableColumn checkBox) {
-			this.checkBox = checkBox;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param validators
 		 * @return den builder
 		 */
-		public Builder validators(List<FieldValidator> validators) {
+		public T validators(List<FieldValidator> validators) {
 			this.validators = validators;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param columnStyleRenderer
 		 * @return den builder
 		 */
-		public Builder columnStyleRenderer(
-				ColumnStyleRenderer columnStyleRenderer) {
+		public T columnStyleRenderer(ColumnStyleRenderer columnStyleRenderer) {
 			this.columnStyleRenderer = columnStyleRenderer;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param editableChecker
 		 * @return den builder
 		 */
-		public Builder editableChecker(FieldEditableChecker editableChecker) {
+		public T editableChecker(FieldEditableChecker editableChecker) {
 			this.editableChecker = editableChecker;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @param customColumnGenerator
 		 * @return den builder
 		 */
-		public Builder customColumnGenerator(
+		public T customColumnGenerator(
 				CustomColumnGenerator scriptColumnGenerator) {
 			this.customColumnGenerator = scriptColumnGenerator;
-			return this;
+			return self();
 		}
 
-		public Builder generatedValueGenerator(GeneratedValueGenerator generator) {
+		public T generatedValueGenerator(GeneratedValueGenerator generator) {
 			this.generatedValueGenerator = generator;
-			return this;
+			return self();
 		}
 
-		public Builder generatedType(Class<?> type) {
+		public T generatedType(Class<?> type) {
 			this.generatedType = type;
-			return this;
+			return self();
 		}
 
 		/**
 		 * @return die erstellte Instanz
 		 */
 		public TableColumn build() {
-			return new TableColumn(this);
+			return new TableColumn(self());
 		}
 	}
 

@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.io.Serializable;
@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
 
 /**
@@ -54,12 +55,17 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 	}
 
 	/**
-	 * @param name
+	 * @param columnName
 	 *            der Name der Spalte
-	 * @return das Spaltenobjekt
+	 * @return das Spaltenobjekt oder
 	 */
-	public TableColumn get(String name) {
-		return columns.get(name);
+	public TableColumn get(String columnName) {
+		TableColumn column = columns.get(columnName);
+		if (column == null) {
+			throw new BusinessException("portlet.crud.error.columnNotFound",
+					columnName);
+		}
+		return column;
 	}
 
 	/**
@@ -148,67 +154,74 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 	/**
 	 * Prüft, ob eine Spalte mehrzeilig ist.
 	 * 
-	 * @param string
+	 * @param columnName
 	 *            Name
 	 * @return isMultiline
 	 */
-	public boolean isMultiline(String string) {
-		return (columns.containsKey(string) && columns.get(string)
-				.isMultiline());
+	public boolean isMultiline(String columnName) {
+		return get(columnName).isMultiline();
 	}
 
 	/**
 	 * Gibt den InputPrompt zurück.
 	 * 
-	 * @param property
+	 * @param columnName
 	 *            Name
 	 * @return Prompt
 	 */
-	public String getInputPrompt(String property) {
-		if (columns.containsKey(property)) {
-			String prompt = columns.get(property).getInputPrompt();
-			if (prompt != null && !prompt.isEmpty()) {
-				return prompt;
-			}
+	public String getInputPrompt(String columnName) {
+		String prompt = get(columnName).getInputPrompt();
+		if (prompt != null && !prompt.isEmpty()) {
+			return prompt;
+		} else {
+			return null;
 		}
-		return null;
 	}
 
 	/**
 	 * Prüft, ob das Property ein Dropdownfeld ist.
 	 * 
-	 * @param property
+	 * @param columnName
 	 *            Name
 	 * @return isDropdown
 	 */
-	public boolean isDropdown(String property) {
-		return columns.containsKey(property)
-				&& columns.get(property).isSelectable();
+	public boolean isDropdown(String columnName) {
+		return get(columnName).isSelectable();
 
 	}
 
 	/**
 	 * Prüft ob das Property eine Checkbox ist.
 	 * 
-	 * @param property
+	 * @param columnName
 	 *            Name
 	 * @return true wenn das Property eine Checkbox ist
 	 */
-	public boolean isCheckbox(String property) {
-		return columns.containsKey(property)
-				&& columns.get(property).isCheckable();
+	public boolean isCheckbox(String columnName) {
+		return get(columnName) instanceof CheckBoxTableColumn;
+	}
+
+	/**
+	 * Prüft ob zusätzliche Infos zu Datum existieren
+	 * 
+	 * @param columnName
+	 *            Name
+	 * @return true wenn weitere Konfigurationdaten existieren
+	 */
+	public boolean isDate(String columnName) {
+		return get(columnName) instanceof DateTableColumn;
 	}
 
 	/**
 	 * Gibt die Auswahlboxen zurück.
 	 * 
-	 * @param property
+	 * @param columnName
 	 *            Name
 	 * @return DropdownSelections
 	 */
-	public OptionList getDropdownSelections(String property) {
-		if (isDropdown(property)) {
-			return columns.get(property).getOptionList();
+	public OptionList getDropdownSelections(String columnName) {
+		if (isDropdown(columnName)) {
+			return get(columnName).getOptionList();
 		}
 		return null;
 	}
@@ -222,10 +235,7 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 	 *         Checkbox ist.
 	 */
 	public CheckBoxTableColumn getCheckBox(String property) {
-		if (isCheckbox(property)) {
-			return columns.get(property).getCheckBox();
-		}
-		return null;
+		return (CheckBoxTableColumn) get(property);
 	}
 
 	public Map<String, String> getFormatPattern() {
@@ -235,5 +245,9 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 		}
 
 		return result;
+	}
+
+	public DateTableColumn getDateColumn(String columnName) {
+		return (DateTableColumn) get(columnName);
 	}
 }

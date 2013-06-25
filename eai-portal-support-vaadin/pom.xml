@@ -104,7 +104,10 @@
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>contextmenu</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.vaadin.addon</groupId>
+			<artifactId>propertytranslator</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

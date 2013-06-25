@@ -31,12 +31,16 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormFieldFactory;
+import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Select;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.TextArea;
 
+import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
+import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.CheckBoxSupport;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.DatePickerSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.SelectSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
@@ -201,6 +205,15 @@ public class CrudFieldFactory implements TableFieldFactory, FormFieldFactory {
 			}
 
 			return checkBox;
+		} else if (!readonly && isDatePicker(propertyId, displayer)) {
+			String format = modelTable.getColumns() == null ? null : modelTable
+					.getColumns().get(propertyId.toString()).getDisplayFormat();
+			PopupDateField datePicker = ((DatePickerSupport) displayer)
+					.createDatePicker(type, propertyId, null, format);
+			datePicker.setLocale(CrudPortletApplication.getCurrentApplication()
+					.getLocale());
+			return datePicker;
+
 		} else {
 			String prompt = null;
 			if (modelTable.getColumns() != null) {
@@ -212,6 +225,15 @@ public class CrudFieldFactory implements TableFieldFactory, FormFieldFactory {
 					isMultiline(propertyId), prompt,
 					dataContainer.getFormat(propertyId.toString()));
 		}
+	}
+
+	private boolean isDatePicker(Object propertyId, DisplaySupport displayer) {
+		String columnName = propertyId.toString();
+		return modelTable.getColumns() != null
+				&& modelTable.getColumns().isDate(columnName)
+				&& modelTable.getColumns().getDateColumn(columnName)
+						.getDateDisplayType() == DateDisplayType.PICKER
+				&& displayer instanceof DatePickerSupport;
 	}
 
 	private boolean isMultiline(Object propertyId) {

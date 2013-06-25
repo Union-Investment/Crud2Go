@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.vaadin.addon.propertytranslator.PropertyTranslator;
+
 import com.vaadin.addon.sqlcontainer.ColumnProperty;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
@@ -228,6 +230,9 @@ public class BufferedTable extends Table {
 		Property property = field.getPropertyDataSource();
 		while (property instanceof PropertyFormatter) {
 			property = ((PropertyFormatter) property).getPropertyDataSource();
+		}
+		while (property instanceof PropertyTranslator) {
+			property = ((PropertyTranslator) property).getPropertyDataSource();
 		}
 		return property;
 	}

@@ -23,9 +23,11 @@ import static java.util.Collections.EMPTY_LIST;
 
 import java.sql.SQLTimeoutException;
 import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -253,6 +255,8 @@ public abstract class AbstractDataContainer implements DataContainer,
 		if (Number.class.isAssignableFrom(type)) {
 			return new NumberFormatter(displayFormatPattern)
 					.getNumberFormat(locale);
+		} else if (Date.class.isAssignableFrom(type)) {
+			return new SimpleDateFormat(displayFormatPattern, locale);
 		} else {
 			return null;
 		}

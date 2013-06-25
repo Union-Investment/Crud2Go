@@ -16,36 +16,50 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.domain.model;
+package de.unioninvestment.eai.portal.support.vaadin.support;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.vaadin.addon.propertytranslator.PropertyTranslator;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.CheckboxConfig;
+import com.vaadin.data.Property;
 
-public class CheckBoxTableColumnTest {
-
-	private CheckBoxTableColumn boxTableColumn;
+public class TranslatedDateFieldTest {
 
 	@Mock
-	private CheckboxConfig checkboxConfigMock;
+	private PropertyTranslator translatorMock;
+	@Mock
+	private Property backendDataSourceMock;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		boxTableColumn = new CheckBoxTableColumn.Builder().name("test")
-				.checkedValue("true").uncheckedValue("false").build();
 	}
 
 	@Test
-	public void shouldGetCheckedAndUncheckedValue() {
-		assertThat(boxTableColumn.getCheckedValue(), is("true"));
-		assertThat(boxTableColumn.getUncheckedValue(), is("false"));
-	}
+	public void shouldInjectTranslatorAroundProperty() {
+		when(translatorMock.getType()).thenAnswer(new Answer<Object>() {
+			@Override
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				return Date.class;
+			}
+		});
+		TranslatedDateField field = new TranslatedDateField(translatorMock);
 
+		field.setPropertyDataSource(backendDataSourceMock);
+
+		verify(translatorMock).setPropertyDataSource(backendDataSourceMock);
+		assertThat(field.getPropertyDataSource(), is((Property) translatorMock));
+	}
 }
