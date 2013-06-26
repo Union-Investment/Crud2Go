@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.export;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -52,7 +52,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RolesConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 
@@ -87,6 +87,9 @@ public class CrudPortletDataHandlerTest {
 
 	private byte[] data = "4711".getBytes();
 
+	@Mock
+	private RoleConfig portalRoleConfigMock;
+
 	@Before
 	public void setUp() throws IOException {
 		MockitoAnnotations.initMocks(this);
@@ -118,9 +121,12 @@ public class CrudPortletDataHandlerTest {
 
 	private void addRolesToTestConfig() {
 		when(roleConfigMock.getName()).thenReturn("admin");
+		when(portalRoleConfigMock.getName()).thenReturn("ignore");
+		when(portalRoleConfigMock.getPortalRole()).thenReturn("name");
 
 		List<RoleConfig> role = new ArrayList<RoleConfig>();
 		role.add(roleConfigMock);
+		role.add(portalRoleConfigMock);
 
 		when(portletConfigMock.getRoles()).thenReturn(rolesConfigMock);
 		when(rolesConfigMock.getRole()).thenReturn(role);
@@ -146,7 +152,7 @@ public class CrudPortletDataHandlerTest {
 		assertThat(data, notNullValue());
 
 		verify(preferencesMock).setValue("ROLE_1", "admin");
-		verify(contextMock).addPermissions(Role.class.getName(), 1);
+		verify(contextMock).addPermissions(PortletRole.class.getName(), 1);
 		verify(preferencesMock).store();
 		verify(zipWriterMock).addEntry("4711/portletConfiguration.xml",
 				"<Konfiguration>");
@@ -157,7 +163,8 @@ public class CrudPortletDataHandlerTest {
 		crudPortletDataHandler.doExportData(contextMock, "4711",
 				preferencesMock);
 
-		verify(contextMock, never()).addPermissions(Role.class.getName(), 1);
+		verify(contextMock, never()).addPermissions(
+				PortletRole.class.getName(), 1);
 		verify(zipWriterMock).addEntry("4711/portletConfiguration.xml",
 				"<Konfiguration>");
 	}
@@ -202,7 +209,7 @@ public class CrudPortletDataHandlerTest {
 				new String[] { "admin" });
 
 		Map<String, List<KeyValuePair>> perm = new HashMap<String, List<KeyValuePair>>();
-		perm.put(Role.class.getName() + "#3",
+		perm.put(PortletRole.class.getName() + "#3",
 				Arrays.asList(new KeyValuePair[] { new KeyValuePair("DUMMY",
 						"MEMBER") }));
 		when(contextMock.getPermissions()).thenReturn(perm);
@@ -216,7 +223,8 @@ public class CrudPortletDataHandlerTest {
 
 		verify(configurationServiceMock).storeRoleResourceId("4711",
 				COMMUNITY_ID, "admin");
-		verify(contextMock).importPermissions(Role.class.getName(), 3L, 1L);
+		verify(contextMock).importPermissions(PortletRole.class.getName(), 3L,
+				1L);
 	}
 
 	@Test(expected = PortletDataException.class)

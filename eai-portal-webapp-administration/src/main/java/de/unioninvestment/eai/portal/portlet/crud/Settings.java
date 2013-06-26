@@ -66,6 +66,9 @@ public class Settings {
 	@Value("${portlet.crud.vcs.password}")
 	private String vcsPassword;
 
+	@Value("${portlet.crud.revision.portal.role}")
+	private String revisionPortalRole;
+
 	private URL propertiesLocation = Settings.class.getClassLoader()
 			.getResource("eai/eai-portal-administration.properties");
 
@@ -169,6 +172,10 @@ public class Settings {
 
 	public String getVcsPassword() {
 		return vcsPassword;
+	}
+
+	public String getRevisionPortalRole() {
+		return revisionPortalRole;
 	}
 
 }

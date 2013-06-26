@@ -37,6 +37,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.vaadin.ui.Component;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
 
@@ -66,10 +67,10 @@ public class CurrentUserTest {
 	@Mock
 	private Principal userPrincipal;
 
-	private Set<Role> roles = new HashSet<Role>();
+	private Set<Role> portletRoles = new HashSet<Role>();
 
 	@Mock
-	private Role roleMock;
+	private PortletRole roleMock;
 
 	@Before
 	public void setUp() {
@@ -80,37 +81,37 @@ public class CurrentUserTest {
 
 		new MyPortletApplication().onRequestStart(request, null);
 
-		roles.add(roleMock);
+		portletRoles.add(roleMock);
 	}
 
 	@Test
 	public void shouldReturnCurrentUserFromPortletRequest() {
-		assertThat(new CurrentUser(roles).getName(), is("Jürgen"));
+		assertThat(new CurrentUser(portletRoles).getName(), is("Jürgen"));
 	}
 
 	@Test
 	public void shouldReturnThatUserIsNotAuthenticated() {
 		when(request.getUserPrincipal()).thenReturn(null);
 
-		assertThat(new CurrentUser(roles).isAuthenticated(), is(false));
+		assertThat(new CurrentUser(portletRoles).isAuthenticated(), is(false));
 	}
 
 	@Test
 	public void shouldReturnThatUserIsAuthenticated() {
-		assertThat(new CurrentUser(roles).isAuthenticated(), is(true));
+		assertThat(new CurrentUser(portletRoles).isAuthenticated(), is(true));
 	}
 
 	@Test
 	public void shouldReturnAnonymousUserOnMissingRequestForTestingPurposes() {
 		new MyPortletApplication().onRequestEnd(request, null);
-		assertThat(new CurrentUser(roles).isAuthenticated(), is(false));
+		assertThat(new CurrentUser(portletRoles).isAuthenticated(), is(false));
 	}
 
 	@Test
 	public void shouldGetPortalRoles() {
 		new MyPortletApplication().onRequestStart(null, null);
 
-		assertThat(new CurrentUser(roles).getPortalRoles(),
+		assertThat(new CurrentUser(portletRoles).getPortalRoles(),
 				equalTo(Collections.EMPTY_SET));
 	}
 
@@ -118,7 +119,7 @@ public class CurrentUserTest {
 	public void shouldGetRoles() {
 		new MyPortletApplication().onRequestStart(null, null);
 
-		assertThat(new CurrentUser(roles).getRoles(),
+		assertThat(new CurrentUser(portletRoles).getRoles(),
 				equalTo(AnonymousUser.ANONYMOUS_ROLES));
 	}
 }

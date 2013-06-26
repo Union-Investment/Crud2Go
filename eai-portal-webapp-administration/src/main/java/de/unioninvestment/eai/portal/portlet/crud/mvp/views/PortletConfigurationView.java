@@ -66,10 +66,10 @@ public interface PortletConfigurationView extends View {
 	/**
 	 * Zeigt die Links zum setzten der Berechtigungen.
 	 * 
-	 * @param roles
+	 * @param portletRoles
 	 *            Rollen
 	 */
-	void displayRoles(Set<Role> roles);
+	void displayRoles(Set<Role> portletRoles);
 
 	/**
 	 * Entfernt die Links zum setzten der Berechtigungen.

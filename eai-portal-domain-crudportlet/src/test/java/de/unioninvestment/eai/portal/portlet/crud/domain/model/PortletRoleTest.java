@@ -35,13 +35,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
 
-public class RoleTest {
+public class PortletRoleTest {
 
 	@Mock
 	private Portal portalMock;
 
 	@InjectMocks
-	private Role role = new Role("admin", 1);
+	private PortletRole portletRole = new PortletRole("admin", 1);
 
 	@Mock
 	private User userMock;
@@ -57,8 +57,8 @@ public class RoleTest {
 	@Test
 	public void shouldRegisterRoleAsLiferayResources() {
 
-		role.registerAsLiferayResource("Horst");
-		verify(portalMock).registerResource(Role.class.getName(),
+		portletRole.registerAsLiferayResource("Horst");
+		verify(portalMock).registerResource(PortletRole.class.getName(),
 				"1", "Horst");
 	}
 
@@ -66,10 +66,10 @@ public class RoleTest {
 	public void shouldCheckRoleIfUserIsMember() {
 		when(userMock.getName()).thenReturn("horst");
 		when(jdbcTemplateMock.queryForInt(anyString(), any())).thenReturn(4711);
-		when(portalMock.hasPermission("horst", "MEMBER", Role.class.getName(),
+		when(portalMock.hasPermission("horst", "MEMBER", PortletRole.class.getName(),
  "1")).thenReturn(
 				true);
-		boolean result = role.isMember(userMock);
+		boolean result = portletRole.isMember(userMock);
 		assertThat(result, is(true));
 	}
 	
@@ -78,15 +78,15 @@ public class RoleTest {
 		when(userMock.getName()).thenReturn("peter");
 		when(
 				portalMock.hasPermission("peter", "MEMBER",
-						Role.class.getName(), "PortletId_admin")).thenReturn(
+						PortletRole.class.getName(), "PortletId_admin")).thenReturn(
 				false);
-		boolean result = role.isMember(userMock);
+		boolean result = portletRole.isMember(userMock);
 		assertThat(result, is(false));
 	}
 
 	@Test
 	public void shouldGetRolename() {
-		String name = role.getName();
+		String name = portletRole.getName();
 		assertThat(name, is("admin"));
 	}
 

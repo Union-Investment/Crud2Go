@@ -185,7 +185,6 @@
 			<element name="role" type="tns:RoleConfig" minOccurs="1"
 				maxOccurs="unbounded" />
 		</sequence>
-
 	</complexType>
 
 	<complexType name="RoleConfig">
@@ -198,6 +197,13 @@
 			<annotation>
 				<documentation>
 					Frei waehlbarer Name einer Benutzerrolle.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="portal-role" type="string">
+			<annotation>
+				<documentation>
+					Portalrolle, die dieser Rolle zugewiesen werden soll.
 				</documentation>
 			</annotation>
 		</attribute>

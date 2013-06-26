@@ -27,6 +27,7 @@ import javax.portlet.PortletPreferences;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
+import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsPasswordConfig;
@@ -42,6 +44,8 @@ import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
+import de.unioninvestment.eai.portal.portlet.crud.config.validation.RevisionRoleVisitor;
+import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationProcessor;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao.StreamProcessor;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
@@ -66,6 +70,8 @@ public class DefaultConfigurationService implements ConfigurationService {
 
 	private PortletConfigurationUnmarshaller unmarshaller;
 
+	private Settings settings;
+
 	/**
 	 * Initialisiert den JAXB-Context.
 	 * 
@@ -73,6 +79,8 @@ public class DefaultConfigurationService implements ConfigurationService {
 	 *            Das DAO für die Persistenzschicht der Konfiguration.
 	 * @param compiler
 	 *            Scriptcompiler
+	 * @param settings
+	 *            benötigte Konfigurationseinstellungen
 	 * 
 	 * @throws JAXBException
 	 *             kann beim Parsen des Konfigurations XSD geworfen werden.
@@ -81,10 +89,11 @@ public class DefaultConfigurationService implements ConfigurationService {
 	 */
 	@Autowired
 	public DefaultConfigurationService(ConfigurationDao dao,
-			ConfigurationScriptsCompiler compiler) throws JAXBException,
-			SAXException {
+			ConfigurationScriptsCompiler compiler, Settings settings)
+			throws JAXBException, SAXException {
 		this.dao = dao;
 		this.compiler = compiler;
+		this.settings = settings;
 		this.unmarshaller = new PortletConfigurationUnmarshaller();
 	}
 
@@ -135,24 +144,37 @@ public class DefaultConfigurationService implements ConfigurationService {
 		}
 	}
 
-	private Config buildPortletConfig(InputStream stream, String portletId,
+	Config buildPortletConfig(InputStream stream, String portletId,
 			long communityId) throws JAXBException {
 		PortletConfig config = unmarshaller.unmarshal(stream);
+		applyRevisionToConfig(config);
 		compiler.compileAllScripts(config);
 
 		Map<String, Long> roleResourceIDs = new HashMap<String, Long>();
 		if (config.getRoles() != null) {
 			for (RoleConfig role : config.getRoles().getRole()) {
-				Long readRoleResourceIdPrimKey = storeRoleResourceId(portletId,
-						communityId, role.getName());
+				if (role.getPortalRole() == null) {
+					Long readRoleResourceIdPrimKey = storeRoleResourceId(
+							portletId, communityId, role.getName());
 
-				String roleResourceId = createRoleResourceId(portletId,
-						communityId, role.getName());
-				roleResourceIDs.put(roleResourceId, readRoleResourceIdPrimKey);
+					String roleResourceId = createRoleResourceId(portletId,
+							communityId, role.getName());
+					roleResourceIDs.put(roleResourceId,
+							readRoleResourceIdPrimKey);
+				}
 			}
 		}
 
 		return new Config(config, roleResourceIDs);
+	}
+
+	private void applyRevisionToConfig(PortletConfig portletConfig) {
+		String portalRole = settings.getRevisionPortalRole();
+		if (StringUtils.isNotBlank(portalRole)) {
+			ConfigurationProcessor roleValidation = new ConfigurationProcessor(
+					new RevisionRoleVisitor("revision", portalRole));
+			roleValidation.traverse(portletConfig);
+		}
 	}
 
 	@Override
@@ -206,8 +228,7 @@ public class DefaultConfigurationService implements ConfigurationService {
 	}
 
 	@Override
-	public boolean isConfigured(Config config,
-			PortletPreferences preferences) {
+	public boolean isConfigured(Config config, PortletPreferences preferences) {
 		if (config != null) {
 			AuthenticationConfig authentication = config.getPortletConfig()
 					.getAuthentication();
@@ -223,21 +244,19 @@ public class DefaultConfigurationService implements ConfigurationService {
 	}
 
 	private boolean authenticationPreferencesExist(
-			PortletPreferences preferences,
-			AuthenticationConfig authentication) {
-		for (AuthenticationRealmConfig realm : authentication
-				.getRealm()) {
+			PortletPreferences preferences, AuthenticationConfig authentication) {
+		for (AuthenticationRealmConfig realm : authentication.getRealm()) {
 			if (realm.getCredentials() != null) {
-				CredentialsUsernameConfig username = realm
-						.getCredentials().getUsername();
+				CredentialsUsernameConfig username = realm.getCredentials()
+						.getUsername();
 				if (username != null
 						&& username.getPreferenceKey() != null
 						&& preferenceMissing(preferences,
 								username.getPreferenceKey())) {
 					return false;
 				}
-				CredentialsPasswordConfig password = realm
-						.getCredentials().getPassword();
+				CredentialsPasswordConfig password = realm.getCredentials()
+						.getPassword();
 				if (password != null
 						&& password.getPreferenceKey() != null
 						&& preferenceMissing(preferences,

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
 	title="Einfaches Tabellen Beispiel">
-	
+
 	<roles>
-		<role name="admin5"/>
-		<role name="user5"/>
+		<role name="admin5" />
+		<role name="user5" />
+		<role name="myRole" portal-role="portalRole" />
 	</roles>
-	
+
 	<page>
 		<table>
 			<database-table datasource="eai" tablename="test_crud2" />

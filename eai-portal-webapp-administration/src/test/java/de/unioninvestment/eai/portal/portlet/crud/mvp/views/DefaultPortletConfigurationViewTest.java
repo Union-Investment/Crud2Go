@@ -55,6 +55,7 @@ import de.unioninvestment.crud2go.spi.security.CryptorFactory;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
 import de.unioninvestment.eai.portal.portlet.crud.ui.security.SecurePasswordField;
 import de.unioninvestment.eai.portal.portlet.test.commons.VaadinViewTest;
@@ -66,10 +67,10 @@ public class DefaultPortletConfigurationViewTest extends VaadinViewTest {
 	DefaultPortletConfigurationView view;
 
 	@Mock
-	private Role roleMock1;
+	private PortletRole roleMock1;
 
 	@Mock
-	private Role roleMock2;
+	private PortletRole roleMock2;
 
 	@Mock
 	private CryptorFactory cryptorFactoryMock;
@@ -118,26 +119,27 @@ public class DefaultPortletConfigurationViewTest extends VaadinViewTest {
 
 	@Test
 	public void shouldHideRolesTabIfNoRolesArePresent() {
-		Set<Role> roles = emptySet();
-		view.displayRoles(roles);
+		Set<Role> portletRoles = emptySet();
+		view.displayRoles(portletRoles);
 
 		assertThat(view.rolesLayout, nullValue());
 	}
 
 	@Test
 	public void shouldDisplayRolesTabOnExistingRoles() {
-		Set<Role> roles = new HashSet<Role>(asList(roleMock1));
+		Set<Role> portletRoles = new HashSet<Role>(asList(roleMock1));
 
-		view.displayRoles(roles);
+		view.displayRoles(portletRoles);
 
 		assertTrue(tabsheetContains("Berechtigungen"));
 	}
 
 	@Test
 	public void shouldDisplaySecurityLinksForRoles() {
-		Set<Role> roles = new LinkedHashSet<Role>(asList(roleMock1, roleMock2));
+		Set<Role> portletRoles = new LinkedHashSet<Role>(asList(roleMock1,
+				roleMock2));
 
-		view.displayRoles(roles);
+		view.displayRoles(portletRoles);
 
 		Link link1 = (Link) view.rolesLayout.getComponent(1);
 		assertThat(link1.getCaption(), is("role1"));
@@ -149,8 +151,8 @@ public class DefaultPortletConfigurationViewTest extends VaadinViewTest {
 
 	@Test
 	public void shouldRemoveSecurityFromView() {
-		Set<Role> roles = new HashSet<Role>(asList(roleMock1));
-		view.displayRoles(roles);
+		Set<Role> portletRoles = new HashSet<Role>(asList(roleMock1));
+		view.displayRoles(portletRoles);
 
 		view.hideRoles();
 
@@ -172,8 +174,8 @@ public class DefaultPortletConfigurationViewTest extends VaadinViewTest {
 	}
 
 	@Test
-	public void shouldDisplayAuthentication()
-			throws JAXBException, SAXException {
+	public void shouldDisplayAuthentication() throws JAXBException,
+			SAXException {
 		InputStream configStream = getClass().getClassLoader()
 				.getResourceAsStream("validReSTSecurityConfig.xml");
 		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
@@ -185,8 +187,8 @@ public class DefaultPortletConfigurationViewTest extends VaadinViewTest {
 	}
 
 	@Test
-	public void shouldDisplayAuthenticationPreferences()
-			throws JAXBException, SAXException {
+	public void shouldDisplayAuthenticationPreferences() throws JAXBException,
+			SAXException {
 		InputStream configStream = getClass().getClassLoader()
 				.getResourceAsStream("validReSTSecurityConfig.xml");
 		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()

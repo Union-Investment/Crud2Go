@@ -63,7 +63,7 @@ public class Portlet implements Serializable {
 
 	private EventRouter<PortletReloadedEventHandler, PortletReloadedEvent> reloadEventRouter = new EventRouter<PortletReloadedEventHandler, PortletReloadedEvent>();
 
-	private Set<Role> roles = new HashSet<Role>();
+	private Set<Role> portletRoles = new HashSet<Role>();
 
 	private EventBus eventBus;
 
@@ -187,26 +187,25 @@ public class Portlet implements Serializable {
 	/**
 	 * add a new role.
 	 * 
-	 * @param role
+	 * @param portletRole
 	 *            Rolle
 	 */
-	void addRole(Role role) {
-		this.roles.add(role);
+	void addRole(Role portletRole) {
+		this.portletRoles.add(portletRole);
 	}
 
 	/**
 	 * @return die am Portlet konfigurierten Benutzerrollen
 	 */
 	public Set<Role> getRoles() {
-		return unmodifiableSet(this.roles);
+		return unmodifiableSet(this.portletRoles);
 	}
 
 	/**
 	 * @param handler
 	 *            a new handler for Refreshing of portlet components
 	 */
-	public void addRefreshHandler(
-			PortletRefreshedEventHandler handler) {
+	public void addRefreshHandler(PortletRefreshedEventHandler handler) {
 		eventBus.addHandler(PortletRefreshedEvent.class, handler);
 	}
 
@@ -234,8 +233,7 @@ public class Portlet implements Serializable {
 	 * @param handler
 	 *            a new handler for custom handling of page reloads
 	 */
-	public void addReloadHandler(
-			PortletReloadedEventHandler handler) {
+	public void addReloadHandler(PortletReloadedEventHandler handler) {
 		reloadEventRouter.addHandler(handler);
 	}
 

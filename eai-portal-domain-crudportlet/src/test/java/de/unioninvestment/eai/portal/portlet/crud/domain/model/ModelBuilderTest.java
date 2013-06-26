@@ -48,6 +48,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -205,8 +206,7 @@ public class ModelBuilderTest {
 
 	private ModelBuilder createTestBuilder(Config config) {
 
-		return new ModelBuilder(eventBus, factoryMock,
-				resetFormActionMock,
+		return new ModelBuilder(eventBus, factoryMock, resetFormActionMock,
 				fieldValidatorFactoryMock, 300, config);
 	}
 
@@ -217,8 +217,7 @@ public class ModelBuilderTest {
 		ModelBuilder builder = createTestBuilder(new Config(config, null));
 
 		when(
-				factoryMock.getDatabaseTableContainer(eq(eventBus),
-						eq("test"),
+				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),
 						eq("test_crud2"), eq(true), eq(true), eq(true),
 						any(CurrentUser.class), any(Map.class),
 						any(List.class), eq(FilterPolicy.ALL), anyInt(),
@@ -236,6 +235,41 @@ public class ModelBuilderTest {
 		assertThat(
 				((Table) build.getPage().getElements().get(0)).getContainer(),
 				instanceOf(DatabaseTableContainer.class));
+	}
+
+	@Test
+	public void shouldCreateRolesFromConfiguration() throws Exception {
+		PortletConfig config = createConfiguration("validRolesConfig.xml");
+		Map<String, Long> roleResourceIds = new HashMap<String, Long>();
+		roleResourceIds.put("PortletId_17808_admin5", 1L);
+		roleResourceIds.put("PortletId_17808_user5", 2L);
+		ModelBuilder builder = createTestBuilder(new Config(config,
+				roleResourceIds));
+
+		when(
+				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),
+						eq("test_crud2"), eq(true), eq(true), eq(true),
+						any(CurrentUser.class), any(Map.class),
+						any(List.class), eq(FilterPolicy.ALL), anyInt(),
+						anyInt(), anyInt())).thenReturn(tableContainerMock);
+
+		Portlet build = builder.build();
+
+		assertThat(findRole(build.getRoles(), "admin5"),
+				instanceOf(PortletRole.class));
+		assertThat(findRole(build.getRoles(), "user5"),
+				instanceOf(PortletRole.class));
+		assertThat(findRole(build.getRoles(), "myRole"),
+				instanceOf(PortalRole.class));
+	}
+
+	private Role findRole(Set<Role> roles, String roleName) {
+		for (Role role : roles) {
+			if (role.getName().equals(roleName)) {
+				return role;
+			}
+		}
+		return null;
 	}
 
 	@Test
@@ -276,9 +310,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, orderBys,
-						null, 100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, orderBys, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
@@ -301,16 +335,14 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, new TestUser("Benutzer"),
-						displayPatternMock, orderBys, null, 100, 1000, 10))
-				.thenReturn(tableContainerMock);
+						"test_crud2", true, true, true,
+						new TestUser("Benutzer"), displayPatternMock, orderBys,
+						null, 100, 1000, 10)).thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
 		verify(factoryMock, times(2)).getDatabaseTableContainer(eq(eventBus),
-				eq("test"),
-				eq("test_crud2"), eq(true), eq(true), eq(true),
+				eq("test"), eq("test_crud2"), eq(true), eq(true), eq(true),
 				any(CurrentUser.class), any(Map.class), any(List.class),
 				eq(FilterPolicy.ALL), anyInt(), anyInt(), anyInt());
 
@@ -514,9 +546,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, orderBys,
-						null, 100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, orderBys, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		try {
 			Portlet build = builder.build();
@@ -597,9 +629,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, orderBys,
-						null, 100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, orderBys, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		try {
 			Portlet build = builder.build();
@@ -626,9 +658,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, orderBys,
-						null, 100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, orderBys, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
@@ -667,9 +699,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, orderBys,
-						null, 100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, orderBys, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 		assertThat(((Table) build.getPage().getElements().get(0)).isExport(),
@@ -688,9 +720,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, null, null,
-						100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, null, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
@@ -708,9 +740,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, null, null,
-						100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, null, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
@@ -726,9 +758,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, null, null,
-						100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, null, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
@@ -744,9 +776,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, null, null,
-						100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, null, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
@@ -761,9 +793,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, null, null,
-						100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, null, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 
@@ -779,9 +811,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, null, null,
-						100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, null, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 		build.getElementById("table2");
@@ -796,9 +828,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, null, null,
-						100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, null, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 		Object elementById = build.getElementById("table3");
@@ -814,9 +846,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, null, null,
-						100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, null, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 		Table table = (Table) build.getElementById("table4");
@@ -836,9 +868,9 @@ public class ModelBuilderTest {
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
-						"test_crud2",
-						true, true, true, null, displayPatternMock, null, null,
-						100, 1000, 10)).thenReturn(tableContainerMock);
+						"test_crud2", true, true, true, null,
+						displayPatternMock, null, null, 100, 1000, 10))
+				.thenReturn(tableContainerMock);
 
 		Portlet build = builder.build();
 		Table table = (Table) build.getElementById("table5");
@@ -895,8 +927,7 @@ public class ModelBuilderTest {
 		builder.build();
 
 		verify(factoryMock, times(4)).getDatabaseTableContainer(eq(eventBus),
-				eq("test"),
-				Mockito.anyString(), insertBooleanCaptor.capture(),
+				eq("test"), Mockito.anyString(), insertBooleanCaptor.capture(),
 				updateBooleanCaptor.capture(), deleteBooleanCaptor.capture(),
 				Mockito.any(CurrentUser.class), anyMap(),
 				anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
@@ -1055,8 +1086,7 @@ public class ModelBuilderTest {
 		assertThat(region, instanceOf(Region.class));
 
 		verify(factoryMock, times(2)).getDatabaseTableContainer(eq(eventBus),
-				eq("test"),
-				eq("test_crud2"), eq(true), eq(true), eq(true),
+				eq("test"), eq("test_crud2"), eq(true), eq(true), eq(true),
 				isA(CurrentUser.class), eq(displayPatternMock), eq(orderBys),
 				eq(FilterPolicy.ALL), anyInt(), anyInt(), anyInt());
 

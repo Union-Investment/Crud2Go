@@ -16,8 +16,8 @@
 		<maven.xsddoc.src>${basedir}/src/main/resources/de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd</maven.xsddoc.src>
 		<maven.xsddoc.target>${project.build.directory}/site/xsddoc</maven.xsddoc.target>
 	</properties>
-	
-	
+
+
 
 	<dependencies>
 
@@ -32,7 +32,14 @@
 			<artifactId>mockito-all</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+		<!-- For Classpath Scan -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>

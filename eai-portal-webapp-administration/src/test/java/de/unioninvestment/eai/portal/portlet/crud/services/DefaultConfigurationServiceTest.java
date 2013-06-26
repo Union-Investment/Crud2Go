@@ -40,6 +40,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.xml.sax.SAXException;
 
+import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
@@ -92,10 +93,14 @@ public class DefaultConfigurationServiceTest {
 	@Mock
 	private PortletPreferences preferencesMock;
 
+	@Mock
+	private Settings settingsMock;
+
 	@Before
 	public void setUp() throws JAXBException, SAXException {
 		MockitoAnnotations.initMocks(this);
-		service = new DefaultConfigurationService(daoMock, compilerMock);
+		service = new DefaultConfigurationService(daoMock, compilerMock,
+				settingsMock);
 	}
 
 	@Test
@@ -103,7 +108,8 @@ public class DefaultConfigurationServiceTest {
 			SAXException {
 
 		service = new DefaultConfigurationService(
-				new ExceptionThrowingConfigurationDao(), compilerMock);
+				new ExceptionThrowingConfigurationDao(), compilerMock,
+				settingsMock);
 
 		Config config = service.getPortletConfig("myWindowId", 17002L);
 
@@ -172,6 +178,63 @@ public class DefaultConfigurationServiceTest {
 	}
 
 	@Test
+	public void shouldApplyRevisionSettingsIfPortalRoleIsConfigured()
+			throws JAXBException, SAXException {
+		InputStream configStream = getClass().getClassLoader()
+				.getResourceAsStream("validConfig.xml");
+		when(settingsMock.getRevisionPortalRole()).thenReturn("revisionRole");
+
+		Config config = service.buildPortletConfig(configStream, "PortletId",
+				17808L);
+
+		assertThat(config.getPortletConfig().getRoles().getRole().get(0)
+				.getName(), is("revision"));
+	}
+
+	@Test
+	public void shouldCreateNewResourceIDsForPortletRoles()
+			throws JAXBException, SAXException {
+		InputStream configStream = getClass().getClassLoader()
+				.getResourceAsStream("validRolesConfig.xml");
+
+		when(daoMock.readRoleResourceIdPrimKey("PortletId_17808_admin5"))
+				.thenReturn(null);
+		when(daoMock.readRoleResourceIdPrimKey("PortletId_17808_user5"))
+				.thenReturn(null);
+		when(daoMock.readNextRoleResourceIdPrimKey()).thenReturn(1L, 2L);
+
+		Config config = service.buildPortletConfig(configStream, "PortletId",
+				17808L);
+
+		assertThat(config.getRoleResourceIDs().size(), is(2));
+		assertThat(config.getRoleResourceIDs().get("PortletId_17808_admin5"),
+				is(1L));
+		assertThat(config.getRoleResourceIDs().get("PortletId_17808_user5"),
+				is(2L));
+	}
+
+	@Test
+	public void shouldRetrieveExistingResourceIDsForPortletRoles()
+			throws JAXBException, SAXException {
+		InputStream configStream = getClass().getClassLoader()
+				.getResourceAsStream("validRolesConfig.xml");
+
+		when(daoMock.readRoleResourceIdPrimKey("PortletId_17808_admin5"))
+				.thenReturn(3L);
+		when(daoMock.readRoleResourceIdPrimKey("PortletId_17808_user5"))
+				.thenReturn(4L);
+
+		Config config = service.buildPortletConfig(configStream, "PortletId",
+				17808L);
+
+		assertThat(config.getRoleResourceIDs().size(), is(2));
+		assertThat(config.getRoleResourceIDs().get("PortletId_17808_admin5"),
+				is(3L));
+		assertThat(config.getRoleResourceIDs().get("PortletId_17808_user5"),
+				is(4L));
+	}
+
+	@Test
 	public void shouldStateUnconfiguredIfAnyUsernameIsMissing()
 			throws JAXBException, SAXException {
 		InputStream configStream = getClass().getClassLoader()
@@ -228,7 +291,8 @@ public class DefaultConfigurationServiceTest {
 
 		ConfigurationDao dao = new FileStreamingConfigurationDao(null,
 				configXmlStream);
-		service = new DefaultConfigurationService(dao, compilerMock);
+		service = new DefaultConfigurationService(dao, compilerMock,
+				settingsMock);
 	}
 
 }

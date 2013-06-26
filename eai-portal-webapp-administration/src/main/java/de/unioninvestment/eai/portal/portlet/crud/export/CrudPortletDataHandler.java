@@ -1,25 +1,26 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.export;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,7 +47,7 @@ import com.liferay.portal.kernel.zip.ZipWriter;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 
@@ -143,7 +144,8 @@ public class CrudPortletDataHandler extends BasePortletDataHandler {
 				portletId, communityId).getPortletConfig();
 
 		if (portletConfig.getRoles() != null) {
-			List<RoleConfig> roleList = portletConfig.getRoles().getRole();
+			List<RoleConfig> roleList = collectPortletRoles(portletConfig
+					.getRoles().getRole());
 			String[] roleNames = new String[roleList.size()];
 			int idx = 0;
 			for (RoleConfig role : roleList) {
@@ -156,11 +158,20 @@ public class CrudPortletDataHandler extends BasePortletDataHandler {
 						ROLE_PREF_PREFIX + String.valueOf(primkey),
 						role.getName());
 
-				context.addPermissions(Role.class.getName(), primkey);
+				context.addPermissions(PortletRole.class.getName(), primkey);
 			}
 			preferences.setValues(ROLE_NAMES_PREF, roleNames);
-
 		}
+	}
+
+	private List<RoleConfig> collectPortletRoles(List<RoleConfig> roles) {
+		List<RoleConfig> results = new LinkedList<RoleConfig>();
+		for (RoleConfig role : roles) {
+			if (role.getPortalRole() == null) {
+				results.add(role);
+			}
+		}
+		return results;
 	}
 
 	@Override
@@ -204,7 +215,7 @@ public class CrudPortletDataHandler extends BasePortletDataHandler {
 		for (Entry<String, List<KeyValuePair>> entry : context.getPermissions()
 				.entrySet()) {
 			String key = entry.getKey();
-			if (key.startsWith(Role.class.getName())) {
+			if (key.startsWith(PortletRole.class.getName())) {
 				long oldId = Long.valueOf(key.substring(key.indexOf('#') + 1));
 				String roleName = preferences.getValue(
 						ROLE_PREF_PREFIX + oldId, null);
@@ -217,8 +228,8 @@ public class CrudPortletDataHandler extends BasePortletDataHandler {
 							new Object[] { key, oldId, roleName, newId });
 					try {
 						if (newId != null) {
-							context.importPermissions(Role.class.getName(),
-									oldId, newId);
+							context.importPermissions(
+									PortletRole.class.getName(), oldId, newId);
 						} else {
 							LOGGER.warn("Cannot import permission: Role resource missing");
 						}

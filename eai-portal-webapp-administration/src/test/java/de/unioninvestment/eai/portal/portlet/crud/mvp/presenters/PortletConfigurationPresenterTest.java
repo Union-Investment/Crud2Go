@@ -58,6 +58,7 @@ import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletConfigurationPresenter.ConfigUploadFinishedListener;
@@ -100,7 +101,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 	private Portlet portletMock;
 
 	@Mock
-	private Role roleMock;
+	private PortletRole roleMock;
 
 	@Mock
 	private ThemeDisplay themeDisplayMock;
@@ -165,8 +166,8 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 	}
 
 	private PortletConfigurationPresenter createPortletConfigurationPresenter() {
-		return new PortletConfigurationPresenter(
-				viewMock, configurationServiceMock, eventBusMock, settingsMock);
+		return new PortletConfigurationPresenter(viewMock,
+				configurationServiceMock, eventBusMock, settingsMock);
 	}
 
 	@Test
@@ -237,13 +238,13 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 	public void shouldUpdateViewWithNewSecurityRolesOnRefresh() {
 		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
-		Set<Role> roles = singleton(roleMock);
-		when(portletMock.getRoles()).thenReturn(roles);
+		Set<Role> portletRoles = singleton((Role) roleMock);
+		when(portletMock.getRoles()).thenReturn(portletRoles);
 
 		portletConfigurationPresenter.refresh(ConfigStatus.CONFIGURED, null,
 				portletMock);
 
-		verify(viewMock).displayRoles(roles);
+		verify(viewMock).displayRoles(portletRoles);
 	}
 
 	@Test
@@ -252,8 +253,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 		Config config = new Config(new PortletConfig(), singletonMap("a", 1L));
 		portletConfigurationPresenter.refresh(ConfigStatus.UNCONFIGURED,
-				config,
-				null);
+				config, null);
 
 		verify(viewMock).displayAuthenticationPreferences(config);
 	}
@@ -291,8 +291,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 			throws ValidatorException, IOException {
 		portletConfigurationPresenter = createPortletConfigurationPresenter();
 		doThrow(new ValidatorException(new RuntimeException(), asList("a")))
-				.when(preferencesMock)
-				.store();
+				.when(preferencesMock).store();
 
 		portletConfigurationPresenter.storePreferencesAndFireConfigChange();
 

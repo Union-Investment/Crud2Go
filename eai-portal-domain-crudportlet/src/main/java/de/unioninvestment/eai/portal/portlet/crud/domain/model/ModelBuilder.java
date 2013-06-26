@@ -200,10 +200,15 @@ public class ModelBuilder {
 			long communityId = application.getCommunityId();
 			for (RoleConfig roleConfig : config.getPortletConfig().getRoles()
 					.getRole()) {
-				portlet.addRole(new Role(roleConfig.getName(), config
-						.getRoleResourceIDs().get(
-								portletId + "_" + communityId + "_"
-										+ roleConfig.getName())));
+				if (roleConfig.getPortalRole() == null) {
+					portlet.addRole(new PortletRole(roleConfig.getName(),
+							config.getRoleResourceIDs().get(
+									portletId + "_" + communityId + "_"
+											+ roleConfig.getName())));
+				} else {
+					portlet.addRole(new PortalRole(roleConfig.getName(),
+							roleConfig.getPortalRole()));
+				}
 			}
 		}
 	}

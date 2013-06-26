@@ -32,6 +32,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.JmxContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.PermissionConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
@@ -67,10 +68,10 @@ public class SecurityValidationVisitor implements ConfigurationVisitor {
 				asList("update", "insert", "delete")));
 		VALID_ACTIONS.put(DatabaseTableConfig.class, new HashSet<String>(
 				asList("update", "insert", "delete")));
-		VALID_ACTIONS.put(DatabaseQueryConfig.class, new HashSet<String>(
-				asList("update", "insert", "delete")));
 		VALID_ACTIONS.put(JmxContainerConfig.class,
 				new HashSet<String>(asList("update", "insert", "delete")));
+		VALID_ACTIONS.put(ReSTContainerConfig.class, new HashSet<String>(
+				asList("update", "insert", "delete")));
 		VALID_ACTIONS.put(ScriptContainerConfig.class, new HashSet<String>(
 				asList("update", "insert", "delete")));
 		VALID_ACTIONS.put(FormActionConfig.class, new HashSet<String>(
@@ -116,9 +117,10 @@ public class SecurityValidationVisitor implements ConfigurationVisitor {
 
 	private void validatePermission(Set<String> validActions,
 			PermissionConfig perm) {
-		if (!validActions.contains(perm.getAction())) {
-			throw new ConfigurationException("Unknown action '"
-					+ perm.getAction() + "'. Known actions: " + validActions);
+		String action = perm.getAction();
+		if (!validActions.contains(action) && !action.equals("all")) {
+			throw new ConfigurationException("Unknown action '" + action
+					+ "'. Known actions: " + validActions);
 		}
 	}
 

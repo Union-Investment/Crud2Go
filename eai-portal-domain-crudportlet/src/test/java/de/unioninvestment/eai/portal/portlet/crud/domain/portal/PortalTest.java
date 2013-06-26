@@ -62,7 +62,7 @@ public class PortalTest {
 	@Mock
 	private User userMock;
 
-	private String type = de.unioninvestment.eai.portal.portlet.crud.domain.model.Role.class
+	private String type = de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole.class
 			.getName();
 
 	private String id = "portletId_admin";

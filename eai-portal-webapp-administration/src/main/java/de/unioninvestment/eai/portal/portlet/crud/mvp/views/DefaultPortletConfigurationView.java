@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
 import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +48,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConf
 import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsPasswordConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsUsernameConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.PreferenceProperty;
 import de.unioninvestment.eai.portal.portlet.crud.ui.security.EncryptionFormatter;
@@ -165,7 +167,8 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 
 	@Override
 	public void displayRoles(Set<Role> roles) {
-		if (roles.size() > 0) {
+		Set<PortletRole> portletRoles = collectPortletRoles(roles);
+		if (portletRoles.size() > 0) {
 			if (rolesLayout != null) {
 				rolesLayout.removeAllComponents();
 			} else {
@@ -180,14 +183,24 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 			rolesLayout.addComponent(new Label(
 					getMessage("portlet.crud.page.edit.roles.description")));
 
-			for (Role role : roles) {
+			for (PortletRole portletRole : portletRoles) {
 				ExternalResource res = new ExternalResource(
-						role.getPermissionsURL());
-				rolesLayout.addComponent(new Link(role.getName(), res));
+						portletRole.getPermissionsURL());
+				rolesLayout.addComponent(new Link(portletRole.getName(), res));
 			}
 		} else {
 			hideRoles();
 		}
+	}
+
+	private Set<PortletRole> collectPortletRoles(Set<Role> roles) {
+		Set<PortletRole> portletRoles = new LinkedHashSet<PortletRole>();
+		for (Role role : roles) {
+			if (role instanceof PortletRole) {
+				portletRoles.add((PortletRole) role);
+			}
+		}
+		return portletRoles;
 	}
 
 	@Override
@@ -238,9 +251,8 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 							.getUsername();
 					if (username != null && username.getPreferenceKey() != null) {
 						TextField field = new TextField(realm.getName()
-								+ " Username",
-								new PreferenceProperty(
-										username.getPreferenceKey()));
+								+ " Username", new PreferenceProperty(
+								username.getPreferenceKey()));
 						field.addStyleName(createValidClassName(username
 								.getPreferenceKey()));
 						field.setNullRepresentation("");
@@ -255,8 +267,7 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 						Property preferenceProperty = new PreferenceProperty(
 								password.getPreferenceKey());
 						EncryptionFormatter encryptionFormatter = new EncryptionFormatter(
-								cryptor,
-								preferenceProperty);
+								cryptor, preferenceProperty);
 						SecurePasswordField field = new SecurePasswordField(
 								realm.getName() + " Passwort",
 								encryptionFormatter);
