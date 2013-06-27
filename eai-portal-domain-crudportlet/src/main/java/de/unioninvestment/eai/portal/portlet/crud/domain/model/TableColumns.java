@@ -238,6 +238,9 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 		return (CheckBoxTableColumn) get(property);
 	}
 
+	/**
+	 * @return the display-format patterns by column name
+	 */
 	public Map<String, String> getFormatPattern() {
 		Map<String, String> result = new HashMap<String, String>();
 		for (TableColumn column : columnsList) {
@@ -247,7 +250,19 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 		return result;
 	}
 
+	/**
+	 * @param columnName
+	 * @return the column data for date columns
+	 */
 	public DateTableColumn getDateColumn(String columnName) {
 		return (DateTableColumn) get(columnName);
+	}
+
+	/**
+	 * @param columnName
+	 * @return <code>true</code>, it the column exists
+	 */
+	public boolean contains(String columnName) {
+		return columns.containsKey(columnName);
 	}
 }

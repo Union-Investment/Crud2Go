@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
@@ -24,6 +24,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,6 +61,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClick
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.EmptyColumnGenerator;
 
 public class TableTest {
 
@@ -114,6 +117,9 @@ public class TableTest {
 	@Mock
 	private ExportCallback exportMock;
 
+	@Mock
+	private Portlet portletMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -123,6 +129,9 @@ public class TableTest {
 		table = new Table(config, tableColumns, true);
 		table.setContainer(containerMock);
 		table.setPresenter(presenterMock);
+		table.setPanel(panelMock);
+
+		when(panelMock.getPortlet()).thenReturn(portletMock);
 	}
 
 	@Test
@@ -239,9 +248,22 @@ public class TableTest {
 
 	@Test
 	public void shouldDelegateAddGeneratedColumn() {
+		when(portletMock.allowsDisplayGeneratedContent()).thenReturn(true);
+
 		com.vaadin.ui.Table.ColumnGenerator columnGenerator = mock(com.vaadin.ui.Table.ColumnGenerator.class);
 		table.addGeneratedColumn("id", "name", columnGenerator);
 		verify(presenterMock).addGeneratedColumn("id", "name", columnGenerator);
+	}
+
+	@Test
+	public void shouldAddEmptyGeneratedColumnIfPermissionIsMissing() {
+		when(portletMock.allowsDisplayGeneratedContent()).thenReturn(false);
+
+		com.vaadin.ui.Table.ColumnGenerator columnGenerator = mock(com.vaadin.ui.Table.ColumnGenerator.class);
+		table.addGeneratedColumn("id", "name", columnGenerator);
+
+		verify(presenterMock).addGeneratedColumn(eq("id"), eq("name"),
+				isA(EmptyColumnGenerator.class));
 	}
 
 	@Test

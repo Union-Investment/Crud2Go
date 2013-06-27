@@ -43,6 +43,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHa
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.EmptyColumnGenerator;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 
 /**
@@ -56,6 +57,13 @@ public class Table extends Component implements Component.ExpandableComponent,
 		Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Permission Actions.
+	 */
+	public enum Permission {
+		BUILD, EDIT
+	}
 
 	/**
 	 * Renderer-Klasse für Zeilen-Styles.
@@ -304,9 +312,11 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 */
 	public ColumnStyleRenderer getColumnStyleRenderer(String columnName) {
 		if (columns != null) {
-			TableColumn tableColumn = columns.get(columnName);
-			if (tableColumn != null) {
-				return tableColumn.getColumnStyleRenderer();
+			if (columns.contains(columnName)) {
+				TableColumn tableColumn = columns.get(columnName);
+				if (tableColumn != null) {
+					return tableColumn.getColumnStyleRenderer();
+				}
 			}
 		}
 		return null;
@@ -536,7 +546,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 	}
 
 	/**
-	 * Fügt der Tabelle dynamisch eine neue Spalte hinzu.
+	 * Fügt der Tabelle dynamisch eine neue Spalte hinzu. Wenn die notwendigen
+	 * Berechtigungen fehlen, werden leere Spalten generiert.
 	 * 
 	 * @param columnName
 	 *            der Name der Spalte
@@ -547,7 +558,17 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 */
 	public void addGeneratedColumn(String columnName, String columnTitle,
 			ColumnGenerator columnGenerator) {
-		presenter.addGeneratedColumn(columnName, columnTitle, columnGenerator);
+		if (getPortlet().allowsDisplayGeneratedContent()) {
+			presenter.addGeneratedColumn(columnName, columnTitle,
+					columnGenerator);
+		} else {
+			presenter.addGeneratedColumn(columnName, columnTitle,
+					new EmptyColumnGenerator());
+		}
+	}
+
+	private Portlet getPortlet() {
+		return getPanel().getPortlet();
 	}
 
 	/**

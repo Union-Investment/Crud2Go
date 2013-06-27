@@ -36,6 +36,13 @@ public class TableColumn implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Permission Actions.
+	 */
+	public enum Permission {
+		DISPLAY, EDIT
+	}
+
 	private String name;
 	private String title;
 	private String longTitle;

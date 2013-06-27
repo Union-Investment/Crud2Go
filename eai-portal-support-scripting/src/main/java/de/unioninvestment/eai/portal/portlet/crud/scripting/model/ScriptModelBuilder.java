@@ -50,6 +50,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.AbstractDatabaseContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
@@ -133,9 +135,7 @@ public class ScriptModelBuilder {
 	 *            Map mit Config
 	 * @param currentUser
 	 */
-	public ScriptModelBuilder(
-			ScriptModelFactory factory,
-			EventBus eventBus,
+	public ScriptModelBuilder(ScriptModelFactory factory, EventBus eventBus,
 			ConnectionPoolFactory connectionPoolFactory,
 			UserFactory userFactory, ScriptBuilder scriptBuilder,
 			Portlet portlet, Map<Object, Object> modelToConfigMapping) {
@@ -195,9 +195,8 @@ public class ScriptModelBuilder {
 		ScriptUser scriptUser = factory.getScriptCurrentUser(currentUser);
 		scriptBuilder.addBindingVariable("currentUser", scriptUser);
 
-		scriptBuilder.addBindingVariable("showPopup",
-				factory.getPopupProvider(scriptBuilder.getMainScript(),
-						eventBus));
+		scriptBuilder.addBindingVariable("showPopup", factory.getPopupProvider(
+				scriptBuilder.getMainScript(), eventBus));
 		scriptBuilder.addBindingVariable("confirm",
 				new ConfirmationDialogProvider(scriptBuilder.getMainScript(),
 						application.getMainWindow()));
@@ -623,13 +622,25 @@ public class ScriptModelBuilder {
 
 	private void populateScriptColumnGenerator(TableColumn column,
 			ColumnConfig columnConfig) {
-		GroovyScript generatedColumnsScript = columnConfig.getGenerator();
+		if (portlet.allowsDisplayGeneratedContent()) {
 
-		Closure<Object> generatedColumnsClosure = scriptBuilder
-				.buildClosure(generatedColumnsScript);
+			GroovyScript generatedColumnsScript = columnConfig.getGenerator();
 
-		column.setCustomColumnGenerator(new CustomColumnGeneratorImpl(
-				generatedColumnsClosure, application));
+			Closure<Object> generatedColumnsClosure = scriptBuilder
+					.buildClosure(generatedColumnsScript);
+
+			column.setCustomColumnGenerator(new CustomColumnGeneratorImpl(
+					generatedColumnsClosure, application));
+		} else {
+			// display empty cell content if user is not allowed to view
+			// generated content
+			column.setCustomColumnGenerator(new CustomColumnGenerator() {
+				@Override
+				public com.vaadin.ui.Component generate(ContainerRow row) {
+					return null;
+				}
+			});
+		}
 	}
 
 	private void buildTableStyleRenderer(Table table) {
@@ -669,8 +680,8 @@ public class ScriptModelBuilder {
 			ReSTContainer restContainer = (ReSTContainer) container;
 			ReSTContainerConfig config = (ReSTContainerConfig) configs
 					.get(container);
-			Realm realm = config.getRealm() == null ? null :
-					portlet.getAuthenticationRealms().get(config.getRealm());
+			Realm realm = config.getRealm() == null ? null : portlet
+					.getAuthenticationRealms().get(config.getRealm());
 			GenericDelegate restDelegate = factory.getReSTDelegate(config,
 					restContainer, realm, scriptBuilder, auditLogger);
 			restContainer.setDelegate(restDelegate);
@@ -714,8 +725,7 @@ public class ScriptModelBuilder {
 
 	private void populateBackendToDataContainer(GenericDataContainer container) {
 		GroovyScript delegateScript = ((ScriptContainerConfig) configs
-				.get(container))
-				.getDelegate();
+				.get(container)).getDelegate();
 		@SuppressWarnings("unchecked")
 		Closure<Object> delegateClosure = scriptBuilder
 				.buildClosure(delegateScript);

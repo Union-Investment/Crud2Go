@@ -37,6 +37,13 @@ public abstract class AbstractAction<T extends AbstractActionConfig> implements
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Permission Actions.
+	 */
+	public enum Permission {
+		BUILD
+	}
+
 	private final Triggers triggers;
 
 	protected final Portlet portlet;

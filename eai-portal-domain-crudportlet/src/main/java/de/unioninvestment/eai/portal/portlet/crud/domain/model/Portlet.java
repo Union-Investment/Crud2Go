@@ -52,6 +52,13 @@ public class Portlet implements Serializable {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(Portlet.class);
 
+	/**
+	 * Permission Actions.
+	 */
+	public enum Permission {
+		DISPLAY_GENERATED_CONTENT
+	}
+
 	private Page page;
 	private Tabs tabs;
 	private Map<String, Object> elementsById = new HashMap<String, Object>();
@@ -69,13 +76,18 @@ public class Portlet implements Serializable {
 
 	private Map<String, Realm> realms = new HashMap<String, Realm>();
 
+	private PortletContext context;
+
 	/**
 	 * @param config
 	 *            PortletConfig
+	 * @param context
 	 */
-	public Portlet(EventBus eventBus, PortletConfig config) {
+	public Portlet(EventBus eventBus, PortletConfig config,
+			PortletContext context) {
 		this.eventBus = eventBus;
 		this.config = config;
+		this.context = context;
 		this.title = config.getTitle();
 	}
 
@@ -243,5 +255,17 @@ public class Portlet implements Serializable {
 
 	void addRealm(String name, Realm realm) {
 		realms.put(name, realm);
+	}
+
+	/**
+	 * @return <code>true</code>, falls der User generierten Content sehen darf.
+	 */
+	public boolean allowsDisplayGeneratedContent() {
+		return context.getCurrentUser().hasPermission(config,
+				Permission.DISPLAY_GENERATED_CONTENT, true);
+	}
+
+	public PortletContext getContext() {
+		return context;
 	}
 }

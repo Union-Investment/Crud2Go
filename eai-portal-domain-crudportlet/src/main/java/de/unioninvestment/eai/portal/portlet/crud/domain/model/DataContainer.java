@@ -46,6 +46,13 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 public interface DataContainer extends Serializable {
 
 	/**
+	 * Permission Actions.
+	 */
+	public enum Permission {
+		INSERT, UPDATE, DELETE
+	}
+
+	/**
 	 * Filter-Verhalten des Containers.
 	 * 
 	 * @author carsten.mjartan

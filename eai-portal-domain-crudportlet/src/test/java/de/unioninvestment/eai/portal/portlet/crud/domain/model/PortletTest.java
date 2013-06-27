@@ -23,6 +23,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +36,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshed
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public class PortletTest {
@@ -56,6 +58,12 @@ public class PortletTest {
 
 	private EventBus eventBus = new EventBus();
 
+	@Mock
+	private PortletContext contextMock;
+
+	@Mock
+	private User userMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -63,7 +71,9 @@ public class PortletTest {
 		config = new PortletConfig();
 		config.setTitle("MyTitle");
 
-		portlet = new Portlet(eventBus, config);
+		portlet = new Portlet(eventBus, config, contextMock);
+
+		when(contextMock.getCurrentUser()).thenReturn(userMock);
 	}
 
 	@Test
@@ -129,7 +139,7 @@ public class PortletTest {
 	@Test
 	public void shouldRefreshOnPageReloadIfConfigured() {
 		config.setRefreshOnPageReload(true);
-		portlet = new Portlet(eventBus, config);
+		portlet = new Portlet(eventBus, config, contextMock);
 		portlet.addRefreshHandler(portletRefreshHandlerMock);
 
 		portlet.handleReload();
@@ -155,5 +165,19 @@ public class PortletTest {
 		portlet.handleReload();
 
 		verifyZeroInteractions(portletRefreshHandlerMock);
+	}
+
+	@Test
+	public void shouldTellIfDisplayingGeneratedContentIsNotAllowed() {
+		assertThat(portlet.allowsDisplayGeneratedContent(), is(false));
+	}
+
+	@Test
+	public void shouldTellIfDisplayingGeneratedContentIsAllowed() {
+		when(
+				userMock.hasPermission(config,
+						Portlet.Permission.DISPLAY_GENERATED_CONTENT, true))
+				.thenReturn(true);
+		assertThat(portlet.allowsDisplayGeneratedContent(), is(true));
 	}
 }

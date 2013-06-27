@@ -156,7 +156,10 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView#initialize(de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter, de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer, de.unioninvestment.eai.portal.portlet.crud.domain.model.Table, int, double)
+	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView#initialize(de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter,
+	 *      de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer,
+	 *      de.unioninvestment.eai.portal.portlet.crud.domain.model.Table, int,
+	 *      double)
 	 */
 	@Override
 	public void initialize(TableView.Presenter presenter,
@@ -446,7 +449,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 					tableComponent.addGeneratedColumn(columnName, generator);
 
 				} else if (c.isBinary()) {
-
 					BLobColumnGenerator generator = new BLobColumnGenerator(
 							PortletApplication.getCurrentApplication(),
 							container, columns);
@@ -994,21 +996,11 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		}
 	}
 
-	private Object getcurrentItemId() {
-		@SuppressWarnings("unchecked")
-		Set<Object> selectedValue = (Set<Object>) table.getValue();
-
-		if (selectedValue != null && selectedValue.size() == 1) {
-			return selectedValue.iterator().next();
-		}
-
-		return null;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView#addGeneratedColumn(String, String, com.vaadin.ui.Table.ColumnGenerator)
+	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView#addGeneratedColumn(String,
+	 *      String, com.vaadin.ui.Table.ColumnGenerator)
 	 */
 	@Override
 	public void addGeneratedColumn(String id, String title,

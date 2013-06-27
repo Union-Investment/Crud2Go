@@ -32,6 +32,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.JmxContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.PermissionConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
@@ -56,6 +57,8 @@ public class SecurityValidationVisitor implements ConfigurationVisitor {
 	private static final Map<Class<? extends SecurableConfig>, Set<String>> VALID_ACTIONS = new HashMap<Class<? extends SecurableConfig>, Set<String>>();
 
 	static {
+		VALID_ACTIONS.put(PortletConfig.class, new HashSet<String>(
+				asList("display-generated-content")));
 		VALID_ACTIONS.put(TabsConfig.class,
 				new HashSet<String>(asList("build")));
 		VALID_ACTIONS.put(FormConfig.class,

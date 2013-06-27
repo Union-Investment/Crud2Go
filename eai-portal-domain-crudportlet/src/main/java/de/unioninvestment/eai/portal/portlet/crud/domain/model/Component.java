@@ -29,6 +29,13 @@ public abstract class Component {
 
 	private Panel panel;
 
+	/**
+	 * Permission Actions.
+	 */
+	public enum Permission {
+		BUILD
+	}
+
 	public Panel getPanel() {
 		return panel;
 	}

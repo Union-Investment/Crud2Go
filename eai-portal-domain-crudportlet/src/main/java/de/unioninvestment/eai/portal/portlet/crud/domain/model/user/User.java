@@ -54,6 +54,27 @@ public abstract class User {
 	 * @param securableConfig
 	 *            Gesichertes Objekt
 	 * @param permission
+	 *            Berechtigung als Enum-Konstante (in Großbuchstaben)
+	 * @param defaultValue
+	 *            Wert, der zurückgeliefert wird, wenn keine Berechtigung
+	 *            hinterlegt ist
+	 * @return ob der Benutzer auf das SecurableConfig-Objekt eine Berechtigung
+	 *         hat.
+	 */
+	public boolean hasPermission(SecurableConfig securableConfig,
+			Enum<?> permission, boolean defaultValue) {
+		String permissionString = permission.name().toLowerCase();
+		return hasPermission(securableConfig, permissionString, defaultValue);
+	}
+
+	/**
+	 * 
+	 * Prüft, ob der Benutzer auf das SecurableConfig-Objekt eine Berechtigung
+	 * hat.
+	 * 
+	 * @param securableConfig
+	 *            Gesichertes Objekt
+	 * @param permission
 	 *            Berechtigung
 	 * @param defaultValue
 	 *            Wert, der zurückgeliefert wird, wenn keine Berechtigung
@@ -61,7 +82,7 @@ public abstract class User {
 	 * @return ob der Benutzer auf das SecurableConfig-Objekt eine Berechtigung
 	 *         hat.
 	 */
-	public boolean hasPermissions(SecurableConfig securableConfig,
+	private boolean hasPermission(SecurableConfig securableConfig,
 			String permission, boolean defaultValue) {
 		if (securableConfig.getPermissions() != null) {
 			Set<String> roles = getRoles();

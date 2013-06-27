@@ -23,51 +23,56 @@
 				Konfiguration des Portlets auf oberster Ebene.
 			</documentation>
 		</annotation>
-		<sequence>
-			<element name="roles" type="tns:RolesConfig" minOccurs="0"
-				maxOccurs="1" />
-			<element name="authentication" type="tns:AuthenticationConfig"
-				minOccurs="0" maxOccurs="1" />
-			<choice>
-				<element name="page" type="tns:PageConfig" />
-				<element name="tabs" type="tns:TabsConfig" />
-			</choice>
-			<element name="dialog" type="tns:DialogConfig" minOccurs="0"
-				maxOccurs="unbounded" />
-			<element name="script" type="tns:ScriptConfig" minOccurs="0" />
-		</sequence>
-		<attribute name="title" type="string">
-			<annotation>
-				<documentation>
-					In der Portlettitelleiste angezeigte Titel des
-					Portlets.
-				</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="refresh-on-page-reload" type="boolean"
-			default="false">
-			<annotation>
-				<documentation>
-					Sollen bei einem Refresh der Seite oder beim
-					zurückwechseln auf das Portlet die Inhalte aktualisiert werden?
-				</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="onReload" type="tns:groovy">
-			<annotation>
-				<documentation>
-					Groovy Closure, die beim Page Reload aufgerufen wird
-				</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="onRefresh" type="tns:groovy">
-			<annotation>
-				<documentation>
-					Groovy Closure, die beim Portlet Refresh aufgerufen
-					wird
-				</documentation>
-			</annotation>
-		</attribute>
+		<complexContent>
+			<extension base="tns:SecurableConfig">
+				<sequence>
+					<element name="roles" type="tns:RolesConfig" minOccurs="0"
+						maxOccurs="1" />
+					<element name="authentication" type="tns:AuthenticationConfig"
+						minOccurs="0" maxOccurs="1" />
+					<choice>
+						<element name="page" type="tns:PageConfig" />
+						<element name="tabs" type="tns:TabsConfig" />
+					</choice>
+					<element name="dialog" type="tns:DialogConfig" minOccurs="0"
+						maxOccurs="unbounded" />
+					<element name="script" type="tns:ScriptConfig" minOccurs="0" />
+				</sequence>
+				<attribute name="title" type="string">
+					<annotation>
+						<documentation>
+							In der Portlettitelleiste angezeigte Titel des
+							Portlets.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="refresh-on-page-reload" type="boolean"
+					default="false">
+					<annotation>
+						<documentation>
+							Sollen bei einem Refresh der Seite oder beim
+							zurückwechseln auf das Portlet die Inhalte aktualisiert werden?
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onReload" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure, die beim Page Reload aufgerufen
+							wird
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="onRefresh" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure, die beim Portlet Refresh aufgerufen
+							wird
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
 	</complexType>
 
 	<complexType name="AuthenticationConfig">

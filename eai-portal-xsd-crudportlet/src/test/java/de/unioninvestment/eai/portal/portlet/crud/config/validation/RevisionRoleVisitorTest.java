@@ -82,8 +82,10 @@ public class RevisionRoleVisitorTest {
 		revisionRole.setName("revision");
 		rolesConfig.getRole().add(revisionRole);
 
-		visitor.visit(revisionRole);
-		visitor.visitAfter(rolesConfig);
+		PortletConfig portletConfig = new PortletConfig();
+		portletConfig.setRoles(rolesConfig);
+
+		visitor.visit(portletConfig);
 
 		TableConfig tableConfig = new TableConfig();
 		visitor.visit(tableConfig);

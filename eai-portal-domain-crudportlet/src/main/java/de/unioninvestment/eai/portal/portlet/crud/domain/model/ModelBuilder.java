@@ -87,18 +87,6 @@ public class ModelBuilder {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(ModelBuilder.class);
 
-	private static final String DISPLAY_ACTION = "display";
-
-	private static final String EDIT_ACTION = "edit";
-
-	private static final String BUILD_ACTION = "build";
-
-	private static final String DELETE_ACTION = "delete";
-
-	private static final String UPDATE_ACTION = "update";
-
-	private static final String INSERT_ACTION = "insert";
-
 	private static final String MESSAGE_KEY_EDITABLE_TABLE_WITHOUT_PRIMARY_KEY = "portlet.crud.unsupported.tableconfig.editable.without.primary.key";
 
 	private static final String MESSAGE_KEY_EXPORTABLE_TABLE_WITHOUT_PRIMARY_KEY = "portlet.crud.unsupported.tableconfig.export.without.primary.key";
@@ -159,13 +147,16 @@ public class ModelBuilder {
 	 */
 	public Portlet build() {
 
-		portlet = new Portlet(eventBus, config.getPortletConfig());
+		PortletContext context = new PortletContext();
+
+		portlet = new Portlet(eventBus, config.getPortletConfig(), context);
 		mappings.put(portlet, config);
 
 		buildRoles();
 		buildAuthenticationRealms();
 
 		currentUser = new CurrentUser(portlet.getRoles());
+		context.setCurrentUser(currentUser);
 
 		if (config.getPortletConfig().getPage() != null) {
 			Page page = (Page) buildPanel(config.getPortletConfig().getPage());
@@ -243,7 +234,8 @@ public class ModelBuilder {
 	}
 
 	private Component buildComponent(ComponentConfig componentConfig) {
-		if (currentUser.hasPermissions(componentConfig, "build", true)) {
+		if (currentUser.hasPermission(componentConfig,
+				Component.Permission.BUILD, true)) {
 			if (componentConfig instanceof FormConfig) {
 				return buildForm((FormConfig) componentConfig);
 			} else if (componentConfig instanceof TableConfig) {
@@ -264,20 +256,30 @@ public class ModelBuilder {
 	}
 
 	private Component buildCustomComponent(ScriptComponentConfig componentConfig) {
-		CustomComponent scriptComponent = new CustomComponent(componentConfig);
-		String componentId = componentConfig.getId();
-		if (StringUtils.isNotEmpty(componentId)) {
-			portlet.addElementById(componentId, scriptComponent);
+		if (currentUser.hasPermission(componentConfig,
+				CustomComponent.Permission.BUILD, true)
+				&& portlet.allowsDisplayGeneratedContent()) {
+
+			CustomComponent scriptComponent = new CustomComponent(
+					componentConfig);
+			String componentId = componentConfig.getId();
+			if (StringUtils.isNotEmpty(componentId)) {
+				portlet.addElementById(componentId, scriptComponent);
+			}
+			mappings.put(scriptComponent, componentConfig);
+			return scriptComponent;
+
+		} else {
+			return null;
 		}
-		mappings.put(scriptComponent, componentConfig);
-		return scriptComponent;
 	}
 
 	private Component buildTabs(TabsConfig config) {
 		Tabs tabs = new Tabs(config);
 		mappings.put(tabs, config);
 		for (TabConfig tabConfig : config.getTab()) {
-			if (currentUser.hasPermissions(tabConfig, BUILD_ACTION, true)) {
+			if (currentUser
+					.hasPermission(tabConfig, Tab.Permission.BUILD, true)) {
 				Tab tab = (Tab) buildPanel(tabConfig);
 				tabs.addElement(tab);
 			}
@@ -324,7 +326,7 @@ public class ModelBuilder {
 		List<FormAction> actionList = new ArrayList<FormAction>();
 		for (FormActionConfig config : formConfig.getAction()) {
 
-			if (currentUser.hasPermissions(config, BUILD_ACTION, true)) {
+			if (currentUser.hasPermission(config, Form.Permission.BUILD, true)) {
 				Triggers triggers = buildTriggers(config);
 
 				FormAction formAction = new FormAction(portlet, config,
@@ -432,14 +434,15 @@ public class ModelBuilder {
 	}
 
 	private Table buildTable(TableConfig tableConfig) {
-		if (currentUser.hasPermissions(tableConfig, BUILD_ACTION, true)) {
+		if (currentUser
+				.hasPermission(tableConfig, Table.Permission.BUILD, true)) {
 			verifyPrimaryKeyColumnsArePresentIfNeccessary(tableConfig);
 			String dataSource = getDataSource(tableConfig);
 			TableColumns tableColumns = buildColumns(tableConfig.getColumns(),
 					dataSource);
 
-			boolean editable = currentUser.hasPermissions(tableConfig,
-					EDIT_ACTION, tableConfig.isEditable());
+			boolean editable = currentUser.hasPermission(tableConfig,
+					Table.Permission.EDIT, tableConfig.isEditable());
 			Table table = new Table(tableConfig, tableColumns, editable);
 			mappings.put(table, tableConfig);
 			portlet.addElementById(tableConfig.getId(), table);
@@ -524,7 +527,8 @@ public class ModelBuilder {
 		if (tableActionConfigs != null) {
 			for (TableActionConfig tac : tableActionConfigs) {
 
-				if (currentUser.hasPermissions(tac, BUILD_ACTION, true)) {
+				if (currentUser.hasPermission(tac,
+						TableAction.Permission.BUILD, true)) {
 					Triggers triggers = buildTriggers(tac);
 
 					TableAction tableAction = new TableAction(portlet, tac,
@@ -579,7 +583,8 @@ public class ModelBuilder {
 			}
 
 			Hidden hs = Hidden.valueOf(c.getHidden().toString());
-			if (!currentUser.hasPermissions(c, DISPLAY_ACTION, true)) {
+			if (!currentUser.hasPermission(c, TableColumn.Permission.DISPLAY,
+					true)) {
 				hs = Hidden.TRUE;
 			}
 
@@ -592,8 +597,8 @@ public class ModelBuilder {
 				isEditableDefault = Boolean
 						.valueOf(editableClosure.getSource());
 			}
-			boolean isEditable = currentUser.hasPermissions(c, EDIT_ACTION,
-					isEditableDefault);
+			boolean isEditable = currentUser.hasPermission(c,
+					TableColumn.Permission.EDIT, isEditableDefault);
 
 			FileMetadata fileMetadata = buildFileMetadata(c.getBinary());
 
@@ -758,17 +763,17 @@ public class ModelBuilder {
 			DatabaseQueryConfig databaseQuery, List<String> primaryKeys,
 			Map<String, String> displayPattern) {
 		boolean insertable = currentUser
-				.hasPermissions(databaseQuery, INSERT_ACTION,
+				.hasPermission(databaseQuery, DataContainer.Permission.INSERT,
 						databaseQuery.getInsert() != null
 								&& databaseQuery.getInsert().getStatement()
 										.getSource() != null);
 		boolean updateable = currentUser
-				.hasPermissions(databaseQuery, UPDATE_ACTION,
+				.hasPermission(databaseQuery, DataContainer.Permission.UPDATE,
 						databaseQuery.getUpdate() != null
 								&& databaseQuery.getUpdate().getStatement()
 										.getSource() != null);
 		boolean deleteable = currentUser
-				.hasPermissions(databaseQuery, DELETE_ACTION,
+				.hasPermission(databaseQuery, DataContainer.Permission.DELETE,
 						databaseQuery.getDelete() != null
 								&& databaseQuery.getDelete().getStatement()
 										.getSource() != null);
@@ -785,12 +790,12 @@ public class ModelBuilder {
 
 	private DataContainer buildTableContainer(DatabaseTableConfig config,
 			Map<String, String> formatPattern) {
-		boolean insertable = currentUser.hasPermissions(config, INSERT_ACTION,
-				true);
-		boolean updateable = currentUser.hasPermissions(config, UPDATE_ACTION,
-				true);
-		boolean deleteable = currentUser.hasPermissions(config, DELETE_ACTION,
-				true);
+		boolean insertable = currentUser.hasPermission(config,
+				DataContainer.Permission.INSERT, true);
+		boolean updateable = currentUser.hasPermission(config,
+				DataContainer.Permission.UPDATE, true);
+		boolean deleteable = currentUser.hasPermission(config,
+				DataContainer.Permission.DELETE, true);
 
 		List<ContainerOrder> orderBys = getDefaultOrder(config);
 

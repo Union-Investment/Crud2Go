@@ -48,6 +48,13 @@ import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationVisitor;
 
+/**
+ * {@link ConfigurationVisitor} that adds a "revision" role to the configuration
+ * and restricts it's permissions to that the configurations are displayed in
+ * "read-only" mode. Writable operations and dynamic content are disabled.
+ * 
+ * @author carsten.mjartan
+ */
 public class RevisionRoleVisitor implements ConfigurationVisitor {
 
 	static final String DO_NOTHING = null;
@@ -63,6 +70,7 @@ public class RevisionRoleVisitor implements ConfigurationVisitor {
 		VALID_ACTIONS.put(TabConfig.class, DO_NOTHING);
 		VALID_ACTIONS.put(FormConfig.class, DO_NOTHING);
 		VALID_ACTIONS.put(TableConfig.class, "build");
+		VALID_ACTIONS.put(PortletConfig.class, NO_ACTIONS);
 		VALID_ACTIONS.put(DatabaseQueryConfig.class, NO_ACTIONS);
 		VALID_ACTIONS.put(DatabaseTableConfig.class, NO_ACTIONS);
 		VALID_ACTIONS.put(ReSTContainerConfig.class, NO_ACTIONS);
@@ -86,12 +94,13 @@ public class RevisionRoleVisitor implements ConfigurationVisitor {
 
 	@Override
 	public void visit(Object element) {
+		if (element instanceof PortletConfig) {
+			PortletConfig portletConfig = (PortletConfig) element;
+			createNewRolesConfig(portletConfig);
+			enabled = !revisionRoleExists(portletConfig);
+		}
 		if (enabled) {
-			if (element instanceof PortletConfig) {
-				createNewRolesConfig((PortletConfig) element);
-			} else if (element instanceof RoleConfig) {
-				disableProcessorIfRevisionRoleAlreadyExists(element);
-			} else if (element instanceof SecurableConfig) {
+			if (element instanceof SecurableConfig) {
 				applyRevisionTo((SecurableConfig) element);
 			}
 		}
@@ -108,12 +117,21 @@ public class RevisionRoleVisitor implements ConfigurationVisitor {
 			String actions = VALID_ACTIONS.get(securableConfig.getClass());
 			if (actions != DO_NOTHING) {
 				maybeCreateNewPermissionsConfig(securableConfig);
-				createPermissionEntries(securableConfig, actions);
+				if (isNonScriptAction(securableConfig)) {
+					createPermissionEntries(securableConfig, "build");
+				} else {
+					createPermissionEntries(securableConfig, actions);
+				}
 			}
 		} else {
 			throw new UnsupportedOperationException("Element of type '"
 					+ securableConfig.getClass().getName() + "' not supported!");
 		}
+	}
+
+	private boolean isNonScriptAction(SecurableConfig securableConfig) {
+		return (securableConfig instanceof FormActionConfig)
+				&& (((FormActionConfig) securableConfig).getOnExecution() == null);
 	}
 
 	private void createPermissionEntries(SecurableConfig securableConfig,
@@ -129,10 +147,13 @@ public class RevisionRoleVisitor implements ConfigurationVisitor {
 		}
 	}
 
-	private void disableProcessorIfRevisionRoleAlreadyExists(Object element) {
-		if (((RoleConfig) element).getName().equals(revisionRoleName)) {
-			enabled = false;
+	private boolean revisionRoleExists(PortletConfig portletConfig) {
+		for (RoleConfig roleConfig : portletConfig.getRoles().getRole()) {
+			if (roleConfig.getName().equals(revisionRoleName)) {
+				return true;
+			}
 		}
+		return false;
 	}
 
 	private PermissionConfig createAllowConfig(String actions) {
