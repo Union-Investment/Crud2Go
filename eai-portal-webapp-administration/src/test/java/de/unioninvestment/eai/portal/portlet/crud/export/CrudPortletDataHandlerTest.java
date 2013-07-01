@@ -152,7 +152,7 @@ public class CrudPortletDataHandlerTest {
 		assertThat(data, notNullValue());
 
 		verify(preferencesMock).setValue("ROLE_1", "admin");
-		verify(contextMock).addPermissions(PortletRole.class.getName(), 1);
+		verify(contextMock).addPermissions(PortletRole.RESOURCE_KEY, 1);
 		verify(preferencesMock).store();
 		verify(zipWriterMock).addEntry("4711/portletConfiguration.xml",
 				"<Konfiguration>");
@@ -163,8 +163,8 @@ public class CrudPortletDataHandlerTest {
 		crudPortletDataHandler.doExportData(contextMock, "4711",
 				preferencesMock);
 
-		verify(contextMock, never()).addPermissions(
-				PortletRole.class.getName(), 1);
+		verify(contextMock, never())
+				.addPermissions(PortletRole.RESOURCE_KEY, 1);
 		verify(zipWriterMock).addEntry("4711/portletConfiguration.xml",
 				"<Konfiguration>");
 	}
@@ -209,7 +209,7 @@ public class CrudPortletDataHandlerTest {
 				new String[] { "admin" });
 
 		Map<String, List<KeyValuePair>> perm = new HashMap<String, List<KeyValuePair>>();
-		perm.put(PortletRole.class.getName() + "#3",
+		perm.put(PortletRole.RESOURCE_KEY + "#3",
 				Arrays.asList(new KeyValuePair[] { new KeyValuePair("DUMMY",
 						"MEMBER") }));
 		when(contextMock.getPermissions()).thenReturn(perm);
@@ -223,8 +223,7 @@ public class CrudPortletDataHandlerTest {
 
 		verify(configurationServiceMock).storeRoleResourceId("4711",
 				COMMUNITY_ID, "admin");
-		verify(contextMock).importPermissions(PortletRole.class.getName(), 3L,
-				1L);
+		verify(contextMock).importPermissions(PortletRole.RESOURCE_KEY, 3L, 1L);
 	}
 
 	@Test(expected = PortletDataException.class)

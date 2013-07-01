@@ -158,7 +158,7 @@ public class CrudPortletDataHandler extends BasePortletDataHandler {
 						ROLE_PREF_PREFIX + String.valueOf(primkey),
 						role.getName());
 
-				context.addPermissions(PortletRole.class.getName(), primkey);
+				context.addPermissions(PortletRole.RESOURCE_KEY, primkey);
 			}
 			preferences.setValues(ROLE_NAMES_PREF, roleNames);
 		}
@@ -215,7 +215,7 @@ public class CrudPortletDataHandler extends BasePortletDataHandler {
 		for (Entry<String, List<KeyValuePair>> entry : context.getPermissions()
 				.entrySet()) {
 			String key = entry.getKey();
-			if (key.startsWith(PortletRole.class.getName())) {
+			if (key.startsWith(PortletRole.RESOURCE_KEY)) {
 				long oldId = Long.valueOf(key.substring(key.indexOf('#') + 1));
 				String roleName = preferences.getValue(
 						ROLE_PREF_PREFIX + oldId, null);
@@ -228,8 +228,8 @@ public class CrudPortletDataHandler extends BasePortletDataHandler {
 							new Object[] { key, oldId, roleName, newId });
 					try {
 						if (newId != null) {
-							context.importPermissions(
-									PortletRole.class.getName(), oldId, newId);
+							context.importPermissions(PortletRole.RESOURCE_KEY,
+									oldId, newId);
 						} else {
 							LOGGER.warn("Cannot import permission: Role resource missing");
 						}
