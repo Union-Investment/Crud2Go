@@ -27,7 +27,7 @@ import javax.portlet.PortletURL;
 import org.junit.Test;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.DefaultPortletConfigurationView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.DefaultPortletConfigurationView;
 import de.unioninvestment.eai.portal.portlet.test.commons.VaadinViewTest;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
@@ -63,7 +63,7 @@ public class BusinessExceptionMessageTest extends VaadinViewTest {
 	@Override
 	protected View getView() {
 		if (view == null)
-			view = new DefaultPortletConfigurationView(null);
+			view = new DefaultPortletConfigurationView();
 		return view;
 	}
 

@@ -56,6 +56,14 @@ public class EncryptionFormatterTest {
 	}
 
 	@Test
+	public void shouldReturnNullForEmptyEncryptedString() {
+		when(backingProperty.getValue()).thenReturn("");
+		when(cryptorMock.decrypt(""))
+				.thenThrow(new NullPointerException("NPE"));
+		assertThat(formatter.getValue(), nullValue());
+	}
+
+	@Test
 	public void shouldReturnDecryptedValue() {
 		when(backingProperty.getValue()).thenReturn("encryptedText");
 		when(cryptorMock.decrypt("encryptedText")).thenReturn("plainText");

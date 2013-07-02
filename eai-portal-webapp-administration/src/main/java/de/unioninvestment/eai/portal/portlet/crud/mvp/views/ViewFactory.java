@@ -20,11 +20,11 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
 import java.io.Serializable;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import de.unioninvestment.crud2go.spi.security.CryptorFactory;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.DefaultPortletConfigurationView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PortletConfigurationView;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
 /**
@@ -38,9 +38,6 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 public class ViewFactory implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	@Autowired
-	private CryptorFactory cryptorFactory;
 
 	/**
 	 * Liefert eine {@link PortletView} zurück.
@@ -106,7 +103,7 @@ public class ViewFactory implements Serializable {
 	 * @return PortletConfigurationView
 	 */
 	public PortletConfigurationView portletConfigurationView() {
-		return new DefaultPortletConfigurationView(cryptorFactory);
+		return new DefaultPortletConfigurationView();
 	}
 
 	/**

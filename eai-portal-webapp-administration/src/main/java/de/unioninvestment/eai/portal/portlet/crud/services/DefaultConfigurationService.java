@@ -46,6 +46,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.config.validation.RevisionRoleVisitor;
 import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationProcessor;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao.StreamProcessor;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
@@ -157,8 +158,8 @@ public class DefaultConfigurationService implements ConfigurationService {
 					Long readRoleResourceIdPrimKey = storeRoleResourceId(
 							portletId, communityId, role.getName());
 
-					String roleResourceId = createRoleResourceId(portletId,
-							communityId, role.getName());
+					String roleResourceId = PortletRole.createRoleResourceId(
+							portletId, communityId, role.getName());
 					roleResourceIDs.put(roleResourceId,
 							readRoleResourceIdPrimKey);
 				}
@@ -180,14 +181,9 @@ public class DefaultConfigurationService implements ConfigurationService {
 	@Override
 	public Long readRoleResourceIdPrimKey(String portletId, long communityId,
 			String roleId) {
-		String roleResourceId = createRoleResourceId(portletId, communityId,
-				roleId);
+		String roleResourceId = PortletRole.createRoleResourceId(portletId,
+				communityId, roleId);
 		return dao.readRoleResourceIdPrimKey(roleResourceId);
-	}
-
-	private String createRoleResourceId(String portletId, long communityId,
-			String roleId) {
-		return portletId + "_" + communityId + "_" + roleId;
 	}
 
 	@Override
@@ -198,7 +194,8 @@ public class DefaultConfigurationService implements ConfigurationService {
 		if (readRoleResourceIdPrimKey == null) {
 			readRoleResourceIdPrimKey = dao.readNextRoleResourceIdPrimKey();
 			dao.storeRoleResourceIdPrimKey(readRoleResourceIdPrimKey,
-					createRoleResourceId(portletId, communityId, roleId));
+					PortletRole.createRoleResourceId(portletId, communityId,
+							roleId));
 		}
 		return readRoleResourceIdPrimKey;
 	}

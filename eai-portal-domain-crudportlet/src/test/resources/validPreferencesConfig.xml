@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<preferences>
+		<preference key="vorname" title="Vorname" default="Hugo" />
+		<preference key="nachname" default="Nachname" />
+	</preferences>
+	<page>
+		<component generator="buttons(builder)"/>
+	</page>
+	<script><![CDATA[
+		def buttons(builder) {
+			builder.button(
+				caption: 'Press me',
+				onclick: {
+					log.info "Vorname: $portlet.preferences.vorname, Nachname: $portlet.preferences.nachname"
+				})
+		}
+	]]></script>
+</portlet>

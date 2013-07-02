@@ -16,23 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.mvp.events;
+package de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import java.util.List;
 
-import org.junit.Test;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
-public class ConfigurationUpdatedEventTest {
+/**
+ * Interface for a view that displays a link for each {@link PortletRole} that
+ * delegates to the liferay permissions configuration.
+ * 
+ * @author carsten.mjartan
+ */
+public interface PortletRolesView extends View {
 
-	@Test
-	public void shouldDispatchToEventHandler() {
-		ConfigurationUpdatedEventHandler handler = mock(ConfigurationUpdatedEventHandler.class);
-		ConfigurationUpdatedEvent event = new ConfigurationUpdatedEvent(true);
-
-		event.dispatch(handler);
-
-		verify(handler).onConfigurationUpdated(event);
-	}
-
+	/**
+	 * @param roles
+	 *            the preferences to be shown in the form
+	 */
+	void display(List<PortletRoleTO> roles);
 }

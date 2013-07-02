@@ -70,18 +70,17 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication.ConfigStatus;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletConfigurationPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PresenterFactory;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PortletConfigurationView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration.PortletConfigurationPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PortletView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PortletConfigurationView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BusinessExceptionMessage;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
@@ -181,8 +180,8 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 						isA(Config.class))).thenReturn(modelBuilderMock);
 		when(modelBuilderMock.build()).thenReturn(portletMock);
 
-		when(presenterFactoryMock.portletConfigurationPresenter(settingsMock))
-				.thenReturn(portletConfigurationPresenterMock);
+		when(presenterFactoryMock.portletConfigurationPresenter()).thenReturn(
+				portletConfigurationPresenterMock);
 		when(portletConfigurationPresenterMock.getView()).thenReturn(
 				portletConfigurationViewMock);
 		when(portletPresenterMock.getView()).thenReturn(portletViewMock);
@@ -358,8 +357,7 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 
 		when(request.getPortletMode()).thenReturn(PortletMode.EDIT);
 		app.handleResourceRequest(request, response, windowSpy);
-		verify(portletConfigurationPresenterMock).refresh(
-				ConfigStatus.NO_CONFIG, null, app.getPortletDomain());
+		verify(portletConfigurationPresenterMock).refresh(null);
 	}
 
 	@Test
@@ -374,7 +372,7 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 
 		app.handleResourceRequest(request, response, windowSpy);
 		verify(portletConfigurationPresenterMock, never()).refresh(
-				any(ConfigStatus.class), any(Config.class), any(Portlet.class));
+				any(Config.class));
 	}
 
 	@Test

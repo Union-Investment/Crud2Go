@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
@@ -77,6 +79,8 @@ public class Portlet implements Serializable {
 	private Map<String, Realm> realms = new HashMap<String, Realm>();
 
 	private PortletContext context;
+
+	private HashMap<String, Preference> preferences;
 
 	/**
 	 * @param config
@@ -267,5 +271,18 @@ public class Portlet implements Serializable {
 
 	public PortletContext getContext() {
 		return context;
+	}
+
+	public synchronized Map<String, Preference> getPreferences() {
+		if (this.preferences == null) {
+			this.preferences = new LinkedHashMap<String, Preference>();
+			if (config.getPreferences() != null) {
+				for (PreferenceConfig pref : config.getPreferences()
+						.getPreference()) {
+					preferences.put(pref.getKey(), new Preference(pref));
+				}
+			}
+		}
+		return preferences;
 	}
 }

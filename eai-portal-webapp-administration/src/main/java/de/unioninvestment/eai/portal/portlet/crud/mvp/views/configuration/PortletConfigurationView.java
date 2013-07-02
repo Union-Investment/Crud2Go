@@ -16,17 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
-
-import java.util.Set;
+package de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Window.Notification;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
 /**
@@ -35,7 +31,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 public interface PortletConfigurationView extends View {
 
 	public interface Presenter {
-		void storePreferencesAndFireConfigChange();
+		// nop
 	}
 
 	/**
@@ -64,19 +60,6 @@ public interface PortletConfigurationView extends View {
 	void setStatus(String msgKey, Object... args);
 
 	/**
-	 * Zeigt die Links zum setzten der Berechtigungen.
-	 * 
-	 * @param portletRoles
-	 *            Rollen
-	 */
-	void displayRoles(Set<Role> portletRoles);
-
-	/**
-	 * Entfernt die Links zum setzten der Berechtigungen.
-	 */
-	void hideRoles();
-
-	/**
 	 * Startet Upload der Konfiguration aus VCS
 	 * 
 	 * @return Button Vaadin Komponente.
@@ -90,20 +73,11 @@ public interface PortletConfigurationView extends View {
 	 */
 	TextField getUploadVcsUri();
 
-	/**
-	 * Shows authentication preferences
-	 * 
-	 * @param portletConfig
-	 *            the configuration
-	 */
-	void displayAuthenticationPreferences(Config portletConfig);
-
-	/**
-	 * Hides the authentication preferences.
-	 */
-	void hideAuthenticationPreferences();
-
 	void setPresenter(PortletConfigurationView.Presenter presenter);
 
-	void switchToAuthenticationPreferences();
+	void displayTab(View view);
+
+	void removeTab(View view);
+
+	void switchTo(View view);
 }

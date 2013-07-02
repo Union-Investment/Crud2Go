@@ -16,32 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
+package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.Set;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
-import javax.portlet.ValidatorException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -53,17 +48,24 @@ import com.vaadin.ui.Upload;
 import com.vaadin.ui.Window.Notification;
 
 import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication.ConfigStatus;
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
+import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsPasswordConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsUsernameConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.RolesConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletConfigurationPresenter.ConfigUploadFinishedListener;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletConfigurationPresenter.ConfigurationReceiver;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PortletConfigurationView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration.PortletConfigurationPresenter.ConfigUploadFinishedListener;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration.PortletConfigurationPresenter.ConfigurationReceiver;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PortletConfigurationView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PortletRolesView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PreferencesView;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.crud.validation.ConfigurationUploadValidator;
@@ -107,9 +109,6 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 	private ThemeDisplay themeDisplayMock;
 
 	@Mock
-	private PortletPreferences preferencesMock;
-
-	@Mock
 	private Settings settingsMock;
 
 	private static final String testWinId = "2";
@@ -127,7 +126,10 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 			}
 		};
 		app.onRequestStart(requestMock, responseMock);
-		when(requestMock.getPreferences()).thenReturn(preferencesMock);
+
+		when(requestMock.getAttribute(WebKeys.PORTLET_ID))
+				.thenReturn(testWinId);
+		when(requestMock.getRemoteUser()).thenReturn("horst");
 
 		when(viewMock.getUpload()).thenReturn(uploadMock);
 		when(viewMock.getUploadVcsButton()).thenReturn(uploadVcsButton);
@@ -185,10 +187,6 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 		when(receiver.getConfigurationXML()).thenReturn(new byte[] { 0 });
 		when(receiver.getFilename()).thenReturn("fileName");
 
-		when(requestMock.getAttribute(WebKeys.PORTLET_ID))
-				.thenReturn(testWinId);
-		when(requestMock.getRemoteUser()).thenReturn("horst");
-
 		configUploadListener.uploadFinished(new Upload.FinishedEvent(
 				uploadMock, "", "", System.currentTimeMillis()));
 
@@ -235,68 +233,65 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 	}
 
 	@Test
+	@Ignore
 	public void shouldUpdateViewWithNewSecurityRolesOnRefresh() {
 		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
-		Set<Role> portletRoles = singleton((Role) roleMock);
-		when(portletMock.getRoles()).thenReturn(portletRoles);
+		PortletConfig portletConfig = createConfigWithRoles();
 
-		portletConfigurationPresenter.refresh(ConfigStatus.CONFIGURED, null,
-				portletMock);
+		Config config = new Config(portletConfig, singletonMap(
+				PortletRole.createRoleResourceId(testWinId, 18004L,
+						"portletRole"), 1L));
+		portletConfigurationPresenter.refresh(config);
 
-		verify(viewMock).displayRoles(portletRoles);
+		verify(viewMock).displayTab(isA(PortletRolesView.class));
 	}
 
 	@Test
 	public void shouldUpdateViewWithNewAuthenticationSheetOnRefresh() {
 		portletConfigurationPresenter = createPortletConfigurationPresenter();
 
-		Config config = new Config(new PortletConfig(), singletonMap("a", 1L));
-		portletConfigurationPresenter.refresh(ConfigStatus.UNCONFIGURED,
-				config, null);
+		PortletConfig portletConfig = createConfigWithPreferences();
 
-		verify(viewMock).displayAuthenticationPreferences(config);
+		Config config = new Config(portletConfig, singletonMap("a", 1L));
+		portletConfigurationPresenter.refresh(config);
+
+		verify(viewMock).displayTab(isA(PreferencesView.class));
 	}
 
-	@Test
-	public void shouldInformViewToRemoveSecurityConfig() {
-		portletConfigurationPresenter = createPortletConfigurationPresenter();
+	private PortletConfig createConfigWithRoles() {
+		RoleConfig portletRoleConfig = new RoleConfig();
+		portletRoleConfig.setName("portletRole");
 
-		portletConfigurationPresenter.refresh(ConfigStatus.NO_CONFIG, null,
-				null);
+		RoleConfig portalRoleConfig = new RoleConfig();
+		portalRoleConfig.setName("portalRole");
+		portalRoleConfig.setPortalRole("liferay-role");
 
-		verify(viewMock).hideRoles();
+		RolesConfig rolesConfig = new RolesConfig();
+		rolesConfig.getRole().add(portletRoleConfig);
+		rolesConfig.getRole().add(portalRoleConfig);
+
+		PortletConfig portletConfig = new PortletConfig();
+		portletConfig.setAuthentication(new AuthenticationConfig());
+		portletConfig.setRoles(rolesConfig);
+		return portletConfig;
 	}
 
-	@Test
-	public void shouldStorePreferences() throws ValidatorException, IOException {
-		portletConfigurationPresenter = createPortletConfigurationPresenter();
+	private PortletConfig createConfigWithPreferences() {
+		CredentialsUsernameConfig usernameConfig = new CredentialsUsernameConfig();
+		usernameConfig.setPreferenceKey("test");
 
-		portletConfigurationPresenter.storePreferencesAndFireConfigChange();
+		CredentialsConfig credentialsConfig = new CredentialsConfig();
+		credentialsConfig.setUsername(usernameConfig);
+		credentialsConfig.setPassword(new CredentialsPasswordConfig());
 
-		verify(preferencesMock).store();
+		AuthenticationRealmConfig realmConfig = new AuthenticationRealmConfig();
+		realmConfig.setCredentials(credentialsConfig);
+
+		PortletConfig portletConfig = new PortletConfig();
+		portletConfig.setAuthentication(new AuthenticationConfig());
+		portletConfig.getAuthentication().getRealm().add(realmConfig);
+		return portletConfig;
 	}
 
-	@Test
-	public void shouldFireConfigChange() throws ValidatorException, IOException {
-		portletConfigurationPresenter = createPortletConfigurationPresenter();
-
-		portletConfigurationPresenter.storePreferencesAndFireConfigChange();
-
-		verify(eventBusMock).fireEvent(new ConfigurationUpdatedEvent());
-	}
-
-	@Test
-	public void shouldShowNotificationOnStorageError()
-			throws ValidatorException, IOException {
-		portletConfigurationPresenter = createPortletConfigurationPresenter();
-		doThrow(new ValidatorException(new RuntimeException(), asList("a")))
-				.when(preferencesMock).store();
-
-		portletConfigurationPresenter.storePreferencesAndFireConfigChange();
-
-		verify(viewMock).showNotification(
-				"Einstellungen konnten nicht gespeichert werden",
-				Notification.TYPE_ERROR_MESSAGE);
-	}
 }

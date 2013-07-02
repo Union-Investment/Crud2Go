@@ -18,6 +18,8 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.ui.security;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.vaadin.data.Property;
 import com.vaadin.data.util.PropertyFormatter;
 
@@ -41,7 +43,12 @@ public class EncryptionFormatter extends PropertyFormatter {
 	 */
 	@Override
 	public String format(Object value) {
-		return cryptor.decrypt((String) value);
+		String backingString = (String) value;
+		if (StringUtils.isNotBlank(backingString)) {
+			return cryptor.decrypt(backingString);
+		} else {
+			return null;
+		}
 	}
 
 	/**

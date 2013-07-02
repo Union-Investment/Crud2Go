@@ -215,4 +215,11 @@ public class ScriptPortlet {
 	public Map<String, Object> getElements() {
 		return unmodifiableMap(elementsById);
 	}
+
+	/**
+	 * @return Preferences as Map
+	 */
+	public Map<String, String> getPreferences() {
+		return new ScriptPreferences(portlet.getPreferences());
+	}
 }

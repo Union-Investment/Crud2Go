@@ -86,6 +86,11 @@ public class PortletRole implements Serializable, Role {
 		return name;
 	}
 
+	public static String createRoleResourceId(String portletId,
+			long communityId, String roleName) {
+		return portletId + "_" + communityId + "_" + roleName;
+	}
+
 	public String getPermissionsURL() {
 		return PermissionsUtil
 				.buildURL(PortletRole.RESOURCE_KEY, primKey, name);

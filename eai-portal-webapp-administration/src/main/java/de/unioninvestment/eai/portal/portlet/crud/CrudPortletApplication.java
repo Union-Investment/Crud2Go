@@ -64,9 +64,9 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudApplication
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.DatasourceInfoPresenter;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletConfigurationPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PresenterFactory;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration.PortletConfigurationPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.DatasourceInfoView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BusinessExceptionMessage;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.Popup;
@@ -139,10 +139,10 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	private Set<Component> registeredComponents = new HashSet<Component>();
 
 	public enum ConfigStatus {
-		UNKNOWN, NO_CONFIG, UNCONFIGURED, CONFIGURED
+		START, UNKNOWN, NO_CONFIG, UNCONFIGURED, CONFIGURED
 	}
 
-	ConfigStatus status = ConfigStatus.UNKNOWN;
+	ConfigStatus status = ConfigStatus.START;
 	boolean initializing = true;
 	boolean firstLoad = true;
 
@@ -162,6 +162,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		mainWindow.setContent(viewPage);
 		setMainWindow(mainWindow);
 
+		recreateEditPage();
 		refreshViews();
 		registerAsPortletListener();
 	}
@@ -183,19 +184,18 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 					@Override
 					public void onConfigurationUpdated(
 							ConfigurationUpdatedEvent event) {
-						refreshViews();
-						if (status == ConfigStatus.CONFIGURED) {
-							firstLoad = true;
-							PortletUtils.switchPortletMode(getMainWindow()
-									.getApplication(), PortletMode.VIEW);
-						} else {
-							configurationPresenter.refresh(status,
-									portletConfig, portletDomain);
-							configurationPresenter
-									.switchToAuthenticationPreferences();
-						}
+						handleConfigurationUpdatedEvent(event);
 					}
 				});
+	}
+
+	private void handleConfigurationUpdatedEvent(ConfigurationUpdatedEvent event) {
+		cleanupViewPage();
+		initializeEventBus();
+		if (!event.isConfigurable()) {
+			PortletUtils.switchPortletMode(getMainWindow().getApplication(),
+					PortletMode.VIEW);
+		}
 	}
 
 	private ComponentContainer initializeHelpPage() {
@@ -290,7 +290,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		try {
 			initializing = true;
 
-			cleanupViews();
+			cleanupViewPage();
 			initializeEventBus();
 
 			LOG.debug("Loading configuration");
@@ -370,7 +370,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		}
 	}
 
-	private void cleanupViews() {
+	private void cleanupViewPage() {
 		dropConfiguration();
 		destroyDomain();
 
@@ -378,12 +378,14 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 
 		viewPage.removeAllComponents();
 
+		addHiddenPortletId(viewPage);
+	}
+
+	private void recreateEditPage() {
 		editPage.removeAllComponents();
 		configurationPresenter = presenterFactory
-				.portletConfigurationPresenter(settings);
+				.portletConfigurationPresenter();
 		editPage.addComponent(configurationPresenter.getView());
-
-		addHiddenPortletId(viewPage);
 	}
 
 	/**
@@ -482,11 +484,15 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 			return;
 		}
 		if (request.getPortletMode() == PortletMode.VIEW) {
+			if (window.getContent() != viewPage
+					&& status == ConfigStatus.UNKNOWN) {
+				firstLoad = true;
+				refreshViews();
+			}
 			window.setContent(viewPage);
 		} else if (request.getPortletMode() == PortletMode.EDIT) {
 			if (window.getContent() != editPage) {
-				configurationPresenter.refresh(status, portletConfig,
-						portletDomain);
+				configurationPresenter.refresh(portletConfig);
 			}
 			window.setContent(editPage);
 		} else if (request.getPortletMode() == PortletMode.HELP) {

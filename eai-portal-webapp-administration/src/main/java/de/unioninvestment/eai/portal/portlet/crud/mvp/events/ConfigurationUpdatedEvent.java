@@ -31,19 +31,41 @@ public class ConfigurationUpdatedEvent implements
 		Event<ConfigurationUpdatedEventHandler> {
 
 	private static final long serialVersionUID = 1L;
+	private boolean configurable;
+
+	public ConfigurationUpdatedEvent(boolean configurable) {
+		this.configurable = configurable;
+	}
 
 	@Override
 	public void dispatch(ConfigurationUpdatedEventHandler eventHandler) {
 		eventHandler.onConfigurationUpdated(this);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof ConfigurationUpdatedEvent;
+	public boolean isConfigurable() {
+		return configurable;
 	}
 
 	@Override
 	public int hashCode() {
-		return 1;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (configurable ? 1231 : 1237);
+		return result;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ConfigurationUpdatedEvent other = (ConfigurationUpdatedEvent) obj;
+		if (configurable != other.configurable)
+			return false;
+		return true;
+	}
+
 }

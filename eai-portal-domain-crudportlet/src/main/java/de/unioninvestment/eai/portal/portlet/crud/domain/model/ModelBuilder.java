@@ -192,10 +192,10 @@ public class ModelBuilder {
 			for (RoleConfig roleConfig : config.getPortletConfig().getRoles()
 					.getRole()) {
 				if (roleConfig.getPortalRole() == null) {
+					String resourceId = PortletRole.createRoleResourceId(
+							portletId, communityId, roleConfig.getName());
 					portlet.addRole(new PortletRole(roleConfig.getName(),
-							config.getRoleResourceIDs().get(
-									portletId + "_" + communityId + "_"
-											+ roleConfig.getName())));
+							config.getRoleResourceIDs().get(resourceId)));
 				} else {
 					portlet.addRole(new PortalRole(roleConfig.getName(),
 							roleConfig.getPortalRole()));

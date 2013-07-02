@@ -16,23 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.mvp.events;
+package de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+public class PortletRoleTO {
+	private String name;
+	private String primaryKey;
 
-import org.junit.Test;
+	public PortletRoleTO(String name, String primaryKey) {
+		this.name = name;
+		this.primaryKey = primaryKey;
+	}
 
-public class ConfigurationUpdatedEventTest {
+	public String getName() {
+		return name;
+	}
 
-	@Test
-	public void shouldDispatchToEventHandler() {
-		ConfigurationUpdatedEventHandler handler = mock(ConfigurationUpdatedEventHandler.class);
-		ConfigurationUpdatedEvent event = new ConfigurationUpdatedEvent(true);
-
-		event.dispatch(handler);
-
-		verify(handler).onConfigurationUpdated(event);
+	public String getPrimaryKey() {
+		return primaryKey;
 	}
 
 }

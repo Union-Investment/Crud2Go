@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
+package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration;
 
 import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
 
@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.portlet.PortletRequest;
 
@@ -47,13 +49,23 @@ import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Window.Notification;
 
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication.ConfigStatus;
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
+import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsPasswordConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsUsernameConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.RolesConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PortletConfigurationView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.DefaultPortletRolesView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.DefaultPreferencesView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PortletConfigurationView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PortletRoleTO;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PortletRolesView;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PreferenceTO;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PreferencesView;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.crud.validation.ConfigurationUploadValidator;
@@ -91,6 +103,17 @@ public class PortletConfigurationPresenter extends
 
 	private Settings settings;
 
+	private PreferencesView prefsView;
+	private PreferencesView authView;
+
+	private String portletId;
+
+	private long communityId;
+
+	private String currentUsername;
+
+	private PortletRolesView rolesView;
+
 	/**
 	 * 
 	 * @param portletConfigurationView
@@ -117,6 +140,13 @@ public class PortletConfigurationPresenter extends
 		getView().getUploadVcsButton().addListener(
 				new ConfigUploadVcsFinishedListener());
 
+		LiferayApplication app = LiferayApplication.getCurrentApplication();
+		PortletRequest request = PortletApplication.getCurrentRequest();
+
+		portletId = app.getPortletId();
+		communityId = app.getCommunityId();
+		currentUsername = request.getRemoteUser();
+
 		initStatus();
 	}
 
@@ -129,23 +159,17 @@ public class PortletConfigurationPresenter extends
 	 *            der XML-Content
 	 */
 	void saveConfig(String fileName, byte[] configurationXml) {
-		LiferayApplication app = LiferayApplication.getCurrentApplication();
-		PortletRequest request = PortletApplication.getCurrentRequest();
 
 		configurationService.storeConfigurationFile(fileName, configurationXml,
-				app.getPortletId(), app.getCommunityId(),
-				request.getRemoteUser());
+				portletId, communityId, currentUsername);
 
-		LOG.info("Saving config for portlet with portletId: "
-				+ app.getPortletId() + " successfull.");
+		LOG.info("Saving config for portlet with portletId: " + portletId
+				+ " successfull.");
 	}
 
 	private void initStatus() {
-		LiferayApplication app = LiferayApplication.getCurrentApplication();
-
 		ConfigurationMetaData metaData = configurationService
-				.getConfigurationMetaData(app.getPortletId(),
-						app.getCommunityId());
+				.getConfigurationMetaData(portletId, communityId);
 
 		if (metaData == null) {
 			getView().setStatus("portlet.crud.page.status.config.notAvailable");
@@ -177,7 +201,9 @@ public class PortletConfigurationPresenter extends
 			if (validator.isValid(receiver.getConfigurationXML())) {
 				saveConfig(receiver.getFilename(),
 						receiver.getConfigurationXML());
-				eventBus.fireEvent(new ConfigurationUpdatedEvent());
+
+				boolean configurable = refresh();
+				eventBus.fireEvent(new ConfigurationUpdatedEvent(configurable));
 
 			} else {
 				getView().showNotification(
@@ -228,7 +254,11 @@ public class PortletConfigurationPresenter extends
 				configValueVcs = IOUtils.toByteArray(ins);
 				if (validator.isValid(configValueVcs)) {
 					saveConfig(vcsUri, configValueVcs);
-					eventBus.fireEvent(new ConfigurationUpdatedEvent());
+
+					boolean configurable = refresh();
+					eventBus.fireEvent(new ConfigurationUpdatedEvent(
+							configurable));
+
 				} else {
 					getView().showNotification(
 							getMessage("portlet.crud.page.upload.invalid"),
@@ -309,45 +339,150 @@ public class PortletConfigurationPresenter extends
 		this.receiver = receiver;
 	}
 
+	public boolean refresh() {
+		Config config = configurationService.getPortletConfig(portletId,
+				communityId);
+		return refresh(config);
+	}
+
 	/**
 	 * Aktualisiert die Ansicht. Die Links zum Ändern der Berechtigungen, werden
 	 * ein- und ausgeblendet.
 	 * 
 	 * @param portletConfig
-	 * @param status
-	 * 
-	 * @param portletDomain
-	 *            Portlet Model
+	 * @return <code>true</code>, falls Konfigurationstabs existieren
 	 */
-	public void refresh(ConfigStatus status, Config portletConfig,
-			Portlet portletDomain) {
-		if (portletDomain != null) {
-			getView().displayRoles(portletDomain.getRoles());
-		} else {
-			getView().hideRoles();
+	public boolean refresh(Config portletConfig) {
+		LOGGER.info("Refreshing portlet configuration view!");
+		updatePortletRoles(portletConfig);
+		updatePortletPreferences(portletConfig);
+		updateAuthenticationPreferences(portletConfig);
+		return (rolesView != null) || (prefsView != null) || (authView != null);
+	}
+
+	private void updatePortletRoles(Config portletConfig) {
+		if (rolesView != null) {
+			getView().removeTab(rolesView);
+			rolesView = null;
 		}
 		if (portletConfig != null) {
-			getView().displayAuthenticationPreferences(portletConfig);
-		} else {
-			getView().hideAuthenticationPreferences();
+			List<PortletRoleTO> roles = findPortletRoles(portletConfig);
+			if (roles.size() > 0) {
+				rolesView = new DefaultPortletRolesView(
+						getMessage("portlet.crud.page.edit.securityHeader"));
+				getView().displayTab(rolesView);
+				rolesView.display(roles);
+			}
 		}
 	}
 
-	@Override
-	public void storePreferencesAndFireConfigChange() {
-		try {
-			CrudPortletApplication.getCurrentRequest().getPreferences().store();
-			eventBus.fireEvent(new ConfigurationUpdatedEvent());
-
-		} catch (Exception e) {
-			LOGGER.error("Error storing preferences", e);
-			getView().showNotification(
-					getMessage("portlet.crud.error.storingPreferences"),
-					Notification.TYPE_ERROR_MESSAGE);
+	private List<PortletRoleTO> findPortletRoles(Config portletConfig) {
+		List<PortletRoleTO> results = new LinkedList<PortletRoleTO>();
+		RolesConfig rolesConfig = portletConfig.getPortletConfig().getRoles();
+		if (rolesConfig != null) {
+			for (RoleConfig config : rolesConfig.getRole()) {
+				if (config.getPortalRole() == null) {
+					String resourceId = PortletRole.createRoleResourceId(
+							portletId, communityId, config.getName());
+					Long primaryKey = portletConfig.getRoleResourceIDs().get(
+							resourceId);
+					results.add(new PortletRoleTO(config.getName(), primaryKey
+							.toString()));
+				}
+			}
 		}
+		return results;
+	}
+
+	private void updatePortletPreferences(Config portletConfig) {
+		if (prefsView != null) {
+			getView().removeTab(prefsView);
+			prefsView = null;
+		}
+		if (portletConfig != null) {
+			List<PreferenceTO> preferences = findPortletPreferences(portletConfig);
+			if (preferences.size() > 0) {
+				prefsView = createPreferencesView(getMessage("portlet.crud.page.edit.preferencesHeader"));
+				getView().displayTab(prefsView);
+				prefsView.display(preferences);
+			}
+		}
+	}
+
+	private void updateAuthenticationPreferences(Config portletConfig) {
+		if (authView != null) {
+			getView().removeTab(authView);
+			authView = null;
+		}
+		if (portletConfig != null) {
+			List<PreferenceTO> preferences = findAuthenticationPreferences(portletConfig);
+			if (preferences.size() > 0) {
+				authView = createPreferencesView(getMessage("portlet.crud.page.edit.authenticationHeader"));
+				getView().displayTab(authView);
+				authView.display(preferences);
+			}
+		}
+	}
+
+	private PreferencesView createPreferencesView(String caption) {
+		DefaultPreferencesView subView = new DefaultPreferencesView(caption);
+		subView.setPresenter(new PreferencesPresenter(subView, eventBus));
+		return subView;
+	}
+
+	private List<PreferenceTO> findPortletPreferences(Config config) {
+		LinkedList<PreferenceTO> results = new LinkedList<PreferenceTO>();
+
+		if (config != null && config.getPortletConfig() != null
+				&& config.getPortletConfig().getPreferences() != null) {
+			for (PreferenceConfig cfg : config.getPortletConfig()
+					.getPreferences().getPreference()) {
+
+				results.add(new PreferenceTO(cfg.getKey(), generateTitle(cfg),
+						false, null));
+			}
+		}
+		return results;
+	}
+
+	private String generateTitle(PreferenceConfig cfg) {
+		return cfg.getTitle() == null ? cfg.getKey() : cfg.getTitle();
+	}
+
+	private List<PreferenceTO> findAuthenticationPreferences(
+			Config portletConfig) {
+		LinkedList<PreferenceTO> results = new LinkedList<PreferenceTO>();
+
+		if (portletConfig != null && portletConfig.getPortletConfig() != null
+				&& portletConfig.getPortletConfig().getAuthentication() != null) {
+			List<AuthenticationRealmConfig> realms = portletConfig
+					.getPortletConfig().getAuthentication().getRealm();
+			for (AuthenticationRealmConfig realm : realms) {
+				if (realm.getCredentials() != null) {
+					CredentialsUsernameConfig username = realm.getCredentials()
+							.getUsername();
+					if (username != null && username.getPreferenceKey() != null) {
+						results.add(new PreferenceTO(username
+								.getPreferenceKey(), realm.getName()
+								+ " Username", false, null));
+					}
+					CredentialsPasswordConfig password = realm.getCredentials()
+							.getPassword();
+					if (password != null && password.getPreferenceKey() != null) {
+						results.add(new PreferenceTO(password
+								.getPreferenceKey(), realm.getName()
+								+ " Passwort", true, password
+								.getEncryptionAlgorithm()));
+					}
+				}
+			}
+		}
+		return results;
 	}
 
 	public void switchToAuthenticationPreferences() {
-		getView().switchToAuthenticationPreferences();
+		if (authView != null) {
+			getView().switchTo(authView);
+		}
 	}
 }

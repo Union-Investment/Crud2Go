@@ -38,6 +38,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Region;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration.PortletConfigurationPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.RowEditingFormView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ViewFactory;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
@@ -62,6 +63,9 @@ public class PresenterFactory {
 
 	@Autowired
 	private EventBus eventBus;
+
+	@Autowired
+	private Settings settings;
 
 	/**
 	 * Liefert eine {@link GuiBuilder} zurück.
@@ -203,13 +207,9 @@ public class PresenterFactory {
 	/**
 	 * Liefert eine {@link PortletConfigurationPresenter} zurück.
 	 * 
-	 * @param settings
-	 * 
-	 * 
 	 * @return PortletConfigurationPresenter
 	 */
-	public PortletConfigurationPresenter portletConfigurationPresenter(
-			Settings settings) {
+	public PortletConfigurationPresenter portletConfigurationPresenter() {
 		return new PortletConfigurationPresenter(
 				viewFactory.portletConfigurationView(), configurationService,
 				eventBus, settings);

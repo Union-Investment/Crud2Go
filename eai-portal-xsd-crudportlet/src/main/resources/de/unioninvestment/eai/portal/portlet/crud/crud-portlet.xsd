@@ -28,6 +28,8 @@
 				<sequence>
 					<element name="roles" type="tns:RolesConfig" minOccurs="0"
 						maxOccurs="1" />
+					<element name="preferences" type="tns:PreferencesConfig" minOccurs="0"
+						maxOccurs="1" />
 					<element name="authentication" type="tns:AuthenticationConfig"
 						minOccurs="0" maxOccurs="1" />
 					<choice>
@@ -74,6 +76,48 @@
 			</extension>
 		</complexContent>
 	</complexType>
+
+	<complexType name="PreferencesConfig">
+		<annotation>
+			<documentation>
+				Portlet Preferences
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="preference" type="tns:PreferenceConfig"
+				minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<complexType name="PreferenceConfig">
+		<annotation>
+			<documentation>
+				Portlet Preference
+			</documentation>
+		</annotation>
+		<attribute name="key" type="string" use="required">
+			<annotation>
+				<documentation>
+					Eindeutiger Portlet Preferences Key
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="title" type="string">
+			<annotation>
+				<documentation>
+					Key aus Portlet Preferences
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="default" type="string">
+			<annotation>
+				<documentation>
+					Standartwert
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
 
 	<complexType name="AuthenticationConfig">
 		<annotation>
