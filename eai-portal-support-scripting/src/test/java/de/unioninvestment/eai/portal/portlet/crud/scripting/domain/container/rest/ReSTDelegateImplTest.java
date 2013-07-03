@@ -36,8 +36,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.http.HttpStatus;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTChangeConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTChangeMethodConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
@@ -120,6 +123,19 @@ public class ReSTDelegateImplTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+
+		when(scriptBuilderMock.buildClosure(isA(GroovyScript.class)))
+				.thenAnswer(new Answer<Closure<Object>>() {
+
+					@Override
+					public Closure<Object> answer(InvocationOnMock invocation)
+							throws Throwable {
+						GroovyScript script = (GroovyScript) invocation
+								.getArguments()[0];
+						return (Closure<Object>) script.getClazz()
+								.newInstance().run();
+					}
+				});
 	}
 
 	@Test
@@ -198,8 +214,9 @@ public class ReSTDelegateImplTest {
 	public void shouldReturmEmptyListIfQueryUrlIsNullOrBlank()
 			throws ClientProtocolException, IOException {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
-		config.setBaseUrl("http://test.de/path");
-		config.getQuery().setUrl("");
+		config.setBaseUrl(RestTestConfig
+				.createGStringScript(("http://test.de/path")));
+		config.getQuery().setUrl(RestTestConfig.createGStringScript(""));
 		ReSTDelegateImpl delegate = newDelegate(config);
 
 		List<Object[]> result = delegate.getRows();
@@ -212,7 +229,6 @@ public class ReSTDelegateImplTest {
 			throws ClientProtocolException, IOException {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
 		config.setBaseUrl(null);
-		config.getQuery().setUrl("http://test.de/path");
 		ReSTDelegateImpl delegate = newDelegate(config);
 		assumeValidResponse();
 
@@ -236,8 +252,7 @@ public class ReSTDelegateImplTest {
 
 		verify(httpMock).execute(requestCaptor.capture());
 		HttpUriRequest request = requestCaptor.getValue();
-		assertThat(request.getFirstHeader("Accept").getValue(),
-				is("text/xml"));
+		assertThat(request.getFirstHeader("Accept").getValue(), is("text/xml"));
 	}
 
 	@Test
@@ -261,8 +276,8 @@ public class ReSTDelegateImplTest {
 	public void shouldConcatBaseUrlAndQueryUrl()
 			throws ClientProtocolException, IOException {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
-		config.setBaseUrl("http://test.de/");
-		config.getQuery().setUrl("path");
+		config.setBaseUrl(RestTestConfig.createGStringScript("http://test.de/"));
+		config.getQuery().setUrl(RestTestConfig.createGStringScript("path"));
 		ReSTDelegateImpl delegate = newDelegate(config);
 		assumeValidResponse();
 
@@ -277,8 +292,8 @@ public class ReSTDelegateImplTest {
 	public void shouldAllowChangingTheBaseUrlAtRuntime()
 			throws ClientProtocolException, IOException {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
-		config.setBaseUrl("http://test.de/");
-		config.getQuery().setUrl("path");
+		config.setBaseUrl(RestTestConfig.createGStringScript("http://test.de/"));
+		config.getQuery().setUrl(RestTestConfig.createGStringScript("path"));
 		ReSTDelegateImpl delegate = newDelegate(config);
 		delegate.setBaseUrl("http://test.nl/");
 		assumeValidResponse();
@@ -294,8 +309,8 @@ public class ReSTDelegateImplTest {
 	public void shouldAllowChangingTheQueryUrlAtRuntime()
 			throws ClientProtocolException, IOException {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
-		config.setBaseUrl("http://test.de/");
-		config.getQuery().setUrl("path");
+		config.setBaseUrl(RestTestConfig.createGStringScript("http://test.de/"));
+		config.getQuery().setUrl(RestTestConfig.createGStringScript("path"));
 		ReSTDelegateImpl delegate = newDelegate(config);
 		delegate.setQueryUrl("otherpath");
 		assumeValidResponse();
@@ -319,7 +334,7 @@ public class ReSTDelegateImplTest {
 	@Test(expected = InvalidConfigurationException.class)
 	public void shouldThrowConfigurationExceptionIfUrlIsInvalid() {
 		ReSTContainerConfig config = RestTestConfig.readonlyConfig();
-		config.getQuery().setUrl("\\");
+		config.getQuery().setUrl(RestTestConfig.createGStringScript("\\\\"));
 		ReSTDelegateImpl delegate = newDelegate(config);
 
 		delegate.getRows();
@@ -385,8 +400,8 @@ public class ReSTDelegateImplTest {
 	}
 
 	@Test
-	public void shouldAuditPostRequest()
-			throws ClientProtocolException, IOException {
+	public void shouldAuditPostRequest() throws ClientProtocolException,
+			IOException {
 
 		// given
 		config = RestTestConfig.readwriteConfig();
@@ -399,8 +414,8 @@ public class ReSTDelegateImplTest {
 
 		// then
 		verify(auditLoggerMock).auditReSTRequest("POST",
-				"http://test.de/insertpath/4711",
-				JSON_STRING, "HTTP/1.1 201 CREATED");
+				"http://test.de/insertpath/4711", JSON_STRING,
+				"HTTP/1.1 201 CREATED");
 	}
 
 	@Test
@@ -421,8 +436,8 @@ public class ReSTDelegateImplTest {
 	}
 
 	@Test
-	public void shouldAuditPutRequest()
-			throws ClientProtocolException, IOException {
+	public void shouldAuditPutRequest() throws ClientProtocolException,
+			IOException {
 
 		// given
 		config = RestTestConfig.readwriteConfig();
@@ -436,8 +451,8 @@ public class ReSTDelegateImplTest {
 
 		// then
 		verify(auditLoggerMock).auditReSTRequest("PUT",
-				"http://test.de/insertpath/4711",
-				JSON_STRING, "HTTP/1.1 200 CREATED");
+				"http://test.de/insertpath/4711", JSON_STRING,
+				"HTTP/1.1 200 CREATED");
 	}
 
 	@Test
@@ -484,8 +499,8 @@ public class ReSTDelegateImplTest {
 	}
 
 	@Test
-	public void shouldSendConfiguredMimetype()
-			throws ClientProtocolException, IOException {
+	public void shouldSendConfiguredMimetype() throws ClientProtocolException,
+			IOException {
 
 		// given
 		config = RestTestConfig.readwriteConfig();
@@ -524,8 +539,8 @@ public class ReSTDelegateImplTest {
 	}
 
 	@Test
-	public void shouldAuditDeleteRequest()
-			throws ClientProtocolException, IOException {
+	public void shouldAuditDeleteRequest() throws ClientProtocolException,
+			IOException {
 
 		// given
 		config = RestTestConfig.readwriteConfig();
@@ -579,8 +594,8 @@ public class ReSTDelegateImplTest {
 		config = RestTestConfig.readwriteConfig();
 		config.setRealm("testserver");
 
-		delegate = new ReSTDelegateImpl(config, containerMock,
-				realmMock, scriptBuilderMock, auditLoggerMock);
+		delegate = new ReSTDelegateImpl(config, containerMock, realmMock,
+				scriptBuilderMock, auditLoggerMock);
 
 		verify(realmMock).applyBasicAuthentication(
 				(DefaultHttpClient) delegate.httpClient);
@@ -591,12 +606,12 @@ public class ReSTDelegateImplTest {
 		when(httpMock.execute(any(HttpUriRequest.class))).thenReturn(
 				responseMock);
 		when(responseMock.getStatusLine()).thenReturn(
-				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
-						201, "CREATED"));
+				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 201,
+						"CREATED"));
 	}
 
-	private void stubValidInsertOperation()
-			throws ClientProtocolException, IOException {
+	private void stubValidInsertOperation() throws ClientProtocolException,
+			IOException {
 
 		// Input for URL
 		when(scriptBuilderMock.buildClosure(config.getInsert().getUrl()))
@@ -644,12 +659,12 @@ public class ReSTDelegateImplTest {
 		when(httpMock.execute(any(HttpUriRequest.class))).thenReturn(
 				responseMock);
 		when(responseMock.getStatusLine()).thenReturn(
-				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
-						200, "CREATED"));
+				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200,
+						"CREATED"));
 	}
 
-	private void prepareValidDeleteRequest()
-			throws ClientProtocolException, IOException {
+	private void prepareValidDeleteRequest() throws ClientProtocolException,
+			IOException {
 		// Input for URL
 		when(scriptBuilderMock.buildClosure(config.getDelete().getUrl()))
 				.thenReturn(urlClosureMock);
@@ -701,18 +716,17 @@ public class ReSTDelegateImplTest {
 		when(httpMock.execute(any(HttpUriRequest.class))).thenReturn(
 				responseMock);
 		when(responseMock.getStatusLine()).thenReturn(
-				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
-						status.value(), message));
+				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), status
+						.value(), message));
 	}
 
-	private void assumeValidQueryResponse(String content,
-			String mimeType, String charset)
-			throws IOException, ClientProtocolException {
+	private void assumeValidQueryResponse(String content, String mimeType,
+			String charset) throws IOException, ClientProtocolException {
 		when(httpMock.execute(any(HttpUriRequest.class))).thenReturn(
 				responseMock);
 		when(responseMock.getStatusLine()).thenReturn(
-				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
-						200, "OK"));
+				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200,
+						"OK"));
 		when(responseMock.getEntity())
 				.thenReturn(
 						new StringEntity(content, ContentType.create(mimeType,

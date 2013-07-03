@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest;
 
 import static java.util.Collections.unmodifiableList;
+import groovy.lang.Closure;
 
 import java.io.IOException;
 import java.net.URI;
@@ -68,6 +69,20 @@ import de.unioninvestment.eai.portal.support.vaadin.container.UpdateContext;
 
 public class ReSTDelegateImpl implements ReSTDelegate {
 
+	static final class ConstantStringProvider extends Closure<Object> {
+		private final String string;
+		private static final long serialVersionUID = 1L;
+
+		ConstantStringProvider(Object owner, String newQueryUrl) {
+			super(owner);
+			this.string = newQueryUrl;
+		}
+
+		public String doCall() {
+			return string;
+		}
+	}
+
 	private static final List<Object[]> EMPTY_RESULT = unmodifiableList(new LinkedList<Object[]>());
 
 	private static final Logger LOGGER = LoggerFactory
@@ -84,16 +99,16 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 	private ReSTContainer container;
 
-	private String baseUrl;
-	private String queryUrl;
+	private Closure<Object> baseUrlProvider;
+	private Closure<Object> queryUrlProvider;
 
 	private AuditLogger auditLogger;
 
 	private Realm realm;
 
 	public ReSTDelegateImpl(ReSTContainerConfig containerConfig,
-			ReSTContainer container,
-			Realm realm, ScriptBuilder scriptBuilder, AuditLogger auditLogger) {
+			ReSTContainer container, Realm realm, ScriptBuilder scriptBuilder,
+			AuditLogger auditLogger) {
 		this.config = containerConfig;
 		this.container = container;
 		this.scriptBuilder = scriptBuilder;
@@ -103,8 +118,9 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		this.parser = createParser();
 		this.creator = createCreator();
 
-		this.baseUrl = config.getBaseUrl();
-		this.queryUrl = config.getQuery().getUrl();
+		this.baseUrlProvider = scriptBuilder.buildClosure(config.getBaseUrl());
+		this.queryUrlProvider = scriptBuilder.buildClosure(config.getQuery()
+				.getUrl());
 
 		if (realm != null && httpClient instanceof DefaultHttpClient) {
 			// for Testing => DefaultHttpClient cannot be fully mocked due to
@@ -139,13 +155,9 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		List<ReSTAttributeConfig> attributes = config.getQuery().getAttribute();
 		List<Column> columns = new ArrayList<Column>(attributes.size());
 		for (ReSTAttributeConfig attribute : attributes) {
-			columns.add(new Column(
-					attribute.getName(),
-					attribute.getType(),
-					attribute.isReadonly(),
-					attribute.isRequired(),
-					attribute.isPrimaryKey(),
-					null));
+			columns.add(new Column(attribute.getName(), attribute.getType(),
+					attribute.isReadonly(), attribute.isRequired(), attribute
+							.isPrimaryKey(), null));
 		}
 		boolean insertSupported = config.getInsert() != null;
 		boolean updateSupported = config.getUpdate() != null;
@@ -162,6 +174,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 	@Override
 	public List<Object[]> getRows() {
+		String queryUrl = (String) queryUrlProvider.call();
 		if (StringUtils.isBlank(queryUrl)) {
 			return EMPTY_RESULT;
 		}
@@ -188,6 +201,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 	}
 
 	private HttpGet createQueryRequest() {
+		String queryUrl = queryUrlProvider.call().toString();
 		URI uri = createURI(queryUrl);
 		HttpGet request = new HttpGet(uri);
 
@@ -201,8 +215,11 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 	private URI createURI(String postfix) {
 		String uri = postfix;
-		if (baseUrl != null) {
-			uri = baseUrl + postfix;
+		if (baseUrlProvider != null) {
+			Object baseUrl = baseUrlProvider.call();
+			if (baseUrl != null) {
+				uri = baseUrl.toString() + postfix;
+			}
 		}
 		try {
 			return URI.create(uri);
@@ -250,8 +267,8 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 	}
 
 	private ReSTChangeConfig findChangeConfig(GenericItem item) {
-		ReSTChangeConfig changeConfig = item.isNewItem() ? config
-				.getInsert() : config.getUpdate();
+		ReSTChangeConfig changeConfig = item.isNewItem() ? config.getInsert()
+				: config.getUpdate();
 		return changeConfig;
 	}
 
@@ -271,9 +288,8 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		return method;
 	}
 
-	private void sendPostRequest(GenericItem item,
-			ReSTChangeConfig changeConfig) throws IOException,
-			ClientProtocolException {
+	private void sendPostRequest(GenericItem item, ReSTChangeConfig changeConfig)
+			throws IOException, ClientProtocolException {
 
 		byte[] content = creator.create(item, changeConfig.getValue(),
 				config.getCharset());
@@ -286,8 +302,8 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 			HttpResponse response = httpClient.execute(request);
 
 			auditLogger.auditReSTRequest(request.getMethod(), uri.toString(),
-					new String(content, config.getCharset()),
-					response.getStatusLine().toString());
+					new String(content, config.getCharset()), response
+							.getStatusLine().toString());
 
 			expectAnyStatusCode(response, HttpStatus.SC_CREATED,
 					HttpStatus.SC_NO_CONTENT);
@@ -297,8 +313,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		}
 	}
 
-	private void sendPutRequest(GenericItem item,
-			ReSTChangeConfig changeConfig)
+	private void sendPutRequest(GenericItem item, ReSTChangeConfig changeConfig)
 			throws ClientProtocolException, IOException {
 
 		byte[] content = creator.create(item, changeConfig.getValue(),
@@ -312,8 +327,8 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 			HttpResponse response = httpClient.execute(request);
 
 			auditLogger.auditReSTRequest(request.getMethod(), uri.toString(),
-					new String(content, config.getCharset()),
-					response.getStatusLine().toString());
+					new String(content, config.getCharset()), response
+							.getStatusLine().toString());
 
 			expectAnyStatusCode(response, HttpStatus.SC_OK,
 					HttpStatus.SC_NO_CONTENT);
@@ -334,8 +349,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 				return;
 			}
 		}
-		throw new BusinessException(
-				"portlet.crud.error.rest.wrongStatus",
+		throw new BusinessException("portlet.crud.error.rest.wrongStatus",
 				statusCode, statusLine.getReasonPhrase());
 	}
 
@@ -344,8 +358,7 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		if (config.getMimetype() != null) {
 			mimetype = config.getMimetype();
 		}
-		return ContentType.create(
-				mimetype, config.getCharset());
+		return ContentType.create(mimetype, config.getCharset());
 	}
 
 	private void sendDeleteRequest(GenericItem item)
@@ -378,11 +391,11 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 		return createURI(postfix.toString());
 	}
 
-	public void setBaseUrl(String newBaseUrl) {
-		this.baseUrl = newBaseUrl;
+	public void setBaseUrl(final String newBaseUrl) {
+		this.baseUrlProvider = new ConstantStringProvider(null, newBaseUrl);
 	}
 
-	public void setQueryUrl(String newQueryUrl) {
-		this.queryUrl = newQueryUrl;
+	public void setQueryUrl(final String newQueryUrl) {
+		this.queryUrlProvider = new ConstantStringProvider(null, newQueryUrl);
 	}
 }

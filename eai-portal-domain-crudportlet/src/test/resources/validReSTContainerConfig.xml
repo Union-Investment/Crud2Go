@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
 	title="Beispiel - Materialsammlung">
+	<preferences>
+		<preference key="baseUrl" default="http://localhost:8080/material/rest/"/>
+	</preferences>
 	<page>
 		<table id="material">
-			<rest-container baseUrl="http://localhost:8080/material/rest/" >
+			<rest-container baseUrl="${portlet.preferences.baseUrl}" >
 				<query url="document" >
 					<attribute name="id" type="java.lang.Long" primary-key="true" />
 					<attribute name="title" />

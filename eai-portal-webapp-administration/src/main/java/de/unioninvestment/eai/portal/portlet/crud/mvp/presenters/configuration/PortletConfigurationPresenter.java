@@ -439,7 +439,7 @@ public class PortletConfigurationPresenter extends
 					.getPreferences().getPreference()) {
 
 				results.add(new PreferenceTO(cfg.getKey(), generateTitle(cfg),
-						false, null));
+						cfg.getDefault(), false, null));
 			}
 		}
 		return results;
@@ -464,14 +464,14 @@ public class PortletConfigurationPresenter extends
 					if (username != null && username.getPreferenceKey() != null) {
 						results.add(new PreferenceTO(username
 								.getPreferenceKey(), realm.getName()
-								+ " Username", false, null));
+								+ " Username", null, false, null));
 					}
 					CredentialsPasswordConfig password = realm.getCredentials()
 							.getPassword();
 					if (password != null && password.getPreferenceKey() != null) {
 						results.add(new PreferenceTO(password
 								.getPreferenceKey(), realm.getName()
-								+ " Passwort", true, password
+								+ " Passwort", null, true, password
 								.getEncryptionAlgorithm()));
 					}
 				}

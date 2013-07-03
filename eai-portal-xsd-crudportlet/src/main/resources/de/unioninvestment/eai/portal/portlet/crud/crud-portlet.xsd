@@ -1914,7 +1914,7 @@
 					<element name="delete" type="tns:ReSTDeleteConfig"
 						minOccurs="0" maxOccurs="1" />
 				</sequence>
-				<attribute name="baseUrl" type="string" use="optional">
+				<attribute name="baseUrl" type="tns:groovy" use="optional">
 					<annotation>
 						<documentation>Basis-URL des ReST-Services. Falls angegeben, wird
 							diese den 'url'-Angaben vorangestellt
@@ -1957,7 +1957,7 @@
 			<element name="attribute" type="tns:ReSTAttributeConfig"
 				minOccurs="1" maxOccurs="unbounded" />
 		</sequence>
-		<attribute name="url" type="string">
+		<attribute name="url" type="tns:groovy">
 			<annotation>
 				<documentation>Relativer Pfad oder absolute URL zur Query. Wenn
 					nicht gegeben, werden keine Ergebnisse zurückgeliefert.

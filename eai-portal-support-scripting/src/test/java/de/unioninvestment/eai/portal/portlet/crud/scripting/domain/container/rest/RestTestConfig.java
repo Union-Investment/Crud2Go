@@ -21,7 +21,8 @@ public class RestTestConfig {
 		ReSTQueryConfig queryConfig = new ReSTQueryConfig();
 		queryConfig.getAttribute().add(idAttribute);
 		queryConfig.getAttribute().add(anAttribute);
-		queryConfig.setUrl("http://test.de/path");
+		queryConfig.setUrl(createGroovyScript("http://test.de/path",
+				"{-> \"http://test.de/path\"}"));
 
 		ReSTContainerConfig containerConfig = new ReSTContainerConfig();
 		containerConfig.setQuery(queryConfig);
@@ -57,6 +58,14 @@ public class RestTestConfig {
 			String scriptSource) {
 		GroovyScript script = new GroovyScript(source);
 		script.setClazz(new GroovyShell().parse(scriptSource).getClass());
+		return script;
+	}
+
+	public static GroovyScript createGStringScript(String source,
+			String... argNames) {
+		GroovyScript script = new GroovyScript(source);
+		script.setClazz(new GroovyShell().parse(
+				"{ -> \"\"\"" + source + "\"\"\"}").getClass());
 		return script;
 	}
 

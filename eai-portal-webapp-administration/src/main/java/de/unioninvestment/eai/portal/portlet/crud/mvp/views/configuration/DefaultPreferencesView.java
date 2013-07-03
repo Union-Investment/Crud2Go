@@ -125,6 +125,8 @@ public class DefaultPreferencesView extends CustomComponent implements
 			}
 			field.addStyleName(createValidClassName(key));
 			field.setNullRepresentation("");
+			field.setInputPrompt(preference.getDefaultValue());
+			field.setWidth("100%");
 			form.addField(key, field);
 		}
 	}

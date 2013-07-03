@@ -78,6 +78,24 @@ public class PreferencePropertyTest {
 	}
 
 	@Test
+	public void shouldResetPreferenceOnNullValue() throws ReadOnlyException {
+		PreferenceProperty property = new PreferenceProperty("prefKey");
+
+		property.setValue(null);
+
+		verify(preferencesMock).reset("prefKey");
+	}
+
+	@Test
+	public void shouldResetPreferenceOnEmptyValue() throws ReadOnlyException {
+		PreferenceProperty property = new PreferenceProperty("prefKey");
+
+		property.setValue("");
+
+		verify(preferencesMock).reset("prefKey");
+	}
+
+	@Test
 	public void shouldReturnTypeString() {
 		assertThat((Class<String>) new PreferenceProperty("bla").getType(),
 				sameInstance(String.class));

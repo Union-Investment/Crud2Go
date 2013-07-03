@@ -30,11 +30,13 @@ public class PreferenceTO {
 	private String title;
 	private boolean password;
 	private String encryptionAlgorithm;
+	private String defaultValue;
 
-	public PreferenceTO(String preferenceKey, String title, boolean password,
-			String encryptionAlgorithm) {
+	public PreferenceTO(String preferenceKey, String title,
+			String defaultValue, boolean password, String encryptionAlgorithm) {
 		this.preferenceKey = preferenceKey;
 		this.title = title;
+		this.defaultValue = defaultValue;
 		this.password = password;
 		this.encryptionAlgorithm = encryptionAlgorithm;
 	}
@@ -53,6 +55,10 @@ public class PreferenceTO {
 
 	public String getEncryptionAlgorithm() {
 		return encryptionAlgorithm;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
 	}
 
 }

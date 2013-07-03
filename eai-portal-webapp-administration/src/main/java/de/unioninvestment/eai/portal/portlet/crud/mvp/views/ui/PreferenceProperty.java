@@ -20,6 +20,8 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 
 import javax.portlet.PortletPreferences;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.vaadin.data.util.AbstractProperty;
 
 import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
@@ -42,7 +44,11 @@ public class PreferenceProperty extends AbstractProperty {
 	public void setValue(Object newValue) throws ReadOnlyException,
 			ConversionException {
 		try {
-			preferences().setValue(preferenceKey, (String) newValue);
+			if (StringUtils.isEmpty((String) newValue)) {
+				preferences().reset(preferenceKey);
+			} else {
+				preferences().setValue(preferenceKey, (String) newValue);
+			}
 
 		} catch (javax.portlet.ReadOnlyException e) {
 			throw new InvalidConfigurationException("The preference '"

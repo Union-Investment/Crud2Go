@@ -306,6 +306,8 @@ public class ConfigurationScriptsCompiler {
 				+ "/query/collection");
 		compileReSTAttributeScripts(config.getQuery().getAttribute(), location
 				+ "/query/attributes");
+		compileGString(config.getBaseUrl(), "", location + "/baseUrl");
+		compileGString(config.getQuery().getUrl(), "", location + "/query/url");
 		if (config.getInsert() != null) {
 			compileGString(config.getInsert().getUrl(), "row", location
 					+ "/insert/url");
