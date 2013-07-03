@@ -8,6 +8,7 @@ Documentation   Story: Als Benutzer möchte ich die Daten einer beliebigen bekan
 	
 	Es existiert eine Portalseite mit CRUD-Portlet
 	und weiterhin ein Benutzer
+	und außerdem keine Testdaten in TEST_USER
 	
 	wenn er die Portalseite öffnet 
 	und dann die XML Konfiguration: 'INSERT.xml' hochlädt
@@ -21,6 +22,7 @@ Documentation   Story: Als Benutzer möchte ich die Daten einer beliebigen bekan
 	
 	Es existiert eine Portalseite mit CRUD-Portlet
 	und weiterhin ein Benutzer
+	und außerdem keine Testdaten in TEST_USER
 
 	wenn er die Portalseite öffnet 
 	und dann die XML Konfiguration: 'INSERT_FREEFORM.xml' hochlädt
@@ -34,6 +36,7 @@ Documentation   Story: Als Benutzer möchte ich die Daten einer beliebigen bekan
 	
 	Es existiert eine Portalseite mit CRUD-Portlet
 	und weiterhin ein Benutzer
+	und außerdem keine Testdaten in TEST_USER
 	
 	wenn er die Portalseite öffnet 
 	und dann die XML Konfiguration: 'NOT_INSERT_FREEFORM.xml' hochlädt

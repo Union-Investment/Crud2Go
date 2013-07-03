@@ -16,11 +16,15 @@ Resource        ${RESOURCES}/objects/common-keywords.txt
 
 
 2 Zeilen Testdaten
+	Execute SQL  truncate table TEST_USER
   	Execute SQL  insert into TEST_USER(NAME) values ('arnie')
 	Execute SQL  insert into TEST_USER(NAME) values ('ein wert')
 
 keine Testdaten in TEST_CLOB
 	Execute SQL  DELETE FROM TEST_CLOB
+
+keine Testdaten in TEST_USER
+	Execute SQL  TRUNCATE TABLE TEST_USER
 
 Testdaten in TEST_CLOB
 	Execute SQL  DELETE FROM TEST_CLOB

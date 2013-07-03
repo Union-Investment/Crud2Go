@@ -20,6 +20,8 @@ Authentifizierungseinstellungen für admin:admin
 	Enter Authentication User  test_username  admin
 	Enter Authentication Password  test_password  admin
 	Click Vaadin Button  Einstellungen speichern
+	Wait Until Page Contains  Die Einstellungen wurden gespeichert
+	Click Link  Zurück zur Seite
 
 ############################
 ###  Wenn / Und dann ... ###
@@ -31,6 +33,8 @@ falsche ReST-Authentifizierungseinstellungen eingegeben werden
 	Enter Authentication User  test_username  admin
 	Enter Authentication Password  test_password  wrongPassword
 	Click Vaadin Button  Einstellungen speichern
+	Wait Until Page Contains  Die Einstellungen wurden gespeichert
+	Click Link  Zurück zur Seite
 
 ##########################
 ###  Dann / Und es ... ###

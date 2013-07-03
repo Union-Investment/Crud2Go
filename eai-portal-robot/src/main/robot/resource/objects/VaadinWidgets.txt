@@ -18,4 +18,4 @@ Select Vaadin Tab
 
 Click Vaadin Button
 	[Arguments]  ${buttonText}
-	Click Button  css=span.v-button-caption:contains("${buttonText}")
+	Click Button  css=span.v-button-caption:contains("${buttonText}")  dont_wait
