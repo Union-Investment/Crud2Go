@@ -1,24 +1,23 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 
-import java.text.MessageFormat;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -26,8 +25,9 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-import com.vaadin.ui.UriFragmentUtility;
-import com.vaadin.ui.Window;
+import com.vaadin.server.Page;
+import com.vaadin.server.Page.UriFragmentChangedEvent;
+import com.vaadin.server.Page.UriFragmentChangedListener;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TabChangeEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TabChangeEventHandler;
@@ -44,8 +44,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
  * @author siva.selvarajah
  */
 @Configurable(preConstruction = true)
-public class PortletUriFragmentUtility extends UriFragmentUtility implements
-		UriFragmentUtility.FragmentChangedListener {
+public class PortletUriFragmentUtility implements UriFragmentChangedListener {
 
 	private static final long serialVersionUID = 42L;
 
@@ -100,11 +99,11 @@ public class PortletUriFragmentUtility extends UriFragmentUtility implements
 			@Override
 			public void onTabChange(TabChangeEvent event) {
 				String fragmentID = buildTabStatus();
-				setFragment(fragmentID, false);
+				Page.getCurrent().setUriFragment(fragmentID, false);
 			}
 		});
 
-		addListener(this);
+		Page.getCurrent().addUriFragmentChangedListener(this);
 	}
 
 	/**
@@ -166,13 +165,9 @@ public class PortletUriFragmentUtility extends UriFragmentUtility implements
 		}
 	}
 
-	/**
-	 * Setzt nach einer Aktivierung eines Tabs das Fragment mit den aktuell
-	 * aktiven Tabs. {@inheritDoc}
-	 */
 	@Override
-	public void fragmentChanged(FragmentChangedEvent source) {
-		String fragment = source.getUriFragmentUtility().getFragment();
+	public void uriFragmentChanged(UriFragmentChangedEvent event) {
+		String fragment = event.getUriFragment();
 		if (StringUtils.isNotEmpty(fragment)) {
 			activateTabs(fragment);
 		}
@@ -180,13 +175,8 @@ public class PortletUriFragmentUtility extends UriFragmentUtility implements
 
 	/**
 	 * Setzt initial per Javascript das Fragment mit den aktuell aktiven Tabs.
-	 * 
-	 * @param mainWindow
-	 *            Window
 	 */
-	public void setInitialFragment(Window mainWindow) {
-		mainWindow.executeJavaScript(MessageFormat.format(
-				"window.location.hash = ''{0}'';", buildTabStatus()));
+	public void setInitialFragment() {
+		Page.getCurrent().setUriFragment(buildTabStatus());
 	}
-
 }

@@ -18,7 +18,7 @@
 */
 package de.unioninvestment.eai.portal.portlet.crud.export;
 
-import com.vaadin.terminal.StreamResource;
+import com.vaadin.server.StreamResource;
 
 /**
  * Schnittstelle, über die ein Frontend Updates von im separaten Thread

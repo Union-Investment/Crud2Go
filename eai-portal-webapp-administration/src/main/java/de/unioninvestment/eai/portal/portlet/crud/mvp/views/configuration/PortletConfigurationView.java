@@ -21,7 +21,6 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
-import com.vaadin.ui.Window.Notification;
 
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
@@ -38,16 +37,6 @@ public interface PortletConfigurationView extends View {
 	 * @return Upload Vaadin Komponente.
 	 */
 	Upload getUpload();
-
-	/**
-	 * Erstellt auf der Anzeige einen entsprechenden Hinweis.
-	 * 
-	 * @param msgKey
-	 *            Message Key für die Anzeige.
-	 * @param type
-	 *            Notification Type {@link Notification}
-	 */
-	void showNotification(String msgKey, int type);
 
 	/**
 	 * Dient der Anzeige von Statusinformationen.
@@ -80,4 +69,6 @@ public interface PortletConfigurationView extends View {
 	void removeTab(View view);
 
 	void switchTo(View view);
+
+	void showError(String message);
 }

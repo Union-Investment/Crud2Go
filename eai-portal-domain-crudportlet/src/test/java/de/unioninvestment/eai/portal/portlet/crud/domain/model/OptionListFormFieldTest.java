@@ -25,8 +25,6 @@ import static org.mockito.Mockito.mock;
 import org.junit.Test;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.QueryOptionList;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
 
 public class OptionListFormFieldTest {
 

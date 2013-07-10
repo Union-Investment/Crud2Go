@@ -24,7 +24,8 @@ import java.util.Set;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.server.Sizeable;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
@@ -36,8 +37,8 @@ import com.vaadin.ui.Select;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
 
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
 import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.CheckBoxSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.DatePickerSupport;
@@ -210,8 +211,7 @@ public class CrudFieldFactory implements TableFieldFactory, FormFieldFactory {
 					.getColumns().get(propertyId.toString()).getDisplayFormat();
 			PopupDateField datePicker = ((DatePickerSupport) displayer)
 					.createDatePicker(type, propertyId, null, format);
-			datePicker.setLocale(CrudPortletApplication.getCurrentApplication()
-					.getLocale());
+			datePicker.setLocale(UI.getCurrent().getLocale());
 			return datePicker;
 
 		} else {
@@ -277,7 +277,7 @@ public class CrudFieldFactory implements TableFieldFactory, FormFieldFactory {
 			Target target) {
 		setCaptionAndTooltipIfGiven(field, propertyId, target);
 		field.setWidth(HUNDRED, Sizeable.UNITS_PERCENTAGE);
-		field.setWriteThrough(false);
+		field.setBuffered(true);
 		if (field instanceof TextArea) {
 			TextArea area = (TextArea) field;
 			if (isEditForm()) {
@@ -296,7 +296,9 @@ public class CrudFieldFactory implements TableFieldFactory, FormFieldFactory {
 					propertyId.toString());
 			String longTitle = column.getLongTitle();
 			if (longTitle != null) {
-				field.setDescription(longTitle);
+				if (field instanceof AbstractComponent) {
+					((AbstractComponent) field).setDescription(longTitle);
+				}
 			}
 			String title = column.getTitle();
 			if (title != null && !leaveCaptionEmpty) {

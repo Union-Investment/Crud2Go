@@ -18,13 +18,9 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
-import com.vaadin.ui.AbstractOrderedLayout;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.ComponentContainer;
-import com.vaadin.ui.Panel;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PanelContentView;
@@ -62,9 +58,8 @@ public class DialogPresenter extends PanelContentPresenter {
 		addBackButton(model.getBackButtonCaption());
 	}
 
-	private void addBackButton(String caption) {
-		backButton = new Button(caption);
-		backButton.addListener(new ClickListener() {
+	protected Button addBackButton(String caption) {
+		return getView().addBackButton(caption, new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -72,26 +67,6 @@ public class DialogPresenter extends PanelContentPresenter {
 				DialogPresenter.this.detach();
 			}
 		});
-
-		getView().addComponent(backButton);
-
-		// FIXME There is no guarantee that the PanelContentView-implementation
-		// given will provide any of those.
-		// In consequence, the alignment of the component can currently not
-		// really be configured by the presenter. Perhaps some kind of
-		// "alignable"-interface needs to be provided.
-		AbstractOrderedLayout layout = null;
-		if (getView() instanceof AbstractOrderedLayout) {
-			layout = (AbstractOrderedLayout) getView();
-		} else if (getView() instanceof Panel) {
-			ComponentContainer content = ((Panel) getView()).getContent();
-			if (content instanceof AbstractOrderedLayout) {
-				layout = (AbstractOrderedLayout) content;
-			}
-		}
-		if (layout != null) {
-			layout.setComponentAlignment(backButton, Alignment.MIDDLE_RIGHT);
-		}
 
 	}
 

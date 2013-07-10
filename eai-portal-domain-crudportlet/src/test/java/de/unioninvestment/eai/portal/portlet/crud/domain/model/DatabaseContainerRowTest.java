@@ -39,11 +39,11 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.vaadin.addon.sqlcontainer.ColumnProperty;
-import com.vaadin.addon.sqlcontainer.RowId;
-import com.vaadin.addon.sqlcontainer.RowItem;
-import com.vaadin.addon.sqlcontainer.SQLContainer;
-import com.vaadin.addon.sqlcontainer.TemporaryRowId;
+import com.vaadin.data.util.sqlcontainer.ColumnProperty;
+import com.vaadin.data.util.sqlcontainer.RowId;
+import com.vaadin.data.util.sqlcontainer.RowItem;
+import com.vaadin.data.util.sqlcontainer.SQLContainer;
+import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;

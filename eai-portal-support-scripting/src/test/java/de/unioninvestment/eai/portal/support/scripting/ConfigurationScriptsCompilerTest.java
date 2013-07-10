@@ -289,7 +289,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 				.newInstance();
 		generatorClosure.setDelegate(mainScript);
 
-		Object result = generatorClosure.call(new VaadinBuilder(null));
+		Object result = generatorClosure.call(new VaadinBuilder());
 
 		assertThat(result, new InstanceOf(Button.class));
 	}

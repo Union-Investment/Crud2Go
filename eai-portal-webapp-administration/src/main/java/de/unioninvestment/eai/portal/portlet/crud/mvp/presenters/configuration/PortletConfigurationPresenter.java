@@ -28,8 +28,6 @@ import java.net.PasswordAuthentication;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.portlet.PortletRequest;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -42,12 +40,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.util.StringUtils;
 
+import com.vaadin.server.VaadinPortletService;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.Receiver;
-import com.vaadin.ui.Window.Notification;
 
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
@@ -69,8 +68,7 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.Prefer
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.crud.validation.ConfigurationUploadValidator;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.AbstractPresenter;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
@@ -136,12 +134,13 @@ public class PortletConfigurationPresenter extends
 		this.receiver = new ConfigurationReceiver();
 		getView().setPresenter(this);
 		getView().getUpload().setReceiver(receiver);
-		getView().getUpload().addListener(new ConfigUploadFinishedListener());
-		getView().getUploadVcsButton().addListener(
+		getView().getUpload().addFinishedListener(
+				new ConfigUploadFinishedListener());
+		getView().getUploadVcsButton().addClickListener(
 				new ConfigUploadVcsFinishedListener());
 
-		LiferayApplication app = LiferayApplication.getCurrentApplication();
-		PortletRequest request = PortletApplication.getCurrentRequest();
+		LiferayUI app = LiferayUI.getCurrent();
+		VaadinRequest request = VaadinPortletService.getCurrentRequest();
 
 		portletId = app.getPortletId();
 		communityId = app.getCommunityId();
@@ -206,9 +205,8 @@ public class PortletConfigurationPresenter extends
 				eventBus.fireEvent(new ConfigurationUpdatedEvent(configurable));
 
 			} else {
-				getView().showNotification(
-						getMessage("portlet.crud.page.upload.invalid"),
-						Notification.TYPE_ERROR_MESSAGE);
+				getView().showError(
+						getMessage("portlet.crud.page.upload.invalid"));
 			}
 			getView().getUpload().setVisible(true);
 		}
@@ -260,14 +258,12 @@ public class PortletConfigurationPresenter extends
 							configurable));
 
 				} else {
-					getView().showNotification(
-							getMessage("portlet.crud.page.upload.invalid"),
-							Notification.TYPE_ERROR_MESSAGE);
+					getView().showError(
+							getMessage("portlet.crud.page.upload.invalid"));
 				}
 			} catch (Exception e) {
-				getView().showNotification(
-						getMessage("portlet.crud.page.upload.vcs.error", e),
-						Notification.TYPE_ERROR_MESSAGE);
+				getView().showError(
+						getMessage("portlet.crud.page.upload.vcs.error", e));
 			}
 		}
 	}

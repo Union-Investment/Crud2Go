@@ -6,11 +6,12 @@ package de.unioninvestment.eai.portal.portlet.crud.export;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import com.vaadin.Application;
 import com.vaadin.addon.tableexport.TableExport;
-import com.vaadin.terminal.StreamResource;
-import com.vaadin.terminal.StreamResource.StreamSource;
+import com.vaadin.server.Page;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 
 /**
  * Export-Task that is intended to be given its download-content asynchronously
@@ -42,8 +43,8 @@ public class DownloadExportTask extends AbstractTableExportTask implements
 	private InputStream content;
 
 	/**
-	 * @param application
-	 *            the application the corresponding table belongs to.
+	 * @param ui
+	 *            the ui the corresponding table belongs to.
 	 * @param vaadinTable
 	 *            the table the corresponding download-action belongs to.
 	 * @param tableModel
@@ -56,11 +57,11 @@ public class DownloadExportTask extends AbstractTableExportTask implements
 	 *            The downloaded file's MIME-Type.
 	 */
 	public DownloadExportTask(
-			Application application,
+			UI ui,
 			Table vaadinTable,
 			de.unioninvestment.eai.portal.portlet.crud.domain.model.Table tableModel,
 			boolean automaticDownload, String filename, String mimeType) {
-		super(application, vaadinTable, tableModel, automaticDownload);
+		super(ui, vaadinTable, tableModel, automaticDownload);
 		this.filename = filename;
 		this.mimeType = mimeType;
 	}
@@ -98,7 +99,6 @@ public class DownloadExportTask extends AbstractTableExportTask implements
 			 */
 			@Override
 			public boolean sendConverted() {
-				Application app = getTable().getApplication();
 				StreamResource resource = new StreamResource(
 						new StreamSource() {
 							/**
@@ -110,10 +110,11 @@ public class DownloadExportTask extends AbstractTableExportTask implements
 							public InputStream getStream() {
 								return DownloadExportTask.this.content;
 							}
-						}, DownloadExportTask.this.filename, app);
+						}, DownloadExportTask.this.filename);
 				resource.setMIMEType(getMimeType());
 				if (isAutomaticDownload()) {
-					app.getMainWindow().open(resource, exportWindow);
+					Page.getCurrent().open(resource, exportWindow,
+							!"_self".equals(exportWindow));
 					return true;
 				} else {
 					DownloadExportTask.this.frontend.finished(resource);

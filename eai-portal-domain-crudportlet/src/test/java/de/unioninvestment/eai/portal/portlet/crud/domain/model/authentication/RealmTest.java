@@ -35,17 +35,19 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.vaadin.server.VaadinPortletRequest;
+import com.vaadin.server.VaadinPortletService;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.util.CurrentInstance;
+
 import de.unioninvestment.crud2go.spi.security.Cryptor;
 import de.unioninvestment.crud2go.spi.security.CryptorFactory;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsPasswordConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsUsernameConfig;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplicationMock;
 
 public class RealmTest {
-
-	private LiferayApplicationMock app;
 
 	@Mock
 	private PortletRequest requestMock;
@@ -58,16 +60,24 @@ public class RealmTest {
 	@Mock
 	private Cryptor cryptorMock;
 
+	@Mock
+	private VaadinPortletService vaadinServiceMock;
+	@Mock
+	private VaadinPortletRequest portletRequestMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		app = new LiferayApplicationMock(requestMock, responseMock);
+
+		VaadinPortletService.setCurrent(vaadinServiceMock);
+		CurrentInstance.set(VaadinRequest.class, portletRequestMock);
+		when(portletRequestMock.getPortletRequest()).thenReturn(requestMock);
 		when(requestMock.getPreferences()).thenReturn(preferencesMock);
 	}
 
 	@After
 	public void tearDown() {
-		app.onRequestEnd(requestMock, responseMock);
+		CurrentInstance.clearAll();
 	}
 
 	@Test

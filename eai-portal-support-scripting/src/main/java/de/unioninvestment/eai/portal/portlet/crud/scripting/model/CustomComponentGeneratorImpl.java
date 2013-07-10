@@ -23,7 +23,6 @@ import groovy.lang.Closure;
 import com.vaadin.ui.Component;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponentGenerator;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
 
 /**
@@ -35,7 +34,6 @@ import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
 public class CustomComponentGeneratorImpl implements CustomComponentGenerator {
 
 	private final Closure<Object> closure;
-	private final PortletApplication application;
 
 	/**
 	 * Konstruktor.
@@ -44,14 +42,12 @@ public class CustomComponentGeneratorImpl implements CustomComponentGenerator {
 	 *            die {@link Closure} zur Erzeugung der Komponente
 	 * @param application
 	 */
-	public CustomComponentGeneratorImpl(Closure<Object> closure,
-			PortletApplication application) {
+	public CustomComponentGeneratorImpl(Closure<Object> closure) {
 		this.closure = closure;
-		this.application = application;
 	}
 
 	@Override
 	public Component generate() {
-		return (Component) closure.call(new VaadinBuilder(application));
+		return (Component) closure.call(new VaadinBuilder());
 	}
 }

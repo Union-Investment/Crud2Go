@@ -30,14 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.MessageSource;
 
-import com.vaadin.Application;
 import com.vaadin.addon.tableexport.TableExport;
+import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 
 /**
  * Abstrakte Oberklasse für Exports, die auf dem TableExport Addon basieren.
@@ -55,7 +54,7 @@ public abstract class AbstractTableExportTask implements ExportTask {
 	private volatile boolean cancelled = false;
 	private volatile boolean finished = false;
 
-	private final Application application;
+	private final UI ui;
 	protected final com.vaadin.ui.Table vaadinTable;
 	protected final Table tableModel;
 	protected volatile ExportFrontend frontend;
@@ -74,10 +73,9 @@ public abstract class AbstractTableExportTask implements ExportTask {
 	 *            das Tabellen-Modell
 	 * @param automaticDownload
 	 */
-	public AbstractTableExportTask(Application application,
-			com.vaadin.ui.Table vaadinTable, Table tableModel,
-			boolean automaticDownload) {
-		this.application = application;
+	public AbstractTableExportTask(UI ui, com.vaadin.ui.Table vaadinTable,
+			Table tableModel, boolean automaticDownload) {
+		this.ui = ui;
 		this.vaadinTable = vaadinTable;
 		this.tableModel = tableModel;
 		this.automaticDownload = automaticDownload;
@@ -85,10 +83,9 @@ public abstract class AbstractTableExportTask implements ExportTask {
 
 	@Override
 	public void run() {
-		Application previousApplication = PortletApplication
-				.getCurrentApplication();
+		UI previousUI = UI.getCurrent();
 		try {
-			PortletApplication.setCurrentApplication(application);
+			UI.setCurrent(ui);
 
 			filename = createFilename();
 			LOGGER.info("Started export thread for report '{}'", filename);
@@ -117,7 +114,7 @@ public abstract class AbstractTableExportTask implements ExportTask {
 
 		} finally {
 			finished = true;
-			PortletApplication.setCurrentApplication(previousApplication);
+			UI.setCurrent(previousUI);
 		}
 	}
 

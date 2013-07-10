@@ -24,7 +24,8 @@ import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.vaadin.data.util.PropertyFormatter;
+import com.vaadin.data.util.converter.Converter;
+import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEvent;
@@ -80,8 +81,11 @@ public class NewRowDefaultsSetterHandler implements CreateEventHandler {
 	private String calculateNow(DataContainer databaseContainer,
 			String columnName) {
 		EditorSupport editor = databaseContainer.findEditor(columnName);
-		PropertyFormatter formatter = editor.createFormatter(Timestamp.class,
-				databaseContainer.getFormat(columnName));
-		return formatter.format(new Timestamp(System.currentTimeMillis()));
+		Converter<String, Object> formatter = (Converter<String, Object>) editor
+				.createFormatter(Timestamp.class,
+						databaseContainer.getFormat(columnName));
+		return formatter.convertToPresentation(
+				new Timestamp(System.currentTimeMillis()), String.class, UI
+						.getCurrent().getLocale());
 	}
 }

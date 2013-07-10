@@ -23,24 +23,39 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import javax.portlet.PortletURL;
+import javax.portlet.ResourceResponse;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.MockitoAnnotations;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.DefaultPortletConfigurationView;
-import de.unioninvestment.eai.portal.portlet.test.commons.VaadinViewTest;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
+import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
-public class BusinessExceptionMessageTest extends VaadinViewTest {
+public class BusinessExceptionMessageTest extends SpringPortletContextTest {
 
 	private DefaultPortletConfigurationView view;
+
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext();
+
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		view = new DefaultPortletConfigurationView();
+	}
 
 	@Test
 	public void shouldPlaceMessagePropertie() {
 
 		PortletURL portletUrl = mock(PortletURL.class);
 
-		when(responseMock.createRenderURL()).thenReturn(portletUrl);
+		when(
+				((ResourceResponse) liferayContext.getPortletResponseMock())
+						.createRenderURL()).thenReturn(portletUrl);
 
 		BusinessExceptionMessage exception = new BusinessExceptionMessage(
 				new BusinessException("error.without.args"));
@@ -52,19 +67,14 @@ public class BusinessExceptionMessageTest extends VaadinViewTest {
 
 		PortletURL portletUrl = mock(PortletURL.class);
 
-		when(responseMock.createRenderURL()).thenReturn(portletUrl);
+		when(
+				((ResourceResponse) liferayContext.getPortletResponseMock())
+						.createRenderURL()).thenReturn(portletUrl);
 
 		BusinessExceptionMessage exception = new BusinessExceptionMessage(
 				new BusinessException("error.with.args", new Object[] {
 						"param1", new Integer(123) }));
 		assertEquals("arg1: param1, arg2: 123", exception.toString());
-	}
-
-	@Override
-	protected View getView() {
-		if (view == null)
-			view = new DefaultPortletConfigurationView();
-		return view;
 	}
 
 }

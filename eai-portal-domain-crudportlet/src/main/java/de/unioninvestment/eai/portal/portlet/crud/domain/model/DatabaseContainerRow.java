@@ -21,9 +21,9 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 import java.util.Collection;
 import java.util.Map;
 
-import com.vaadin.addon.sqlcontainer.ColumnProperty;
-import com.vaadin.addon.sqlcontainer.RowItem;
-import com.vaadin.addon.sqlcontainer.TemporaryRowId;
+import com.vaadin.data.util.sqlcontainer.ColumnProperty;
+import com.vaadin.data.util.sqlcontainer.RowItem;
+import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.map.TransformedKeyMap;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.map.ValueTransformer;

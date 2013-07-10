@@ -19,27 +19,29 @@
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
 import java.util.Iterator;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Window.Notification;
+import com.vaadin.ui.Notification.Type;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
-import de.unioninvestment.eai.portal.portlet.test.commons.VaadinViewTest;
+import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
-public class DefaultPortletConfigurationViewTest extends VaadinViewTest {
+public class DefaultPortletConfigurationViewTest extends
+		SpringPortletContextTest {
 
-	DefaultPortletConfigurationView view;
+	private DefaultPortletConfigurationView view;
 
 	@Mock
 	private PortletRole roleMock1;
@@ -47,20 +49,22 @@ public class DefaultPortletConfigurationViewTest extends VaadinViewTest {
 	@Mock
 	private PortletRole roleMock2;
 
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext("portletId",
+			18004L);
+
 	@Before
 	public void prepareMocks() {
+		MockitoAnnotations.initMocks(this);
+
+		liferayContext.initialize();
+		view = new DefaultPortletConfigurationView();
+
 		when(roleMock1.getName()).thenReturn("role1");
 		when(roleMock1.getPermissionsURL()).thenReturn("http://test.de/role1");
 
 		when(roleMock2.getName()).thenReturn("role2");
 		when(roleMock2.getPermissionsURL()).thenReturn("http://test.de/role2");
-	}
-
-	@Override
-	protected View getView() {
-		if (view == null)
-			view = new DefaultPortletConfigurationView();
-		return view;
 	}
 
 	@Test
@@ -84,9 +88,9 @@ public class DefaultPortletConfigurationViewTest extends VaadinViewTest {
 
 	@Test
 	public void shouldShowWindowNotification() {
-		view.showNotification("test.alert", Notification.TYPE_ERROR_MESSAGE);
-		verify(windowSpy).showNotification("test.alert",
-				Notification.TYPE_ERROR_MESSAGE);
+		view.showError("test.alert");
+		liferayContext.shouldShowNotification("test.alert", null,
+				Type.ERROR_MESSAGE);
 	}
 
 	private boolean tabsheetContains(String caption) {

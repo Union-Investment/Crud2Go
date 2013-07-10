@@ -1,0 +1,226 @@
+/* Import the reindeer theme.*/
+/* This only allows us to use the mixins defined in it and does not add any styles by itself. */
+@import "../liferay/liferay.scss";
+
+
+@mixin tablebackground($style, $light, $dark) {
+	
+	/* View/EditMode auf Spalte alternierend */	
+	
+	td.v-table-cell-content-#{$style} {
+		background: $light;
+	}
+	
+	tr.v-table-row-odd td.v-table-cell-content-#{$style} {
+		background: $dark;
+	}
+	
+	div.crudEditMode td.v-table-cell-content-#{$style} {
+		background: $light;
+	}
+	
+	div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-#{$style} {
+		background: $dark;
+	}
+
+	/* View/Edit Mode auf Zeile alternierend */
+	
+	tr.v-table-row-#{$style} {
+		background: $light;
+	}
+	
+	tr.v-table-row-odd.v-table-row-#{$style} {
+		background: $dark;
+	}
+	
+	div.crudEditMode tr.v-table-row-#{$style} {
+		background: $light;
+	}
+	
+	div.crudEditMode tr.v-table-row-odd.v-table-row-#{$style} {
+		background: $dark;
+	}
+}
+
+
+/* This contains all of your theme.*/
+/* If somebody wants to extend the theme she will include this mixin. */
+@mixin crud2go {
+  /* Include all the styles from the liferay theme */
+  @include liferay;
+
+  /* Insert your theme rules here */
+
+	/* Button bar spacing in Table and RowEditingForm */
+	.v-csslayout-actions .v-button + .v-button {
+	     margin-left: 5px;
+	}
+	
+	.v-label-crudPortletId, .v-label-crudPortletCommunityId {
+		display: none;
+	}
+	
+	div.crudTable .v-checkbox {
+		display: inline;
+	}
+	
+	div.crudTable .v-csslayout .v-caption {
+		display: none;
+	}
+	
+	/* Fixed height table cells */
+	
+	div.crudTable td div.v-table-cell-wrapper {
+	    -webkit-box-sizing: border-box;
+	    -moz-box-sizing: border-box;
+	    -ms-box-sizing: border-box;
+	    -o-box-sizing: border-box;
+	    box-sizing: border-box;
+	    display: block;
+	}
+	
+	/* Gefärbter Hintergrund EDIT-Mode */
+	
+	div.crudEditMode tr.v-table-row {
+		background: #ffdddd;
+	}
+	
+	div.crudEditMode tr.v-table-row-odd {
+		background: #ffbbbb;
+	}
+	
+	/* Markierte Zeile */
+	
+	tbody tr.v-table-row.v-selected td {
+		background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
+	}
+	
+	tbody tr.v-table-row-odd.v-selected td {
+		background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
+	}
+	
+	div.crudEditMode tbody tr.v-table-row.v-selected td {
+		background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
+	}
+	
+	div.crudEditMode tbody tr.v-table-row-odd.v-selected td {
+		background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
+	}
+	
+	/*deaktiviert den uppercase column header*/
+	.v-table-header { 
+		text-transform: none; 
+	}
+	
+	.wordwrap {
+		white-space: normal;
+	}
+	
+	.v-textfield-prompt {
+		color: #999999;
+	}
+	
+	.crudEditMode div.v-label {
+		color: #000000;
+		text-shadow: 0 0px 0;
+	}
+	
+	
+	/* Tabellenhintergruende */
+	@include tablebackground(warn, #F3F781, #E3E771);
+	@include tablebackground(ok, #00A57D, #00956D);
+	@include tablebackground(error, #DF013A, #CF012A);
+	
+	/* CSS-Klassen für Freigabe (EAI-457) */
+	@include tablebackground(freigabe-ok, #00A57D, #00956D);
+	@include tablebackground(freigabe-none, #FFF000, #EFE000);
+	@include tablebackground(freigabe-discarded, #FF0000, #EF0000);
+	
+	/* CSS-Klassen leere Zellen (EAI-462) */
+	@include tablebackground(empty-cell, #FF0000, #EF0000);
+	
+	/* CSS-Klassen geaenderte Zellen NOTE: Style funktioniert nur für Table cells! */
+	@include tablebackground(changed-cell, #FF0000, #EF0000);
+	
+	
+	/* CSS-Klassen für die Union CI */
+	
+	
+	/*Primäres Farbklima */
+	
+	/* 5X% UI-Blau*/
+	@include tablebackground(primaer_05, #E6EBF1, #DDE5ED);
+	@include tablebackground(primaer_10, #DDE5ED, #C5D2E2);
+	@include tablebackground(primaer_20, #C5D2E2, #A7BCD5);
+	@include tablebackground(primaer_35, #A7BCD5, #8DA8C5);
+	@include tablebackground(primaer_40, #8DA8C5, #5884AE);
+	@include tablebackground(primaer_55, #5884AE, #226796);
+	@include tablebackground(primaer_75, #226796, #003F74);
+	
+	/*Ergaenzngsfarben*/
+	
+	/* 35% Gruen*/
+	@include tablebackground(ergaenzung_gruen, #AEC6A1, #88AC77);
+	
+	/* 25% Grau*/
+	@include tablebackground(ergaenzung_grau, #D1D3D2, #A6AAAD);
+	
+
+	/* Auszeichnungsfarben */
+
+	/* Ocker */
+	@include tablebackground(auszeichnung_ocker, #FBD69B, #FAB94D);
+	
+	/* Rot */
+	@include tablebackground(auszeichnung_rot, #E0A0A0, #BF3954);
+	
+	
+	/* Risikofarben */
+	
+	/* geringe Wertschwankung */
+	@include tablebackground(risiko_geringe, #019BF4, #017DC3);
+	
+	/* moderate Wertschwankung */
+	@include tablebackground(risiko_moderate, #00D6A1, #00A57D);
+	
+	/* erhoehte Wertschwankung */
+	@include tablebackground(risiko_erhoehte, #FFF899, #FFF000);
+	
+	/* hohe Wertschwankung */
+	@include tablebackground(risiko_hohe, #FCBC69, #FA9B1E);
+	
+	/* sehr hohe Wertschwankung */
+	@include tablebackground(risiko_sehr_hohe, #FF6666, #FF0000);
+	
+	/* FinanzGruppe */
+	/* HKS 44 K */
+	@include tablebackground(finanzgruppe_44, #0091FF, #0066B3);
+	
+	/* HKS 08 K */
+	@include tablebackground(finanzgruppe_08, #FF944D, #FF6600);
+	
+	
+	/* Alignment */
+	
+	td.v-table-cell-content-align_center {
+		text-align: center;
+	}
+	
+	td.v-table-cell-content-align_center input {
+		text-align: center;
+	}
+	
+	td.v-table-cell-content-align_right {
+		text-align: right;
+	}
+	
+	td.v-table-cell-content-align_right input {
+		text-align: right;
+	}
+	
+	.v-caption-crudRegion {
+		font-weight: bold;
+	}
+
+}
+

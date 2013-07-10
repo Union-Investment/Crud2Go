@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 
 public class OracleRegExpFilterTranslatorTest {
 
@@ -43,18 +43,16 @@ public class OracleRegExpFilterTranslatorTest {
 	@Test
 	public void shouldCreateSQLWithQuestionmarksForPatternAndParameter() {
 		OracleRegExpFilterTranslator translator = new OracleRegExpFilterTranslator();
-		String sql = translator.getWhereStringForFilter(
-				new OracleRegExpFilter("mycol",
-						"abcde", "i"), helperMock);
+		String sql = translator.getWhereStringForFilter(new OracleRegExpFilter(
+				"mycol", "abcde", "i"), helperMock);
 		assertThat(sql, is("REGEXP_LIKE(\"mycol\",?,?)"));
 	}
 
 	@Test
 	public void shouldAddPatternAndParameterAsSqlParameters() {
 		OracleRegExpFilterTranslator translator = new OracleRegExpFilterTranslator();
-		translator.getWhereStringForFilter(
-				new OracleRegExpFilter("mycol",
-						"abcde", "i"), helperMock);
+		translator.getWhereStringForFilter(new OracleRegExpFilter("mycol",
+				"abcde", "i"), helperMock);
 
 		verify(helperMock).addParameterValue("abcde");
 		verify(helperMock).addParameterValue("i");
@@ -64,18 +62,16 @@ public class OracleRegExpFilterTranslatorTest {
 	@Test
 	public void shouldCreateSQLWithQuestionmarkForPattern() {
 		OracleRegExpFilterTranslator translator = new OracleRegExpFilterTranslator();
-		String sql = translator.getWhereStringForFilter(
-				new OracleRegExpFilter("mycol",
-						"abcde", null), helperMock);
+		String sql = translator.getWhereStringForFilter(new OracleRegExpFilter(
+				"mycol", "abcde", null), helperMock);
 		assertThat(sql, is("REGEXP_LIKE(\"mycol\",?)"));
 	}
 
 	@Test
 	public void shouldAddPatternAsSqlParameter() {
 		OracleRegExpFilterTranslator translator = new OracleRegExpFilterTranslator();
-		translator.getWhereStringForFilter(
-				new OracleRegExpFilter("mycol",
-						"abcde", null), helperMock);
+		translator.getWhereStringForFilter(new OracleRegExpFilter("mycol",
+				"abcde", null), helperMock);
 
 		verify(helperMock).addParameterValue("abcde");
 		verifyNoMoreInteractions(helperMock);

@@ -1,33 +1,31 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.support.vaadin.support;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -46,11 +44,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.vaadin.addon.sqlcontainer.ColumnProperty;
 import com.vaadin.data.Buffered.SourceException;
 import com.vaadin.data.Container;
 import com.vaadin.data.Validator;
-import com.vaadin.data.util.PropertyFormatter;
+import com.vaadin.data.util.sqlcontainer.ColumnProperty;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.TableFieldFactory;
@@ -65,9 +62,6 @@ public class BufferedTableTest {
 
 	@Mock
 	private Field fieldMock;
-
-	@Mock
-	private PropertyFormatter propertyFormatterMock;
 
 	// @Spy
 	// private StringDataType stringDataTypeMock = new StringDataType();
@@ -101,9 +95,9 @@ public class BufferedTableTest {
 	}
 
 	@Test
-	public void shouldRegisterNewFieldsOnlyIfWriteThrough() {
+	public void shouldRegisterNewFieldsOnlyIfBuffered() {
 
-		when(fieldMock.isWriteThrough()).thenReturn(true);
+		when(fieldMock.isBuffered()).thenReturn(false);
 		when(
 				fieldFactoryMock.createField(table.getContainerDataSource(), 1,
 						"col", table)).thenReturn(fieldMock);
@@ -117,14 +111,14 @@ public class BufferedTableTest {
 	@Test
 	public void shouldRegisterNewFields() {
 
-		when(fieldMock.isWriteThrough()).thenReturn(false);
+		when(fieldMock.isBuffered()).thenReturn(true);
 		when(
 				fieldFactoryMock.createField(table.getContainerDataSource(), 1,
 						"col", table)).thenReturn(fieldMock);
 
 		Field field = (Field) table.getPropertyValue(1, "col", null);
 		assertEquals(fieldMock, field);
-		assertThat(table.getRegisteredFields(), hasItem(field));
+		assertTrue(table.getRegisteredFields().contains(fieldMock));
 	}
 
 	@Test
@@ -133,7 +127,7 @@ public class BufferedTableTest {
 		shouldRegisterNewFields();
 
 		table.unregisterComponent(fieldMock);
-		assertThat(table.getRegisteredFields(), not(hasItem(fieldMock)));
+		assertFalse(table.getRegisteredFields().contains(fieldMock));
 	}
 
 	/**
@@ -147,14 +141,15 @@ public class BufferedTableTest {
 		layout.addComponent(fieldMock);
 
 		table.unregisterComponent(layout);
-		assertThat(table.getRegisteredFields(), not(hasItem(fieldMock)));
+		assertFalse(table.getRegisteredFields().contains(fieldMock));
 	}
 
 	@Test
 	public void shouldCommitAllValidFields() {
 		shouldRegisterNewFields();
 		Field notValidFieldMock = mock(Field.class);
-		when(fieldMock.isWriteThrough()).thenReturn(false);
+		when(notValidFieldMock.isBuffered()).thenReturn(true);
+		when(fieldMock.isBuffered()).thenReturn(true);
 		when(
 				fieldFactoryMock.createField(table.getContainerDataSource(), 2,
 						"col2", table)).thenReturn(notValidFieldMock);
@@ -241,17 +236,14 @@ public class BufferedTableTest {
 		String propertyId = "id";
 		String value = "value";
 
-		Set<Field> registeredFields = new HashSet<Field>();
+		Set<Field<?>> registeredFields = new HashSet<Field<?>>();
 		registeredFields.add(fieldMock);
 		when(fieldMock.isModified()).thenReturn(true);
 
 		ColumnProperty columnProperty = new ColumnProperty(propertyId, false,
-				true, true, value, String.class);
+				true, true, false, value, String.class);
 
-		when(fieldMock.getPropertyDataSource()).thenReturn(
-				propertyFormatterMock);
-		when(propertyFormatterMock.getPropertyDataSource()).thenReturn(
-				columnProperty);
+		when(fieldMock.getPropertyDataSource()).thenReturn(columnProperty);
 
 		table.getRegisteredFields().addAll(registeredFields);
 

@@ -37,17 +37,14 @@ import javax.portlet.ResourceResponse;
 
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Upload;
-import com.vaadin.ui.Window.Notification;
 
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
@@ -58,7 +55,6 @@ import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RolesConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration.PortletConfigurationPresenter.ConfigUploadFinishedListener;
@@ -70,13 +66,12 @@ import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaD
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.crud.validation.ConfigurationUploadValidator;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public class PortletConfigurationPresenterTest extends SpringPortletContextTest {
 
 	private PortletConfigurationPresenter portletConfigurationPresenter;
-
-	private CrudPortletApplication app;
 
 	@Mock
 	private PortletConfigurationView viewMock;
@@ -100,36 +95,20 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 	private ResourceRequest requestMock;
 
 	@Mock
-	private Portlet portletMock;
-
-	@Mock
-	private PortletRole roleMock;
-
-	@Mock
-	private ThemeDisplay themeDisplayMock;
-
-	@Mock
 	private Settings settingsMock;
 
 	private static final String testWinId = "2";
 
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext(testWinId, 18004L);
+
 	@Before
 	public void setUp() throws SQLException {
 		MockitoAnnotations.initMocks(this);
-		app = new CrudPortletApplication() {
-			public String getPortletId() {
-				return testWinId;
-			}
+		liferayContext.initialize();
 
-			public long getCommunityId() {
-				return 18004L;
-			}
-		};
-		app.onRequestStart(requestMock, responseMock);
-
-		when(requestMock.getAttribute(WebKeys.PORTLET_ID))
-				.thenReturn(testWinId);
-		when(requestMock.getRemoteUser()).thenReturn("horst");
+		when(liferayContext.getVaadinPortletRequestMock().getRemoteUser())
+				.thenReturn("horst");
 
 		when(viewMock.getUpload()).thenReturn(uploadMock);
 		when(viewMock.getUploadVcsButton()).thenReturn(uploadVcsButton);
@@ -213,9 +192,8 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 		configUploadListener.uploadFinished(new Upload.FinishedEvent(
 				uploadMock, "", "", System.currentTimeMillis()));
 
-		verify(viewMock).showNotification(
-				"Die Konfiguration entspricht nicht dem gültigen XSD!",
-				Notification.TYPE_ERROR_MESSAGE);
+		verify(viewMock).showError(
+				"Die Konfiguration entspricht nicht dem gültigen XSD!");
 	}
 
 	@Test

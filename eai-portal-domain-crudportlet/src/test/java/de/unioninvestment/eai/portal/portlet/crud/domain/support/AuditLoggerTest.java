@@ -1,5 +1,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.support;
 
+import static org.mockito.Mockito.when;
+
 import org.apache.log4j.Level;
 import org.junit.After;
 import org.junit.Before;
@@ -8,9 +10,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.vaadin.ui.UI;
+import com.vaadin.util.CurrentInstance;
+
 import de.unioninvestment.eai.portal.junit.rules.Log4jStub;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplicationMock;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 
 public class AuditLoggerTest {
 
@@ -23,19 +28,23 @@ public class AuditLoggerTest {
 
 	private AuditLogger auditLogger;
 
-	private LiferayApplicationMock applicationMock;
+	@Mock
+	private LiferayUI uiMock;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		applicationMock = new LiferayApplicationMock(null, null, "portletId",
-				4711);
+
+		UI.setCurrent(uiMock);
+		when(uiMock.getPortletId()).thenReturn("portletId");
+		when(uiMock.getCommunityId()).thenReturn(4711L);
+
 		auditLogger = new AuditLogger(currentUserMock);
 	}
 
 	@After
 	public void cleanUp() {
-		applicationMock.onRequestEnd(null, null);
+		CurrentInstance.clearAll();
 	}
 
 	@Test

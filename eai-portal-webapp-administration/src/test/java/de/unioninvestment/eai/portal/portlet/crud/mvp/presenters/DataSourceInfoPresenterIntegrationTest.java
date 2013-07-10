@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -38,7 +39,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.JMXWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.DatasourceInfoView;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplicationMock;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 /**
  * <pre>
@@ -61,6 +62,9 @@ public class DataSourceInfoPresenterIntegrationTest extends
 	private DatasourceInfos model;
 	private DatasourceInfoPresenter presenter;
 
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext();
+
 	@Before
 	public void setUp() throws IOException {
 		MockitoAnnotations.initMocks(this);
@@ -70,7 +74,6 @@ public class DataSourceInfoPresenterIntegrationTest extends
 				this.model.getContainer());
 		this.presenter = new DatasourceInfoPresenter(view, this.model);
 
-		new LiferayApplicationMock(null, null, null, 12345L);
 		presenter.setSettings(settingsMock);
 		when(settingsMock.getDatasourceInfoPattern(12345L)).thenReturn(
 				"dev/{0}");

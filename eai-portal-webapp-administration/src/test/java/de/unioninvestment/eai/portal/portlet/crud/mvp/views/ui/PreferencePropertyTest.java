@@ -24,46 +24,31 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
 import javax.portlet.ReadOnlyException;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplicationMock;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class PreferencePropertyTest {
 
-	private LiferayApplicationMock app;
-
-	@Mock
-	private PortletResponse responseMock;
-	@Mock
-	private PortletRequest requestMock;
-	@Mock
-	private PortletPreferences preferencesMock;
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext();
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		app = new LiferayApplicationMock(requestMock, responseMock);
-		when(requestMock.getPreferences()).thenReturn(preferencesMock);
-	}
-
-	@After
-	public void tearDown() {
-		app.onRequestEnd(requestMock, responseMock);
 	}
 
 	@Test
 	public void shouldReadValueFromPrefrences() {
 		PreferenceProperty property = new PreferenceProperty("prefKey");
-		when(preferencesMock.getValue("prefKey", null)).thenReturn("prefValue");
+		when(
+				liferayContext.getPortletPreferencesMock().getValue("prefKey",
+						null)).thenReturn("prefValue");
 
 		assertThat(property.getValue(), is((Object) "prefValue"));
 	}
@@ -74,7 +59,8 @@ public class PreferencePropertyTest {
 
 		property.setValue("prefValue2");
 
-		verify(preferencesMock).setValue("prefKey", "prefValue2");
+		verify(liferayContext.getPortletPreferencesMock()).setValue("prefKey",
+				"prefValue2");
 	}
 
 	@Test
@@ -83,7 +69,7 @@ public class PreferencePropertyTest {
 
 		property.setValue(null);
 
-		verify(preferencesMock).reset("prefKey");
+		verify(liferayContext.getPortletPreferencesMock()).reset("prefKey");
 	}
 
 	@Test
@@ -92,7 +78,7 @@ public class PreferencePropertyTest {
 
 		property.setValue("");
 
-		verify(preferencesMock).reset("prefKey");
+		verify(liferayContext.getPortletPreferencesMock()).reset("prefKey");
 	}
 
 	@Test

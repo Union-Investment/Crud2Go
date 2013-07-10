@@ -6,7 +6,7 @@
 	</classpath>
 
 	<web>
-		<link target="/eai-portal-webapp-administration">
+		<link target="/">
 			<dir name="${workspace.root}/eai-portal-webapp-administration/src/main/webapp"/>
 		</link>
 	</web>

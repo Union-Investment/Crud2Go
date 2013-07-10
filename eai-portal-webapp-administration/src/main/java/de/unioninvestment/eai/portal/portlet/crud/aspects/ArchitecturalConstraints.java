@@ -99,7 +99,7 @@ public class ArchitecturalConstraints {
 	/**
 	 * Aufruf von Vaadin SQL-Container Klassen
 	 */
-	@Pointcut("call(* (com.vaadin.addon.sqlcontainer..*).*(..))")
+	@Pointcut("call(* (com.vaadin.data.util.sqlcontainer..*).*(..))")
 	public void accessSqlContainer() {
 		// pointcut specification
 	}

@@ -18,10 +18,14 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.jouni.animator.AnimatorProxy.AnimationEvent;
 import org.vaadin.jouni.animator.AnimatorProxy.AnimationListener;
 import org.vaadin.jouni.animator.Disclosure;
 
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.VerticalLayout;
@@ -33,6 +37,9 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class DefaultCollapsibleRegionView extends Disclosure implements
 		CollapsibleRegionView {
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(DefaultCollapsibleRegionView.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -116,4 +123,17 @@ public class DefaultCollapsibleRegionView extends Disclosure implements
 
 		return layout;
 	}
+
+	@Override
+	public void setMargin(boolean enabled) {
+		// FIXME
+		LOGGER.warn("Fixme Margin on CollapsibleRegion");
+	}
+
+	@Override
+	public Button addBackButton(String caption, ClickListener clickListener) {
+		throw new UnsupportedOperationException(
+				"Regions cannot have a back button");
+	}
+
 }

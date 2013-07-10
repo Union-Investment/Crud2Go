@@ -18,10 +18,14 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractOrderedLayout;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Layout.MarginInfo;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.LiferayTheme;
 
@@ -37,7 +41,8 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
  * @see PanelContentView
  * @since 1.45 extending Panel
  */
-public class DefaultPanelContentView extends Panel implements PanelContentView {
+public class DefaultPanelContentView extends CustomComponent implements
+		PanelContentView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -59,7 +64,8 @@ public class DefaultPanelContentView extends Panel implements PanelContentView {
 	public DefaultPanelContentView(boolean withMargin,
 			boolean useHorizontalLayout, String width, String height) {
 		// will use VerticalLayout by default.
-		super(useHorizontalLayout ? new HorizontalLayout() : null);
+		super(useHorizontalLayout ? new HorizontalLayout()
+				: new VerticalLayout());
 		AbstractOrderedLayout layout = getLayoutInternal();
 		layout.setSpacing(true);
 		layout.setMargin(withMargin);
@@ -99,7 +105,22 @@ public class DefaultPanelContentView extends Panel implements PanelContentView {
 	 * @since 1.45
 	 */
 	protected AbstractOrderedLayout getLayoutInternal() {
-		return (AbstractOrderedLayout) getContent();
+		return (AbstractOrderedLayout) getCompositionRoot();
 	}
 
+	@Override
+	public void addComponent(Component component) {
+		getLayoutInternal().addComponent(component);
+	}
+
+	@Override
+	public Button addBackButton(String caption, ClickListener clickListener) {
+		AbstractOrderedLayout layout = getLayoutInternal();
+
+		Button backButton = new Button(caption);
+		backButton.addClickListener(clickListener);
+		layout.addComponent(backButton, 0);
+		layout.setComponentAlignment(backButton, Alignment.MIDDLE_RIGHT);
+		return backButton;
+	}
 }

@@ -1,0 +1,9 @@
+@import "addons.scss";
+@import "crud2go.scss";
+
+/* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
+/* The actual styles should be defined in crud2go.scss */
+.crud2go {
+  @include addons;
+  @include crud2go;
+}

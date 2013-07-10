@@ -31,13 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
-import com.vaadin.addon.sqlcontainer.RowId;
-import com.vaadin.addon.sqlcontainer.RowItem;
-import com.vaadin.addon.sqlcontainer.TemporaryRowId;
-import com.vaadin.addon.sqlcontainer.query.OrderBy;
-import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
-import com.vaadin.addon.sqlcontainer.query.generator.filter.QueryBuilder;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.util.sqlcontainer.RowId;
+import com.vaadin.data.util.sqlcontainer.RowItem;
+import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
+import com.vaadin.data.util.sqlcontainer.query.OrderBy;
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseContainerRow;

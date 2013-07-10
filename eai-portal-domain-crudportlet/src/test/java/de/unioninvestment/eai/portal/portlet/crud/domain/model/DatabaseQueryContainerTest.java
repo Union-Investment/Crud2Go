@@ -47,11 +47,11 @@ import javax.naming.NamingException;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import com.vaadin.addon.sqlcontainer.RowId;
-import com.vaadin.addon.sqlcontainer.RowItem;
-import com.vaadin.addon.sqlcontainer.TemporaryRowId;
-import com.vaadin.addon.sqlcontainer.query.OrderBy;
-import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.RowId;
+import com.vaadin.data.util.sqlcontainer.RowItem;
+import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
+import com.vaadin.data.util.sqlcontainer.query.OrderBy;
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQueryEventWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
@@ -110,8 +110,7 @@ public class DatabaseQueryContainerTest
 	@Test
 	public void shouldAllowOnlyQuerying() {
 		DatabaseQueryContainer container = new DatabaseQueryContainer(eventBus,
-				"eai",
-				"select * from test", false, false, false,
+				"eai", "select * from test", false, false, false,
 				Arrays.asList("test"), connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0);
 		assertFalse(container.isInsertable());
@@ -122,16 +121,14 @@ public class DatabaseQueryContainerTest
 	@Test
 	public void shouldAllowEmptyPrimaryKeysIfReadonly() {
 		new DatabaseQueryContainer(eventBus, "eai", "select * from test",
-				false, false,
-				false, null, connectionPoolMock, "Benutzer",
+				false, false, false, null, connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0);
 	}
 
 	@Test(expected = BusinessException.class)
 	public void shouldRequirePrimaryKeysForEditing() {
 		new DatabaseQueryContainer(eventBus, "eai", "select * from test", true,
-				false,
-				false, null, connectionPoolMock, "Benutzer",
+				false, false, null, connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0);
 	}
 

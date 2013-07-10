@@ -112,6 +112,11 @@ public class GenericVaadinContainer extends
 
 	}
 
+	@Override
+	public Collection<Filter> getContainerFilters() {
+		return super.getContainerFilters();
+	}
+
 	/**
 	 * @param filter
 	 *            die Liste der Filter als Ersatz

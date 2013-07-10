@@ -23,6 +23,7 @@ import org.springframework.util.Assert;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.ui.PasswordField;
 
 /**
@@ -38,18 +39,18 @@ public class SecurePasswordField extends PasswordField {
 
 	private static final String XXX = "xxxxxxxx";
 
-	private Property realDataSource;
+	private Property<String> realDataSource;
 
 	private Object realValue;
 
-	public SecurePasswordField(String caption, Property dataSource) {
+	public SecurePasswordField(String caption, Property<String> dataSource) {
 		super(caption);
 		Assert.isAssignable(String.class, dataSource.getType(),
 				"SecurePasswordField only works for String properties");
 		this.realDataSource = dataSource;
 
 		realValue = realDataSource.getValue();
-		setPropertyDataSource(new ObjectProperty(
+		setPropertyDataSource(new ObjectProperty<String>(
 				placeholder(realValue), String.class));
 	}
 
@@ -58,7 +59,7 @@ public class SecurePasswordField extends PasswordField {
 	}
 
 	@Override
-	protected void setValue(Object newValue, boolean repaintIsNotNeeded)
+	protected void setValue(String newValue, boolean repaintIsNotNeeded)
 			throws ReadOnlyException, ConversionException {
 		if (newValue == null) {
 			realValue = newValue;
@@ -67,15 +68,15 @@ public class SecurePasswordField extends PasswordField {
 			realValue = newValue;
 		}
 		super.setValue(placeholder(newValue), repaintIsNotNeeded);
-		if (isWriteThrough() && realDataSource != null) {
-			realDataSource.setValue(realValue);
+		if (!isBuffered() && realDataSource != null) {
+			realDataSource.setValue((String) realValue);
 		}
 	}
 
 	@Override
 	public void commit() throws SourceException, InvalidValueException {
 		super.commit();
-		realDataSource.setValue(realValue);
+		realDataSource.setValue((String) realValue);
 	}
 
 	@Override

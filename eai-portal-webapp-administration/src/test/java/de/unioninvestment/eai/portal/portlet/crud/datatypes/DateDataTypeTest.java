@@ -40,4 +40,9 @@ public class DateDataTypeTest {
 
 		Assert.assertTrue(result);
 	}
+
+	@Test
+	public void createFormatter() {
+	
+	}
 }

@@ -23,10 +23,12 @@ import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessa
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.server.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
@@ -152,13 +154,13 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
+	public void showError(String message) {
+		Notification.show(message, Type.ERROR_MESSAGE);
 	}
 
 	@Override
-	public void showNotification(String msgKey, int type) {
-		getApplication().getMainWindow().showNotification(msgKey, type);
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 
 }

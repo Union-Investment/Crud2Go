@@ -24,7 +24,6 @@ import com.vaadin.ui.Component;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomColumnGenerator;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
 
 /**
@@ -36,27 +35,20 @@ import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
 public class CustomColumnGeneratorImpl implements CustomColumnGenerator {
 
 	private final Closure<Object> closure;
-	private final PortletApplication application;
 
 	/**
 	 * @param closure
 	 *            Closure, die für die Generierung der Vaadin-Komponenten
 	 *            verwendet werden soll
-	 * @param application
-	 *            die Vaadin-Application (benötigt für den an die Closure
-	 *            übergebenen {@link VaadinBuilder})
 	 */
-	public CustomColumnGeneratorImpl(Closure<Object> closure,
-			PortletApplication application) {
+	public CustomColumnGeneratorImpl(Closure<Object> closure) {
 		this.closure = closure;
-		this.application = application;
 	}
 
 	@Override
 	public Component generate(ContainerRow row) {
 		ScriptRow scriptRow = new ScriptRow(row);
-		Object component = closure.call(scriptRow,
-				new VaadinBuilder(application));
+		Object component = closure.call(scriptRow, new VaadinBuilder());
 		return (Component) component;
 	}
 

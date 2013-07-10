@@ -22,6 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -38,6 +39,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.VerticalLayout;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
@@ -96,6 +99,9 @@ public class PresenterFactoryTest {
 
 	@Mock
 	private DefaultRowEditingFormView rowEditingFormViewMock;
+
+	@Mock
+	private Button backButtonMock;
 
 	@Before
 	public void setUp() {
@@ -247,6 +253,9 @@ public class PresenterFactoryTest {
 				viewFactoryMock.rowEditingFormView(anyBoolean(), anyBoolean(),
 						anyString(), anyString())).thenReturn(
 				rowEditingFormViewMock);
+		when(
+				rowEditingFormViewMock.addBackButton(anyString(),
+						any(ClickListener.class))).thenReturn(backButtonMock);
 
 		// when
 		RowEditingFormPresenter presenter = presenterFactory

@@ -22,15 +22,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import com.vaadin.data.Property;
 
 import de.unioninvestment.crud2go.spi.security.Cryptor;
 
@@ -40,53 +37,51 @@ public class EncryptionFormatterTest {
 
 	@Mock
 	private Cryptor cryptorMock;
-	@Mock
-	private Property backingProperty;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		formatter = new EncryptionFormatter(cryptorMock, backingProperty);
+		formatter = new EncryptionFormatter(cryptorMock);
 	}
 
 	@Test
 	public void shouldReturnNullForNull() {
-		when(backingProperty.getValue()).thenReturn(null);
-		assertThat(formatter.getValue(), nullValue());
+		assertThat(formatter.convertToPresentation(null, String.class, null),
+				nullValue());
 	}
 
 	@Test
 	public void shouldReturnNullForEmptyEncryptedString() {
-		when(backingProperty.getValue()).thenReturn("");
 		when(cryptorMock.decrypt(""))
 				.thenThrow(new NullPointerException("NPE"));
-		assertThat(formatter.getValue(), nullValue());
+		assertThat(formatter.convertToPresentation("", String.class, null),
+				nullValue());
 	}
 
 	@Test
 	public void shouldReturnDecryptedValue() {
-		when(backingProperty.getValue()).thenReturn("encryptedText");
 		when(cryptorMock.decrypt("encryptedText")).thenReturn("plainText");
 
-		assertThat(formatter.getValue(), is((Object) "plainText"));
+		assertThat(formatter.convertToPresentation("encryptedText",
+				String.class, null), is("plainText"));
 	}
 
 	@Test
 	public void shouldParseNullAsNull() {
-		when(backingProperty.getValue()).thenReturn("bla");
-		formatter.setValue(null);
-		verify(backingProperty).setValue(null);
+		assertThat(formatter.convertToModel(null, String.class, null),
+				is(nullValue()));
 	}
 
 	@Test
 	public void shouldForwardEncryptedValue() {
 		when(cryptorMock.encrypt("plainText")).thenReturn("encryptedText");
-		formatter.setValue("plainText");
-		verify(backingProperty).setValue("encryptedText");
+		assertThat(formatter.convertToModel("plainText", String.class, null),
+				is("encryptedText"));
 	}
 
 	@Test
-	public void shouldReturnStringType() {
-		assertEquals(String.class, formatter.getType());
+	public void shouldHandleStringTypes() {
+		assertEquals(String.class, formatter.getPresentationType());
+		assertEquals(String.class, formatter.getModelType());
 	}
 }

@@ -22,7 +22,7 @@ import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessa
 
 import java.util.List;
 
-import com.vaadin.terminal.ExternalResource;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;

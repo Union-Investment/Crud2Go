@@ -36,7 +36,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GeneratedValueGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.VaadinExportableColumnGenerator;
 
 public class VaadinExportableColumnGeneratorTest {
 

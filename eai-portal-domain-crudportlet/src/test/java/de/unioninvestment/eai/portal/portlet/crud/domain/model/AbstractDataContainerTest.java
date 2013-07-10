@@ -51,6 +51,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -59,10 +60,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.vaadin.addon.sqlcontainer.filters.Like;
 import com.vaadin.data.Container.Ordered;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.Like;
 import com.vaadin.data.util.filter.Or;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
@@ -85,6 +86,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public abstract class AbstractDataContainerTest<C extends AbstractDataContainer, V extends Ordered> {
@@ -129,6 +131,9 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 
 	@Mock
 	private EventBus eventBusMock;
+
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext();
 
 	@Before
 	public final void setUp() {

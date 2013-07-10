@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
 import static de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.DatasourceInfoPresenter.MANAGED_CONNECTION_FACTORY_CLASS_ATTRIBUTE;
@@ -34,6 +34,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -52,7 +53,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrud
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfo;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.DatasourceInfoView;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplicationMock;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class DatasourceInfoPresenterTest {
 
@@ -66,6 +67,10 @@ public class DatasourceInfoPresenterTest {
 
 	private DatasourceInfos model;
 	private DatasourceInfoPresenter presenter;
+
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext("portletId",
+			12345L);
 
 	@Before
 	public void setUp() {
@@ -92,7 +97,6 @@ public class DatasourceInfoPresenterTest {
 	}
 
 	private void prepareDatasourceInfoPatternMocking() {
-		new LiferayApplicationMock(null, null, null, 12345L);
 		presenter.setSettings(settingsMock);
 		when(settingsMock.getDatasourceInfoPattern(12345L)).thenReturn(
 				"dev/{0}");

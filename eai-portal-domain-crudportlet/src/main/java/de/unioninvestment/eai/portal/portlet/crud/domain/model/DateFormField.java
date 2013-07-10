@@ -21,9 +21,11 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.vaadin.ui.UI;
+
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
 import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
-import de.unioninvestment.eai.portal.support.vaadin.support.TimestampConverter;
+import de.unioninvestment.eai.portal.support.vaadin.support.DateToStringConverter;
 
 /**
  * 
@@ -35,7 +37,7 @@ import de.unioninvestment.eai.portal.support.vaadin.support.TimestampConverter;
 public class DateFormField extends FormField {
 	private static final long serialVersionUID = 42L;
 
-	private TimestampConverter timestampConverter;
+	private DateToStringConverter dateToStringConverter;
 
 	/**
 	 * Konstruktor mit Parametern.
@@ -46,8 +48,8 @@ public class DateFormField extends FormField {
 	public DateFormField(FormFieldConfig config) {
 		super(config);
 
-		timestampConverter = new TimestampConverter(super.getProperty(),
-				getResolution(), getDateFormat());
+		dateToStringConverter = new DateToStringConverter(getResolution(),
+				getDateFormat());
 	}
 
 	/**
@@ -82,12 +84,13 @@ public class DateFormField extends FormField {
 		return config.getDate().getDefault();
 	}
 
-	public TimestampConverter getTimestampProperty() {
-		return timestampConverter;
+	public DateToStringConverter getConverter() {
+		return dateToStringConverter;
 	}
 
 	public Date getBeginDate() {
-		return (Date) getTimestampProperty().getValue();
+		return (Date) getConverter().convertToPresentation(getValue(),
+				Date.class, UI.getCurrent().getLocale());
 	}
 
 	/**

@@ -25,14 +25,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,13 +38,14 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.portlet.PortletMode;
-import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -56,19 +55,17 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.mock.web.portlet.MockPortalContext;
 import org.springframework.mock.web.portlet.MockPortletURL;
-import org.vaadin.peter.contextmenu.ContextMenu;
 
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.vaadin.terminal.Terminal.ErrorEvent;
-import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
-import com.vaadin.terminal.gwt.server.WebBrowser;
+import com.vaadin.server.ErrorEvent;
+import com.vaadin.server.Page;
+import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
@@ -86,6 +83,7 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBui
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public class CrudPortletApplicationTest extends SpringPortletContextTest {
@@ -95,17 +93,8 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	@InjectMocks
 	private CrudPortletApplication app = new CrudPortletApplication();
 
-	private Window windowSpy;
-	@Mock
-	private ResourceResponse response;
-	@Mock
-	private ResourceRequest request;
-	@Mock
-	private PortletApplicationContext2 contextMock;
 	@Mock
 	private Settings settingsMock;
-	@Mock
-	private Principal principalMock;
 	@Mock
 	private Portlet portletMock;
 	@Mock
@@ -159,21 +148,23 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	private RenderResponse renderResponseMock;
 
 	@Mock
-	private PortletPreferences preferencesMock;
-
-	@Mock
 	private WebBrowser browserMock;
+
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext("4711", 14008L);
 
 	@Before
 	public void setUp() throws MalformedURLException {
+		liferayContext.initialize();
+
 		applicationUrl = new URL("http://xxx");
 
 		MockitoAnnotations.initMocks(this);
 
-		app.onRequestStart(request, response);
-
 		when(settingsMock.getHelpUrl()).thenReturn("http://help.us");
-		when(response.createRenderURL()).thenReturn(
+		when(
+				((ResourceResponse) liferayContext.getPortletResponseMock())
+						.createRenderURL()).thenReturn(
 				new MockPortletURL(new MockPortalContext(), "myurl"));
 		when(
 				modelFactoryMock.getBuilder(isA(EventBus.class),
@@ -188,20 +179,17 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		when(configurationServiceMock.getPortletConfig("4711", 14008))
 				.thenReturn(configMock);
 
-		when(request.getAttribute(WebKeys.THEME_DISPLAY)).thenReturn(
-				themeDisplayMock);
+		when(
+				liferayContext.getPortletRequestMock().getAttribute(
+						WebKeys.PORTLET_ID)).thenReturn("4711");
+		when(
+				liferayContext.getPortletRequestMock().getAttribute(
+						WebKeys.THEME_DISPLAY)).thenReturn(themeDisplayMock);
 		when(themeDisplayMock.getScopeGroupId()).thenReturn(14008L);
 
-		when(request.getPreferences()).thenReturn(preferencesMock);
-
-		when(contextMock.getBrowser()).thenReturn(browserMock);
+		when(Page.getCurrent().getWebBrowser()).thenReturn(browserMock);
 		when(browserMock.getLocale()).thenReturn(Locale.GERMANY);
-	}
 
-	private void initializeWindowSpy() {
-		windowSpy = spy(new Window());
-		app.setMainWindow(windowSpy);
-		windowSpy.setApplication(app);
 	}
 
 	/**
@@ -212,25 +200,25 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	 */
 	private void provideUserWithRoles(String... roles) {
 
-		when(request.getUserPrincipal()).thenReturn(principalMock);
+		when(liferayContext.getVaadinPortletRequestMock().getRemoteUser())
+				.thenReturn("carsten");
 
 		final Set<String> roleSet = roles == null ? null : new HashSet<String>(
 				Arrays.asList(roles));
-		when(request.isUserInRole(isA(String.class))).thenAnswer(
-				new Answer<Boolean>() {
-					@Override
-					public Boolean answer(InvocationOnMock invocation)
-							throws Throwable {
-						return roleSet != null
-								&& roleSet.contains(invocation.getArguments()[0]);
-					}
-				});
-		when(principalMock.getName()).thenReturn("carsten");
+		when(
+				liferayContext.getVaadinPortletRequestMock().isUserInRole(
+						isA(String.class))).thenAnswer(new Answer<Boolean>() {
+			@Override
+			public Boolean answer(InvocationOnMock invocation) throws Throwable {
+				return roleSet != null
+						&& roleSet.contains(invocation.getArguments()[0]);
+			}
+		});
 	}
 
 	@Test
 	public void shouldApplyPreferredBrowserLocale() {
-		app.start(applicationUrl, null, contextMock);
+		app.init(liferayContext.getVaadinPortletRequestMock());
 
 		assertThat(app.getLocale(), is(Locale.GERMANY));
 	}
@@ -238,58 +226,66 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	@Test
 	public void shouldDisplayErrorsAsNotifications() {
 		provideUserWithRoles();
-		app.start(applicationUrl, null, contextMock);
-		initializeWindowSpy();
+		initializeUI();
 
 		RuntimeException rootCause = new RuntimeException("MyMessage");
-		ErrorEvent event = app.new ApplicationError(rootCause);
+		ErrorEvent event = new ErrorEvent(rootCause);
 
-		app.getErrorHandler().terminalError(event);
+		app.getErrorHandler().error(event);
 
-		verify(windowSpy).showNotification("MyMessage",
-				Notification.TYPE_ERROR_MESSAGE);
+		liferayContext.shouldShowNotification("MyMessage", null,
+				Notification.Type.ERROR_MESSAGE);
+	}
+
+	private void initializeWindowSpy() {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Test
 	public void shouldDisplayRootCauseErrorsAsNotifications() {
 		provideUserWithRoles();
-		app.start(applicationUrl, null, contextMock);
-		initializeWindowSpy();
+		initializeUI();
 
 		RuntimeException rootCause = new RuntimeException("MyMessage");
 		RuntimeException higherCause = new RuntimeException(rootCause);
-		ErrorEvent event = app.new ApplicationError(higherCause);
 
-		app.getErrorHandler().terminalError(event);
+		ErrorEvent event = new ErrorEvent(higherCause);
 
-		verify(windowSpy).showNotification("MyMessage",
-				Notification.TYPE_ERROR_MESSAGE);
+		app.getErrorHandler().error(event);
+
+		liferayContext.shouldShowNotification("MyMessage", null,
+				Notification.Type.ERROR_MESSAGE);
+	}
+
+	private void initializeUI() {
+		app.init(liferayContext.getVaadinPortletRequestMock());
+		initializeWindowSpy();
 	}
 
 	@Test
+	@Ignore
 	public void shouldDisplayUnconfiguredMessage() {
-		app.onRequestStart(request, response);
-		app.start(applicationUrl, null, contextMock);
+		initializeUI();
 
 	}
 
 	@Test
 	public void shouldDisplayMessageOnConfigurationError() {
-		app.onRequestStart(request, response);
-
 		PortletConfig portletConfig = new PortletConfig();
 
 		when(configMock.getPortletConfig()).thenReturn(portletConfig);
-		when(configurationServiceMock.isConfigured(configMock, preferencesMock))
+		when(
+				configurationServiceMock.isConfigured(configMock,
+						liferayContext.getPortletPreferencesMock()))
 				.thenReturn(true);
-		when(request.getAttribute(WebKeys.PORTLET_ID)).thenReturn("4711");
 
 		when(modelBuilderMock.build()).thenThrow(new RuntimeException("bla"));
 
 		ArgumentCaptor<Component> components = ArgumentCaptor
 				.forClass(Component.class);
 
-		app.start(applicationUrl, null, contextMock);
+		initializeUI();
 
 		verify(viewPageMock, times(3)).addComponent(components.capture());
 		// PortletId
@@ -303,15 +299,15 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldDisplayPortletViewForExistingConfiguration() {
-		app.onRequestStart(request, response);
-		app.start(applicationUrl, null, contextMock);
+		initializeUI();
 
 		PortletConfig portletConfig = new PortletConfig();
-		when(configurationServiceMock.isConfigured(configMock, preferencesMock))
+		when(
+				configurationServiceMock.isConfigured(configMock,
+						liferayContext.getPortletPreferencesMock()))
 				.thenReturn(true);
 
 		when(configMock.getPortletConfig()).thenReturn(portletConfig);
-		when(request.getAttribute(WebKeys.PORTLET_ID)).thenReturn("4711");
 		when(modelBuilderMock.build()).thenReturn(portletMock);
 		when(guiBuilderMock.build(portletMock))
 				.thenReturn(portletPresenterMock);
@@ -330,90 +326,62 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 
 	@Test
 	public void testHandleResourceRequest() {
-		app.start(applicationUrl, null, contextMock);
-		initializeWindowSpy();
-		expectWindowContentChange(app, PortletMode.EDIT, app.getEditContent());
-		expectWindowContentChange(app, PortletMode.VIEW, app.getViewContent());
-		expectWindowContentChange(app, PortletMode.HELP, app.getHelpContent());
+		initializeUI();
+		expectWindowContentChange(PortletMode.EDIT, app.getEditContent());
+		expectWindowContentChange(PortletMode.VIEW, app.getViewContent());
+		expectWindowContentChange(PortletMode.HELP, app.getHelpContent());
 	}
 
-	private void expectWindowContentChange(CrudPortletApplication app,
-			PortletMode targetMode, ComponentContainer expectedContent) {
-		reset(windowSpy);
-		when(request.getPortletMode()).thenReturn(targetMode);
-		app.handleResourceRequest(request, response, windowSpy);
-		verify(windowSpy).setContent(expectedContent);
+	private void expectWindowContentChange(PortletMode targetMode,
+			ComponentContainer expectedContent) {
+		when(liferayContext.getPortletRequestMock().getPortletMode())
+				.thenReturn(targetMode);
+		callHandleResourceRequest();
+		assertThat(app.getContent(), is((Component) expectedContent));
+	}
+
+	private void callHandleResourceRequest() {
+		app.handleResourceRequest(
+				(ResourceRequest) liferayContext.getPortletRequestMock(),
+				(ResourceResponse) liferayContext.getPortletResponseMock(), app);
 	}
 
 	@Test
 	public void shouldRefreshEditPageBeforeEntering() {
-		app.start(applicationUrl, null, contextMock);
+		initializeUI();
 		app.setPortletDomain(portletMock);
-		initializeWindowSpy();
 
-		when(request.getPortletMode()).thenReturn(PortletMode.VIEW);
-		app.handleResourceRequest(request, response, windowSpy);
+		when(liferayContext.getPortletRequestMock().getPortletMode())
+				.thenReturn(PortletMode.VIEW);
+		callHandleResourceRequest();
 		reset(portletConfigurationPresenterMock);
 
-		when(request.getPortletMode()).thenReturn(PortletMode.EDIT);
-		app.handleResourceRequest(request, response, windowSpy);
-		verify(portletConfigurationPresenterMock).refresh(null);
+		when(liferayContext.getPortletRequestMock().getPortletMode())
+				.thenReturn(PortletMode.EDIT);
+		callHandleResourceRequest();
+		verify(portletConfigurationPresenterMock).refresh(configMock);
 	}
 
 	@Test
 	public void shouldNotRefreshIfAlreadyOnEditPage() {
-		app.start(applicationUrl, null, contextMock);
+		initializeUI();
 		app.setPortletDomain(portletMock);
-		initializeWindowSpy();
 
-		when(request.getPortletMode()).thenReturn(PortletMode.EDIT);
-		app.handleResourceRequest(request, response, windowSpy);
+		when(liferayContext.getPortletRequestMock().getPortletMode())
+				.thenReturn(PortletMode.EDIT);
+		callHandleResourceRequest();
 		reset(portletConfigurationPresenterMock);
 
-		app.handleResourceRequest(request, response, windowSpy);
+		callHandleResourceRequest();
 		verify(portletConfigurationPresenterMock, never()).refresh(
 				any(Config.class));
 	}
 
 	@Test
 	public void shouldRegisterPopupEventHandler() {
-		app.start(applicationUrl, null, contextMock);
-		initializeWindowSpy();
+		initializeUI();
 
 		verify(eventBusMock).addHandler(ShowPopupEvent.class, app);
-	}
-
-	@Test
-	public void shouldAllowAddingComponentsToTheEndOfViewPage() {
-		app.start(applicationUrl, null, contextMock);
-
-		ContextMenu menu = new ContextMenu();
-		app.addToView(menu);
-
-		verify(viewPageMock).addComponent(menu);
-	}
-
-	@Test
-	public void shouldNotAllowAddingComponentsTwice() {
-		app.start(applicationUrl, null, contextMock);
-
-		ContextMenu menu = new ContextMenu();
-		app.addToView(menu);
-		app.addToView(menu);
-
-		verify(viewPageMock, times(1)).addComponent(menu);
-	}
-
-	@Test
-	public void shouldRemoveAddedComponents() {
-		app.start(applicationUrl, null, contextMock);
-
-		ContextMenu menu = new ContextMenu();
-		app.addToView(menu);
-		app.removeAddedComponentsFromView();
-
-		verify(viewPageMock).removeComponent(menu);
-
 	}
 
 	@Test
@@ -421,11 +389,12 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 
 		assertThat(app.isInitializing(), is(true));
 
-		app.onRequestStart(request, response);
-		app.start(applicationUrl, null, contextMock);
+		initializeUI();
 
 		final PortletConfig portletConfig = new PortletConfig();
-		when(configurationServiceMock.isConfigured(configMock, preferencesMock))
+		when(
+				configurationServiceMock.isConfigured(configMock,
+						liferayContext.getPortletPreferencesMock()))
 				.thenReturn(true);
 
 		when(configMock.getPortletConfig()).thenAnswer(
@@ -437,7 +406,6 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 						return portletConfig;
 					}
 				});
-		when(request.getAttribute(WebKeys.PORTLET_ID)).thenReturn("4711");
 		when(modelBuilderMock.build()).thenAnswer(new Answer<Portlet>() {
 			@Override
 			public Portlet answer(InvocationOnMock invocation) throws Throwable {
@@ -480,38 +448,44 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 
 	@Test
 	public void shouldNotInformPortletDomainAboutReloadOnFirstRenderRequest() {
+		initializeUI();
+		app.setPortletDomain(portletMock);
 		app.initializing = false;
-		app.handleRenderRequest(renderRequestMock, renderResponseMock,
-				windowSpy);
+
+		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+
 		verify(portletMock, never()).handleReload();
 	}
 
 	@Test
 	public void shouldInformPortletDomainAboutReloadOnSecondRenderRequest() {
+		initializeUI();
+		app.setPortletDomain(portletMock);
 		app.initializing = false;
 		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.VIEW);
-		app.handleRenderRequest(renderRequestMock, renderResponseMock,
-				windowSpy);
-		app.handleRenderRequest(renderRequestMock, renderResponseMock,
-				windowSpy);
+		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+
+		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+
 		verify(portletMock, times(1)).handleReload();
 	}
 
 	@Test
 	public void shouldNotInformPortletDomainAboutReloadIfPortletModeIsNotVIEW() {
+		initializeUI();
+		app.setPortletDomain(portletMock);
 		app.initializing = false;
 		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.EDIT);
-		app.handleRenderRequest(renderRequestMock, renderResponseMock,
-				windowSpy);
-		app.handleRenderRequest(renderRequestMock, renderResponseMock,
-				windowSpy);
+		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+
+		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+
 		verify(portletMock, never()).handleReload();
 	}
 
 	@Test
 	public void shouldNotInformPortletDomainAboutReloadOnInitializingRenderRequest() {
-		app.handleRenderRequest(renderRequestMock, renderResponseMock,
-				windowSpy);
+		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
 		verify(portletMock, never()).handleReload();
 	}
 

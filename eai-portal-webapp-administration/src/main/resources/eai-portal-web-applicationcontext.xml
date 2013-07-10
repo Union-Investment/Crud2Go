@@ -58,8 +58,6 @@
 		<ref bean="sqlDateDataType" />
 		<ref bean="sqlTimestampDataType" />
 		<ref bean="dateDataType" />
-		<ref bean="sqlTimeDataType" />
-		<ref bean="oracleTimestampDataType" />
 		<ref bean="otherDataType" />
 	</util:list>
 

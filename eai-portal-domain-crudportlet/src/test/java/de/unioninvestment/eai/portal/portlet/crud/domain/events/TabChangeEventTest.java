@@ -27,8 +27,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.TabChangeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.TabChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
 
 public class TabChangeEventTest {

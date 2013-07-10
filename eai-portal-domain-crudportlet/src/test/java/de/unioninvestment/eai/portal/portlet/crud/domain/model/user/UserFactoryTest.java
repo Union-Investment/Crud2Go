@@ -23,17 +23,11 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 
 public class UserFactoryTest {
-
-	@Before
-	public void setup() {
-		new CurrentUserTest.MyPortletApplication().onRequestStart(null, null);
-	}
 
 	@Test
 	public void shouldReturnCurrentUser() {

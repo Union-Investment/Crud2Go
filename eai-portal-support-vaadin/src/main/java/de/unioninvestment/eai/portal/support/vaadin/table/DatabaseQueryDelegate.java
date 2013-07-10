@@ -20,10 +20,10 @@ package de.unioninvestment.eai.portal.support.vaadin.table;
 
 import java.util.List;
 
-import com.vaadin.addon.sqlcontainer.RowId;
-import com.vaadin.addon.sqlcontainer.query.FreeformStatementDelegate;
-import com.vaadin.addon.sqlcontainer.query.OrderBy;
-import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.RowId;
+import com.vaadin.data.util.sqlcontainer.query.FreeformStatementDelegate;
+import com.vaadin.data.util.sqlcontainer.query.OrderBy;
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 
 /**
  * Erweiteres Interface des @see

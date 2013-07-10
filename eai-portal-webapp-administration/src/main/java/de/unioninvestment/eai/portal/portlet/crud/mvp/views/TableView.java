@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.vaadin.data.Item;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table.ColumnGenerator;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
@@ -171,7 +172,7 @@ public interface TableView extends View {
 	 * @param notificationType
 	 *            Notification Type
 	 */
-	void showNotification(String msgKey, int notificationType);
+	void showNotification(String msgKey, Type notificationType);
 
 	/**
 	 * Action Methode fuer das Zuruecksetzen von Aenderungen in der
@@ -286,4 +287,5 @@ public interface TableView extends View {
 	 *            the new selection
 	 */
 	void selectionUpdatedExternally(Set<Object> selection);
+
 }

@@ -58,7 +58,6 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.res
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptPortal;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.scripting.ScriptJMXWrapper;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
@@ -142,9 +141,8 @@ public class ScriptModelFactory {
 	 *            die entsprechende Instanz aus dem Modell
 	 * @return eine neue Wrapper-Klasse
 	 */
-	public ScriptTable getScriptTable(PortletApplication application,
-			Table table) {
-		return new ScriptTable(application, table);
+	public ScriptTable getScriptTable(Table table) {
+		return new ScriptTable(table);
 	}
 
 	/**

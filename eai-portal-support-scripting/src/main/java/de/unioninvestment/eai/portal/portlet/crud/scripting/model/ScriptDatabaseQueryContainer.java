@@ -17,7 +17,7 @@ import java.util.Map;
 import org.codehaus.groovy.runtime.GStringImpl;
 import org.springframework.util.Assert;
 
-import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;

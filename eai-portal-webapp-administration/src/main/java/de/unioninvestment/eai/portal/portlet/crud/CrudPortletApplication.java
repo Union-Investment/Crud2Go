@@ -28,6 +28,7 @@ import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
 import javax.portlet.PortletMode;
+import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -37,20 +38,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.theme.ThemeDisplay;
-import com.vaadin.terminal.ExternalResource;
-import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
-import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
-import com.vaadin.terminal.gwt.server.WebBrowser;
+import com.vaadin.annotations.PreserveOnRefresh;
+import com.vaadin.annotations.Theme;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.Page;
+import com.vaadin.server.VaadinPortletService;
+import com.vaadin.server.VaadinPortletSession;
+import com.vaadin.server.VaadinPortletSession.PortletListener;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEvent;
@@ -60,7 +64,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
-import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudApplication;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudUI;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.DatasourceInfoPresenter;
@@ -74,9 +78,8 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.PortletUriFragmen
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
-import de.unioninvestment.eai.portal.support.vaadin.SpringPortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.support.UnconfiguredMessage;
 import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationException;
@@ -89,9 +92,11 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationExcepti
  * @author carsten.mjartan
  * 
  */
+@Theme("crud2go")
+@PreserveOnRefresh
 @Configurable(preConstruction = true, dependencyCheck = true)
-public class CrudPortletApplication extends SpringPortletApplication implements
-		PortletListener, ShowPopupEventHandler, CrudApplication {
+public class CrudPortletApplication extends LiferayUI implements
+		PortletListener, ShowPopupEventHandler, CrudUI {
 
 	private static final long serialVersionUID = 1L;
 
@@ -153,23 +158,30 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	 * 
 	 */
 	@Override
-	public void doInit() {
+	public void doInit(VaadinRequest request) {
+		// deprecated, but currently the only way
+		VaadinPortletSession portletSession = (VaadinPortletSession) VaadinPortletSession
+				.getCurrent();
+
+		setErrorHandler(new CrudErrorHandler());
 
 		applyBrowserLocale();
 
 		helpPage = initializeHelpPage();
-		mainWindow = new Window(getMessage("portlet.crud.window.name"));
-		mainWindow.setContent(viewPage);
-		setMainWindow(mainWindow);
+
+		setContent(viewPage);
+
+		// FIXME title
+		// mainWindow = new Window(getMessage("portlet.crud.window.name"));
 
 		recreateEditPage();
 		refreshViews();
-		registerAsPortletListener();
+
+		portletSession.addPortletListener(this);
 	}
 
 	private void applyBrowserLocale() {
-		setLocale(((PortletApplicationContext2) getContext()).getBrowser()
-				.getLocale());
+		setLocale(Page.getCurrent().getWebBrowser().getLocale());
 	}
 
 	private void initializeEventBus() {
@@ -193,8 +205,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		cleanupViewPage();
 		initializeEventBus();
 		if (!event.isConfigurable()) {
-			PortletUtils.switchPortletMode(getMainWindow().getApplication(),
-					PortletMode.VIEW);
+			PortletUtils.switchPortletMode(PortletMode.VIEW);
 		}
 	}
 
@@ -219,27 +230,9 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		return help;
 	}
 
-	@Override
-	public void terminalError(com.vaadin.terminal.Terminal.ErrorEvent event) {
-		Throwable throwable = event.getThrowable();
-		LOG.error("Internal error", throwable);
-		while (throwable.getCause() != null) {
-			throwable = throwable.getCause();
-		}
-		String message = throwable.getMessage();
-		if (message != null) {
-			getMainWindow().showNotification(message,
-					Notification.TYPE_ERROR_MESSAGE);
-		}
-	}
-
 	private Config getConfiguration() {
-		String portletId = (String) getCurrentRequest().getAttribute(
-				WebKeys.PORTLET_ID);
-		ThemeDisplay themeDisplay = (ThemeDisplay) getCurrentRequest()
-				.getAttribute(WebKeys.THEME_DISPLAY);
-		long communityId = themeDisplay.getScopeGroupId();
-		return configurationService.getPortletConfig(portletId, communityId);
+		return configurationService.getPortletConfig(getPortletId(),
+				getCommunityId());
 	}
 
 	public void addToView(Component component) {
@@ -288,6 +281,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	 */
 	public void refreshViews() {
 		try {
+			LOG.info("Refreshing views");
 			initializing = true;
 
 			cleanupViewPage();
@@ -318,7 +312,8 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 			return ConfigStatus.NO_CONFIG;
 		} else {
 			if (configurationService.isConfigured(portletConfig,
-					getCurrentRequest().getPreferences())) {
+					VaadinPortletService.getCurrentPortletRequest()
+							.getPreferences())) {
 				return ConfigStatus.CONFIGURED;
 			} else {
 				return ConfigStatus.UNCONFIGURED;
@@ -340,7 +335,6 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 					.getBuilder(eventBus, portletDomain,
 							modelBuilder.getModelToConfigMapping());
 
-			scriptModelBuilder.setApplication(this);
 			scriptModelBuilder.build();
 
 			LOG.debug("Building GUI");
@@ -358,11 +352,10 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	}
 
 	private void provideBackButtonFunctionality(String portletId) {
-		WebBrowser browser = (WebBrowser) mainWindow.getTerminal();
+		WebBrowser browser = getPage().getWebBrowser();
 		if (browser != null && !browser.isIE()) {
 			portletUriFragmentUtility = new PortletUriFragmentUtility(
 					portletDomain, portletId);
-			viewPage.addComponent(portletUriFragmentUtility);
 		} else {
 			LOG.info("Browser not detected or is Internet Explorer. Disabling back button functionality");
 			// ...weil sie zu einem unschönen Refresh des Browsers
@@ -421,17 +414,6 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		container.addComponent(labelForCommunityId);
 	}
 
-	private void registerAsPortletListener() {
-		if (getContext() instanceof PortletApplicationContext2) {
-			((PortletApplicationContext2) getContext()).addPortletListener(
-					this, this);
-		} else {
-			getMainWindow().showNotification(
-					getMessage("portlet.crud.error.noPortlet2Container"),
-					Notification.TYPE_ERROR_MESSAGE);
-		}
-	}
-
 	/**
 	 * Setzt den konfigurierten PortletPresenter-Title während des
 	 * Render-Request.
@@ -439,7 +421,8 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 	 * {@inheritDoc}
 	 */
 	public void handleRenderRequest(RenderRequest request,
-			RenderResponse response, Window window) {
+			RenderResponse response, UI ui) {
+		LOG.debug("Handling render request...");
 		if (portletDomain != null) {
 			if (portletDomain.getTitle() != null) {
 				response.setTitle(portletDomain.getTitle());
@@ -451,53 +434,61 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 			}
 		}
 		if (portletUriFragmentUtility != null) {
-			portletUriFragmentUtility.setInitialFragment(getMainWindow());
+			// portletUriFragmentUtility.setInitialFragment();
 		}
+		handleViewChange(request);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void handleActionRequest(ActionRequest request,
-			ActionResponse response, Window window) {
+			ActionResponse response, UI ui) {
 		// keine Aktion
+		LOG.debug("Handling action request...");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void handleEventRequest(EventRequest request,
-			EventResponse response, Window window) {
+			EventResponse response, UI ui) {
 		// keine Aktion
 	}
 
 	/**
 	 * Hier wird auf den Wechsel des {@link PortletMode} reagiert, der durch den
 	 * Container an das PortletPresenter gemeldet wird.
-	 * 
-	 * {@inheritDoc}
 	 */
+	@Override
 	public void handleResourceRequest(ResourceRequest request,
-			ResourceResponse response, Window window) {
+			ResourceResponse response, UI ui) {
+		LOG.debug("Handling resource request...");
+		handleViewChange(request);
+	}
 
-		if (window == null) {
-			return;
-		}
-		if (request.getPortletMode() == PortletMode.VIEW) {
-			if (window.getContent() != viewPage
-					&& status == ConfigStatus.UNKNOWN) {
-				firstLoad = true;
-				refreshViews();
+	private void handleViewChange(PortletRequest request) {
+		UI oldUI = UI.getCurrent();
+		try {
+			UI.setCurrent(this);
+			// if (ui == null) {
+			// return;
+			// }
+			if (request.getPortletMode() == PortletMode.VIEW) {
+				if (getContent() != viewPage && status == ConfigStatus.UNKNOWN) {
+					firstLoad = true;
+					refreshViews();
+				}
+				setContent(viewPage);
+			} else if (request.getPortletMode() == PortletMode.EDIT) {
+				LOG.info("Request on EDIT page!");
+				if (getContent() != editPage) {
+					configurationPresenter.refresh(portletConfig);
+				}
+				setContent(editPage);
+			} else if (request.getPortletMode() == PortletMode.HELP) {
+				this.datasourceInfo.refresh();
+				setContent(helpPage);
 			}
-			window.setContent(viewPage);
-		} else if (request.getPortletMode() == PortletMode.EDIT) {
-			if (window.getContent() != editPage) {
-				configurationPresenter.refresh(portletConfig);
-			}
-			window.setContent(editPage);
-		} else if (request.getPortletMode() == PortletMode.HELP) {
-			this.datasourceInfo.refresh();
-			window.setContent(helpPage);
+
+		} finally {
+			UI.setCurrent(oldUI);
 		}
 	}
 
@@ -506,7 +497,7 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		Popup popup = new Popup(event.getSource().getTitle(), event.getSource()
 				.getBody(), event.getSource().getContentType());
 
-		getMainWindow().addWindow(popup);
+		addWindow(popup);
 	}
 
 	ComponentContainer getViewContent() {
@@ -534,9 +525,8 @@ public class CrudPortletApplication extends SpringPortletApplication implements
 		this.portletDomain = portletDomain;
 	}
 
-	public static CrudPortletApplication getCurrentApplication() {
-		return (CrudPortletApplication) PortletApplication
-				.getCurrentApplication();
+	public static CrudPortletApplication getCurrent() {
+		return (CrudPortletApplication) UI.getCurrent();
 	}
 
 	public boolean isInitializing() {

@@ -25,8 +25,9 @@ import javax.portlet.PortletRequest;
 
 import org.springframework.beans.factory.annotation.Configurable;
 
+import com.vaadin.server.VaadinPortletService;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
 
 /**
  * 
@@ -60,7 +61,8 @@ public class PortalRole implements Serializable, Role {
 	 */
 	@Override
 	public boolean isMember(User user) {
-		PortletRequest request = LiferayApplication.getCurrentRequest();
+		PortletRequest request = VaadinPortletService
+				.getCurrentPortletRequest();
 		Principal principal = request.getUserPrincipal();
 		if ((user == null && principal == null)
 				|| (user.getName() != null && principal != null && user

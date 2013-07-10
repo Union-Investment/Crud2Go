@@ -18,14 +18,15 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.ui.security;
 
+import java.util.Locale;
+
 import org.apache.commons.lang.StringUtils;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.util.PropertyFormatter;
+import com.vaadin.data.util.converter.Converter;
 
 import de.unioninvestment.crud2go.spi.security.Cryptor;
 
-public class EncryptionFormatter extends PropertyFormatter {
+public class EncryptionFormatter implements Converter<String, String> {
 
 	private Cryptor cryptor;
 
@@ -33,34 +34,31 @@ public class EncryptionFormatter extends PropertyFormatter {
 		this.cryptor = cryptor;
 	}
 
-	public EncryptionFormatter(Cryptor cryptor, Property propertyDataSource) {
-		this.cryptor = cryptor;
-		setPropertyDataSource(propertyDataSource);
+	@Override
+	public String convertToModel(String value,
+			Class<? extends String> targetType, Locale locale)
+			throws com.vaadin.data.util.converter.Converter.ConversionException {
+		return cryptor.encrypt(value);
 	}
 
-	/**
-	 * Do not return password.
-	 */
 	@Override
-	public String format(Object value) {
-		String backingString = (String) value;
-		if (StringUtils.isNotBlank(backingString)) {
-			return cryptor.decrypt(backingString);
+	public String convertToPresentation(String value,
+			Class<? extends String> targetType, Locale locale)
+			throws com.vaadin.data.util.converter.Converter.ConversionException {
+		if (StringUtils.isNotBlank(value)) {
+			return cryptor.decrypt(value);
 		} else {
 			return null;
 		}
 	}
 
-	/**
-	 * Encrypt given password.
-	 */
 	@Override
-	public Object parse(String formattedValue) throws Exception {
-		return cryptor.encrypt(formattedValue);
+	public Class<String> getModelType() {
+		return String.class;
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<String> getPresentationType() {
 		return String.class;
 	}
 }

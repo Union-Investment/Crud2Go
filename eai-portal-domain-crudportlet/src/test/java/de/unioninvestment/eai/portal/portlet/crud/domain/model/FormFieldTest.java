@@ -24,7 +24,6 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
 
 public class FormFieldTest {
 

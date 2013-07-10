@@ -12,7 +12,7 @@
 	<artifactId>eai-portal-domain-crudportlet</artifactId>
 	<name>Osiris :: Investment :: EAI-Portal-Administration :: CRUD-Portlet Domain</name>
 	<packaging>jar</packaging>
-	
+
 	<dependencies>
 
 		<dependency>
@@ -95,13 +95,7 @@
 
 		<dependency>
 			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin</artifactId>
-			<!-- Configured as Liferay Dependency in liferay-plugin-package.properties -->
-		</dependency>
-
-		<dependency>
-			<groupId>org.vaadin.addons</groupId>
-			<artifactId>vaadin-sqlcontainer</artifactId>
+			<artifactId>vaadin-server</artifactId>
 		</dependency>
 
 		<dependency>

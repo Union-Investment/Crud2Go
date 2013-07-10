@@ -23,6 +23,8 @@ import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +38,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.vaadin.data.Item;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Form;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
@@ -97,6 +101,9 @@ public class RowEditingFormPresenterTest {
 	@Mock
 	private ContainerField containerFieldMock;
 
+	@Mock
+	private Button backButtonMock;
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -104,6 +111,8 @@ public class RowEditingFormPresenterTest {
 		when(tableMock.getContainer()).thenReturn(containerMock);
 		when(tableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(viewMock.getForm()).thenReturn(formMock);
+		when(viewMock.addBackButton(anyString(), any(ClickListener.class)))
+				.thenReturn(backButtonMock);
 		when(containerRowMock.getId()).thenReturn(containerRowIdMock);
 
 		// default

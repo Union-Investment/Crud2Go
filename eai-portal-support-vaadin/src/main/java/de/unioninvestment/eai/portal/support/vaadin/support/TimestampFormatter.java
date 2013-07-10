@@ -20,8 +20,10 @@ package de.unioninvestment.eai.portal.support.vaadin.support;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
-import com.vaadin.data.util.PropertyFormatter;
+import com.vaadin.data.util.converter.Converter;
 
 /**
  * Formatierung und Parsing von SQL Timestamps. Wird als Wrapper um eine
@@ -31,7 +33,7 @@ import com.vaadin.data.util.PropertyFormatter;
  */
 @SuppressWarnings("unchecked")
 @org.springframework.stereotype.Component
-public class TimestampFormatter extends PropertyFormatter {
+public class TimestampFormatter implements Converter<String, Timestamp> {
 
 	private static final long serialVersionUID = 1L;
 	private DateFormat format;
@@ -45,6 +47,26 @@ public class TimestampFormatter extends PropertyFormatter {
 		this.format = format;
 	}
 
+	@Override
+	public Timestamp convertToModel(String value,
+			Class<? extends Timestamp> targetType, Locale locale)
+			throws com.vaadin.data.util.converter.Converter.ConversionException {
+
+		if (value == null || value.trim().length() == 0) {
+			return null;
+		} else if (format != null) {
+			try {
+				return new Timestamp(format.parse(value).getTime());
+
+			} catch (ParseException e) {
+				throw new ConversionException(
+						"Error converting String to Timestamp", e);
+			}
+		} else {
+			return TimestampUtils.parseTimestamp(value);
+		}
+	}
+
 	/**
 	 * Formatiert Timestamp Werte in deutscher Lokalisierung, für andere
 	 * Datentypen wird toString() aufgerufen.
@@ -52,7 +74,10 @@ public class TimestampFormatter extends PropertyFormatter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(Object value) {
+	public String convertToPresentation(Timestamp value,
+			Class<? extends String> targetType, Locale locale)
+			throws com.vaadin.data.util.converter.Converter.ConversionException {
+
 		if (value instanceof Timestamp) {
 			if (format != null) {
 				return format.format(value);
@@ -66,20 +91,13 @@ public class TimestampFormatter extends PropertyFormatter {
 		}
 	}
 
-	/**
-	 * Parst deutsch lokalisierte Timestamps und konvertiert in
-	 * java.sql.Timestamp.
-	 * 
-	 * {@inheritDoc}
-	 */
 	@Override
-	public Object parse(String formattedValue) throws Exception {
-		if (formattedValue == null || formattedValue.trim().length() == 0) {
-			return null;
-		} else if (format != null) {
-			return new Timestamp(format.parse(formattedValue).getTime());
-		} else {
-			return TimestampUtils.parseTimestamp(formattedValue);
-		}
+	public Class<Timestamp> getModelType() {
+		return Timestamp.class;
 	}
+
+	public java.lang.Class<String> getPresentationType() {
+		return String.class;
+	}
+
 }

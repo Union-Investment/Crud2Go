@@ -1,27 +1,27 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.support.vaadin.table;
 
 import java.text.Format;
 
 import com.vaadin.data.Property;
-import com.vaadin.data.util.PropertyFormatter;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Field;
 
 /**
@@ -52,7 +52,7 @@ public interface DisplaySupport {
 	 * 
 	 * @return ein Formularfeld für die Anzeige (und ggf. Eingabe) von Daten
 	 */
-	Field createField(Class<?> type, Object propertyId, boolean multiline,
+	Field<?> createField(Class<?> type, Object propertyId, boolean multiline,
 			String inputPrompt, Format format);
 
 	/**
@@ -62,12 +62,13 @@ public interface DisplaySupport {
 	 *            Datentyp
 	 * @return Hilfsklasse zum Formatieren der Eingabe
 	 */
-	PropertyFormatter createFormatter(Class<?> type, Format format);
+	Converter<String, ?> createFormatter(Class<?> type, Format format);
 
 	/**
 	 * @param property
 	 *            das zu formatierende Datenfeld
 	 * @return der formatierte String zum Wert
 	 */
+	@Deprecated
 	String formatPropertyValue(Property property, Format format);
 }

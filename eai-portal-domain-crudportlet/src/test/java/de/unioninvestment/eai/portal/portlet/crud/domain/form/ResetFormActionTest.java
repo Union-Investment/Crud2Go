@@ -33,12 +33,12 @@ import org.mockito.MockitoAnnotations;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DeferredExecutionActionProxy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormFields;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Page;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DeferredExecutionActionProxy;
 
 public class ResetFormActionTest {
 

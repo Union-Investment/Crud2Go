@@ -1,18 +1,13 @@
 <module>
 	<!-- Inherit super widgetset -->
-	<inherits name="com.vaadin.terminal.gwt.DefaultWidgetSet" /> 
 
-    <inherits name="com.vaadin.addon.tableexport.widgetset.Tableexport_for_vaadinWidgetset" />
-    
-    <!-- <set-property name="user.agent" value="gecko1_8,ie9,safari"/> -->
+	<!-- <set-property name="user.agent" value="gecko1_8,ie9,safari"/> -->
 
-    <inherits name="org.vaadin.svg.widgetset.VsvgwebWidgetset" />
+	<inherits name="org.vaadin.peter.contextmenu.ContextmenuWidgetset" />
 
-    <inherits name="org.vaadin.peter.contextmenu.ContextmenuWidgetset" />
+	<inherits name="org.vaadin.jouni.animator.AnimatorWidgetset" />
 
-    <inherits name="org.vaadin.jouni.animator.AnimatorWidgetset" />
+	<inherits name="org.vaadin.svg.widgetset.VsvgwebWidgetset" />
 
-    
-
-    <inherits name="org.vaadin.cssinject.Cssinject_addonWidgetset" />
+	<inherits name="com.vaadin.DefaultWidgetSet" />
 </module>

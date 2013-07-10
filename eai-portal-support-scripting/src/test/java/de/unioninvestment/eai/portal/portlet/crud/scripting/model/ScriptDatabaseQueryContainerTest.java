@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
 

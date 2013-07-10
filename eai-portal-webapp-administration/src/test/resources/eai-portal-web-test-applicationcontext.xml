@@ -59,10 +59,6 @@
 		<bean
 			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.SqlTimestampDataType" />
 		<bean
-			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.SqlTimeDataType" />
-		<bean
-			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.OracleTimestampDataType" />
-		<bean
 			class="de.unioninvestment.eai.portal.portlet.crud.datatypes.OtherDataType" />
 	</util:list>
 

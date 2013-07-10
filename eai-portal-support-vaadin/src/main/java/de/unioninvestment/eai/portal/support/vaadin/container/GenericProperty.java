@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.support.vaadin.container;
 
 import java.util.Arrays;
@@ -28,7 +28,7 @@ import com.vaadin.data.Property;
  * 
  * @author carsten.mjartan
  */
-public class GenericProperty implements Property {
+public class GenericProperty<T> implements Property<T> {
 
 	/**
 	 * wird geworfen beim Versuch {@code null} als Wert von
@@ -48,10 +48,10 @@ public class GenericProperty implements Property {
 	private boolean readOnly;
 	private GenericItem item;
 
-	private Object value;
-	private Object newValue;
+	private T value;
+	private T newValue;
 
-	public GenericProperty(Column column, Object value) {
+	public GenericProperty(Column column, T value) {
 		this.metaData = column;
 		this.readOnly = metaData.isReadOnly();
 		this.value = value;
@@ -85,20 +85,19 @@ public class GenericProperty implements Property {
 	}
 
 	@Override
-	public Object getValue() {
+	public T getValue() {
 		return isModified() ? newValue : value;
 	}
 
 	@Override
-	public void setValue(Object newValue) throws ReadOnlyException,
-			ConversionException {
+	public void setValue(T newValue) throws ReadOnlyException {
 		if (isReadOnly()) {
 			throw new ReadOnlyException("Field " + metaData.getName()
 					+ " is readOnly");
 		}
 		if (newValue != null
 				&& !getType().isAssignableFrom(newValue.getClass())) {
-			throw new ConversionException("Cannot convert value of type '"
+			throw new RuntimeException("Cannot convert value of type '"
 					+ newValue.getClass().getName() + "' to type '"
 					+ getType().getName() + "'");
 		}
@@ -112,8 +111,8 @@ public class GenericProperty implements Property {
 	}
 
 	@Override
-	public Class<?> getType() {
-		return metaData.getType();
+	public Class<? extends T> getType() {
+		return (Class<? extends T>) metaData.getType();
 	}
 
 	@Override

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.server.Sizeable;
 
 public class DefaultCustomComponentViewTest {
 

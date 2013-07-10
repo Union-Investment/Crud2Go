@@ -26,6 +26,7 @@ import static org.junit.Assert.assertThat;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,19 +49,43 @@ public class TimestampFormatterTest {
 	}
 
 	@Test
+	public void shouldFormatTimestampWithNanos() {
+		TimestampFormatter formatter = new TimestampFormatter(null);
+
+		assertEquals("01.01.2011 15:23:22.123456789",
+				formatter.convertToPresentation(timestampNanos, String.class,
+						Locale.GERMANY));
+	}
+
+	@Test
+	public void shouldParseTimestampWithNanos() {
+		TimestampFormatter formatter = new TimestampFormatter(null);
+
+		assertEquals(timestampNanos, formatter.convertToModel(
+				"01.01.2011 15:23:22.123456789", Timestamp.class,
+				Locale.GERMANY));
+	}
+
+	@Test
 	public void shouldFormatTimestampsAsGermanDates() {
 		TimestampFormatter formatter = new TimestampFormatter(null);
-		assertEquals("01.01.2011 15:23:22", formatter.format(timestamp1));
-		assertEquals("true", formatter.format(true)); // needed by vaadin (why?)
-		assertNull(formatter.format(null));
+		assertEquals("01.01.2011 15:23:22", formatter.convertToPresentation(
+				timestamp1, String.class, Locale.GERMANY));
+		// TODO needed by vaadin 6 (why?), what about Vaadin 7?
+		// assertEquals("true", formatter.format(true));
+		assertNull(formatter.convertToPresentation(null, String.class,
+				Locale.GERMANY));
 	}
 
 	@Test
 	public void shouldParseGermanTimestamps() throws Exception {
 		TimestampFormatter formatter = new TimestampFormatter(null);
-		assertEquals(timestamp1, formatter.parse("01.01.2011 15:23:22"));
-		assertNull(formatter.parse(""));
-		assertNull(formatter.parse(null));
+		assertEquals(timestamp1, formatter.convertToModel(
+				"01.01.2011 15:23:22", Timestamp.class, Locale.GERMANY));
+		assertNull(formatter
+				.convertToModel("", Timestamp.class, Locale.GERMANY));
+		assertNull(formatter.convertToModel(null, Timestamp.class,
+				Locale.GERMANY));
 	}
 
 	@Test
@@ -70,14 +95,15 @@ public class TimestampFormatterTest {
 		assertEquals(
 				new Timestamp(
 						new GregorianCalendar(2011, 0, 1, 15, 23)
-								.getTimeInMillis()),
-				formatter.parse("01.01.2011 15:23"));
+								.getTimeInMillis()), formatter.convertToModel(
+						"01.01.2011 15:23", Timestamp.class, Locale.GERMANY));
 	}
 
 	@Test
 	public void shouldFormatUsingDateFormat() throws Exception {
 		TimestampFormatter formatter = new TimestampFormatter(
 				new SimpleDateFormat("dd.MM.yyyy HH:mm"));
-		assertThat(formatter.format(timestamp1), is("01.01.2011 15:23"));
+		assertThat(formatter.convertToPresentation(timestamp1, String.class,
+				Locale.GERMANY), is("01.01.2011 15:23"));
 	}
 }

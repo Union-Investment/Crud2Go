@@ -28,10 +28,10 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.vaadin.addon.sqlcontainer.ColumnProperty;
-import com.vaadin.addon.sqlcontainer.RowItem;
-import com.vaadin.addon.sqlcontainer.TemporaryRowId;
-import com.vaadin.addon.sqlcontainer.query.QueryDelegate;
+import com.vaadin.data.util.sqlcontainer.ColumnProperty;
+import com.vaadin.data.util.sqlcontainer.RowItem;
+import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
+import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;

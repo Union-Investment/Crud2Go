@@ -13,6 +13,10 @@
 	<name>Osiris :: Investment :: EAI-Portal-Administration :: Support for Vaadin</name>
 
 	<dependencies>
+		<dependency>
+			<groupId>ru.xpoft.vaadin</groupId>
+			<artifactId>spring-vaadin-integration</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>de.uit.eai.portal</groupId>
@@ -79,35 +83,22 @@
 
 		<dependency>
 			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin</artifactId>
-			<scope>provided</scope>
-			<!-- Configured as Liferay Dependency in liferay-plugin-package.properties -->
+			<artifactId>vaadin-server</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.vaadin.addon</groupId>
 			<artifactId>jfreechartwrapper</artifactId>
-			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.vaadin.addons</groupId>
-			<artifactId>vaadin-sqlcontainer</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.vaadin.addons</groupId>
+			<groupId>de.codecentric.vaadin.addons</groupId>
 			<artifactId>svgcomponent</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>contextmenu</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.vaadin.addon</groupId>
-			<artifactId>propertytranslator</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

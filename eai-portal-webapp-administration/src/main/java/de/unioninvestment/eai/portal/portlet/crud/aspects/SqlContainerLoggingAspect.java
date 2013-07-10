@@ -54,13 +54,13 @@ public class SqlContainerLoggingAspect {
 	 * @throws Throwable
 	 *             bei Fehler
 	 */
-	@Around("execution(public * com.vaadin.addon.sqlcontainer.query.QueryDelegate.getCount())")
+	@Around("execution(public * com.vaadin.data.util.sqlcontainer.query.QueryDelegate.getCount())")
 	public Object logCountQueries(ProceedingJoinPoint pjp) throws Throwable {
 		LOG.info("querying database for row count");
 		return runAndLogDuration(pjp);
 	}
 
-	@Around("execution(public * com.vaadin.addon.sqlcontainer.query.QueryDelegate.getResults(..))")
+	@Around("execution(public * com.vaadin.data.util.sqlcontainer.query.QueryDelegate.getResults(..))")
 	public Object logResultQueries(ProceedingJoinPoint pjp) throws Throwable {
 		return runAndLogDuration(pjp);
 	}
@@ -89,7 +89,7 @@ public class SqlContainerLoggingAspect {
 		}
 	}
 
-	@Around("execution(public * com.vaadin.addon.sqlcontainer.SQLContainer.*(..)) && !execution(public * com.vaadin.addon.sqlcontainer.SQLContainer.getType(..))")
+	@Around("execution(public * com.vaadin.data.util.sqlcontainer.SQLContainer.*(..)) && !execution(public * com.vaadin.data.util.sqlcontainer.SQLContainer.getType(..))")
 	public Object logContainerCalls(ProceedingJoinPoint pjp) throws Throwable {
 		return runAndLogDuration(pjp);
 	}

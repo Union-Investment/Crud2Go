@@ -23,7 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import com.vaadin.ui.PopupDateField;
+import com.vaadin.shared.ui.datefield.Resolution;
 
 public class DateUtils {
 
@@ -70,26 +70,26 @@ public class DateUtils {
 		return resolution;
 	}
 
-	public static int getVaadinResolution(int resolution) {
+	public static Resolution getVaadinResolution(int resolution) {
 		switch (resolution) {
 		case Calendar.SECOND:
-			return PopupDateField.RESOLUTION_SEC;
+			return Resolution.SECOND;
 		case Calendar.MINUTE:
-			return PopupDateField.RESOLUTION_MIN;
+			return Resolution.MINUTE;
 		case Calendar.HOUR_OF_DAY:
-			return PopupDateField.RESOLUTION_HOUR;
+			return Resolution.HOUR;
 		case Calendar.DAY_OF_MONTH:
-			return PopupDateField.RESOLUTION_DAY;
+			return Resolution.DAY;
 		case Calendar.MONTH:
-			return PopupDateField.RESOLUTION_MONTH;
+			return Resolution.MONTH;
 		case Calendar.YEAR:
-			return PopupDateField.RESOLUTION_YEAR;
+			return Resolution.YEAR;
 		default:
-			return PopupDateField.RESOLUTION_MSEC;
+			return Resolution.SECOND;
 		}
 	}
 
-	public static int getVaadinResolution(String dateFormat) {
+	public static Resolution getVaadinResolution(String dateFormat) {
 		return getVaadinResolution(getResolution(dateFormat));
 	}
 

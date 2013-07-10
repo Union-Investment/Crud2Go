@@ -26,22 +26,25 @@ import static org.mockito.Mockito.when;
 import groovy.lang.Closure;
 
 import java.sql.Timestamp;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
-import com.vaadin.data.util.PropertyFormatter;
+import com.vaadin.data.util.converter.Converter;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
+import de.unioninvestment.eai.portal.support.vaadin.junit.Answers;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class NewRowDefaultsSetterHandlerTest {
 
@@ -62,7 +65,10 @@ public class NewRowDefaultsSetterHandlerTest {
 	private EditorSupport editorSupportMock;
 
 	@Mock
-	private PropertyFormatter propertyFormatterMock;
+	private Converter<String, Timestamp> propertyFormatterMock;
+
+	@Rule
+	public LiferayContext vaadinContext = new LiferayContext();
 
 	@Before
 	public void setUp() {
@@ -79,19 +85,16 @@ public class NewRowDefaultsSetterHandlerTest {
 		when(gString1.call(any())).thenReturn("2");
 
 		when(sourceMock.getType(anyString())).thenAnswer(
-				new Answer<Class<Timestamp>>() {
-					@Override
-					public Class<Timestamp> answer(InvocationOnMock invocation)
-							throws Throwable {
-						return Timestamp.class;
-					}
-				});
+				Answers.object(Timestamp.class));
 
 		when(sourceMock.findEditor(anyString())).thenReturn(editorSupportMock);
 		when(editorSupportMock.createFormatter(Timestamp.class, null))
-				.thenReturn(
-						propertyFormatterMock);
-		when(propertyFormatterMock.format(any())).thenReturn("01.01.2011");
+				.thenAnswer(Answers.object(propertyFormatterMock));
+		when(
+				propertyFormatterMock.convertToModel("2", Timestamp.class,
+						Locale.GERMANY)).thenReturn(
+				new Timestamp(new GregorianCalendar(2011, 0, 1)
+						.getTimeInMillis()));
 	}
 
 	@Test

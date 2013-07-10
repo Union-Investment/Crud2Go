@@ -7,7 +7,5 @@
 		<instanceable>true</instanceable>
 		<user-principal-strategy>screenName</user-principal-strategy>
 		<ajaxable>false</ajaxable>
-		<header-portal-css>/css/eai.css</header-portal-css>
-		<header-portlet-css>/css/styles.css</header-portlet-css>
 	</portlet>
 </liferay-portlet-app>

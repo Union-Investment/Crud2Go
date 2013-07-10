@@ -25,11 +25,12 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.vaadin.server.VaadinPortletService;
+
 import de.unioninvestment.crud2go.spi.security.Cryptor;
 import de.unioninvestment.crud2go.spi.security.CryptorFactory;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsConfig;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
 
 public class Realm {
 
@@ -37,11 +38,10 @@ public class Realm {
 	private String password;
 	private Cryptor cryptor;
 
-	public Realm(AuthenticationRealmConfig config,
-			CryptorFactory cryptorFactory) {
+	public Realm(AuthenticationRealmConfig config, CryptorFactory cryptorFactory) {
 
-		PortletPreferences preferences = LiferayApplication.getCurrentRequest()
-				.getPreferences();
+		PortletPreferences preferences = VaadinPortletService
+				.getCurrentPortletRequest().getPreferences();
 
 		CredentialsConfig credentials = config.getCredentials();
 		String usernameKey = credentials.getUsername().getPreferenceKey();
@@ -68,8 +68,8 @@ public class Realm {
 	 * @param httpClient
 	 */
 	public void applyBasicAuthentication(DefaultHttpClient httpClient) {
-		String plaintextPassword = cryptor == null ? this.password
-				: cryptor.decrypt(this.password);
+		String plaintextPassword = cryptor == null ? this.password : cryptor
+				.decrypt(this.password);
 		httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY,
 				new UsernamePasswordCredentials(username, plaintextPassword));
 	}

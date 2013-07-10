@@ -54,6 +54,7 @@
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Spring source -->
@@ -116,13 +117,27 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.vaadin.addons</groupId>
-			<artifactId>vaadin-sqlcontainer</artifactId>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-server</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.vaadin.addons</groupId>
-			<artifactId>cssinject</artifactId>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client-compiled</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-themes</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin.external.atmosphere</groupId>
+			<artifactId>atmosphere-runtime</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.vaadin.addon</groupId>
 			<artifactId>jfreechartwrapper</artifactId>
@@ -136,16 +151,12 @@
 			<artifactId>tableexport</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.vaadin.addons</groupId>
+			<groupId>de.codecentric.vaadin.addons</groupId>
 			<artifactId>svgcomponent</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>contextmenu</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.vaadin.addon</groupId>
-			<artifactId>propertytranslator</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -193,10 +204,6 @@
 		</dependency>
 
 		<!-- Provided by app server -->
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>xml-apis</groupId>
 			<artifactId>xml-apis</artifactId>
@@ -320,12 +327,14 @@
 					<excludes>
 						<exclude>de/unioninvestment/eai/portal/portlet/crud/domain/aspects/*.java</exclude>
 					</excludes>
+					<Xlint>warning</Xlint>
+					<XnoInline>true</XnoInline>
 					<verbose>false</verbose>
 					<showWeaveInfo>false</showWeaveInfo>
 					<weaveDependencies>
 						<weaveDependency>
-							<groupId>org.vaadin.addons</groupId>
-							<artifactId>vaadin-sqlcontainer</artifactId>
+							<groupId>com.vaadin</groupId>
+							<artifactId>vaadin-server</artifactId>
 						</weaveDependency>
 					</weaveDependencies>
 					<aspectLibraries>
@@ -343,16 +352,42 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-war-plugin</artifactId> 
+				<configuration> <webResources> <resource> <directory>${basedir}/src/main/webapp-vaadin</directory> 
+				</resource> </webResources> </configuration> </plugin> -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.plugin.version}</version>
 				<configuration>
-					<webResources>
-						<resource>
-							<directory>${basedir}/src/main/webapp-vaadin</directory>
-						</resource>
-					</webResources>
+					<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+					<!-- <runTarget>mobilemail</runTarget> -->
+					<!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This 
+						way compatible with Vaadin eclipse plugin. -->
+					<webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets
+					</webappDirectory>
+					<hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets
+					</hostedWebapp>
+					<noServer>true</noServer>
+					<!-- Remove draftCompile when project is ready -->
+					<draftCompile>false</draftCompile>
+					<compileReport>true</compileReport>
+					<style>OBF</style>
+					<strict>true</strict>
+					<runTarget>http://localhost:8080/</runTarget>
 				</configuration>
+				<executions>
+					<execution>
+						<configuration>
+							<!-- if you don't specify any modules, the plugin will find them -->
+							<!-- <modules> <module>com.vaadin.demo.mobilemail.gwt.ColorPickerWidgetSet</module> 
+								</modules> -->
+						</configuration>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -28,16 +28,12 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponentGenerator;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
 
 public class CustomComponentGeneratorImplTest {
 
 	@Mock
 	private Closure<Object> closureMock;
-
-	@Mock
-	private PortletApplication applicationMock;
 
 	@Before
 	public void setUp() {
@@ -47,7 +43,7 @@ public class CustomComponentGeneratorImplTest {
 	@Test
 	public void shouldCallClosure() {
 		CustomComponentGenerator generator = new CustomComponentGeneratorImpl(
-				closureMock, applicationMock);
+				closureMock);
 
 		generator.generate();
 

@@ -50,6 +50,7 @@ import de.unioninvestment.eai.portal.portlet.crud.datatypes.StringDataType;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxTableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
+import de.unioninvestment.eai.portal.support.vaadin.junit.Answers;
 
 public class CrudTableColumnGeneratorTest {
 
@@ -147,8 +148,7 @@ public class CrudTableColumnGeneratorTest {
 		Object component = columnGenerator.generateCell(tableMock, itemId,
 				columnId);
 		assertTrue(component instanceof TextArea);
-		assertEquals(100.0f, ((TextArea) component).getHeight(),
-				0);
+		assertEquals(100.0f, ((TextArea) component).getHeight(), 0);
 	}
 
 	@Test
@@ -192,6 +192,7 @@ public class CrudTableColumnGeneratorTest {
 		when(tableColumnsMock.getCheckBox(anyString())).thenReturn(
 				checkBoxModelMock);
 		when(propertyMock.getValue()).thenReturn("true");
+		when(propertyMock.getType()).thenAnswer(Answers.object(String.class));
 		when(itemMock.getItemProperty(columnId)).thenReturn(propertyMock);
 		when(tableMock.getPropertyValue(itemId, columnId, propertyMock))
 				.thenReturn(new Object());

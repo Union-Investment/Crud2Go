@@ -68,13 +68,9 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptP
 import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
 import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 
 @ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
 public class ScriptModelBuilderTest extends ModelSupport {
-
-	@Mock
-	private PortletApplication applicationMock;
 
 	@Mock
 	private ScriptBuilder scriptBuilderMock;
@@ -682,6 +678,5 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		scriptModelBuilder = new ScriptModelBuilder(factory, eventBus,
 				connectionPoolFactoryMock, userFactoryMock, scriptBuilderMock,
 				portlet, mapping);
-		scriptModelBuilder.setApplication(applicationMock);
 	}
 }

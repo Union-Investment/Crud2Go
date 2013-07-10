@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
 import static java.util.Arrays.asList;
@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -41,6 +42,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.test.context.ContextConfiguration;
 
+import com.vaadin.server.Page.Styles;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 
@@ -55,6 +57,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.DomainSpringPortletContextTest;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTable;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
@@ -77,15 +80,26 @@ public class DefaultTableViewTest extends DomainSpringPortletContextTest {
 	@Mock
 	CrudTable crudTableMock;
 
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext();
+
+	@Mock
+	private Styles stylesMock;
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
+
+		liferayContext.initialize();
+		when(liferayContext.getPageMock().getStyles()).thenReturn(stylesMock);
+
 		initializeView();
 	}
 
 	private void initializeView() {
 		view = new DefaultTableView();
-		when(databaseContainerMock.findDisplayer(Mockito.anyString())).thenReturn(new OtherDataType());
+		when(databaseContainerMock.findDisplayer(Mockito.anyString()))
+				.thenReturn(new OtherDataType());
 		view.initialize(presenterMock, databaseContainerMock, modelTableMock,
 				10, 1D);
 	}

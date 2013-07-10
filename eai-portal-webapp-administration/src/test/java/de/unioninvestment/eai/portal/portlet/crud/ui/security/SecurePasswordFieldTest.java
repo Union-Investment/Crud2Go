@@ -80,8 +80,7 @@ public class SecurePasswordFieldTest {
 
 	@Test
 	public void shouldChangeRealPasswordIfPlaceholderIsSetAndPreviouslyNull() {
-		ObjectProperty realDataSource = new ObjectProperty(null,
-				String.class);
+		ObjectProperty realDataSource = new ObjectProperty(null, String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
 
@@ -96,7 +95,7 @@ public class SecurePasswordFieldTest {
 				String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
-		field.setWriteThrough(false);
+		field.setBuffered(true);
 
 		field.setValue("ecdba");
 
@@ -109,7 +108,7 @@ public class SecurePasswordFieldTest {
 				String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
-		field.setWriteThrough(false);
+		field.setBuffered(true);
 
 		field.setValue("ecdba");
 		field.commit();
@@ -123,7 +122,7 @@ public class SecurePasswordFieldTest {
 				String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
-		field.setWriteThrough(false);
+		field.setBuffered(true);
 
 		field.setValue("ecdba");
 		field.discard();

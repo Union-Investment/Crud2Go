@@ -22,8 +22,9 @@ import java.io.Serializable;
 
 import javax.portlet.PortletPreferences;
 
+import com.vaadin.server.VaadinPortletService;
+
 import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
 
 /**
  * A value that is persisted in the portlet preferences.
@@ -52,8 +53,8 @@ public class Preference implements Serializable {
 	 *         value if not set
 	 */
 	public String getValue() {
-		PortletPreferences liferayPreferences = LiferayApplication
-				.getCurrentRequest().getPreferences();
+		PortletPreferences liferayPreferences = VaadinPortletService
+				.getCurrentPortletRequest().getPreferences();
 		return liferayPreferences.getValue(getKey(), config.getDefault());
 	}
 

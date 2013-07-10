@@ -40,27 +40,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
-import org.vaadin.cssinject.CSSInject;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Buffered.SourceException;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.terminal.gwt.server.WebBrowser;
+import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.Page;
+import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.ui.MultiSelectMode;
 import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.AbstractSelect.MultiSelectMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window.Notification;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
@@ -85,7 +87,6 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTableColumnGe
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.VaadinCustomColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.VaadinExportableColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFactoryWrapper;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.support.BufferedTable;
 
 /**
@@ -206,8 +207,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 					+ " .v-table-cell-content { height: " + rowHeight + "px; }";
 			css += "div.crudTable td div.v-table-cell-wrapper { max-height: "
 					+ rowHeight + "px; }";
-			CSSInject injector = new CSSInject(css);
-			addComponent(injector);
+			Page.getCurrent().getStyles().add(css);
 		}
 
 		table.setPageLength(pageLength);
@@ -450,7 +450,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 				} else if (c.isBinary()) {
 					BLobColumnGenerator generator = new BLobColumnGenerator(
-							PortletApplication.getCurrentApplication(),
 							container, columns);
 					tableComponent.addGeneratedColumn(columnName, generator);
 				} else {
@@ -721,8 +720,8 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private Layout initButtonBar() {
-		HorizontalLayout buttonbar = new HorizontalLayout();
-		buttonbar.setSpacing(true);
+		CssLayout buttonbar = new CssLayout();
+		buttonbar.setStyleName("actions");
 
 		if (!this.presenter.isReadonly()) {
 			if (!this.presenter.isReadonly()) {
@@ -778,8 +777,8 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 					@Override
 					public void start(String filename, String mimeType) {
-						exportTask = new DownloadExportTask(table
-								.getApplication(), table, tableModel,
+						exportTask = new DownloadExportTask(UI.getCurrent(),
+								table, tableModel,
 								automaticDownloadIsPossible(), filename,
 								mimeType);
 						executeExport(exportTask);
@@ -854,16 +853,13 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	 */
 	@SuppressWarnings("serial")
 	protected void setupErrorHandling() {
-		table.setErrorHandler(new ComponentErrorHandler() {
-
+		table.setErrorHandler(new ErrorHandler() {
 			@Override
-			public boolean handleComponentError(ComponentErrorEvent event) {
+			public void error(com.vaadin.server.ErrorEvent event) {
 				Throwable throwable = event.getThrowable();
 				if (throwable instanceof SourceException) {
 					onError(throwable);
-					return true;
 				}
-				return false;
 			}
 		});
 	}
@@ -888,8 +884,8 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			LOG.debug("Field error for {}: {}", sourceCaption,
 					throwable.getMessage());
 
-			showNotification(sourceCaption + ": " + message,
-					Notification.TYPE_ERROR_MESSAGE);
+			Notification.show(sourceCaption + ": " + message,
+					Notification.Type.ERROR_MESSAGE);
 			return;
 		} else {
 			LOG.error("Error in table operation", throwable);
@@ -899,7 +895,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			message = getMessage("portlet.crud.error.ofType", throwable
 					.getClass().getName());
 		}
-		showNotification(message, Notification.TYPE_ERROR_MESSAGE);
+		Notification.show(message, Notification.Type.ERROR_MESSAGE);
 	}
 
 	private void updateVisibleColumns(boolean isEditMode) {
@@ -951,9 +947,9 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	@Override
-	public void showNotification(String msgKey, int notificationType) {
-		getApplication().getMainWindow().showNotification(msgKey,
-				notificationType);
+	public void showNotification(String msgKey,
+			Notification.Type notificationType) {
+		Notification.show(msgKey, notificationType);
 	}
 
 	void setTable(CrudTable table) {
@@ -961,13 +957,13 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void exportCSVSheet() {
-		executeExport(new CsvExportTask(table.getApplication(), table,
-				tableModel, automaticDownloadIsPossible()));
+		executeExport(new CsvExportTask(UI.getCurrent(), table, tableModel,
+				automaticDownloadIsPossible()));
 	}
 
 	private void exportExcelSheet() {
-		executeExport(new ExcelExportTask(table.getApplication(), table,
-				tableModel, automaticDownloadIsPossible()));
+		executeExport(new ExcelExportTask(UI.getCurrent(), table, tableModel,
+				automaticDownloadIsPossible()));
 	}
 
 	private void executeExport(ExportTask exportTask) {
@@ -976,13 +972,12 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 		ExportDialog dialog = new ExportDialog(table, exportTask,
 				automaticDownload);
-		this.getApplication().getMainWindow().addWindow(dialog);
+		UI.getCurrent().addWindow(dialog);
 		exportExecutor.execute(exportTask);
 	}
 
 	private boolean automaticDownloadIsPossible() {
-		WebBrowser browser = (WebBrowser) table.getApplication()
-				.getMainWindow().getTerminal();
+		WebBrowser browser = Page.getCurrent().getWebBrowser();
 		return browser != null && !browser.isIE();
 	}
 

@@ -18,16 +18,15 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.user;
 
-import java.security.Principal;
 import java.util.Set;
-
-import javax.portlet.PortletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinService;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 
 /**
  * Repräsentriert einen User.
@@ -74,11 +73,11 @@ public class CurrentUser extends User {
 	}
 
 	private User currentUser() {
-		PortletRequest request = PortletApplication.getCurrentRequest();
-		if (request != null) {
-			Principal userPrincipal = request.getUserPrincipal();
-			if (userPrincipal != null) {
-				return new NamedUser(userPrincipal.getName(), portalRoles);
+		VaadinRequest currentRequest = VaadinService.getCurrentRequest();
+		if (currentRequest != null) {
+			String remoteUser = currentRequest.getRemoteUser();
+			if (remoteUser != null) {
+				return new NamedUser(remoteUser, portalRoles);
 			}
 		} else {
 			LOG.warn("No portlet request found - that's ok for unit testing. Returning anonymous user");

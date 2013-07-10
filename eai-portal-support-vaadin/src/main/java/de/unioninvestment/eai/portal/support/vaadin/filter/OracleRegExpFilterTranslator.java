@@ -20,9 +20,9 @@ package de.unioninvestment.eai.portal.support.vaadin.filter;
 
 import java.text.MessageFormat;
 
-import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
-import com.vaadin.addon.sqlcontainer.query.generator.filter.FilterTranslator;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.FilterTranslator;
 import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 
 /**
@@ -32,6 +32,8 @@ import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
  * 
  */
 public class OracleRegExpFilterTranslator implements FilterTranslator {
+
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public boolean translatesFilter(Filter filter) {

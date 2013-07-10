@@ -1,29 +1,29 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.vaadin.addon.sqlcontainer.RowId;
-import com.vaadin.terminal.StreamResource.StreamSource;
+import com.vaadin.data.util.sqlcontainer.RowId;
+import com.vaadin.server.StreamResource.StreamSource;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQueryEventWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
@@ -64,7 +64,6 @@ public class ContainerBlob {
 		this.columnName = columnName;
 	}
 
-
 	public boolean isModified() {
 		return isModified;
 	}
@@ -101,8 +100,7 @@ public class ContainerBlob {
 			return data != null;
 		} else {
 			return queryDelegate.hasBlobData(
-					(RowId) containerRowId.getInternalId(),
-					columnName);
+					(RowId) containerRowId.getInternalId(), columnName);
 		}
 	}
 

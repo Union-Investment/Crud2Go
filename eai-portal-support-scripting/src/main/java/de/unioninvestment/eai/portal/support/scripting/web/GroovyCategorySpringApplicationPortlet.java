@@ -34,7 +34,7 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.category.Collections
 import de.unioninvestment.eai.portal.portlet.crud.scripting.category.DateCategory;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.category.GStringCategory;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.category.StringCategory;
-import de.unioninvestment.eai.portal.support.vaadin.SpringApplicationPortlet2;
+import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortlet;
 
 /**
  * Erweitert bestehende Klassen um Methoden, die in Groovy verwendet werden
@@ -43,8 +43,7 @@ import de.unioninvestment.eai.portal.support.vaadin.SpringApplicationPortlet2;
  * @author eugen.melnichuk
  * @author bastian.kr0l
  */
-public class GroovyCategorySpringApplicationPortlet extends
-		SpringApplicationPortlet2 {
+public class GroovyCategorySpringApplicationPortlet extends CrudVaadinPortlet {
 
 	/**
 	 * Liste mit Klassen, die zusätzliche Methoden enthalten.

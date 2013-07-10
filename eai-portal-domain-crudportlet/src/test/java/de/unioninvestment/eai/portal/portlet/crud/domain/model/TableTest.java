@@ -45,8 +45,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.vaadin.addon.sqlcontainer.RowId;
 import com.vaadin.data.Item;
+import com.vaadin.data.util.sqlcontainer.RowId;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;

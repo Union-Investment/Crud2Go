@@ -23,7 +23,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-import com.vaadin.data.Property;
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -31,9 +30,9 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window.Notification;
 
 import de.unioninvestment.crud2go.spi.security.Cryptor;
 import de.unioninvestment.crud2go.spi.security.CryptorFactory;
@@ -73,7 +72,7 @@ public class DefaultPreferencesView extends CustomComponent implements
 
 	private Form createForm() {
 		final Form form = new Form();
-		form.setWriteThrough(false);
+		form.setBuffered(true);
 
 		Button submitButton = new Button("Einstellungen speichern",
 				new ClickListener() {
@@ -113,11 +112,13 @@ public class DefaultPreferencesView extends CustomComponent implements
 			if (preference.isPassword()) {
 				Cryptor cryptor = cryptorFactory.getCryptor(preference
 						.getEncryptionAlgorithm());
-				Property preferenceProperty = new PreferenceProperty(key);
+				PreferenceProperty preferenceProperty = new PreferenceProperty(
+						key);
 				EncryptionFormatter encryptionFormatter = new EncryptionFormatter(
-						cryptor, preferenceProperty);
+						cryptor);
 				field = new SecurePasswordField(preference.getTitle(),
-						encryptionFormatter);
+						preferenceProperty);
+				field.setConverter(encryptionFormatter);
 
 			} else {
 				field = new TextField(preference.getTitle(),
@@ -133,14 +134,12 @@ public class DefaultPreferencesView extends CustomComponent implements
 
 	@Override
 	public void showError(String message) {
-		getApplication().getMainWindow().showNotification(message,
-				Notification.TYPE_ERROR_MESSAGE);
+		Notification.show(message, Notification.Type.ERROR_MESSAGE);
 	}
 
 	@Override
 	public void showNotification(String message) {
-		getApplication().getMainWindow().showNotification(message,
-				Notification.TYPE_HUMANIZED_MESSAGE);
+		Notification.show(message, Notification.Type.HUMANIZED_MESSAGE);
 	}
 
 	private String createValidClassName(String preferenceKey) {

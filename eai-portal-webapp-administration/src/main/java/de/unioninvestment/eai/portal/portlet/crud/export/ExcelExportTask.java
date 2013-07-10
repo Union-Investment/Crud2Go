@@ -28,10 +28,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
-import com.vaadin.Application;
 import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.addon.tableexport.TableExport;
 import com.vaadin.addon.tableexport.TemporaryFileDownloadResource;
+import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 
@@ -97,8 +97,8 @@ public class ExcelExportTask extends AbstractTableExportTask implements
 					setMimeType(EXCEL_MIME_TYPE);
 				}
 				// removed "super."
-				final boolean success = sendConvertedFileToUser(getTable()
-						.getApplication(), tempFile, exportFileName);
+				final boolean success = sendConvertedFileToUser(
+						UI.getCurrent(), tempFile, exportFileName);
 				return success;
 			} catch (final IOException e) {
 				LOGGER.warn("Converting to XLS failed with IOException ", e);
@@ -110,16 +110,17 @@ public class ExcelExportTask extends AbstractTableExportTask implements
 		}
 
 		@Override
-		protected boolean sendConvertedFileToUser(Application app,
-				File fileToExport, String exportFileName) {
+		protected boolean sendConvertedFileToUser(UI ui, File fileToExport,
+				String exportFileName) {
 			if (isAutomaticDownload()) {
-				return super.sendConvertedFileToUser(app, fileToExport,
-						exportFileName);
+				return super.sendConvertedFileToUser(UI.getCurrent(),
+						fileToExport, exportFileName);
 			} else {
 				TemporaryFileDownloadResource resource;
 				try {
-					resource = new TemporaryFileDownloadResource(app,
-							exportFileName, mimeType, fileToExport);
+					resource = new TemporaryFileDownloadResource(
+							UI.getCurrent(), exportFileName, mimeType,
+							fileToExport);
 					frontend.finished(resource);
 					return true;
 
@@ -144,10 +145,9 @@ public class ExcelExportTask extends AbstractTableExportTask implements
 	 *            sonst wird bei Fertigmeldung eine StreamResource mitgegeben,
 	 *            auf die als Link geklickt werden kann.
 	 */
-	public ExcelExportTask(Application application,
-			com.vaadin.ui.Table vaadinTable, Table tableModel,
-			boolean automaticDownload) {
-		super(application, vaadinTable, tableModel, automaticDownload);
+	public ExcelExportTask(UI ui, com.vaadin.ui.Table vaadinTable,
+			Table tableModel, boolean automaticDownload) {
+		super(ui, vaadinTable, tableModel, automaticDownload);
 	}
 
 	@Override

@@ -25,25 +25,26 @@ import org.springframework.util.Assert;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.terminal.StreamResource;
-import com.vaadin.terminal.StreamResource.StreamSource;
+import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.FormFieldFactory;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FileMetadata;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
@@ -118,11 +119,11 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	}
 
 	private void buildViewComponents() {
-		form.setWriteThrough(false);
+		form.setBuffered(true);
 		addComponent(form);
 
-		HorizontalLayout footerLayout = new HorizontalLayout();
-		footerLayout.setSpacing(true);
+		CssLayout footerLayout = new CssLayout();
+		footerLayout.setStyleName("actions");
 		form.setFooter(footerLayout);
 
 		saveButton = new Button("Speichern");
@@ -190,15 +191,15 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 			}
 		});
 		form.getFooter().addComponent(cancelButton);
-		form.setErrorHandler(new ComponentErrorHandler() {
+		form.setErrorHandler(new ErrorHandler() {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public boolean handleComponentError(ComponentErrorEvent event) {
+			public void error(com.vaadin.server.ErrorEvent event) {
 				System.out
 						.println("Error handler:" + this.getClass().getName());
-				return true;
+				// FIXME return true;
 			}
 		});
 	}
@@ -251,8 +252,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		StreamSource streamSource = containerBlob.getStreamSource();
 		final FileMetadata metadata = tableColumn.getFileMetadata();
 		StreamResource resource = new StreamResource(streamSource,
-				metadata.getFileName(),
-				CrudPortletApplication.getCurrentApplication());
+				metadata.getFileName());
 		resource.setMIMEType(metadata.getMineType());
 		Link link = buildDownloadLink(metadata, resource);
 
@@ -276,7 +276,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		upload.setImmediate(true);
 		upload.setReceiver(new BlobUploadReceiver());
 
-		upload.addListener(new Upload.FinishedListener() {
+		upload.addFinishedListener(new Upload.FinishedListener() {
 
 			private static final long serialVersionUID = 1L;
 
@@ -289,11 +289,9 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 								.getMaxFileSize()) {
 					containerBlob.setValue(receiver.getBaos().toByteArray());
 				} else {
-					getApplication().getMainWindow().showNotification(
-							"Ein Datei darauf nicht größer als "
-									+ metadata.getMaxFileSize()
-									+ " Bytes sein.",
-							Notification.TYPE_ERROR_MESSAGE);
+					Notification.show("Ein Datei darauf nicht größer als "
+							+ metadata.getMaxFileSize() + " Bytes sein.",
+							Notification.Type.ERROR_MESSAGE);
 				}
 			}
 		});

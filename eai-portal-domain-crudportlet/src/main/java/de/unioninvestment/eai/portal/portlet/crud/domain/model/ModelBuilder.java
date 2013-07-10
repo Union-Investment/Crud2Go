@@ -71,7 +71,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Init;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
@@ -185,8 +185,8 @@ public class ModelBuilder {
 
 	private void buildRoles() {
 		if (config.getPortletConfig().getRoles() != null) {
-			LiferayApplication application = LiferayApplication
-					.getCurrentApplication();
+			LiferayUI application = LiferayUI
+					.getCurrent();
 			String portletId = application.getPortletId();
 			long communityId = application.getCommunityId();
 			for (RoleConfig roleConfig : config.getPortletConfig().getRoles()

@@ -18,12 +18,11 @@
  */
 package de.unioninvestment.eai.portal.support.vaadin.groovy
 
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication
 
 class VaadinBuilder extends FactoryBuilderSupport {
 	def components = [:]
 
-	VaadinBuilder(PortletApplication application) {
+	VaadinBuilder() {
 		registerFactory('button', new ButtonFactory());
 		registerFactory('panel', new PanelFactory());
 		registerFactory('table', new TableFactory());
@@ -31,17 +30,17 @@ class VaadinBuilder extends FactoryBuilderSupport {
 		registerFactory('link', new LinkFactory());
 		registerFactory('label', new LabelFactory());
 		registerFactory('externalResource', new ExternalResourceFactory());
-		registerFactory('streamResource', new StreamResourceFactory(application));
+		registerFactory('streamResource', new StreamResourceFactory());
 		registerFactory('themeResource', new ThemeResourceFactory());
 		registerFactory('embedded', new EmbeddedFactory());
 		registerFactory('svgComponent', new SvgComponentFactory());
 		registerFactory('verticalLayout', new VerticalLayoutFactory());
 		registerFactory('horizontalLayout', new HorizontalLayoutFactory());
-		registerFactory('downloadLink', new DownloadLinkFactory(application));
+		registerFactory('downloadLink', new DownloadLinkFactory());
 		registerFactory('xslt', new XSLTFactory());
 		registerFactory('form', new FormFactory());
 		registerFactory('textArea', new TextAreaFactory());
-		registerFactory('contextMenu', new ContextMenuFactory(application));
+		registerFactory('contextMenu', new ContextMenuFactory());
 		registerFactory('chart', new ChartFactory());
 		registerFactory('select', new SelectFactory());
 		registerFactory('tree', new TreeFactory());

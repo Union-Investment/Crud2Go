@@ -52,19 +52,16 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-server</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>confirmdialog</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>tableexport</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin</artifactId>
-			<scope>provided</scope>
-			<!-- Configured as Liferay Dependency in liferay-plugin-package.properties -->
 		</dependency>
 
 		<dependency>
@@ -122,13 +119,6 @@
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin</artifactId>
-			<scope>provided</scope>
-
 		</dependency>
 
 		<dependency>

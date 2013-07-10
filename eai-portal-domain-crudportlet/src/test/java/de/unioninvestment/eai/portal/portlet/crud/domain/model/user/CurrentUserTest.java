@@ -30,36 +30,22 @@ import java.util.Set;
 
 import javax.portlet.PortletRequest;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.vaadin.ui.Component;
+import com.vaadin.server.VaadinPortletRequest;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.UI;
+import com.vaadin.util.CurrentInstance;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 
 public class CurrentUserTest {
-	static class MyPortletApplication extends LiferayApplication {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public void doInit() {
-			// ...
-		}
-
-		@Override
-		public void addToView(Component component) {
-			// ...
-		}
-
-		@Override
-		public void removeAddedComponentsFromView() {
-			// ...
-		}
-	}
 
 	@Mock
 	private PortletRequest request;
@@ -72,6 +58,12 @@ public class CurrentUserTest {
 	@Mock
 	private PortletRole roleMock;
 
+	@Mock
+	private LiferayUI liferayUIMock;
+
+	@Mock
+	private VaadinPortletRequest portletRequestMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -79,46 +71,47 @@ public class CurrentUserTest {
 		when(request.getUserPrincipal()).thenReturn(userPrincipal);
 		when(userPrincipal.getName()).thenReturn("Jürgen");
 
-		new MyPortletApplication().onRequestStart(request, null);
-
+		UI.setCurrent(liferayUIMock);
+		CurrentInstance.set(VaadinRequest.class, portletRequestMock);
 		portletRoles.add(roleMock);
+	}
+
+	@After
+	public void tearDown() {
+		CurrentInstance.clearAll();
 	}
 
 	@Test
 	public void shouldReturnCurrentUserFromPortletRequest() {
+		when(portletRequestMock.getRemoteUser()).thenReturn("Jürgen");
 		assertThat(new CurrentUser(portletRoles).getName(), is("Jürgen"));
 	}
 
 	@Test
 	public void shouldReturnThatUserIsNotAuthenticated() {
-		when(request.getUserPrincipal()).thenReturn(null);
-
 		assertThat(new CurrentUser(portletRoles).isAuthenticated(), is(false));
 	}
 
 	@Test
 	public void shouldReturnThatUserIsAuthenticated() {
+		when(portletRequestMock.getRemoteUser()).thenReturn("Jürgen");
 		assertThat(new CurrentUser(portletRoles).isAuthenticated(), is(true));
 	}
 
 	@Test
 	public void shouldReturnAnonymousUserOnMissingRequestForTestingPurposes() {
-		new MyPortletApplication().onRequestEnd(request, null);
+		tearDown();
 		assertThat(new CurrentUser(portletRoles).isAuthenticated(), is(false));
 	}
 
 	@Test
 	public void shouldGetPortalRoles() {
-		new MyPortletApplication().onRequestStart(null, null);
-
 		assertThat(new CurrentUser(portletRoles).getPortalRoles(),
 				equalTo(Collections.EMPTY_SET));
 	}
 
 	@Test
 	public void shouldGetRoles() {
-		new MyPortletApplication().onRequestStart(null, null);
-
 		assertThat(new CurrentUser(portletRoles).getRoles(),
 				equalTo(AnonymousUser.ANONYMOUS_ROLES));
 	}

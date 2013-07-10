@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 
 import static java.util.Collections.singletonMap;
@@ -34,13 +34,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.vaadin.addon.sqlcontainer.ColumnProperty;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.PropertyFormatter;
+import com.vaadin.data.util.sqlcontainer.ColumnProperty;
 import com.vaadin.data.validator.NullValidator;
 import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 
@@ -52,7 +53,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidde
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.validation.FormattingValidator;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
-import de.unioninvestment.eai.portal.support.vaadin.support.FormattedSelect;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 
 public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest {
@@ -64,7 +64,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 	@Mock
 	private Container containerMock;
 	@Mock
-	private FormattedSelect textFieldMock;
+	private ComboBox comboBoxMock;
 	@Mock
 	private Item itemMock;
 
@@ -86,11 +86,11 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 
-		when(textFieldMock.getPropertyDataSource()).thenReturn(null);
+		when(comboBoxMock.getPropertyDataSource()).thenReturn(null);
 		when(delegateMock.createField(containerMock, 1, "test", uiContextMock))
-				.thenReturn(textFieldMock);
+				.thenReturn(comboBoxMock);
 		when(delegateMock.createField(itemMock, "test", uiContextMock))
-				.thenReturn(textFieldMock);
+				.thenReturn(comboBoxMock);
 
 		when(databaseContainer.convertItemToRow(itemMock, false, true))
 				.thenReturn(containerRowMock);
@@ -120,7 +120,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 
 		verify(delegateMock).createField(containerMock, 1, "test",
 				uiContextMock);
-		assertEquals(textFieldMock, field);
+		assertEquals(comboBoxMock, field);
 	}
 
 	@Test
@@ -135,7 +135,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		Field field = wrapper.createField(itemMock, "test", uiContextMock);
 
 		verify(delegateMock).createField(itemMock, "test", uiContextMock);
-		assertEquals(textFieldMock, field);
+		assertEquals(comboBoxMock, field);
 	}
 
 	@Test
@@ -188,7 +188,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		ValidationFieldFactoryWrapper wrapper = new ValidationFieldFactoryWrapper(
 				databaseContainer, delegateMock, tableColumns);
 
-		when(textFieldMock.getPropertyDataSource()).thenReturn(formatterMock);
+		when(comboBoxMock.getPropertyDataSource()).thenReturn(formatterMock);
 
 		Field field = wrapper.createField(containerMock, 1, "test",
 				uiContextMock);

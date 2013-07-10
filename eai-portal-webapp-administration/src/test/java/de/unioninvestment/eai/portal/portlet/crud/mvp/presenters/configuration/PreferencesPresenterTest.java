@@ -21,24 +21,21 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration;
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
 import javax.portlet.ValidatorException;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.DefaultPreferencesView;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public class PreferencesPresenterTest extends SpringPortletContextTest {
@@ -49,35 +46,15 @@ public class PreferencesPresenterTest extends SpringPortletContextTest {
 	private DefaultPreferencesView viewMock;
 
 	@Mock
-	private PortletPreferences preferencesMock;
-
-	@Mock
 	private EventBus eventBusMock;
 
-	private CrudPortletApplication app;
-
-	@Mock
-	private PortletRequest requestMock;
-
-	@Mock
-	private PortletResponse responseMock;
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext("portletId",
+			18004L);
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-
-		app = new CrudPortletApplication() {
-			public String getPortletId() {
-				return "portletId";
-			}
-
-			public long getCommunityId() {
-				return 18004L;
-			}
-		};
-		app.onRequestStart(requestMock, responseMock);
-		when(requestMock.getPreferences()).thenReturn(preferencesMock);
-
 		presenter = new PreferencesPresenter(viewMock, eventBusMock);
 	}
 
@@ -85,7 +62,7 @@ public class PreferencesPresenterTest extends SpringPortletContextTest {
 	public void shouldStorePreferences() throws ValidatorException, IOException {
 		presenter.storePreferencesAndFireConfigChange();
 
-		verify(preferencesMock).store();
+		verify(liferayContext.getPortletPreferencesMock()).store();
 	}
 
 	@Test
@@ -99,7 +76,7 @@ public class PreferencesPresenterTest extends SpringPortletContextTest {
 	public void shouldShowNotificationOnStorageError()
 			throws ValidatorException, IOException {
 		doThrow(new ValidatorException(new RuntimeException(), asList("a")))
-				.when(preferencesMock).store();
+				.when(liferayContext.getPortletPreferencesMock()).store();
 
 		presenter.storePreferencesAndFireConfigChange();
 

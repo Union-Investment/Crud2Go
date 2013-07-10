@@ -50,6 +50,6 @@ public class CheckBoxFormFieldTest {
 
 		when(configMock.getCheckbox()).thenReturn(checkboxConfigMock);
 		CheckBoxFormField checkBoxFormField = new CheckBoxFormField(configMock);
-		assertThat(checkBoxFormField.getCheckboxProperty(), notNullValue());
+		assertThat(checkBoxFormField.getConverter(), notNullValue());
 	}
 }

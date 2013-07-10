@@ -25,15 +25,19 @@ import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.vaadin.ui.UI;
+
 import de.unioninvestment.eai.portal.portlet.crud.config.DateConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.support.vaadin.support.TimestampConverter;
+import de.unioninvestment.eai.portal.support.vaadin.support.DateToStringConverter;
 
 public class DateFormFieldTest {
 
@@ -45,10 +49,19 @@ public class DateFormFieldTest {
 	@Mock
 	private DateConfig dateConfig;
 
+	@Mock
+	private UI uiMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+		UI.setCurrent(uiMock);
+		when(uiMock.getLocale()).thenReturn(Locale.GERMANY);
+	}
 
+	@After
+	public void tearDown() {
+		UI.setCurrent(null);
 	}
 
 	@Test
@@ -87,8 +100,8 @@ public class DateFormFieldTest {
 		when(dateConfig.getFormat()).thenReturn(format);
 		dateFormField = new DateFormField(config);
 
-		assertEquals(TimestampConverter.class, dateFormField
-				.getTimestampProperty().getClass());
+		assertEquals(DateToStringConverter.class, dateFormField.getConverter()
+				.getClass());
 	}
 
 	@Test

@@ -1,31 +1,31 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.vaadin.addon.sqlcontainer.RowId;
-import com.vaadin.addon.sqlcontainer.RowItem;
-import com.vaadin.addon.sqlcontainer.SQLContainer;
-import com.vaadin.addon.sqlcontainer.query.QueryDelegate;
+import com.vaadin.data.util.sqlcontainer.RowId;
+import com.vaadin.data.util.sqlcontainer.RowItem;
+import com.vaadin.data.util.sqlcontainer.SQLContainer;
+import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.IndexResolver;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEvent;
@@ -84,14 +84,15 @@ public class SQLContainerEventWrapper extends SQLContainer implements
 	}
 
 	/**
-	 * Sichtbarkeit erhöhen. Erlaubt das Anstoßen des Rerenderings bei Table ohne dass die Datenbank gepollt wird.
+	 * Sichtbarkeit erhöhen. Erlaubt das Anstoßen des Rerenderings bei Table
+	 * ohne dass die Datenbank gepollt wird.
 	 */
 	@Override
 	public void fireContentsChange() {
 
 		super.fireContentsChange();
 	}
-	
+
 	@Override
 	public int indexOfId(Object itemId) {
 		if (getItemUnfiltered(itemId) != null
@@ -127,4 +128,27 @@ public class SQLContainerEventWrapper extends SQLContainer implements
 					"'filters' field not accessible", e);
 		}
 	}
+
+	public void setSizeValidMilliSeconds(int i) {
+		try {
+			Field field = SQLContainer.class
+					.getDeclaredField("sizeValidMilliSeconds");
+			field.setAccessible(true);
+			field.set(this, i);
+
+		} catch (SecurityException e) {
+			throw new TechnicalCrudPortletException(
+					"Error setting sizeValidMilliSeconds", e);
+		} catch (NoSuchFieldException e) {
+			throw new TechnicalCrudPortletException(
+					"Error setting sizeValidMilliSeconds", e);
+		} catch (IllegalArgumentException e) {
+			throw new TechnicalCrudPortletException(
+					"Error setting sizeValidMilliSeconds", e);
+		} catch (IllegalAccessException e) {
+			throw new TechnicalCrudPortletException(
+					"Error setting sizeValidMilliSeconds", e);
+		}
+	}
+
 }

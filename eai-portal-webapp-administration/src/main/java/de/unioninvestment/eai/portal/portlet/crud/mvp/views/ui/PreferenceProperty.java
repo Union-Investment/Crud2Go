@@ -23,11 +23,14 @@ import javax.portlet.PortletPreferences;
 import org.apache.commons.lang.StringUtils;
 
 import com.vaadin.data.util.AbstractProperty;
+import com.vaadin.data.util.converter.Converter.ConversionException;
+import com.vaadin.server.VaadinPortletService;
 
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.InvalidConfigurationException;
 
-public class PreferenceProperty extends AbstractProperty {
+public class PreferenceProperty extends AbstractProperty<String> {
+
+	private static final long serialVersionUID = 1L;
 
 	private String preferenceKey;
 
@@ -36,18 +39,18 @@ public class PreferenceProperty extends AbstractProperty {
 	}
 
 	@Override
-	public Object getValue() {
+	public String getValue() {
 		return preferences().getValue(preferenceKey, null);
 	}
 
 	@Override
-	public void setValue(Object newValue) throws ReadOnlyException,
+	public void setValue(String newValue) throws ReadOnlyException,
 			ConversionException {
 		try {
-			if (StringUtils.isEmpty((String) newValue)) {
+			if (StringUtils.isEmpty(newValue)) {
 				preferences().reset(preferenceKey);
 			} else {
-				preferences().setValue(preferenceKey, (String) newValue);
+				preferences().setValue(preferenceKey, newValue);
 			}
 
 		} catch (javax.portlet.ReadOnlyException e) {
@@ -57,11 +60,11 @@ public class PreferenceProperty extends AbstractProperty {
 	}
 
 	private PortletPreferences preferences() {
-		return CrudPortletApplication.getCurrentRequest().getPreferences();
+		return VaadinPortletService.getCurrentPortletRequest().getPreferences();
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<String> getType() {
 		return String.class;
 	}
 

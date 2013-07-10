@@ -22,12 +22,15 @@ import java.util.Locale;
 import java.util.Set;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.GridLayout;
@@ -56,6 +59,7 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.OptionListContain
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.FormSelectionContext;
 import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
+import de.unioninvestment.eai.portal.support.vaadin.support.DateToTimestampConverter;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 
 /**
@@ -69,19 +73,6 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
  * @author carsten.mjartan
  */
 public class DefaultFormView extends Form implements FormView {
-
-	@SuppressWarnings("unused")
-	private static class IgnoreErrorHandler implements ComponentErrorHandler {
-
-		private static final long serialVersionUID = 42L;
-
-		@Override
-		public boolean handleComponentError(ComponentErrorEvent event) {
-			// do nothing
-			return true;
-		}
-
-	}
 
 	private static final long serialVersionUID = 1L;
 	private Presenter presenter;
@@ -118,9 +109,9 @@ public class DefaultFormView extends Form implements FormView {
 		int rows = calculateRowCount(columns, fieldCount);
 
 		grid = new GridLayout(columns, rows);
-		grid.setMargin(true, false, true, false);
+		grid.setMargin(new MarginInfo(true, false, true, false));
 		grid.setSpacing(true);
-		grid.setWidth(100, UNITS_PERCENTAGE);
+		grid.setWidth("100%");
 
 		setLayout(grid);
 	}
@@ -157,12 +148,10 @@ public class DefaultFormView extends Form implements FormView {
 		datetime.setDateFormat(dff.getDateFormat());
 		datetime.setLocale(Locale.GERMAN);
 
-		datetime.setValue(dff.getDefaultValue());
-
 		datetime.setResolution(DateUtils.getVaadinResolution(dff
 				.getResolution()));
-
-		datetime.setPropertyDataSource(dff.getTimestampProperty());
+		datetime.setConverter(new DateToTimestampConverter(dff.getResolution()));
+		datetime.setPropertyDataSource(dff.getProperty());
 		datetime.setImmediate(true);
 		datetime.addStyleName(field.getName());
 
@@ -188,7 +177,10 @@ public class DefaultFormView extends Form implements FormView {
 		if (grid != null) {
 			vaadinField.setWidth("100%");
 			if (field.getTitle().length() > 15) {
-				vaadinField.setDescription(field.getTitle());
+				if (vaadinField instanceof AbstractComponent) {
+					((AbstractComponent) vaadinField).setDescription(field
+							.getTitle());
+				}
 			}
 			grid.setComponentAlignment(vaadinField, Alignment.BOTTOM_LEFT);
 		}
@@ -299,8 +291,8 @@ public class DefaultFormView extends Form implements FormView {
 		CheckBox checkBoxField = new CheckBox();
 		checkboxLayout.addComponent(checkBoxField);
 
-		checkBoxField.setPropertyDataSource(checkBoxFormField
-				.getCheckboxProperty());
+		checkBoxField.setConverter(checkBoxFormField.getConverter());
+		checkBoxField.setPropertyDataSource(checkBoxFormField.getProperty());
 		checkBoxField.setImmediate(true);
 		checkBoxField.addStyleName(field.getName());
 
@@ -318,8 +310,8 @@ public class DefaultFormView extends Form implements FormView {
 	}
 
 	private void populateActions(FormActions actions) {
-		HorizontalLayout buttons = new HorizontalLayout();
-		buttons.setSpacing(true);
+		CssLayout buttons = new CssLayout();
+		buttons.setStyleName("actions");
 
 		boolean allHidden = true;
 		boolean first = true;
@@ -327,13 +319,13 @@ public class DefaultFormView extends Form implements FormView {
 			Button button;
 			if (action.getActionHandler() instanceof SearchFormAction) {
 				searchAction = action;
-				button = new Button(action.getTitle(), this, "commit");
+				button = new Button(action.getTitle());
 				if (first) {
 					button.setClickShortcut(KeyCode.ENTER);
 					first = false;
 				}
 				// button.setErrorHandler(new IgnoreErrorHandler());
-				button.addListener(new ClickListener() {
+				button.addClickListener(new ClickListener() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
@@ -343,7 +335,7 @@ public class DefaultFormView extends Form implements FormView {
 				});
 			} else {
 				button = new Button(action.getTitle());
-				button.addListener(new ClickListener() {
+				button.addClickListener(new ClickListener() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
@@ -363,7 +355,6 @@ public class DefaultFormView extends Form implements FormView {
 		}
 		if (!allHidden) {
 			getFooter().addComponent(buttons);
-			getFooter().setMargin(false, true, true, false);
 		}
 	}
 

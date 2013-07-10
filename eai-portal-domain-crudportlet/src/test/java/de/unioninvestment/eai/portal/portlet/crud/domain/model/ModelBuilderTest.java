@@ -77,6 +77,7 @@ import com.liferay.portal.service.ResourceActionLocalService;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.ResourceLocalService;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
+import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
@@ -90,8 +91,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidde
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplicationMock;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationException;
@@ -151,7 +151,7 @@ public class ModelBuilderTest {
 	@Captor
 	ArgumentCaptor<Boolean> deleteBooleanCaptor;
 
-	private LiferayApplication applicationMock;
+	private LiferayUI applicationMock;
 
 	private Map<String, Long> resourceIds = new HashMap<String, Long>();
 
@@ -165,6 +165,9 @@ public class ModelBuilderTest {
 
 	@Mock
 	private Realm realmMock;
+
+	@Mock
+	private LiferayUI uiMock;
 
 	@Before
 	public void setUp() throws Exception {
@@ -182,13 +185,14 @@ public class ModelBuilderTest {
 		resourceIds.put("PortletId_17808_admin", 1l);
 		resourceIds.put("PortletId_17808_benutzer", 1l);
 
-		applicationMock = new LiferayApplicationMock(null, null, "PortletId",
-				17808L);
+		UI.setCurrent(uiMock);
+		when(uiMock.getPortletId()).thenReturn("PortletId");
+		when(uiMock.getCommunityId()).thenReturn(17808L);
 	}
 
 	@After
 	public void tearDown() {
-		applicationMock.onRequestEnd(null, null);
+		UI.setCurrent(null);
 	}
 
 	private void mockExistingResourceWithTestAction() throws SystemException,

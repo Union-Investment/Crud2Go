@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.AllFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.AnyFilterConfig;
@@ -81,8 +84,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilt
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
-import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudApplication;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudUI;
 import de.unioninvestment.eai.portal.support.vaadin.support.NumberFormatter;
 
 /**
@@ -153,8 +155,7 @@ public class SearchFormAction implements ActionHandler {
 	}
 
 	private boolean policyAllowsFiltering(Table table) {
-		CrudApplication application = (CrudApplication) PortletApplication
-				.getCurrentApplication();
+		CrudUI application = (CrudUI) UI.getCurrent();
 		if (application != null && application.isInitializing()) {
 			FilterPolicy policy = table.getContainer().getFilterPolicy();
 			if (policy == FilterPolicy.NOTHING
@@ -290,10 +291,13 @@ public class SearchFormAction implements ActionHandler {
 					addGeneralFilterByConfig(result, config, fieldValue,
 							columnName);
 				} else if (Number.class.isAssignableFrom(columnType)) {
-					@SuppressWarnings("unchecked")
-					Number numberValue = NumberFormatter.parseNumber(
-							fieldValue, (Class<? extends Number>) columnType,
+					NumberFormatter numberFormatter = new NumberFormatter(
 							(NumberFormat) container.getFormat(columnName));
+					Locale locale = UI.getCurrent().getLocale();
+					@SuppressWarnings("unchecked")
+					Number numberValue = numberFormatter.convertToModel(
+							fieldValue, (Class<? extends Number>) columnType,
+							locale);
 					if (!addGeneralFilterByConfig(result, config, numberValue,
 							columnName)) {
 						throw new IllegalArgumentException(

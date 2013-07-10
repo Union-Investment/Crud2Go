@@ -20,7 +20,6 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;

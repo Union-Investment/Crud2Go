@@ -21,24 +21,18 @@ package de.unioninvestment.eai.portal.portlet.crud.datatypes;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.Format;
+import java.util.Date;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.util.PropertyFormatter;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.PopupDateField;
-import com.vaadin.ui.TextField;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.DatePickerSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.SelectSupport;
 import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
-import de.unioninvestment.eai.portal.support.vaadin.support.DateToTimestampTranslator;
-import de.unioninvestment.eai.portal.support.vaadin.support.FormattedSelect;
-import de.unioninvestment.eai.portal.support.vaadin.support.FormattedTextField;
+import de.unioninvestment.eai.portal.support.vaadin.support.DateToTimestampConverter;
 import de.unioninvestment.eai.portal.support.vaadin.support.TimestampFormatter;
-import de.unioninvestment.eai.portal.support.vaadin.support.TimestampUtils;
-import de.unioninvestment.eai.portal.support.vaadin.support.TranslatedDateField;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 
 /**
@@ -49,29 +43,12 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
  * 
  */
 @org.springframework.stereotype.Component("sqlTimestampDataType")
-public class SqlTimestampDataType implements DisplaySupport, EditorSupport,
-		SelectSupport, DatePickerSupport {
+public class SqlTimestampDataType extends AbstractDataType implements
+		DisplaySupport, EditorSupport, SelectSupport, DatePickerSupport {
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public boolean supportsDisplaying(Class<?> clazz) {
 		return Timestamp.class.isAssignableFrom(clazz);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String formatPropertyValue(Property property, Format format) {
-		if (property == null || property.getValue() == null) {
-			return "";
-		}
-		Timestamp value = (Timestamp) property.getValue();
-		if (format != null) {
-			return format.format(value);
-		} else {
-			return TimestampUtils.formatTimestamp(value);
-		}
 	}
 
 	@Override
@@ -80,43 +57,33 @@ public class SqlTimestampDataType implements DisplaySupport, EditorSupport,
 	}
 
 	@Override
-	public Field createField(Class<?> type, Object propertyId,
-			boolean multiline, String inputPrompt, Format format) {
-
-		TextField textField = new FormattedTextField(createFormatter(null,
-				format));
-		textField.setNullRepresentation("");
-		textField.setNullSettingAllowed(true);
-		if (inputPrompt != null) {
-			textField.setInputPrompt(inputPrompt);
-		}
-		return textField;
-	}
-
-	@Override
 	public AbstractSelect createSelect(Class<?> type, Object propertyId,
 			Format format) {
-		return new FormattedSelect(createFormatter(null, format));
+		return super.createSelect(type, propertyId, format);
 	}
 
 	@Override
 	public PopupDateField createDatePicker(Class<?> type, Object propertyId,
 			String inputPrompt, String format) {
-		int resolution = DateUtils.getResolution(format);
-		DateToTimestampTranslator translator = new DateToTimestampTranslator(
+		return super.createDatePicker(type, propertyId, inputPrompt, format);
+	}
+
+	public Converter<Date, ?> createDateConverter(Class<?> type,
+			String simpleDateFormat) {
+		int resolution = DateUtils.getResolution(simpleDateFormat);
+		DateToTimestampConverter converter = new DateToTimestampConverter(
 				resolution);
-		PopupDateField field = new TranslatedDateField(translator);
-		field.setInputPrompt(inputPrompt);
-		if (format != null) {
-			field.setDateFormat(format);
-			field.setResolution(DateUtils.getVaadinResolution(resolution));
-		}
-		return field;
+		return converter;
 	}
 
 	@Override
-	public PropertyFormatter createFormatter(Class<?> type, Format format) {
+	public Converter<String, ?> createFormatter(Class<?> type, Format format) {
 		return new TimestampFormatter((DateFormat) format);
+	}
+
+	@Override
+	boolean isReadonly() {
+		return false;
 	}
 
 }

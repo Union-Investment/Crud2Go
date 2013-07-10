@@ -21,7 +21,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.support;
 import org.slf4j.LoggerFactory;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericProperty;
 
 /**
@@ -48,8 +48,8 @@ public class AuditLogger {
 	public AuditLogger(CurrentUser currentUser) {
 		this.currentUserName = isNamedUser(currentUser) ? currentUser.getName()
 				: "Anonymous";
-		LiferayApplication currentApplication = LiferayApplication
-				.getCurrentApplication();
+		LiferayUI currentApplication = LiferayUI
+				.getCurrent();
 		long communityId = -1;
 		if (currentApplication != null) {
 			communityId = currentApplication.getCommunityId();

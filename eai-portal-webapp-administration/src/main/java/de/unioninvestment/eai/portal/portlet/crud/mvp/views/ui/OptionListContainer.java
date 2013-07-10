@@ -1,6 +1,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -179,6 +180,24 @@ public class OptionListContainer extends AbstractContainer implements
 	}
 
 	@Override
+	public List<?> getItemIds(int startIndex, int numberOfItems) {
+		int realCount = optionsAsList.size() - startIndex;
+		if (realCount < 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (realCount > numberOfItems) {
+			realCount = numberOfItems;
+		}
+		List<String> results = new ArrayList<String>(realCount);
+		List<Option> subList = optionsAsList.subList(startIndex, startIndex
+				+ realCount);
+		for (Option option : subList) {
+			results.add(option.key);
+		}
+		return results;
+	}
+
+	@Override
 	public Property getContainerProperty(Object itemId, Object propertyId) {
 		refreshOptionListIfNeeded();
 		Option option = options.get(itemId);
@@ -268,6 +287,11 @@ public class OptionListContainer extends AbstractContainer implements
 				return;
 			}
 		}
+	}
+
+	@Override
+	public Collection<Filter> getContainerFilters() {
+		return unmodifiableList(filters);
 	}
 
 	@Override
@@ -414,6 +438,16 @@ public class OptionListContainer extends AbstractContainer implements
 		}
 	}
 
+	@Override
+	public void addItemSetChangeListener(ItemSetChangeListener listener) {
+		super.addItemSetChangeListener(listener);
+	}
+
+	@Override
+	public void removeItemSetChangeListener(ItemSetChangeListener listener) {
+		super.removeItemSetChangeListener(listener);
+	}
+
 	/**
 	 * Unregister from {@link OptionList} events.
 	 */
@@ -422,4 +456,5 @@ public class OptionListContainer extends AbstractContainer implements
 		options = null;
 		optionsAsList = null;
 	}
+
 }

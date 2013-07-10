@@ -7,7 +7,7 @@
 		<portlet-name>crudportlet</portlet-name>
 		<portlet-class>de.unioninvestment.eai.portal.support.scripting.web.GroovyCategorySpringApplicationPortlet</portlet-class>
 		<init-param>
-			<name>application</name>
+			<name>UI</name>
 			<value>de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication</value>
 		</init-param>
 		<init-param>

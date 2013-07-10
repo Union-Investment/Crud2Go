@@ -29,6 +29,7 @@ import java.util.concurrent.Executors;
 import javax.xml.bind.JAXBException;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.xml.sax.SAXException;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
@@ -37,7 +38,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.DomainSpringPortletContextTest;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplicationMock;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
@@ -58,11 +59,13 @@ public abstract class ModelSupport extends DomainSpringPortletContextTest {
 	private ExecutorService prefetchExecutor = Executors
 			.newSingleThreadExecutor();
 
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext(TEST_PORTLET_ID,
+			TEST_COMMUNITY_ID);
+
 	public ModelSupport() {
 		try {
 			unmarshaller = new PortletConfigurationUnmarshaller();
-			new LiferayApplicationMock(null, null, TEST_PORTLET_ID,
-					TEST_COMMUNITY_ID);
 
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);

@@ -45,11 +45,11 @@ import org.mockito.internal.matchers.InstanceOf;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.vaadin.addon.sqlcontainer.ColumnProperty;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.data.util.sqlcontainer.ColumnProperty;
+import com.vaadin.server.Sizeable;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
@@ -68,6 +68,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.Answers;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 
 public class CrudFieldFactoryTest extends SpringPortletContextTest {
@@ -183,7 +184,7 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(
 				displaySupportMock.createField(String.class, "test", false,
-						null, null)).thenReturn(fieldMock);
+						null, null)).thenAnswer(Answers.object(fieldMock));
 
 		TextField result = (TextField) crudTableFieldFactory.createField(
 				containerMock, "1", "test", componentMock);
@@ -255,7 +256,7 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(
 				displaySupportMock.createField(String.class, "test", true,
-						null, null)).thenReturn(textAreaMock);
+						null, null)).thenAnswer(Answers.object(textAreaMock));
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
@@ -401,7 +402,8 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 		when(tableColumnsMock.getInputPrompt("test")).thenReturn("testPrompt");
 		when(
 				displaySupportMock.createField(String.class, "test", true,
-						"testPrompt", null)).thenReturn(fieldMock);
+						"testPrompt", null)).thenAnswer(
+				Answers.object(fieldMock));
 
 		TextField result = (TextField) crudTableFieldFactory.createField(
 				containerMock, "1", "test", componentMock);
@@ -409,7 +411,7 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 		assertThat(result, is(fieldMock));
 		verify(fieldMock).setCaption("Test");
 		verify(fieldMock).setWidth(100, Sizeable.UNITS_PERCENTAGE);
-		verify(fieldMock).setWriteThrough(false); // enable buffering
+		verify(fieldMock).setBuffered(true); // enable buffering
 	}
 
 	@Test
@@ -426,7 +428,7 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(
 				displaySupportMock.createField(String.class, "test", false,
-						null, null)).thenReturn(fieldMock);
+						null, null)).thenAnswer(Answers.object(fieldMock));
 
 		TextField result = (TextField) crudTableFieldFactory.createField(
 				containerMock, "1", "test", componentMock);
@@ -447,7 +449,7 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(
 				displaySupportMock.createField(String.class, "test", false,
-						null, null)).thenReturn(fieldMock);
+						null, null)).thenAnswer(Answers.object(fieldMock));
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
@@ -472,7 +474,7 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(
 				displaySupportMock.createField(String.class, "test", false,
-						null, null)).thenReturn(fieldMock);
+						null, null)).thenAnswer(Answers.object(fieldMock));
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);

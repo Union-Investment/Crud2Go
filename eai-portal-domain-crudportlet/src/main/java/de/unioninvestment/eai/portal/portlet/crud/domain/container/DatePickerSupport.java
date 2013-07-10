@@ -18,6 +18,9 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
+import java.util.Date;
+
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.PopupDateField;
 
 /**
@@ -35,7 +38,10 @@ public interface DatePickerSupport {
 	 *            der Datentyp der zugrundeliegenden DataSource
 	 * @return die Vaadin-Checkbox
 	 */
-	public PopupDateField createDatePicker(Class<?> type, Object propertyId,
+	PopupDateField createDatePicker(Class<?> type, Object propertyId,
 			String inputPrompt, String simpleDateFormat);
+
+	Converter<Date, ?> createDateConverter(Class<?> type,
+			String simpleDateFormat);
 
 }

@@ -24,7 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Configurable;
 
-import de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication;
+import com.vaadin.server.VaadinPortletService;
+
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.DefaultPreferencesView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PreferencesView;
@@ -57,7 +58,8 @@ public class PreferencesPresenter extends AbstractPresenter<PreferencesView>
 		try {
 			getView().commit();
 
-			CrudPortletApplication.getCurrentRequest().getPreferences().store();
+			VaadinPortletService.getCurrentPortletRequest().getPreferences()
+					.store();
 			eventBus.fireEvent(new ConfigurationUpdatedEvent(true));
 
 			getView().showNotification(

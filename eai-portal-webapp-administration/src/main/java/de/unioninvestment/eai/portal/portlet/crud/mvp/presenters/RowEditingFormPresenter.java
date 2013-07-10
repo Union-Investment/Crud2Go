@@ -31,7 +31,8 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.terminal.UserError;
+import com.vaadin.server.UserError;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 
@@ -97,6 +98,13 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		this.tablePresenter = tablePresenter;
 		this.container = table.getContainer();
 		initialize();
+	}
+
+	@Override
+	protected Button addBackButton(String caption) {
+		Button button = super.addBackButton(caption);
+		this.backButton = button;
+		return button;
 	}
 
 	private void initialize() {

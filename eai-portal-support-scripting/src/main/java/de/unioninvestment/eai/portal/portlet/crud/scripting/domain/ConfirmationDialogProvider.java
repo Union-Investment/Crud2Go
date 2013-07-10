@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.domain;
 
 import groovy.lang.Closure;
@@ -24,11 +24,10 @@ import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.dialogs.ConfirmDialog.Listener;
 import org.vaadin.dialogs.DefaultConfirmDialogFactory;
 
-import com.vaadin.Application;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.Reindeer;
 
 /**
@@ -84,7 +83,6 @@ public class ConfirmationDialogProvider extends Closure<String> {
 	}
 
 	private static final long serialVersionUID = 1L;
-	private final Window window;
 
 	static {
 		ConfirmDialog.Factory df = new ReverseButtonOrderConfirmDialogFactory();
@@ -96,13 +94,9 @@ public class ConfirmationDialogProvider extends Closure<String> {
 	 * 
 	 * @param owner
 	 *            das Main-Script
-	 * @param window
-	 *            Das Fenster was für die Anzeige zu verwenden ist. Idealerweise
-	 *            {@link Application#getMainWindow()}
 	 */
-	public ConfirmationDialogProvider(Object owner, Window window) {
+	public ConfirmationDialogProvider(Object owner) {
 		super(owner);
-		this.window = window;
 	}
 
 	/**
@@ -120,8 +114,10 @@ public class ConfirmationDialogProvider extends Closure<String> {
 	 */
 	public void doCall(String title, String message, String confirmButtonText,
 			String declineButtonText, final Closure<?> action) {
-		ConfirmDialog.show(window, title, message, confirmButtonText,
+		ConfirmDialog.show(UI.getCurrent(), title, message, confirmButtonText,
 				declineButtonText, new Listener() {
+					private static final long serialVersionUID = 1L;
+
 					@Override
 					public void onClose(final ConfirmDialog dialog) {
 						action.call(new Result() {

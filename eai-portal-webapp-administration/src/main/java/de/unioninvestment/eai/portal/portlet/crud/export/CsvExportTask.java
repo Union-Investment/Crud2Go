@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.export;
 
 import java.io.BufferedOutputStream;
@@ -30,12 +30,12 @@ import java.util.Collection;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import com.vaadin.Application;
 import com.vaadin.addon.tableexport.CsvExport;
 import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.addon.tableexport.TableExport;
 import com.vaadin.addon.tableexport.TemporaryFileDownloadResource;
 import com.vaadin.addon.tableexport.XLS2CSVmra;
+import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
@@ -103,8 +103,8 @@ public class CsvExportTask extends AbstractTableExportTask implements
 				}
 				// "super." entfernt, damit die Methode in der Subklasse
 				// überschrieben werden kann.
-				return sendConvertedFileToUser(getTable().getApplication(),
-						tempCsvFile, exportFileName);
+				return sendConvertedFileToUser(UI.getCurrent(), tempCsvFile,
+						exportFileName);
 			} catch (final IOException e) {
 				LOGGER.warn("Converting to CSV failed with IOException ", e);
 				return false;
@@ -112,15 +112,15 @@ public class CsvExportTask extends AbstractTableExportTask implements
 		}
 
 		@Override
-		protected boolean sendConvertedFileToUser(Application app,
-				File fileToExport, String exportFileName) {
+		protected boolean sendConvertedFileToUser(UI ui, File fileToExport,
+				String exportFileName) {
 			if (isAutomaticDownload()) {
-				return super.sendConvertedFileToUser(app, fileToExport,
+				return super.sendConvertedFileToUser(ui, fileToExport,
 						exportFileName);
 			} else {
 				TemporaryFileDownloadResource resource;
 				try {
-					resource = new TemporaryFileDownloadResource(app,
+					resource = new TemporaryFileDownloadResource(ui,
 							exportFileName, mimeType, fileToExport);
 					frontend.finished(resource);
 					return true;
@@ -141,10 +141,9 @@ public class CsvExportTask extends AbstractTableExportTask implements
 	 * @param application
 	 * @param automaticDownload
 	 */
-	public CsvExportTask(Application application,
-			com.vaadin.ui.Table vaadinTable, Table tableModel,
-			boolean automaticDownload) {
-		super(application, vaadinTable, tableModel, automaticDownload);
+	public CsvExportTask(UI ui, com.vaadin.ui.Table vaadinTable,
+			Table tableModel, boolean automaticDownload) {
+		super(ui, vaadinTable, tableModel, automaticDownload);
 	}
 
 	@Override

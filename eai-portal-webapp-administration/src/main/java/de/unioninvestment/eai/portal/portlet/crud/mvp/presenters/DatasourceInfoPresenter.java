@@ -42,7 +42,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrud
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfo;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.DatasourceInfoView;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayApplication;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 
 /**
  * Der Presenter der Datenquellen-Infoübersicht.
@@ -190,7 +190,7 @@ public class DatasourceInfoPresenter extends
 	}
 
 	private String retrieveJndiName(String datasourceName) {
-		long communityId = LiferayApplication.getCurrentApplication()
+		long communityId = LiferayUI.getCurrent()
 				.getCommunityId();
 		String pattern = settings.getDatasourceInfoPattern(communityId);
 		if (pattern == null) {

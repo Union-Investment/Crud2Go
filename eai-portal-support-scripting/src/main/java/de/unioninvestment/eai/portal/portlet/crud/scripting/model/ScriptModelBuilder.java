@@ -93,7 +93,6 @@ import de.unioninvestment.eai.portal.support.scripting.ScriptContainerDelegate;
 import de.unioninvestment.eai.portal.support.scripting.ScriptCustomFilterFactory;
 import de.unioninvestment.eai.portal.support.scripting.ScriptFormSQLWhereFactory;
 import de.unioninvestment.eai.portal.support.scripting.SqlProvider;
-import de.unioninvestment.eai.portal.support.vaadin.PortletApplication;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
@@ -114,7 +113,6 @@ public class ScriptModelBuilder {
 	private final UserFactory userFactory;
 	private ScriptPortlet scriptPortlet;
 
-	private PortletApplication application;
 	private EventBus eventBus;
 	private AuditLogger auditLogger;
 
@@ -198,18 +196,16 @@ public class ScriptModelBuilder {
 		scriptBuilder.addBindingVariable("showPopup", factory.getPopupProvider(
 				scriptBuilder.getMainScript(), eventBus));
 		scriptBuilder.addBindingVariable("confirm",
-				new ConfirmationDialogProvider(scriptBuilder.getMainScript(),
-						application.getMainWindow()));
+				new ConfirmationDialogProvider(scriptBuilder.getMainScript()));
 		scriptBuilder.addBindingVariable("showWarning",
 				new NotificationProvider(scriptBuilder.getMainScript(),
-						application.getMainWindow(),
 						NotificationProvider.Type.WARNING));
-		scriptBuilder.addBindingVariable("showError", new NotificationProvider(
-				scriptBuilder.getMainScript(), application.getMainWindow(),
-				NotificationProvider.Type.ERROR));
+		scriptBuilder
+				.addBindingVariable("showError", new NotificationProvider(
+						scriptBuilder.getMainScript(),
+						NotificationProvider.Type.ERROR));
 		scriptBuilder.addBindingVariable("showInfo", new NotificationProvider(
-				scriptBuilder.getMainScript(), application.getMainWindow(),
-				NotificationProvider.Type.INFO));
+				scriptBuilder.getMainScript(), NotificationProvider.Type.INFO));
 
 		scriptBuilder.addBindingVariable("audit", new ScriptAuditLogger(
 				scriptBuilder.getMainScript(), auditLogger));
@@ -321,7 +317,7 @@ public class ScriptModelBuilder {
 		Closure<Object> generatorClosure = scriptBuilder
 				.buildClosure(generatorScript);
 		component.setGenerator(new CustomComponentGeneratorImpl(
-				generatorClosure, application));
+				generatorClosure));
 
 		ScriptCustomComponent scriptCustomComponent = new ScriptCustomComponent(
 				component);
@@ -410,7 +406,7 @@ public class ScriptModelBuilder {
 
 		populateGeneratedColumnsClosures(table);
 
-		ScriptTable scriptTable = factory.getScriptTable(application, table);
+		ScriptTable scriptTable = factory.getScriptTable(table);
 
 		ScriptContainer scriptContainer = buildScriptContainer(table
 				.getContainer());
@@ -630,7 +626,7 @@ public class ScriptModelBuilder {
 					.buildClosure(generatedColumnsScript);
 
 			column.setCustomColumnGenerator(new CustomColumnGeneratorImpl(
-					generatedColumnsClosure, application));
+					generatedColumnsClosure));
 		} else {
 			// display empty cell content if user is not allowed to view
 			// generated content
@@ -860,9 +856,5 @@ public class ScriptModelBuilder {
 				.getOnValueChange());
 
 		scriptFormField.setOnChange(onExecution);
-	}
-
-	public void setApplication(PortletApplication application) {
-		this.application = application;
 	}
 }
