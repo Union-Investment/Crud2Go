@@ -45,6 +45,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.ConnectorTracker;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 import com.vaadin.util.CurrentInstance;
@@ -78,6 +79,8 @@ public class LiferayContext extends TestWatchman {
 	private VaadinPortletSession vaadinPortletSessionMock;
 	@Mock
 	private ConnectorTracker connectorTrackerMock;
+	@Mock
+	private JavaScript javascriptMock;
 
 	private boolean initialized = false;
 
@@ -108,6 +111,8 @@ public class LiferayContext extends TestWatchman {
 		when(uiMock.getPage()).thenReturn(pageMock);
 		when(uiMock.getConnectorTracker()).thenReturn(connectorTrackerMock);
 
+		when(pageMock.getJavaScript()).thenReturn(javascriptMock);
+		
 		CurrentInstance.set(VaadinResponse.class, vaadinPortletResponseMock);
 		when(vaadinPortletResponseMock.getPortletResponse()).thenReturn(
 				portletResponseMock);

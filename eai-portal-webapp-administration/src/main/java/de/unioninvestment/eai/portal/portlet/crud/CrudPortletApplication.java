@@ -29,6 +29,7 @@ import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -50,6 +51,7 @@ import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
@@ -139,8 +141,6 @@ public class CrudPortletApplication extends LiferayUI implements
 
 	private PortletConfigurationPresenter configurationPresenter;
 
-	private Window mainWindow;
-
 	private Set<Component> registeredComponents = new HashSet<Component>();
 
 	public enum ConfigStatus {
@@ -171,13 +171,29 @@ public class CrudPortletApplication extends LiferayUI implements
 
 		setContent(viewPage);
 
-		// FIXME title
-		// mainWindow = new Window(getMessage("portlet.crud.window.name"));
+		tryToSetPortletTitle(getMessage("portlet.crud.window.name"));
 
 		recreateEditPage();
 		refreshViews();
 
 		portletSession.addPortletListener(this);
+	}
+
+	private void tryToSetPortletTitle(String title) {
+		String realTitle = title != null ? title
+				: getMessage("portlet.crud.window.name");
+
+		PortletResponse portletResponse = VaadinPortletService
+				.getCurrentResponse().getPortletResponse();
+		if (portletResponse instanceof RenderResponse) {
+			((RenderResponse) portletResponse).setTitle(realTitle);
+		} else {
+			String titleUpdate = "document.getElementById('portlet_"
+					+ getPortletId()
+					+ "').getElementsByClassName('portlet-title-text')[0]"
+					+ ".childNodes[0].nodeValue = '" + realTitle + "'";
+			JavaScript.getCurrent().execute(titleUpdate);
+		}
 	}
 
 	private void applyBrowserLocale() {
@@ -343,6 +359,8 @@ public class CrudPortletApplication extends LiferayUI implements
 			viewPage.addComponent(portletGui.getView());
 
 			provideBackButtonFunctionality(portletId);
+
+			tryToSetPortletTitle(portletDomain.getTitle());
 
 		} catch (ValidationException ve) {
 			throw new BusinessException(ve.getCode(), ve.getArgs());
