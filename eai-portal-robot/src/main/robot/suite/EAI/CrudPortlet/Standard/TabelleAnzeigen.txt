@@ -1,0 +1,224 @@
+*** Settings ***
+Documentation   Story: Als Benutzer möchte ich die Daten einer beliebigen bekannten \
+...				Oracle Datasource ansehen können, um die Daten überprüfen zu können
+...             Abnahme: Bei ausreichend Berechtigungen kann eine Tabelle angezeigt werden
+
+*** Test Case ***
+DataSource nicht verfügbar
+	[Tags]  EAI_11
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'EAI_DATA_SOURCE_FALSCH.xml'
+	dann wird die Meldung 'Die Datenquelle FALSCHE_DS ist nicht verfügbar.' angezeigt
+
+
+Tabelle existiert nicht
+	[Tags]  EAI_11  
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'EAI_TABELLE_FALSCH.xml'	
+	dann wird die Meldung 'Die Tabelle "TabelleExistiertNicht" in DataSource "test" ist nicht vorhanden.' angezeigt
+
+
+Tabelle Lesen
+	[Tags]  EAI_11
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'VALIDES.xml'	
+	
+	# TODO
+	dann ist die Tabelle sortierbar
+	und die Tabellenspalten können aus- und eingeblendet werden
+
+
+Portlet Titel
+	[Tags]  EAI_12  
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'EAI_TITEL.xml'	
+	dann wird als Portlet-Titel 'Robot Test Titel' angezeigt
+
+	
+Query Anzeige
+	[Tags]  EAI_12
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'EAI_QUERY_SELECT.xml'	
+	
+	# TODO
+	dann hat die Tabelle eine Spalte 'ID'
+	und außerdem hat die Tabelle eine Spalte 'CNUMBER5_2'
+	und außerdem ist die Tabelle sortierbar
+	und die Tabellenspalten können aus- und eingeblendet werden	
+	und das Button 'Editieren' is nicht vorhanden	
+
+
+Query Anzeige - nothing Filter - Initialisierung mit leerer Tabelle
+	[Tags]  EAI_12
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'EAI_QUERY_SELECT_NOTHING_FILTER.xml'	
+	dann werden keine Daten angezeigt	
+
+
+Query Anzeige - nothing-at-all Filter - Initialisierung mit leerer Tabelle
+	[Tags]  EAI_12
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'EAI_QUERY_SELECT_NOTHING_AT_ALL_FILTER.xml'	
+	dann werden keine Daten angezeigt	
+
+	
+Query Anzeige - nothing-at-all Filter - Keine Filter gesetzt. leerer Tabelle erwartet
+	[Tags]  EAI_12
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'EAI_QUERY_SELECT_NOTHING_AT_ALL_FILTER.xml'	
+	wenn der Button 'suchen' geklickt wird
+	dann werden keine Daten angezeigt	
+
+
+Query Anzeige - Filter wird benötigt - Keine Filter gesetzt, Fehler-Meldung erwartet
+	[Tags]  EAI_12
+	[Documentation]  EAI_QUERY_SELECT_REQUIRES_FILTER.xml besteht aus einer Frei Form Query. Es hat zwei sichtbare Spalten
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'EAI_QUERY_SELECT_REQUIRES_FILTER.xml'	
+	wenn der Button 'suchen' geklickt wird
+	dann wird die Validierungsfehlermeldung 'Eine Filterung wird benötigt' angezeigt
+	
+	
+Query Anzeige - Filter - Filterung der Tabelle
+	[Tags]  EAI_12
+	[Documentation]  EAI_QUERY_SELECT_REQUIRES_FILTER.xml besteht aus einer Frei Form Query. Es hat zwei sichtbare Spalten
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'EAI_QUERY_SELECT_REQUIRES_FILTER.xml'	
+
+	# TODO
+	und dann die Tabelle auf 1 filtert
+	
+	und dann steht in der '1'. Zeile und '1'. Spalte der Wert '1'	
+
+
+Reihenfolge der Spalte
+	[Tags]  EAI_13
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'REIHENFOLGE.xml'	
+
+	und die Spalte '1' den Wert 'ID'
+	und die Spalte '2' den Wert 'SPALTEEDIT'
+	und die Spalte '3' den Wert 'NAME'
+
+	
+Sichtbarkeit der Spalte im View-Modus
+	[Tags]  EAI_13
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'NAME_NICHT_SICHTBAR.xml'		
+	dann wird die Spalte 'NAME' nicht angezeigt
+
+
+Sichtbarkeit der Spalte im Edit-Modus
+	[Tags]  EAI_13
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'NAME_NICHT_SICHTBAR.xml'	
+	wenn der Button 'Editieren' geklickt wird
+	dann wird die Spalte 'NAME' nicht angezeigt
+
+
+Breite einer Spalten
+	[Tags]  EAI_13  
+
+	Es existieren 2 Zeilen Testdaten
+	und außerdem ein Portlet mit der XML-Konfiguration 'SPALTEN_BREITE.xml'	
+	
+	dann hat die Spalte '1' die Breite 'width: 222px;'
+	und dann hat die Spalte '2' die Breite 'width: 223px;'
+	und dann hat die Spalte '3' die Breite 'width: 224px;'
+
+
+14. Höhe einer Spalten
+	[Tags]  EAI_13
+
+	Es existieren 2 Zeilen Testdaten
+	und außerdem ein Portlet mit der XML-Konfiguration 'SPALTEN_HOEHE.xml'	
+	dann hat die Tabellenzeile die Höhe 123 Pixel
+
+
+Titel einer Spalte
+	[Tags]  EAI_13  
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'SPALTEN_TITEL.xml'	
+
+	dann hat die Spalte '1' den Titel 'TITEL_ID'
+	und dann hat die Spalte '2' den Titel 'TITEL_2'
+	und dann hat die Spalte '3' den Titel 'NAME_TITEL'
+	
+	
+Multiline
+	[Tags]  EAI_13  
+
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'MULTI_LINE.xml'	
+	wenn im Editieren-Modus eine neue Zeile eingefügt wird
+	dann ist die Zeile '1' und Spalte '2' im Multiline-Modus	
+
+
+Select in Option
+	[Tags]  EAI_73
+
+	Es existieren 2 Zeilen Testdaten
+	und außerdem ein Portlet mit der XML-Konfiguration 'SELECT_OPTION.xml'	
+	
+	# TODO 
+	wenn eine neue Zeile einfügen aufruft 
+	und danach in der '3'. Zeile und '2'. Spalte den Wert 'Hans' auswählt
+	und danach in der '3'. Zeile und '3'. Spalte den Wert '1' auswählt
+	und dann den Editier-Modus verlässt
+	
+	dann steht in der '3'. Zeile und '2'. Spalte der Wert 'Hans'
+
+
+Select in Option Pflicht
+	[Tags]  EAI_73
+
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'SELECT_OPTION.xml'	
+
+	# TODO
+	wenn eine neue Zeile einfügen aufruft 
+	und danach in der '1'. Zeile und '2'. Spalte den Wert 'Hans' auswählt
+	und dann den Editier-Modus verlässt
+	
+	dann wird die Validierungsfehlermeldung 'SPALTEEDIT: Wert darf nicht null sein' angezeigt
+	
+	
+Valide Eingaben bleiben nach Validierungsfehler erhalten
+	[Tags]  EAI_73
+
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'SELECT_OPTION.xml'	
+
+	# TODO
+	wenn eine neue Zeile einfügen aufruft 
+	und danach in der '1'. Zeile und '2'. Spalte den Wert 'Hans' auswählt
+	und dann den Editier-Modus verlässt
+	der Administrator die Fehlermeldung schließt
+	
+	dann steht in der Eingabefeld der '1'. Zeile und '2'. Spalte der Wert 'Hans'
+	
+	
+Query Anzeige - Filterung ohne Suchbutton - Filterung der Tabelle
+	[Tags]  UI_177
+
+	Es existieren 2 Zeilen Testdaten
+	und außerdem ein Portlet mit der XML-Konfiguration 'TRIGGER_ON_CHANGE_ACTION.xml'	
+
+	# TODO
+	wenn die Tabelle ohne Suchbutton auf 1 filtert
+
+	dann steht in der '1'. Zeile und '1'. Spalte der Wert '1'
+	
+	
+Query Anzeige - Filterung ohne Suchbutton - Kein Reset erlaubt
+	[Tags]  UI_177
+
+	Es existiert ein Portlet mit der XML-Konfiguration 'TRIGGER_ON_CHANGE_RESET_ACTION.xml'	
+	
+	dann wird die Meldung 'Die Reset Action sollte nicht bei Änderung einer Formulareingabe angestoßen werden.' angezeigt
+	
+	
+
+*** Settings ***
+Force Tags      autor-cmj  autor-mca  tabelle-anzeigen  
+Resource        ${RESOURCES}/import/CrudPortlet.txt
