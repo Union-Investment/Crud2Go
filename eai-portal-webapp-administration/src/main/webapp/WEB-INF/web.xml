@@ -24,8 +24,8 @@
 	</listener>
 	<listener>
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-  	</listener>
-  
+	</listener>
+
 	<servlet>
 		<servlet-name>CrudPortletApplication</servlet-name>
 		<servlet-class>ru.xpoft.vaadin.SpringVaadinServlet</servlet-class>
@@ -47,6 +47,11 @@
 		<servlet-name>CrudPortletApplication</servlet-name>
 		<url-pattern>/VAADIN/*</url-pattern>
 	</servlet-mapping>
+
+	<mime-mapping>
+		<extension>htc</extension>
+		<mime-type>text/x-component</mime-type>
+	</mime-mapping>
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
