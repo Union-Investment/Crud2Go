@@ -49,7 +49,17 @@
   /* Include all the styles from the liferay theme */
   @include liferay;
 
-  /* Insert your theme rules here */
+	/* Liferay theme bugfix */
+	
+	.v-datefield-popupcalendar {
+		padding-right: 24px;
+	}
+
+	.v-datefield-button {
+		margin-right: -24px;
+	}
+
+    /* Insert your theme rules here */
 
 	/* Button bar spacing in Table and RowEditingForm */
 	.v-csslayout-actions .v-button + .v-button {
