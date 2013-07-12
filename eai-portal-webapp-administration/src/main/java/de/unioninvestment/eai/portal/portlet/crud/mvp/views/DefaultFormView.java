@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 
@@ -25,26 +26,26 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.PopupDateField;
-import com.vaadin.ui.Select;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateFormField;
@@ -72,12 +73,14 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
  * 
  * @author carsten.mjartan
  */
-public class DefaultFormView extends Form implements FormView {
+public class DefaultFormView extends CustomComponent implements FormView {
 
 	private static final long serialVersionUID = 1L;
 	private Presenter presenter;
 	private FormAction searchAction;
-	private GridLayout grid;
+	
+	private VerticalLayout rootLayout;
+	private Layout fieldLayout;
 
 	@Override
 	public void initialize(Presenter presenter,
@@ -92,34 +95,43 @@ public class DefaultFormView extends Form implements FormView {
 		}
 
 		this.presenter = presenter;
-		setValidationVisibleOnCommit(true);
 
 		int columns = model.getColumns();
 		FormFields fields = model.getFields();
 		FormActions actions = model.getActions();
 
+		rootLayout = new VerticalLayout();
+		setCompositionRoot(rootLayout);
+		
 		if (columns > 1) {
-			layoutAsGrid(columns, fields.count());
+			fieldLayout = layoutAsGrid(columns, fields.count());
+		} else {
+			fieldLayout = layoutAsForm();
 		}
 		populateFields(fields, columns);
-		populateActions(actions);
+		rootLayout.addComponent(fieldLayout);
+		
+		createFooterAndPopulateActions(actions);
 	}
 
-	private void layoutAsGrid(int columns, int fieldCount) {
+	private Layout layoutAsForm() {
+		return new FormLayout();
+	}
+
+	private GridLayout layoutAsGrid(int columns, int fieldCount) {
 		int rows = calculateRowCount(columns, fieldCount);
 
-		grid = new GridLayout(columns, rows);
+		GridLayout grid = new GridLayout(columns, rows);
 		grid.setMargin(new MarginInfo(true, false, true, false));
 		grid.setSpacing(true);
 		grid.setWidth("100%");
-
-		setLayout(grid);
+		return grid;
 	}
 
 	private void populateFields(FormFields fields, int columns) {
 		for (FormField field : fields) {
 
-			Field vaadinField;
+			Field<?> vaadinField;
 			if (field instanceof MultiOptionListFormField) {
 				vaadinField = createMultiSelect((MultiOptionListFormField) field);
 			} else if (field instanceof OptionListFormField) {
@@ -140,7 +152,7 @@ public class DefaultFormView extends Form implements FormView {
 		}
 	}
 
-	private Field createDateFormField(FormField field) {
+	private Field<Date> createDateFormField(FormField field) {
 		DateFormField dff = (DateFormField) field;
 
 		PopupDateField datetime = new PopupDateField(field.getTitle());
@@ -158,7 +170,7 @@ public class DefaultFormView extends Form implements FormView {
 		return datetime;
 	}
 
-	private Field createTextField(FormField field) {
+	private Field<String> createTextField(FormField field) {
 		TextField textField = new TextField(field.getTitle(),
 				field.getProperty());
 
@@ -172,9 +184,11 @@ public class DefaultFormView extends Form implements FormView {
 		return textField;
 	}
 
-	private void addFieldToLayout(FormField field, Field vaadinField) {
-		addField(field.getName(), vaadinField);
-		if (grid != null) {
+	private void addFieldToLayout(FormField field, Field<?> vaadinField) {
+		
+		fieldLayout.addComponent(vaadinField);
+
+		if (fieldLayout instanceof GridLayout) {
 			vaadinField.setWidth("100%");
 			if (field.getTitle().length() > 15) {
 				if (vaadinField instanceof AbstractComponent) {
@@ -182,11 +196,11 @@ public class DefaultFormView extends Form implements FormView {
 							.getTitle());
 				}
 			}
-			grid.setComponentAlignment(vaadinField, Alignment.BOTTOM_LEFT);
+			((GridLayout)fieldLayout).setComponentAlignment(vaadinField, Alignment.BOTTOM_LEFT);
 		}
 	}
 
-	private void applyValidators(FormField field, Field textField) {
+	private void applyValidators(FormField field, Field<?> textField) {
 		if (field.getValidators() != null) {
 			for (FieldValidator validator : field.getValidators()) {
 				validator.apply(textField);
@@ -194,10 +208,10 @@ public class DefaultFormView extends Form implements FormView {
 		}
 	}
 
-	private Field createSelect(OptionListFormField field) {
+	private Field<?> createSelect(OptionListFormField field) {
 		AbstractSelect select;
 		if (field.getVisibleRows() <= 1) {
-			select = new Select(field.getTitle());
+			select = new ComboBox(field.getTitle());
 		} else {
 			select = new ListSelect(field.getTitle());
 			((ListSelect) select).setRows(field.getVisibleRows());
@@ -217,7 +231,7 @@ public class DefaultFormView extends Form implements FormView {
 		return select;
 	}
 
-	private Field createMultiSelect(MultiOptionListFormField field) {
+	private Field<?> createMultiSelect(MultiOptionListFormField field) {
 		ListSelect select = new ListSelect(field.getTitle());
 
 		fillOptions(field.getOptionList(), select, new FormSelectionContext(
@@ -240,7 +254,7 @@ public class DefaultFormView extends Form implements FormView {
 			FormSelectionContext ctx) {
 		Object currentValue = select.getValue();
 		select.setContainerDataSource(new OptionListContainer(optionList, ctx));
-		select.setItemCaptionMode(Select.ITEM_CAPTION_MODE_PROPERTY);
+		select.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		select.setItemCaptionPropertyId("title");
 		reapplyCurrentValue(select, currentValue);
 	}
@@ -248,7 +262,7 @@ public class DefaultFormView extends Form implements FormView {
 	private void reapplyCurrentValue(AbstractSelect select, Object currentValue) {
 		if (currentValue != null) {
 			if (select.isMultiSelect()) {
-				for (Object element : (Set) currentValue) {
+				for (Object element : (Set<?>) currentValue) {
 					if (select.containsId(element)) {
 						select.select(element);
 					}
@@ -261,21 +275,7 @@ public class DefaultFormView extends Form implements FormView {
 		}
 	}
 
-	private void addOptionListChangeListener(OptionListFormField field,
-			final AbstractSelect select, final FormSelectionContext ctx) {
-		field.getOptionList().addChangeListener(
-				new OptionListChangeEventHandler() {
-
-					private static final long serialVersionUID = 42L;
-
-					@Override
-					public void onOptionListChange(OptionListChangeEvent event) {
-						fillOptions(event.getSource(), select, ctx);
-					}
-				});
-	}
-
-	private Field createCheckBox(FormField field, int columns) {
+	private Field<Boolean> createCheckBox(FormField field, int columns) {
 		CheckBoxFormField checkBoxFormField = (CheckBoxFormField) field;
 
 		Layout checkboxLayout = null;
@@ -297,7 +297,7 @@ public class DefaultFormView extends Form implements FormView {
 		checkBoxField.addStyleName(field.getName());
 
 		// addField(field.getName(), checkBoxField);
-		getLayout().addComponent(checkboxLayout);
+		fieldLayout.addComponent(checkboxLayout);
 
 		return checkBoxField;
 	}
@@ -309,7 +309,7 @@ public class DefaultFormView extends Form implements FormView {
 		}
 	}
 
-	private void populateActions(FormActions actions) {
+	private void createFooterAndPopulateActions(FormActions actions) {
 		CssLayout buttons = new CssLayout();
 		buttons.setStyleName("actions");
 
@@ -340,7 +340,6 @@ public class DefaultFormView extends Form implements FormView {
 
 					@Override
 					public void buttonClick(ClickEvent event) {
-						DefaultFormView.this.setValidationVisible(false);
 						presenter.executeAction(action);
 					}
 				});
@@ -354,7 +353,7 @@ public class DefaultFormView extends Form implements FormView {
 			buttons.addComponent(button);
 		}
 		if (!allHidden) {
-			getFooter().addComponent(buttons);
+			rootLayout.addComponent(buttons);
 		}
 	}
 
