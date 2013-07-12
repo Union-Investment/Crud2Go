@@ -371,7 +371,7 @@
 					<noServer>true</noServer>
 					<!-- Remove draftCompile when project is ready -->
 					<draftCompile>false</draftCompile>
-					<compileReport>true</compileReport>
+					<compileReport>false</compileReport>
 					<style>OBF</style>
 					<strict>true</strict>
 					<runTarget>http://localhost:8080/</runTarget>
