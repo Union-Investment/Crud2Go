@@ -37,6 +37,11 @@ die erste Tabellenzeile gelöscht wird
 	Switch To Table Edit Mode
 	Delete Table Row  1
 
+im Editieren-Modus eine neue Zeile eingefügt wird
+	Switch To Table Edit Mode
+	Insert New Table Row
+
+
 ##########################
 ###  Dann / Und es ... ###
 ##########################
@@ -62,6 +67,10 @@ werden keine Tabellenzeilen mehr angezeigt
 enthält die Tabelle nur eine Zeile mit dem Wert 'TEST5' in der Spalte CVARCHAR5_NN
 	Table Should Have Number Of Rows  1
 	Table Cell Should Have Text  1  5  TEST5
+	
+ist die Zeile '${ZEILE}' und Spalte '${SPALTE}' im Multiline-Modus
+	Wait for AJAX calls to complete
+	Page Should Contain Element   xpath=//table[@class="v-table-table"]//tr[${ZEILE}]//td[${SPALTE}]//textarea[@class="v-textarea"]
 	
 
 ##########################

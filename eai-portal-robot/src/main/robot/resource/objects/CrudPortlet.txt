@@ -93,7 +93,7 @@ werden die Tabelleninhalte der TEST_USER angezeigt
 	Wait until page contains  ID  10s
 	Wait until page contains  NAME  10s
 
-Tabelle ist sortierbar
+ist die Tabelle sortierbar
 	No Operation
 	
 Tabelleninhalte ist filterbar
@@ -301,7 +301,7 @@ wird ein Link mit dem Text '${text}' angezeigt
 wird als Portlet-Titel '${TEXT}' angezeigt
 	Wait until page contains  ${TEXT}  10s
 
-Tabelle hat die Spalte '${TEXT}'
+hat die Tabelle eine Spalte '${TEXT}'
 	Wait until page contains  ${TEXT}  10s
 
 Button Editieren ist ausgeschlatet	
@@ -385,11 +385,6 @@ hat die Spalte '${SPALTE}' den Titel '${WERT}'
 	${var}  Get Text  xpath=//div[@class="v-table-header"]//table//tr[1]//td[${SPALTE}]
 	Should Be True  '${var}'=='${WERT}'
 
-ist die Zeile '${ZEILE}' und Spalte '${SPALTE}' im Mulitline Modus
-	eine neue Zeile einfügen aufruft  
-	Vaadin MouseDownAndUp  xpath=//table[@class="v-table-table"]//tr[${ZEILE}]//td[1]//div[@class="v-table-cell-wrapper"]
-	Page Should Contain Element   xpath=//table[@class="v-table-table"]//tr[${ZEILE}]//td[${SPALTE}]//textarea[@class="v-textarea"]
-	
 eine neue Zeile einfügt und den Editieren Modus verlässt
 	eine neue Zeile einfügen aufruft
   	den Editier-Modus verlässt
