@@ -1,0 +1,5956 @@
+.v-assistive-device-only {
+	position: absolute;
+	top: -2000px;
+	left: -2000px;
+	width: 10px;
+	overflow: hidden;
+}
+
+.v-vaadin-version:after {
+	content: "7.1.0";
+}
+
+.v-generated-body {
+	width: 100%;
+	height: 100%;
+	border: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.v-debug-console {
+	background: #fff;
+	opacity: 0.9;
+	border: 1px solid #000;
+	font-family: sans-serif;
+}
+
+.v-debug-console-caption {
+	background: #000;
+	border-bottom: 1px solid grey;
+	color: white;
+	font-weight: bold;
+}
+
+.v-debug-console-content {
+	font-size: x-small;
+	overflow: auto;
+	white-space: pre;
+}
+
+.v-debug-console-content input {
+	font-size: xx-small;
+}
+
+.v-app .invalidlayout, .v-app .invalidlayout * {
+	background: #f99 !important;
+}
+
+@font-face {
+	font-family: "vdebugfont";
+	src: url(../base/debug/fonts/font.eot);
+	src: url(../base/debug/fonts/font.eot?#iefix) format("embedded-opentype"), url(../base/debug/fonts/font.woff) format("woff"), url(../base/debug/fonts/font.ttf) format("truetype"), url(../base/debug/fonts/font.svg#fontawesome) format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+
+.v-debugwindow [data-icon]:before, .v-debugwindow-menu [data-icon]:before {
+	font-family: "vdebugfont";
+	content: attr(data-icon);
+	speak: none;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	font-style: normal;
+	vertical-align: text-bottom;
+}
+
+.v-debugwindow {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-opacity: 0.8;
+	-webkit-opacity: 0.8;
+	opacity: 0.8;
+	color: #666;
+	font-family: Arial, Helvetica, Tahoma, Verdana, sans-serif;
+	font-size: 13px;
+}
+
+.v-debugwindow .v-debugwindow-handle {
+	position: absolute;
+	bottom: 0;
+	background-color: #fff;
+	-moz-opacity: 0;
+	-webkit-opacity: 0;
+	opacity: 0;
+	z-index: 1000;
+}
+
+.v-debugwindow .v-debugwindow-handle-sw {
+	width: 7px;
+	height: 7px;
+}
+
+.v-debugwindow .v-debugwindow-handle-se {
+	right: 0;
+	width: 14px;
+	height: 14px;
+}
+
+.v-debugwindow:hover {
+	-moz-opacity: 1;
+	-webkit-opacity: 1;
+	opacity: 1;
+}
+
+.v-debugwindow * {
+	font-size: inherit !important;
+}
+
+.v-debugwindow-size0, .v-debugwindow-menu .v-debugwindow-button-size0 {
+	font-size: 10px;
+}
+
+.v-debugwindow-size1, .v-debugwindow-menu .v-debugwindow-button-size1 {
+	font-size: 13px;
+}
+
+.v-debugwindow-size2, .v-debugwindow-menu .v-debugwindow-button-size2 {
+	font-size: 16px;
+}
+
+.v-debugwindow-head {
+	text-align: right;
+	background-color: transparent;
+}
+
+.v-debugwindow-tabs {
+	display: inline-block;
+	background-color: #fff;
+}
+
+.v-debugwindow-tab, .v-debugwindow-controls > * {
+	width: 2em;
+	border: none;
+	margin: 0;
+	line-height: 1.5em;
+	background-color: #fff;
+	color: #666;
+}
+
+.v-debugwindow-tab {
+	position: relative;
+	top: 1px;
+	border-width: 1px 0 1px 1px;
+	border-style: solid;
+	border-color: #666;
+	border-radius: 2px 2px 0 0;
+}
+
+.v-debugwindow-tab-selected {
+	color: #666;
+	background-color: #fff;
+	border-bottom: 1px solid #fff;
+}
+
+.v-debugwindow-controls {
+	position: relative;
+	top: 1px;
+	display: inline-block;
+	background-color: #fff;
+	border: 1px solid #666;
+	border-radius: 2px 2px 0 0;
+}
+
+.v-debugwindow-section-head {
+	text-align: left;
+	background-color: #fff;
+	border: 1px solid #666;
+	border-bottom: 1px solid #999;
+	box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
+	min-height: 1.5em;
+	line-height: 1.5em;
+	padding-left: 5px;
+}
+
+.v-debugwindow-button {
+	border: none;
+	background-color: transparent;
+	color: #666;
+}
+
+.v-debugwindow-button:hover {
+	color: #000;
+	text-decoration: underline;
+}
+
+.v-debugwindow-button-active {
+	color: #666;
+	box-shadow: 1px 1px 3px 0 inset;
+}
+
+.v-debugwindow-content {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
+	background-color: #fff;
+	border: 1px solid #666;
+	border-top: none;
+}
+
+.v-debugwindow-menu {
+	background-color: #fff;
+	padding: 4px;
+	border: 1px solid #999;
+	border-top: none;
+	border-radius: 0 0 5px 5px;
+	box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
+}
+
+.v-debugwindow-menu-content {
+	min-width: 100px;
+}
+
+.v-debugwindow-menu-content .v-debugwindow-button {
+	line-height: 22px;
+}
+
+.v-debugwindow-menu-content > div > .v-debugwindow-button {
+	width: 33%;
+}
+
+.v-debugwindow-row {
+	display: table-row;
+}
+
+.v-debugwindow-row:nth-child(odd) {
+	background-color: rgba(0, 61, 255, 0.11);
+}
+
+.v-debugwindow-row > span {
+	display: table-cell;
+	padding: 4px;
+}
+
+.v-debugwindow-row.SEVERE {
+	color: #550000;
+	background-color: #FFC5C5;
+}
+
+.v-debugwindow-row.WARNING {
+	background-color: #FFFF99;
+}
+
+.v-debugwindow-row.FINE {
+	color: #777;
+}
+
+.v-debugwindow-row.FINER {
+	color: #888;
+}
+
+.v-debugwindow-row.FINEST {
+	color: #888;
+}
+
+.v-debugwindow-row > span.caption {
+	color: #999;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.v-debugwindow-row > span.value {
+	width: 100%;
+}
+
+.v-debugwindow-log {
+	font-family: monospace;
+}
+
+.v-debugwindow-log .v-debugwindow-reset {
+	color: #fff;
+	background-color: #4C92ED;
+	padding: 4px;
+}
+
+.v-debugwindow-log .v-debugwindow-time {
+	text-align: right;
+	color: #999;
+}
+
+.v-debugwindow-log .v-debugwindow-message {
+	white-space: nowrap;
+	width: 100%;
+}
+
+.v-debugwindow-log .v-debugwindow-message:hover {
+	white-space: normal;
+	word-wrap: break-word;
+}
+
+.v-debugwindow-log .v-debugwindow-message em {
+	background-color: #C4E6F8;
+}
+
+.v-debugwindow-hierarchy .v-debugwindow-info {
+	padding: 1em;
+}
+
+.v-debugwindow-network .v-debugwindow-row {
+	display: block !important;
+}
+
+.v-debugwindow-network .v-debugwindow-row > span {
+	display: inline;
+}
+
+.crud2go .v-widget {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	text-align: left;
+	display: inline-block;
+	white-space: normal;
+	vertical-align: bottom;
+	font-size: 11px;
+	line-height: normal;
+}
+
+.crud2go .v-absolutelayout-wrapper {
+	position: absolute;
+	overflow: hidden;
+}
+
+.crud2go .v-absolutelayout-margin, .crud2go .v-absolutelayout-canvas {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-absolutelayout.v-has-height > div, .crud2go .v-absolutelayout.v-has-height > div > div {
+	height: 100%;
+}
+
+.crud2go .v-absolutelayout.v-has-width > div, .crud2go .v-absolutelayout.v-has-width > div > div {
+	width: 100%;
+}
+
+.crud2go .v-accordion {
+	position: relative;
+	outline: none;
+	overflow: visible;
+	text-align: left;
+	font-size: 0;
+}
+
+.crud2go .v-accordion-item {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+
+.crud2go .v-accordion-item-caption {
+	overflow: visible;
+	white-space: nowrap;
+	background: #eee;
+	border-bottom: 1px solid #ddd;
+}
+
+.crud2go .v-accordion-item-caption .v-caption {
+	cursor: pointer;
+	font-size: 11px;
+}
+
+.crud2go .v-accordion-item-open .v-accordion-item-caption .v-caption {
+	cursor: default;
+}
+
+.crud2go .v-accordion-item-content {
+	position: absolute;
+	width: 100%;
+}
+
+.crud2go .v-button {
+	display: inline-block;
+	zoom: 1;
+	text-align: center !important;
+	text-decoration: none;
+	border: 2px outset #ddd;
+	background: #eee;
+	cursor: pointer;
+	white-space: nowrap;
+	margin: 0;
+	padding: 0.2em 1em;
+	color: inherit;
+	font: inherit;
+	font-size: 11px;
+	line-height: normal;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-button.v-disabled {
+	cursor: default;
+}
+
+.crud2go .v-button-wrap, .crud2go .v-button-caption {
+	vertical-align: baseline;
+	white-space: nowrap;
+	font: inherit;
+	color: inherit;
+	line-height: normal;
+}
+
+.crud2go .v-button .v-icon {
+	vertical-align: middle;
+	margin-right: 3px;
+	border: none;
+}
+
+.crud2go .v-button .v-errorindicator {
+	display: inline-block;
+	zoom: 1;
+	vertical-align: middle;
+	float: none;
+}
+
+.crud2go .v-button-link {
+	border: none;
+	text-align: left !important;
+	background: transparent;
+	padding: 0;
+	color: inherit;
+	-khtml-user-select: text;
+	-moz-user-select: text;
+	-ie-user-select: text;
+	user-select: text;
+}
+
+.v-sa .crud2go .v-button-link:focus {
+	outline-offset: -3px;
+}
+
+.crud2go .v-button-link .v-button-caption {
+	text-decoration: underline;
+	color: inherit;
+	text-align: left;
+}
+
+.crud2go .v-nativebutton .v-icon {
+	vertical-align: middle;
+	margin-right: 3px;
+	border: none;
+}
+
+.crud2go .v-nativebutton .v-errorindicator {
+	display: inline-block;
+	zoom: 1;
+	vertical-align: middle;
+	float: none;
+}
+
+.crud2go .v-nativebutton-link {
+	border: none;
+	text-align: left !important;
+	background: transparent;
+	padding: 0;
+	color: inherit;
+	-khtml-user-select: text;
+	-moz-user-select: text;
+	-ie-user-select: text;
+	user-select: text;
+}
+
+.crud2go .v-nativebutton-link .v-nativebutton-caption {
+	text-decoration: underline;
+	color: inherit;
+	text-align: left;
+}
+
+.crud2go .v-nativebutton {
+	text-align: center !important;
+	cursor: pointer;
+	white-space: nowrap;
+	margin: 0;
+	color: inherit;
+	font: inherit;
+	line-height: normal;
+}
+
+.crud2go .v-nativebutton .v-nativebutton-caption {
+	vertical-align: middle;
+	white-space: nowrap;
+	font: inherit;
+	color: inherit;
+}
+
+.crud2go .v-nativebutton .v-icon {
+	vertical-align: middle;
+	margin-right: 3px;
+}
+
+.crud2go .v-nativebutton .v-errorindicator {
+	display: inline-block;
+	zoom: 1;
+	float: none;
+}
+
+.v-ie .crud2go .v-nativebutton {
+	overflow: visible;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+.v-ie .crud2go .v-nativebutton-link {
+	padding: 0;
+}
+
+.crud2go .v-checkbox {
+	display: block;
+}
+
+.crud2go .v-checkbox, .crud2go .v-checkbox label, .crud2go .v-checkbox input, .crud2go .v-checkbox .v-icon {
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.crud2go .v-checkbox .v-icon {
+	margin: 0 2px;
+}
+
+.crud2go .v-checkbox .v-errorindicator {
+	float: none;
+	display: inline;
+	display: inline-block;
+	zoom: 1;
+}
+
+.crud2go .v-captionwrapper {
+	text-align: left;
+}
+
+.crud2go .v-caption {
+	overflow: hidden;
+	white-space: nowrap;
+	font-size: 11px;
+}
+
+.crud2go .v-errorindicator {
+	display: inline-block;
+}
+
+.crud2go .v-caption .v-icon {
+	display: inline-block;
+	padding-right: 2px;
+	vertical-align: middle;
+}
+
+.crud2go .v-caption .v-captiontext {
+	display: inline-block;
+	overflow: hidden;
+	vertical-align: middle;
+}
+
+.crud2go .v-caption .v-required-field-indicator {
+	display: inline-block;
+}
+
+.crud2go .v-colorpicker {
+	text-align: center;
+}
+
+.crud2go .v-colorpicker-button-color {
+	border: 1px solid silver;
+	float: left;
+	width: 10px;
+	height: 10px;
+	margin-top: 2px;
+	margin-right: 5px;
+}
+
+.crud2go .v-colorpicker-area {
+	border: 1px solid silver;
+	margin: 1px auto;
+}
+
+.crud2go .v-colorpicker-history {
+	margin: 5px;
+}
+
+.crud2go .v-colorpicker-history td {
+	border: 1px solid silver !important;
+}
+
+.crud2go .v-colorpicker-history td {
+	line-height: 15px;
+}
+
+.crud2go .v-colorpicker-popup {
+	width: 244px;
+}
+
+.crud2go .v-colorpicker-popup .v-scrollable {
+	background-color: #dddddd;
+}
+
+.crud2go .v-colorpicker-popup .v-tabsheet-content .v-scrollable {
+	background-color: #eaeaea;
+}
+
+.crud2go .v-colorpicker-popup .v-tabsheet-content .v-tabsheet-tabsheetpanel {
+	background: transparent;
+}
+
+.crud2go .v-colorpicker-popup .resize-button {
+	border: 0px solid silver;
+	background: url(../base/colorpicker/images/resizebg.png);
+	margin-top: 5px;
+}
+
+.crud2go .v-colorpicker-popup .resize-button-caption {
+	display: none;
+}
+
+.crud2go .v-colorpicker-popup .resize-button:hover {
+	background: url(../base/colorpicker/images/resizebg-selected.png);
+}
+
+.crud2go .v-colorpicker-popup .resize-button:focus {
+	outline: none;
+}
+
+.crud2go .v-colorpicker-gradient {
+	width: 220px;
+	height: 220px;
+	padding-left: 10px;
+	margin-top: 0px;
+}
+
+.crud2go .v-colorpicker-gradient .v-colorpicker-gradient-clicklayer {
+	background-color: white;
+	filter: alpha(opacity = 0);
+	opacity: 0;
+}
+
+.crud2go .v-colorpicker-popup .rgb-gradient .v-colorpicker-gradient-background {
+	width: 220px;
+	height: 220px;
+	background: url(../base/colorpicker/images/gradient2.png);
+}
+
+.crud2go .v-colorpicker-popup .hsv-gradient .v-colorpicker-gradient-foreground {
+	background: url(../base/colorpicker/images/gradient.png);
+}
+
+.crud2go .v-colorpicker-popup .v-colorpicker-gradient-lowerbox {
+	border-right: 1px solid white;
+	border-top: 1px solid white;
+}
+
+.crud2go .v-colorpicker-popup .v-colorpicker-gradient-higherbox {
+	border-left: 1px solid white;
+	border-bottom: 1px solid white;
+}
+
+.crud2go .v-colorpicker-popup .rgb-sliders {
+	width: 227px;
+	padding-left: 10px;
+	color: #444444;
+	text-shadow: 0 1px 0 #FFFFFF;
+}
+
+.crud2go .v-colorpicker-popup .rgb-sliders .red .v-slider-base {
+	background-color: red;
+}
+
+.crud2go .v-colorpicker-popup .rgb-sliders .green .v-slider-base {
+	background-color: green;
+}
+
+.crud2go .v-colorpicker-popup .rgb-sliders .blue .v-slider-base {
+	background-color: blue;
+}
+
+.crud2go .v-colorpicker-popup .hsv-sliders {
+	padding-left: 10px;
+	color: #444444;
+	text-shadow: 0 1px 0 #FFFFFF;
+}
+
+.crud2go .v-colorpicker-popup .hue-slider {
+	height: 10px;
+	border: 0px solid silver;
+	background-image: url(../base/colorpicker/images/slider_hue_bg.png);
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-position: 0 3px;
+	margin-top: 0px;
+}
+
+.crud2go .v-colorpicker-popup .hue-slider .v-slider-handle {
+	margin-top: -2px;
+}
+
+.crud2go .v-colorpicker-popup .hue-slider .v-slider-base {
+	border: 0px none;
+	height: 0px;
+	background-color: transparent;
+}
+
+.crud2go .v-colorpicker-popup .v-colorpicker-preview {
+	margin-top: 5px;
+	padding-left: 11px;
+	padding-right: 10px;
+	margin-bottom: 0px;
+}
+
+.crud2go .v-colorpicker-popup .v-absolutelayout-wrapper {
+	width: 100%;
+	height: 100%;
+}
+
+.crud2go .v-colorpicker-popup .v-colorpicker-preview-textfield {
+	background: none;
+	overflow: hidden;
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+.crud2go .v-colorpicker-popup .v-textfield-dark {
+	color: #FFFFFF;
+}
+
+.crud2go .v-colorpicker-popup .v-textfield-light {
+	color: #000000;
+}
+
+.crud2go .v-colorpicker-popup .colorselect {
+	margin-top: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.crud2go .v-colorpicker-popup .v-tabsheet .v-colorpicker-grid {
+	height: 319px;
+}
+
+.crud2go .v-colorpicker-popup .colorselect td {
+	line-height: 15px;
+}
+
+.crud2go .v-colorpicker-popup .v-filterselect {
+	padding-right: 16px;
+}
+
+.crud2go .v-calendar-nresize DIV DIV {
+	cursor: n-resize !important;
+}
+
+.crud2go .v-calendar-sresize DIV DIV {
+	cursor: s-resize !important;
+}
+
+.crud2go .v-calendar {
+	background-color: #fff;
+}
+
+.crud2go .v-calendar-header-month, .crud2go .v-calendar-header-week {
+	border-bottom: 1px solid #c1c1c1;
+}
+
+.crud2go .v-calendar-header-day {
+	text-align: center;
+	color: #666;
+	font-size: 12px;
+	line-height: normal;
+}
+
+.crud2go .v-calendar-header-week .v-calendar-header-day:hover {
+	cursor: pointer;
+	color: #222;
+}
+
+.crud2go .v-calendar-header-day-today {
+	font-weight: bold;
+	color: #444;
+}
+
+.crud2go .v-calendar-header-month td:first-child {
+	padding-left: 19px;
+}
+
+.crud2go .v-calendar-header-week .v-calendar-back, .crud2go .v-calendar-header-week .v-calendar-next {
+	border: none;
+	padding: 0;
+	margin: 0;
+	height: 12px;
+	width: 12px;
+	overflow: hidden;
+	background: transparent url(../base/calendar/img/arrows.png) no-repeat 50% 0;
+	opacity: 0.3;
+	filter: alpha(opacity = 30);
+	cursor: default;
+}
+
+.crud2go .v-calendar-header-week .v-calendar-back:hover, .crud2go .v-calendar-header-week .v-calendar-next:hover {
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+}
+
+.crud2go .v-calendar-header-week .v-calendar-back:active, .crud2go .v-calendar-header-week .v-calendar-next:active {
+	opacity: 1;
+	filter: alpha(opacity = 100);
+}
+
+.crud2go .v-calendar-header-week .v-calendar-next {
+	background-position: 50% -12px;
+}
+
+.crud2go .v-calendar-month {
+	outline: none;
+}
+
+.crud2go .v-calendar-week-numbers {
+	width: 20px;
+	border-right: 1px solid #ccc;
+}
+
+.crud2go .v-calendar-week-number {
+	border: none;
+	background: transparent;
+	padding: 0;
+	margin: 0;
+	cursor: pointer;
+	opacity: 0.5;
+	width: 20px;
+	text-align: center;
+	border-bottom: 1px solid #ddd;
+}
+
+.crud2go .v-calendar-week-number:hover {
+	opacity: 1;
+}
+
+.crud2go .v-calendar-month-day {
+	border-bottom: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+	outline: none;
+}
+
+.crud2go .v-calendar-month-day-today {
+	background-color: #e7f0f5;
+}
+
+.crud2go .v-calendar-month-day-selected {
+	background-color: #fffee7;
+}
+
+.crud2go .v-calendar-month-day-dragemphasis {
+	background-color: #a8a8a8;
+}
+
+.crud2go .v-calendar-month-day-scrollable {
+	overflow-y: scroll;
+}
+
+.crud2go .v-calendar-day-number {
+	height: 18px;
+	line-height: 18px;
+	font-size: 12px;
+	text-align: right;
+	padding-right: 3px;
+	white-space: nowrap;
+}
+
+.crud2go .v-calendar-day-number:hover {
+	cursor: pointer;
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+}
+
+.crud2go .v-calendar-month .v-calendar-spacer, .crud2go .v-calendar-month .v-calendar-bottom-spacer, .crud2go .v-calendar-month .v-calendar-bottom-spacer-empty {
+	height: 15px;
+	font-size: 11px;
+}
+
+.crud2go .v-calendar-month .v-calendar-bottom-spacer:hover {
+	cursor: pointer;
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+}
+
+.crud2go .v-calendar-event {
+	line-height: 14px;
+	font-size: 11px;
+	padding: 0 0 0 4px;
+	cursor: pointer;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	outline: none;
+}
+
+.crud2go .v-calendar-event-month {
+	margin-bottom: 1px;
+	white-space: nowrap;
+}
+
+.crud2go .v-calendar-event-month:hover {
+	text-decoration: underline;
+}
+
+.crud2go .v-calendar-event-all-day {
+	background: #999;
+	display: block;
+	margin-left: -2px;
+}
+
+.crud2go div.v-calendar-event-all-day {
+	color: #fff;
+	height: 14px;
+}
+
+.crud2go .v-calendar-event-continued-from {
+	margin-left: 0;
+}
+
+.crud2go .v-calendar-event-start {
+	-webkit-border-top-left-radius: 6px;
+	-webkit-border-bottom-left-radius: 6px;
+	-moz-border-radius-topleft: 6px;
+	-moz-border-radius-bottomleft: 6px;
+	border-top-left-radius: 6px;
+	border-bottom-left-radius: 6px;
+	margin-left: 0;
+}
+
+.crud2go .v-calendar-event-end {
+	-webkit-border-top-right-radius: 6px;
+	-webkit-border-bottom-right-radius: 6px;
+	-moz-border-radius-topright: 6px;
+	-moz-border-radius-bottomright: 6px;
+	border-top-right-radius: 6px;
+	border-bottom-right-radius: 6px;
+}
+
+.crud2go .v-calendar-week-wrapper {
+	position: relative;
+}
+
+.crud2go .v-calendar-times {
+	width: 51px;
+}
+
+.crud2go .v-calendar-time {
+	padding: 0 8px 7px 0;
+	margin-top: -7px;
+	text-align: right;
+	font-size: 11px;
+	color: #666;
+	border-right: 1px solid #ccc;
+}
+
+.crud2go .v-calendar-weekly-longevents {
+	border-left: 1px solid #ccc;
+	border-bottom: 2px solid #bbb;
+	margin-left: 50px;
+}
+
+.crud2go .v-calendar-weekly-longevents .v-calendar-datecell {
+	border-right: 1px solid #ccc;
+	padding: 1px 0 0;
+}
+
+.crud2go .v-calendar-weekly-longevents .v-calendar-event {
+	height: 14px;
+	margin-bottom: 1px;
+}
+
+.crud2go .v-calendar-weekly-longevents .v-calendar-event:hover {
+	text-decoration: underline;
+}
+
+.crud2go .v-calendar-day-times {
+	border-right: 1px solid #ccc;
+	outline: none;
+}
+
+.crud2go .v-calendar-day-times .v-datecellslot, .crud2go .v-calendar-day-times .v-datecellslot-even {
+	border-bottom: 1px solid #ccc;
+}
+
+.crud2go .v-calendar-day-times .v-datecellslot-even {
+	border-bottom-color: #eee;
+}
+
+.crud2go .v-calendar-day-times .v-daterange {
+	background-color: #a8a8a8;
+}
+
+.crud2go .v-calendar-day-times .v-reserved {
+	background-color: #FF3333;
+}
+
+.crud2go .v-calendar-day-times .dragemphasis {
+	background-color: #a8a8a8;
+}
+
+.crud2go .v-calendar-week-wrapper .v-calendar-event {
+	padding: 0;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	margin-top: -1px;
+}
+
+.crud2go .v-calendar-event-caption {
+	position: absolute;
+	z-index: 1;
+	top: 2px;
+	left: 4px;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: normal;
+}
+
+.crud2go .v-calendar-event-content {
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	border: 1px solid #777;
+	background: #eee;
+	opacity: 0.8;
+	filter: alpha(opacity = 80);
+	height: 14px;
+}
+
+.crud2go .v-calendar-current-time {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 1px;
+	overflow: hidden;
+	background: #5a6c86;
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+	z-index: 2;
+}
+
+.crud2go .v-calendar-event-resizetop {
+	position: absolute;
+	cursor: n-resize;
+	height: 5%;
+	min-height: 3px;
+	top: 0;
+	width: 100%;
+	z-index: 1;
+}
+
+.crud2go .v-calendar-event-resizebottom {
+	position: absolute;
+	cursor: s-resize;
+	height: 5%;
+	min-height: 3px;
+	bottom: 0;
+	width: 100%;
+	z-index: 1;
+}
+
+.crud2go .v-calendar-month-sizedheight .v-calendar-month-day {
+	height: 100px;
+}
+
+.crud2go .v-calendar-month-sizedwidth .v-calendar-month-day {
+	width: 100px;
+}
+
+.crud2go .v-calendar-header-month-Hsized .v-calendar-header-day {
+	width: 101px;
+}
+
+.crud2go .v-calendar-header-month-Hsized td:first-child {
+	padding-left: 21px;
+}
+
+.crud2go .v-calendar-header-day-Hsized {
+	width: 200px;
+}
+
+.crud2go .v-calendar-week-numbers-Vsized .v-calendar-week-number {
+	height: 100px;
+	line-height: 100px;
+}
+
+.crud2go .v-calendar-week-wrapper-Vsized {
+	height: 400px;
+	overflow-x: hidden !important;
+}
+
+.crud2go .v-calendar-times-Vsized .v-calendar-time {
+	height: 38px;
+}
+
+.crud2go .v-calendar-times-Hsized .v-calendar-time {
+	width: 42px;
+}
+
+.crud2go .v-calendar-day-times-Vsized .v-datecellslot, .crud2go .v-calendar-day-times-Vsized .v-datecellslot-even {
+	height: 18px;
+}
+
+.crud2go .v-calendar-day-times-Hsized, .crud2go .v-calendar-day-times-Hsized .v-datecellslot, .crud2go .v-calendar-day-times-Hsized .v-datecellslot-even {
+	width: 200px;
+}
+
+.crud2go.v-app {
+	height: 100%;
+}
+
+.crud2go.v-app, .crud2go .v-window, .crud2go .v-popupview-popup, .crud2go .v-label, .crud2go .v-caption {
+	cursor: default;
+}
+
+body .crud2go.v-app .v-app-loading {
+	background-image: url(../base/common/img/loading-indicator.gif);
+	background-repeat: no-repeat;
+	background-position: 50%;
+	width: 100%;
+	height: 100%;
+}
+
+.crud2go .v-ui {
+	height: 100%;
+	width: 100%;
+	outline: none;
+	position: relative;
+}
+
+.crud2go .v-ui.v-ui-embedded {
+	margin-top: -1px;
+	border-top: 1px solid transparent;
+}
+
+.crud2go .v-ui:active, .crud2go .v-ui:focus {
+	outline: none;
+}
+
+.crud2go.v-app select, .crud2go .v-window select {
+	margin: 0;
+}
+
+.crud2go .v-disabled {
+	opacity: 0.3;
+	filter: alpha(opacity=30);
+	cursor: default;
+}
+
+.crud2go .v-disabled * {
+	cursor: default;
+}
+
+* html .crud2go .v-disabled {
+	zoom: 1;
+}
+
+* + html .crud2go .v-disabled {
+	zoom: 1;
+}
+
+.crud2go .v-disabled .v-disabled {
+	opacity: 1;
+}
+
+.crud2go .v-required-field-indicator {
+	padding-left: 2px;
+	color: red;
+}
+
+.crud2go .v-form fieldset {
+	border: none;
+	padding: 0;
+	margin: 0;
+	height: 100%;
+}
+
+.crud2go .v-form-content {
+	height: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-tooltip {
+	cursor: default;
+	background: #fff;
+}
+
+.crud2go .v-tooltip-text {
+	overflow: auto;
+}
+
+.crud2go .v-tooltip .v-errormessage {
+	overflow: auto;
+}
+
+.crud2go .v-contextmenu {
+	background: #fff;
+}
+
+.crud2go .v-contextmenu .gwt-MenuItem {
+	cursor: pointer;
+	vertical-align: middle;
+	padding: 0;
+	border: 0;
+	margin: 0;
+}
+
+.crud2go .v-contextmenu .gwt-MenuItem div {
+	cursor: pointer;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.crud2go .v-contextmenu .gwt-MenuItem-selected div {
+	background: #aaa;
+	color: #fff;
+}
+
+.crud2go .v-contextmenu table {
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+}
+
+.crud2go .v-contextmenu .gwt-MenuItem img {
+	margin-right: 1em;
+	vertical-align: middle;
+}
+
+.crud2go .v-label pre {
+	margin: 0;
+}
+
+.crud2go .v-label-undef-w {
+	white-space: nowrap;
+}
+
+.crud2go .v-label h1, .crud2go .v-label h2, .crud2go .v-label h3, .crud2go .v-label h4, .crud2go .v-label h5, .crud2go .v-label h6 {
+	line-height: normal;
+}
+
+.crud2go .v-loading-indicator, .crud2go .v-loading-indicator-delay, .crud2go .v-loading-indicator-wait {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 30000;
+	width: 31px;
+	height: 31px;
+	background: transparent url(../base/common/img/loading-indicator.gif);
+	margin-right: 5px;
+	margin-top: 5px;
+}
+
+.crud2go .v-loading-indicator-delay {
+	background-image: url(../base/common/img/loading-indicator-delay.gif);
+}
+
+.crud2go .v-loading-indicator-wait {
+	background-image: url(../base/common/img/loading-indicator-wait.gif);
+}
+
+.crud2go.v-app input[type="text"], .crud2go.v-app input[type="password"], .crud2go.v-app input[type="reset"], .crud2go.v-app select, .crud2go.v-app textarea, .crud2go .v-window input[type="text"], .crud2go .v-window input[type="password"], .crud2go .v-window input[type="reset"], .crud2go .v-window select, .crud2go .v-window textarea {
+	padding: 2px;
+}
+
+.crud2go input::-ms-clear {
+	display: none;
+}
+
+.crud2go .v-drag-element {
+	z-index: 60000;
+	position: absolute !important;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+	cursor: default;
+}
+
+.crud2go .v-clip {
+	overflow: hidden;
+}
+
+.crud2go .v-scrollable {
+	overflow: auto;
+	font-size: 0;
+	line-height: normal;
+}
+
+.v-ios.v-sa6 .crud2go .v-scrollable {
+	-webkit-overflow-scrolling: touch;
+}
+
+.crud2go.v-overlay-container {
+	width: 0;
+	height: 0;
+}
+
+.crud2go .v-vertical.v-margin-top, .crud2go .v-horizontal.v-margin-top {
+	padding-top: 12px;
+}
+
+.crud2go .v-vertical.v-margin-right, .crud2go .v-horizontal.v-margin-right {
+	padding-right: 12px;
+}
+
+.crud2go .v-vertical.v-margin-bottom, .crud2go .v-horizontal.v-margin-bottom {
+	padding-bottom: 12px;
+}
+
+.crud2go .v-vertical.v-margin-left, .crud2go .v-horizontal.v-margin-left {
+	padding-left: 12px;
+}
+
+.crud2go .v-gridlayout.v-layout-margin-top {
+	padding-top: 24px;
+}
+
+.crud2go .v-gridlayout, .crud2go .v-verticallayout, .crud2go .v-horizontallayout {
+	font-size: 0;
+	line-height: normal;
+}
+
+.crud2go .v-gridlayout.v-layout-margin-bottom {
+	padding-bottom: 24px;
+}
+
+.crud2go .v-gridlayout.v-layout-margin-left {
+	padding-left: 24px;
+}
+
+.crud2go .v-gridlayout.v-layout-margin-right {
+	padding-right: 24px;
+}
+
+.crud2go .v-gridlayout .v-layout-spacing-on {
+	padding-left: 12px;
+	padding-top: 12px;
+}
+
+.crud2go .v-spacing {
+	width: 6px;
+	height: 6px;
+}
+
+.crud2go .v-vertical, .crud2go .v-horizontal {
+	display: inline-block;
+}
+
+.crud2go div.v-layout.v-horizontal.v-widget {
+	white-space: nowrap;
+}
+
+.crud2go .v-layout.v-vertical > .v-expand, .crud2go .v-layout.v-horizontal > .v-expand {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+}
+
+.crud2go .v-slot, .crud2go .v-spacing {
+	display: inline-block;
+	white-space: normal;
+	vertical-align: top;
+}
+
+.crud2go .v-vertical > .v-slot:after {
+	display: inline-block;
+	clear: both;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+	line-height: 0;
+}
+
+.crud2go .v-vertical > .v-slot, .crud2go .v-vertical > .v-expand > .v-slot {
+	display: block;
+	clear: both;
+}
+
+.crud2go .v-horizontal > .v-slot, .crud2go .v-horizontal > .v-expand > .v-slot {
+	height: 100%;
+}
+
+.crud2go .v-horizontal > .v-expand > .v-slot {
+	position: relative;
+}
+
+.crud2go .v-vertical > .v-spacing, .crud2go .v-vertical > .v-expand > .v-spacing {
+	width: 0;
+	display: block;
+	clear: both;
+}
+
+.crud2go .v-horizontal > .v-spacing, .crud2go .v-horizontal > .v-expand > .v-spacing {
+	height: 0;
+}
+
+.crud2go .v-align-middle:before, .crud2go .v-align-bottom:before, .crud2go .v-expand > .v-align-middle:before, .crud2go .v-expand > .v-align-bottom:before {
+	content: "";
+	display: inline-block;
+	height: 100%;
+	vertical-align: middle;
+	width: 0;
+}
+
+.crud2go .v-align-middle, .crud2go .v-align-bottom {
+	white-space: nowrap;
+}
+
+.crud2go .v-align-middle > .v-widget, .crud2go .v-align-bottom > .v-widget {
+	display: inline-block;
+}
+
+.crud2go .v-align-middle, .crud2go .v-align-middle > .v-widget {
+	vertical-align: middle;
+}
+
+.crud2go .v-align-bottom, .crud2go .v-align-bottom > .v-widget {
+	vertical-align: bottom;
+}
+
+.crud2go .v-align-center {
+	text-align: center;
+}
+
+.crud2go .v-align-center > .v-widget {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.crud2go .v-align-right {
+	text-align: right;
+}
+
+.crud2go .v-align-right > .v-widget {
+	margin-left: auto;
+}
+
+.crud2go .v-has-caption, .crud2go .v-has-caption > .v-caption {
+	display: inline-block;
+}
+
+.crud2go .v-caption {
+	overflow: visible;
+	vertical-align: middle;
+}
+
+.crud2go .v-caption-on-left, .crud2go .v-caption-on-right {
+	white-space: nowrap;
+}
+
+.crud2go .v-caption-on-top > .v-caption, .crud2go .v-caption-on-bottom > .v-caption {
+	display: block;
+}
+
+.crud2go .v-caption-on-left > .v-caption {
+	padding-right: 0.5em;
+}
+
+.crud2go .v-caption-on-right > .v-caption {
+	vertical-align: top;
+}
+
+.crud2go .v-caption-on-left > .v-widget, .crud2go .v-caption-on-right > .v-widget {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.crud2go .v-has-caption.v-has-width > .v-widget {
+	width: 100% !important;
+}
+
+.crud2go .v-has-caption.v-has-height > .v-widget {
+	height: 100% !important;
+}
+
+.crud2go .v-errorindicator {
+	vertical-align: middle;
+}
+
+.crud2go .v-csslayout {
+	overflow: hidden;
+}
+
+.crud2go div.v-csslayout {
+	display: block;
+}
+
+.crud2go .v-csslayout-margin, .crud2go .v-csslayout-container {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-has-width > .v-csslayout-margin, .crud2go .v-has-width > .v-csslayout-margin > .v-csslayout-container {
+	width: 100%;
+}
+
+.crud2go .v-has-height > .v-csslayout-margin, .crud2go .v-has-height > .v-csslayout-margin > .v-csslayout-container {
+	height: 100%;
+}
+
+.crud2go .v-csslayout-margin-top {
+	padding-top: 12px;
+}
+
+.crud2go .v-csslayout-margin-bottom {
+	padding-bottom: 12px;
+}
+
+.crud2go .v-csslayout-margin-left {
+	padding-left: 12px;
+}
+
+.crud2go .v-csslayout-margin-right {
+	padding-right: 12px;
+}
+
+.crud2go .v-customcomponent {
+	overflow: hidden;
+}
+
+.crud2go .v-customlayout {
+	overflow: hidden;
+}
+
+.crud2go .v-datefield {
+	white-space: nowrap;
+	display: inline-block;
+}
+
+.crud2go .v-datefield-textfield {
+	vertical-align: top;
+}
+
+.v-ie .crud2go .v-datefield-button:after {
+	content: "\200B";
+}
+
+.crud2go .v-datefield-button {
+	cursor: pointer;
+	vertical-align: top;
+}
+
+.crud2go .v-has-width > input.v-datefield-textfield {
+	width: 100%;
+}
+
+.crud2go .v-datefield-prompt .v-datefield-textfield {
+	color: #999;
+	font-style: italic;
+}
+
+.crud2go .v-datefield .v-datefield-button-readonly {
+	display: none;
+}
+
+.crud2go .v-datefield-calendarpanel table {
+	width: 100%;
+}
+
+.crud2go .v-datefield-calendarpanel td {
+	padding: 0;
+	margin: 0;
+}
+
+.crud2go .v-datefield-calendarpanel:focus {
+	outline: none;
+}
+
+.crud2go .v-datefield-calendarpanel-header td {
+	text-align: center;
+}
+
+.crud2go .v-datefield-calendarpanel-month {
+	text-align: center;
+	white-space: nowrap;
+}
+
+.crud2go .v-datefield-calendarpanel-weeknumber {
+	color: #999;
+	border-right: 1px solid #ddd;
+	font-size: 11.7px;
+}
+
+.crud2go .v-datefield-calendarpanel-day, .crud2go .v-datefield-calendarpanel-day-today {
+	cursor: pointer;
+}
+
+.crud2go .v-datefield-calendarpanel-day-today {
+	border: 1px solid #ddd;
+}
+
+.crud2go .v-disabled .v-datefield-calendarpanel-day, .crud2go .v-disabled .v-datefield-calendarpanel-day-today {
+	cursor: default;
+}
+
+.crud2go .v-datefield-calendarpanel-day-disabled, .crud2go .v-datefield-calendarpanel-day-outside-range {
+	cursor: default;
+	opacity: 0.5;
+}
+
+.crud2go .v-datefield-calendarpanel-prevyear button.outside-range, .crud2go .v-datefield-calendarpanel-nextyear button.outside-range, .crud2go .v-datefield-calendarpanel-prevmonth button.outside-range, .crud2go .v-datefield-calendarpanel-nextmonth button.outside-range {
+	opacity: 0.5;
+}
+
+.crud2go .v-datefield-calendarpanel-day-selected {
+	cursor: default;
+	background: #333;
+	color: #fff;
+}
+
+.crud2go .v-datefield-calendarpanel-day-focused {
+	outline: 1px dotted black;
+}
+
+.crud2go .v-datefield-calendarpanel-day-offmonth {
+	color: #666;
+}
+
+.crud2go .v-datefield-time {
+	white-space: nowrap;
+}
+
+.crud2go .v-datefield-time .v-label {
+	display: inline;
+}
+
+.crud2go .v-datefield-popup {
+	background: #fff;
+}
+
+.crud2go .v-datefield-popupcalendar input.v-datefield-textfield {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-inline-datefield {
+	white-space: nowrap;
+	display: inline-block;
+}
+
+.crud2go .v-inline-datefield-textfield {
+	vertical-align: top;
+}
+
+.v-ie .crud2go .v-inline-datefield-button:after {
+	content: "\200B";
+}
+
+.crud2go .v-inline-datefield-button {
+	cursor: pointer;
+	vertical-align: top;
+}
+
+.crud2go .v-has-width > input.v-inline-datefield-textfield {
+	width: 100%;
+}
+
+.crud2go .v-inline-datefield-prompt .v-inline-datefield-textfield {
+	color: #999;
+	font-style: italic;
+}
+
+.crud2go .v-inline-datefield .v-inline-datefield-button-readonly {
+	display: none;
+}
+
+.crud2go .v-inline-datefield-calendarpanel table {
+	width: 100%;
+}
+
+.crud2go .v-inline-datefield-calendarpanel td {
+	padding: 0;
+	margin: 0;
+}
+
+.crud2go .v-inline-datefield-calendarpanel:focus {
+	outline: none;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-header td {
+	text-align: center;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-month {
+	text-align: center;
+	white-space: nowrap;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-weeknumber {
+	color: #999;
+	border-right: 1px solid #ddd;
+	font-size: 11.7px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day, .crud2go .v-inline-datefield-calendarpanel-day-today {
+	cursor: pointer;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day-today {
+	border: 1px solid #ddd;
+}
+
+.crud2go .v-disabled .v-inline-datefield-calendarpanel-day, .crud2go .v-disabled .v-inline-datefield-calendarpanel-day-today {
+	cursor: default;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day-disabled, .crud2go .v-inline-datefield-calendarpanel-day-outside-range {
+	cursor: default;
+	opacity: 0.5;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-prevyear button.outside-range, .crud2go .v-inline-datefield-calendarpanel-nextyear button.outside-range, .crud2go .v-inline-datefield-calendarpanel-prevmonth button.outside-range, .crud2go .v-inline-datefield-calendarpanel-nextmonth button.outside-range {
+	opacity: 0.5;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day-selected {
+	cursor: default;
+	background: #333;
+	color: #fff;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day-focused {
+	outline: 1px dotted black;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day-offmonth {
+	color: #666;
+}
+
+.crud2go .v-inline-datefield-time {
+	white-space: nowrap;
+}
+
+.crud2go .v-inline-datefield-time .v-label {
+	display: inline;
+}
+
+.crud2go .v-inline-datefield-popup {
+	background: #fff;
+}
+
+.crud2go .v-inline-datefield-popupcalendar input.v-inline-datefield-textfield {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-ddwrapper {
+	padding: 2px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	position: relative;
+}
+
+.crud2go [draggable=true] {
+	-khtml-user-drag: element;
+	-webkit-user-drag: element;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+}
+
+.v-ie .crud2go .v-ddwrapper a.drag-start {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	background-color: cyan;
+	filter: alpha(opacity=0);
+}
+
+.crud2go .v-ddwrapper-over {
+	border: 2px solid #1d9dff;
+	background-color: #bcdcff;
+	padding: 0;
+}
+
+.crud2go .v-ddwrapper-over {
+	background-color: rgba(169, 209, 255, 0.6);
+}
+
+.crud2go .no-box-drag-hints .v-ddwrapper-over {
+	border: none;
+	background-color: transparent;
+	padding: 2px;
+}
+
+.crud2go.v-app .v-ddwrapper-over-top, .crud2go .v-window .v-ddwrapper-over-top, .crud2go .v-popupview-popup .v-ddwrapper-over-top {
+	border: none;
+	border-top: 2px solid #1d9dff;
+	background-color: transparent;
+	padding: 2px;
+	padding-top: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+.crud2go.v-app .v-ddwrapper-over-bottom, .crud2go .v-window .v-ddwrapper-over-bottom, .crud2go .v-popupview-popup .v-ddwrapper-over-bottom {
+	border: none;
+	border-bottom: 2px solid #1d9dff;
+	background-color: transparent;
+	padding: 2px;
+	padding-bottom: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+.crud2go.v-app .v-ddwrapper-over-left, .crud2go .v-window .v-ddwrapper-over-left, .crud2go .v-popupview-popup .v-ddwrapper-over-left {
+	border: none;
+	border-left: 2px solid #1d9dff;
+	background-color: transparent;
+	padding: 2px;
+	padding-left: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+.crud2go.v-app .v-ddwrapper-over-right, .crud2go .v-window .v-ddwrapper-over-right, .crud2go .v-popupview-popup .v-ddwrapper-over-right {
+	border: none;
+	border-right: 2px solid #1d9dff;
+	background-color: transparent;
+	padding: 2px;
+	padding-right: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+.crud2go .v-ddwrapper, .crud2go .v-ddwrapper-over, .crud2go.v-app .v-ddwrapper-over-top, .crud2go .v-window .v-ddwrapper-over-top, .crud2go .v-popupview-popup .v-ddwrapper-over-top, .crud2go.v-app .v-ddwrapper-over-bottom, .crud2go .v-window .v-ddwrapper-over-bottom, .crud2go .v-popupview-popup .v-ddwrapper-over-bottom, .crud2go.v-app .v-ddwrapper-over-left, .crud2go .v-window .v-ddwrapper-over-left, .crud2go .v-popupview-popup .v-ddwrapper-over-left, .crud2go.v-app .v-ddwrapper-over-right, .crud2go .v-window .v-ddwrapper-over-right, .crud2go .v-popupview-popup .v-ddwrapper-over-right {
+	border-color: rgba(0, 109, 232, 0.6);
+}
+
+.crud2go .v-ddwrapper-over-top:before, .crud2go .v-ddwrapper-over-bottom:after, .crud2go .v-ddwrapper-over-left:before, .crud2go .v-ddwrapper-over-right:before {
+	display: block;
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	margin-top: -4px;
+	margin-left: -2px;
+	background: transparent url(../base/common/img/drag-slot-dot.png) no-repeat;
+}
+
+.crud2go .v-ddwrapper-over-bottom:after {
+	margin-top: -2px;
+}
+
+.crud2go .v-ddwrapper-over-left:before, .crud2go .v-ddwrapper-over-right:before {
+	background-position: 0 -6px;
+	margin-top: -2px;
+	margin-left: -4px;
+}
+
+.crud2go .v-ddwrapper-over-right:before {
+	position: relative;
+	margin-bottom: -4px;
+	margin-right: -4px;
+	margin-left: 0;
+	width: auto;
+	background-position: 100% -6px;
+}
+
+.crud2go .no-horizontal-drag-hints .v-ddwrapper-over-left {
+	padding-left: 2px;
+	border-left: none;
+}
+
+.crud2go .no-horizontal-drag-hints .v-ddwrapper-over-right {
+	padding-right: 2px;
+	border-right: none;
+}
+
+.crud2go .no-vertical-drag-hints .v-ddwrapper-over-top {
+	padding-top: 2px;
+	border-top: none;
+}
+
+.crud2go .no-vertical-drag-hints .v-ddwrapper-over-bottom {
+	padding-bottom: 2px;
+	border-bottom: none;
+}
+
+.crud2go .no-horizontal-drag-hints .v-ddwrapper-over-left:before, .crud2go .no-horizontal-drag-hints .v-ddwrapper-over-right:before, .crud2go .no-vertical-drag-hints .v-ddwrapper-over-top:before, .crud2go .no-vertical-drag-hints .v-ddwrapper-over-bottom:after {
+	display: none;
+}
+
+.crud2go .v-table .v-embedded-image {
+	display: inline-block;
+}
+
+.crud2go .v-formlayout.v-has-width > table {
+	width: 100%;
+}
+
+.crud2go .v-formlayout.v-has-height > table {
+	height: 100%;
+}
+
+.crud2go .v-formlayout-cell .v-errorindicator {
+	display: block;
+}
+
+.crud2go .v-formlayout-error-indicator {
+	width: 12px;
+}
+
+.crud2go .v-formlayout-captioncell {
+	text-align: right;
+	white-space: nowrap;
+}
+
+.crud2go .v-formlayout-errorcell, .crud2go .v-formlayout-captioncell {
+	width: 1px;
+}
+
+.crud2go .v-formlayout-captioncell .v-caption {
+	overflow: visible;
+}
+
+.crud2go .v-formlayout-spacing > tbody > .v-formlayout-row > .v-formlayout-captioncell, .crud2go .v-formlayout-spacing > tbody > .v-formlayout-row > .v-formlayout-contentcell, .crud2go .v-formlayout-spacing > tbody > .v-formlayout-row > .v-formlayout-errorcell {
+	padding-top: 6px;
+}
+
+.crud2go .v-formlayout-spacing > tbody > .v-formlayout-firstrow > .v-formlayout-captioncell, .crud2go .v-formlayout-spacing > tbody > .v-formlayout-firstrow > .v-formlayout-contentcell, .crud2go .v-formlayout-spacing > tbody > .v-formlayout-firstrow > .v-formlayout-errorcell {
+	padding-top: 0;
+}
+
+.crud2go .v-formlayout-margin-top > tbody > .v-formlayout-firstrow > .v-formlayout-captioncell, .crud2go .v-formlayout-margin-top > tbody > .v-formlayout-firstrow > .v-formlayout-contentcell, .crud2go .v-formlayout-margin-top > tbody > .v-formlayout-firstrow > .v-formlayout-errorcell {
+	padding-top: 12px;
+}
+
+.crud2go .v-formlayout-margin-bottom > tbody > .v-formlayout-lastrow > .v-formlayout-captioncell, .crud2go .v-formlayout-margin-bottom > tbody > .v-formlayout-lastrow > .v-formlayout-contentcell, .crud2go .v-formlayout-margin-bottom > tbody > .v-formlayout-lastrow > .v-formlayout-errorcell {
+	padding-bottom: 12px;
+}
+
+.crud2go .v-formlayout-margin-left > tbody > .v-formlayout-row > .v-formlayout-captioncell {
+	padding-left: 12px;
+}
+
+.crud2go .v-formlayout-margin-right > tbody > .v-formlayout-row > .v-formlayout-contentcell {
+	padding-right: 12px;
+}
+
+.crud2go .v-formlayout-captioncell .v-caption .v-required-field-indicator {
+	float: none;
+}
+
+.crud2go .v-gridlayout {
+	position: relative;
+}
+
+.crud2go .v-gridlayout-slot {
+	position: absolute;
+}
+
+.crud2go .v-gridlayout-margin-top {
+	padding-top: 12px;
+}
+
+.crud2go .v-gridlayout-margin-bottom {
+	padding-bottom: 12px;
+}
+
+.crud2go .v-gridlayout-margin-left {
+	padding-left: 12px;
+}
+
+.crud2go .v-gridlayout-margin-right {
+	padding-right: 12px;
+}
+
+.crud2go .v-gridlayout-spacing-on {
+	padding-left: 6px;
+	padding-top: 6px;
+	overflow: hidden;
+}
+
+.crud2go .v-gridlayout-spacing, .crud2go .v-gridlayout-spacing-off {
+	padding-left: 0;
+	padding-top: 0;
+}
+
+.crud2go .v-gridlayout-spacing-off {
+	overflow: hidden;
+}
+
+.crud2go .v-label {
+	overflow: hidden;
+}
+
+.crud2go .v-label.v-has-width {
+	white-space: normal;
+}
+
+.crud2go .v-link {
+	white-space: nowrap;
+}
+
+.crud2go .v-link a {
+	vertical-align: middle;
+	text-decoration: none;
+}
+
+.crud2go .v-link span {
+	text-decoration: underline;
+	vertical-align: middle;
+}
+
+.crud2go .v-disabled a {
+	cursor: default;
+}
+
+.crud2go .v-link img {
+	vertical-align: middle;
+	border: none;
+}
+
+.crud2go .v-loginform {
+	height: 140px;
+	width: 200px;
+}
+
+.crud2go .v-app-loginpage .v-button, .crud2go .v-app-loginpage .v-button {
+	float: left;
+}
+
+.crud2go .v-menubar {
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.crud2go .v-menubar .v-menubar-menuitem {
+	cursor: default;
+	vertical-align: middle;
+	white-space: nowrap;
+	display: inline;
+	display: inline-block;
+	zoom: 1;
+}
+
+.crud2go .v-menubar .v-menubar-menuitem-caption .v-icon {
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.crud2go .v-menubar-submenu {
+	background: #fff;
+}
+
+.crud2go .v-menubar-menuitem-selected {
+	background: #333;
+	color: #fff;
+}
+
+.crud2go .v-menubar-submenu .v-menubar-menuitem {
+	cursor: default;
+	display: block;
+	position: relative;
+	padding-right: 1.5em;
+}
+
+.crud2go .v-menubar-submenu .v-menubar-menuitem-caption {
+	display: block;
+}
+
+.crud2go .v-menubar-submenu .v-menubar-menuitem *, .crud2go .v-menubar-submenu .v-menubar-menuitem-caption * {
+	white-space: nowrap;
+}
+
+.crud2go .v-menubar-submenu-indicator {
+	display: none;
+	font-family: arial, helvetica, sans-serif;
+}
+
+.crud2go .v-menubar-submenu .v-menubar-submenu-indicator {
+	display: block;
+	position: absolute;
+	right: 0;
+	width: 1em;
+	height: 1em;
+	font-size: 11.7px;
+}
+
+.crud2go .v-menubar-menuitem-disabled, .crud2go .v-menubar span.v-menubar-menuitem-disabled:hover, .crud2go .v-menubar span.v-menubar-menuitem-disabled:focus, .crud2go .v-menubar span.v-menubar-menuitem-disabled:active {
+	color: #999;
+}
+
+.crud2go .v-menubar-more-menuitem {
+	font-family: arial, helvetica, sans-serif;
+}
+
+.crud2go .v-menubar-separator {
+	overflow: hidden;
+}
+
+.crud2go .v-menubar-separator span {
+	display: block;
+	text-indent: -9999px;
+	font-size: 1px;
+	line-height: 1px;
+	border-top: 1px solid #ddd;
+	margin: 3px 0 2px;
+	overflow: hidden;
+}
+
+.crud2go .v-menubar .v-icon, .crud2go .v-menubar-submenu .v-icon {
+	margin-right: 3px;
+}
+
+.crud2go .v-menubar:focus, .crud2go .v-menubar-popup:focus, .crud2go .v-menubar-popup .popupContent:focus, .crud2go .v-menubar-popup .popupContent .v-menubar-submenu:focus {
+	outline: none;
+}
+
+.crud2go .v-menubar-submenu-check-column .v-menubar-menuitem {
+	padding-left: 6px;
+}
+
+.crud2go .v-menubar-submenu-check-column .v-menubar-menuitem-caption {
+	padding-left: 18px;
+}
+
+.crud2go .v-menubar-submenu .v-menubar-menuitem-checked .v-menubar-menuitem-caption {
+	background: transparent url(../base/menubar/img/check.gif) no-repeat left;
+}
+
+.crud2go .v-Notification {
+	background: #999;
+	color: #fff;
+	cursor: pointer;
+	overflow: hidden;
+	padding: 1em;
+	max-width: 85%;
+}
+
+.crud2go .v-Notification h1, .crud2go .v-Notification p, .crud2go .v-Notification-error h1, .crud2go .v-Notification-error p, .crud2go .v-Notification-warning h1, .crud2go .v-Notification-warning p {
+	display: inline;
+	margin: 0 0.5em 0 0;
+}
+
+.crud2go .v-Notification-warning {
+	background: orange;
+}
+
+.crud2go .v-Notification-error {
+	background: red;
+}
+
+.crud2go .v-Notification-tray h1 {
+	display: block;
+}
+
+.crud2go .v-Notification-tray p {
+	display: block;
+}
+
+.crud2go .v-Notification-system {
+	background-color: red;
+	opacity: 0.7;
+	filter: alpha(opacity=70);
+}
+
+.crud2go .v-Notification-system h1 {
+	display: block;
+	margin: 0;
+}
+
+.crud2go .v-orderedlayout, .crud2go .v-horizontallayout, .crud2go .v-verticallayout {
+	position: relative;
+}
+
+.crud2go .v-orderedlayout-margin-top, .crud2go .v-horizontallayout-margin-top, .crud2go .v-verticallayout-margin-top {
+	padding-top: 12px;
+}
+
+.crud2go .v-orderedlayout-margin-right, .crud2go .v-horizontallayout-margin-right, .crud2go .v-verticallayout-margin-right {
+	padding-right: 12px;
+}
+
+.crud2go .v-orderedlayout-margin-bottom, .crud2go .v-horizontallayout-margin-bottom, .crud2go .v-verticallayout-margin-bottom {
+	padding-bottom: 12px;
+}
+
+.crud2go .v-orderedlayout-margin-left, .crud2go .v-horizontallayout-margin-left, .crud2go .v-verticallayout-margin-left {
+	padding-left: 12px;
+}
+
+.crud2go .v-orderedlayout-spacing-on, .crud2go .v-horizontallayout-spacing-on, .crud2go .v-verticallayout-spacing-on {
+	padding-top: 6px;
+	padding-left: 6px;
+}
+
+.crud2go .v-orderedlayout-spacing-off, .crud2go .v-horizontallayout-spacing-off, .crud2go .v-verticallayout-spacing-off {
+	padding-top: 0;
+	padding-left: 0;
+}
+
+.crud2go .v-horizontallayout-slot, .crud2go .v-verticallayout-slot {
+	position: absolute;
+}
+
+.crud2go .v-panel, .crud2go .v-panel-caption, .crud2go .v-panel-content, .crud2go .v-panel-deco, .crud2go .v-panel-light, .crud2go .v-panel-caption-light, .crud2go .v-panel-content-light, .crud2go .v-panel-deco-light {
+	outline: none;
+	text-align: left;
+}
+
+.crud2go .v-panel-caption .v-errorindicator {
+	float: none;
+	display: inline;
+}
+
+.crud2go .v-panel-caption .v-icon {
+	display: inline;
+	vertical-align: middle;
+}
+
+.crud2go .v-panel-caption span {
+	vertical-align: middle;
+}
+
+.crud2go .v-panel-caption {
+	white-space: nowrap;
+	overflow: hidden;
+	font-weight: bold;
+}
+
+.crud2go .v-panel-nocaption {
+	overflow: hidden;
+}
+
+.crud2go .v-panel-content {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-panel.v-has-width > .v-panel-content {
+	width: 100%;
+}
+
+.crud2go .v-panel.v-has-height > .v-panel-content {
+	height: 100%;
+}
+
+.crud2go .v-popupview {
+	cursor: pointer;
+	text-decoration: underline;
+	white-space: nowrap;
+}
+
+.crud2go .v-popupview-popup {
+	overflow: auto;
+}
+
+.crud2go .v-popupview-loading {
+	width: 30px;
+	height: 30px;
+	background: transparent url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
+}
+
+.crud2go .v-progressbar {
+	width: 150px;
+}
+
+.crud2go .v-progressbar-wrapper {
+	height: 7px;
+	border: 1px solid #ddd;
+}
+
+.crud2go .v-progressbar-indicator {
+	height: 7px;
+	background: #ddd;
+}
+
+.crud2go div.v-progressbar-indeterminate {
+	height: 20px;
+	width: 20px;
+	background: #fff url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+
+.crud2go .v-progressbar-indeterminate .v-progressbar-wrapper, .crud2go .v-progressbar-indeterminate .v-progressbar-indicator, .crud2go .v-progressbar-indeterminate-disabled .v-progressbar-wrapper, .crud2go .v-progressbar-indeterminate-disabled .v-progressbar-indicator {
+	display: none;
+}
+
+.crud2go div.v-progressbar-indeterminate-disabled {
+	height: 20px;
+	width: 20px;
+	background: transparent;
+}
+
+.crud2go .v-progressindicator {
+	width: 150px;
+}
+
+.crud2go .v-progressindicator-wrapper {
+	height: 7px;
+	border: 1px solid #ddd;
+}
+
+.crud2go .v-progressindicator-indicator {
+	height: 7px;
+	background: #ddd;
+}
+
+.crud2go div.v-progressindicator-indeterminate {
+	height: 20px;
+	width: 20px;
+	background: #fff url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+
+.crud2go .v-progressindicator-indeterminate .v-progressindicator-wrapper, .crud2go .v-progressindicator-indeterminate .v-progressindicator-indicator, .crud2go .v-progressindicator-indeterminate-disabled .v-progressindicator-wrapper, .crud2go .v-progressindicator-indeterminate-disabled .v-progressindicator-indicator {
+	display: none;
+}
+
+.crud2go div.v-progressindicator-indeterminate-disabled {
+	height: 20px;
+	width: 20px;
+	background: transparent;
+}
+
+.crud2go .v-select {
+	text-align: left;
+}
+
+.crud2go .v-select-optiongroup .v-select-option {
+	display: block;
+	white-space: nowrap;
+}
+
+.crud2go .v-select-optiongroup .v-icon {
+	vertical-align: middle;
+	white-space: nowrap;
+	margin: 0 2px;
+}
+
+.v-ie .crud2go .v-select-optiongroup .v-select-option {
+	zoom: 1;
+}
+
+.crud2go .v-select-select {
+	display: block;
+}
+
+.crud2go .v-select-twincol {
+	white-space: nowrap;
+}
+
+.crud2go .v-select-twincol-options {
+	float: left;
+}
+
+.crud2go .v-select-twincol-caption-left {
+	float: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.crud2go .v-select-twincol-selections {
+	font-weight: bold;
+}
+
+.crud2go .v-select-twincol-caption-right {
+	float: right;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.crud2go .v-select-twincol-buttons {
+	float: left;
+	text-align: center;
+}
+
+.crud2go .v-select-twincol-buttons .v-select-twincol-deco {
+	clear: both;
+}
+
+.crud2go .v-select-twincol .v-textfield {
+	display: block;
+	float: left;
+	clear: left;
+}
+
+.crud2go .v-select-twincol .v-button {
+	float: left;
+}
+
+.crud2go .v-select-twincol-buttons .v-button {
+	float: none;
+}
+
+.crud2go .v-filterselect {
+	white-space: nowrap;
+	text-align: left;
+	display: inline-block;
+	padding-right: 1em;
+}
+
+.crud2go .v-filterselect .v-icon {
+	float: left;
+}
+
+.crud2go.v-app .v-filterselect-input, .crud2go .v-window .v-filterselect-input, .crud2go .v-popupview-popup .v-filterselect-input {
+	margin: 0;
+	float: left;
+	-webkit-border-radius: 0px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-filterselect-prompt .v-filterselect-input {
+	color: #999;
+	font-style: italic;
+}
+
+.crud2go .v-filterselect-button {
+	display: inline-block;
+	cursor: pointer;
+	width: 1em;
+	margin-right: -1em;
+	height: 1em;
+	background: transparent url(../base/common/img/sprites.png) no-repeat -5px -8px;
+}
+
+.crud2go .v-filterselect.v-readonly .v-filterselect-button {
+	display: none;
+}
+
+.crud2go .v-filterselect.v-readonly, .crud2go .v-filterselect.v-readonly .v-filterselect-input {
+	background: transparent;
+}
+
+.crud2go .v-filterselect-suggestpopup {
+	background: #fff;
+	border: 1px solid #eee;
+}
+
+.crud2go .v-filterselect-suggestmenu table {
+	border-collapse: collapse;
+	border: none;
+	vertical-align: top;
+}
+
+.crud2go .v-filterselect-suggestmenu .gwt-MenuItem {
+	white-space: nowrap;
+}
+
+.crud2go .v-filterselect-suggestmenu .gwt-MenuItem .v-icon {
+	margin-right: 3px;
+	vertical-align: middle;
+}
+
+.crud2go .v-filterselect-suggestmenu .gwt-MenuItem span {
+	vertical-align: middle;
+}
+
+.crud2go .v-filterselect-suggestmenu .gwt-MenuItem-selected {
+	background: #333;
+	color: #fff;
+}
+
+.crud2go .v-filterselect-nextpage, .crud2go .v-filterselect-nextpage-off, .crud2go .v-filterselect-prevpage-off, .crud2go .v-filterselect-prevpage {
+	width: 100%;
+	background: #aaa;
+	text-align: center;
+	overflow: hidden;
+	cursor: pointer;
+}
+
+.crud2go .v-filterselect-nextpage-off, .crud2go .v-filterselect-prevpage-off {
+	color: #666;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+	cursor: default;
+}
+
+.crud2go .v-filterselect-nextpage-off span, .crud2go .v-filterselect-prevpage-off span {
+	cursor: default;
+}
+
+.crud2go .v-filterselect-status {
+	white-space: nowrap;
+	text-align: center;
+}
+
+.crud2go .v-filterselect-no-input .v-filterselect-input {
+	cursor: default;
+}
+
+.crud2go .v-shadow {
+	position: absolute;
+}
+
+.crud2go .v-shadow .top-left {
+	position: absolute;
+	overflow: hidden;
+	top: -3px;
+	left: -5px;
+	width: 10px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/top-left.png);
+}
+
+.crud2go .v-shadow .top {
+	position: absolute;
+	overflow: hidden;
+	top: -3px;
+	left: 5px;
+	height: 10px;
+	right: 5px;
+	background: transparent url(../base/shadow/img/top.png);
+}
+
+.crud2go .v-shadow .top-right {
+	position: absolute;
+	overflow: hidden;
+	top: -3px;
+	right: -5px;
+	width: 10px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/top-right.png);
+}
+
+.crud2go .v-shadow .left {
+	position: absolute;
+	overflow: hidden;
+	top: 7px;
+	left: -5px;
+	width: 10px;
+	bottom: 3px;
+	background: transparent url(../base/shadow/img/left.png);
+}
+
+.crud2go .v-shadow .center {
+	position: absolute;
+	overflow: hidden;
+	top: 7px;
+	left: 5px;
+	bottom: 3px;
+	right: 5px;
+	background: transparent url(../base/shadow/img/center.png);
+}
+
+.crud2go .v-shadow .right {
+	position: absolute;
+	overflow: hidden;
+	top: 7px;
+	right: -5px;
+	width: 10px;
+	bottom: 3px;
+	background: transparent url(../base/shadow/img/right.png);
+}
+
+.crud2go .v-shadow .bottom-left {
+	position: absolute;
+	overflow: hidden;
+	bottom: -7px;
+	left: -5px;
+	width: 10px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/bottom-left.png);
+}
+
+.crud2go .v-shadow .bottom {
+	position: absolute;
+	overflow: hidden;
+	bottom: -7px;
+	left: 5px;
+	right: 5px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/bottom.png);
+}
+
+.crud2go .v-shadow .bottom-right {
+	position: absolute;
+	overflow: hidden;
+	bottom: -7px;
+	right: -5px;
+	width: 10px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/bottom-right.png);
+}
+
+.crud2go .v-slider {
+	margin: 5px 0;
+}
+
+.crud2go .v-slider-base {
+	height: 2px;
+	border-top: 1px solid #ddd;
+	background: #eee;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #eee;
+}
+
+.crud2go .v-slider-handle {
+	background: #aaa;
+	width: 12px;
+	height: 12px;
+	margin-top: -5px;
+	font-size: 0;
+}
+
+.crud2go .v-slider-vertical {
+	width: 2px;
+	height: auto;
+	margin: 0 5px;
+	border: none;
+	border-left: 1px solid #cccfd0;
+	border-right: 1px solid #cccfd0;
+}
+
+.crud2go .v-slider-vertical .v-slider-base {
+	width: 2px;
+	border-bottom: 1px solid #eee;
+	border-right: none;
+}
+
+.crud2go .v-slider-vertical .v-slider-handle {
+	width: 12px;
+	height: 12px;
+	font-size: 0;
+	margin-left: -5px;
+}
+
+.crud2go .v-slider-feedback {
+	padding: 2px 5px;
+	background: #444;
+	color: #fff;
+	font-size: 11px;
+	line-height: 13px;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	margin: -2px 0 0 2px;
+	text-shadow: 0 1px 0 #000;
+}
+
+.crud2go .v-splitpanel-horizontal, .crud2go .v-splitpanel-vertical {
+	overflow: hidden;
+}
+
+.crud2go .v-splitpanel-hsplitter {
+	width: 6px;
+}
+
+.crud2go .v-splitpanel-hsplitter div {
+	width: 6px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	background: #ddd;
+	cursor: e-resize;
+	cursor: col-resize;
+}
+
+.crud2go .v-disabled .v-splitpanel-hsplitter div {
+	cursor: default;
+}
+
+.crud2go .v-splitpanel-vsplitter {
+	height: 6px;
+}
+
+.crud2go .v-splitpanel-vsplitter div {
+	height: 6px;
+	background: #ddd;
+	cursor: s-resize;
+	cursor: row-resize;
+}
+
+.crud2go .v-disabled .v-splitpanel-vsplitter div {
+	cursor: default;
+}
+
+.crud2go .v-table {
+	overflow: hidden;
+	text-align: left;
+}
+
+.crud2go .v-table-header-wrap {
+	overflow: hidden;
+	border: 1px solid #aaa;
+	border-bottom: none;
+	background: #efefef;
+}
+
+.crud2go .v-table-header table, .crud2go .v-table-table {
+	border-spacing: 0;
+	border-collapse: separate;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.crud2go .v-table-table {
+	font-size: 11px;
+}
+
+.crud2go .v-table-header td {
+	padding: 0;
+}
+
+.crud2go .v-table-header-cell, .crud2go .v-table-header-cell-asc, .crud2go .v-table-header-cell-desc {
+	cursor: pointer;
+}
+
+.crud2go .v-table.v-disabled .v-table-header-cell, .crud2go .v-table.v-disabled .v-table-header-cell-asc, .crud2go .v-table.v-disabled .v-table-header-cell-desc {
+	cursor: default;
+}
+
+.crud2go .v-table-footer-wrap {
+	overflow: hidden;
+	border: 1px solid #aaa;
+	border-top: none;
+	background: #efefef;
+}
+
+.crud2go .v-table-footer table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.crud2go .v-table-footer td {
+	padding: 0;
+	border-right: 1px solid #aaa;
+}
+
+.crud2go .v-table-footer-cell {
+	cursor: pointer;
+}
+
+.crud2go .v-table-footer-container {
+	float: right;
+	padding-right: 6px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.crud2go .v-table-resizer {
+	display: block;
+	height: 1.2em;
+	float: right;
+	background: #aaa;
+	cursor: e-resize;
+	cursor: col-resize;
+	width: 1px;
+	overflow: hidden;
+}
+
+.crud2go .v-table.v-disabled .v-table-resizer {
+	cursor: default;
+}
+
+.crud2go .v-table-caption-container {
+	overflow: hidden;
+	white-space: nowrap;
+	margin-left: 6px;
+}
+
+.crud2go .v-table-caption-container-align-right {
+	float: right;
+}
+
+.crud2go .v-table-sort-indicator {
+	width: 0px;
+	height: 1.2em;
+	float: right;
+}
+
+.crud2go .v-table-header-cell-asc .v-table-sort-indicator, .crud2go .v-table-header-cell-desc .v-table-sort-indicator {
+	width: 16px;
+	height: 1.2em;
+	float: right;
+}
+
+.crud2go .v-table-header-cell-asc .v-table-sort-indicator {
+	background: transparent url(../base/common/img/sprites.png) no-repeat right 6px;
+}
+
+.crud2go .v-table-header-cell-desc .v-table-sort-indicator {
+	background: transparent url(../base/common/img/sprites.png) no-repeat right -10px;
+}
+
+.crud2go .v-table-caption-container-align-center {
+	text-align: center;
+}
+
+.crud2go .v-table-caption-container-align-right {
+	text-align: right;
+}
+
+.crud2go .v-table-caption-container .v-icon, .crud2go .v-table-header-drag .v-icon {
+	vertical-align: middle;
+}
+
+.crud2go .v-table-body {
+	border: 1px solid #aaa;
+}
+
+.crud2go .v-table-row-spacer {
+	height: 10px;
+	overflow: hidden;
+}
+
+.crud2go .v-table-row, .crud2go .v-table-row-odd {
+	background: #fff;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	cursor: pointer;
+}
+
+.crud2go .v-table-generated-row {
+	background: #efefef;
+}
+
+.crud2go .v-table-body-noselection .v-table-row, .crud2go .v-table-body-noselection .v-table-row-odd {
+	cursor: default;
+}
+
+.crud2go .v-table .v-selected {
+	background: #999;
+	color: #fff;
+}
+
+.crud2go .v-table-cell-content {
+	white-space: nowrap;
+	overflow: hidden;
+	padding: 0 6px;
+	border-right: 1px solid #aaa;
+}
+
+.crud2go .v-table-cell-wrapper {
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.crud2go .v-table-cell-wrapper-align-center {
+	text-align: center;
+}
+
+.crud2go .v-table-cell-wrapper-align-right {
+	text-align: right;
+}
+
+.crud2go .v-table-column-selector {
+	float: right;
+	background: transparent url(../base/common/img/sprites.png) no-repeat 4px -37px;
+	margin: -1.2em 0 0 0;
+	height: 1.2em;
+	width: 14px;
+	position: relative;
+	cursor: pointer;
+}
+
+.crud2go .v-table.v-disabled .v-table-column-selector {
+	cursor: default;
+}
+
+.crud2go .v-table-focus-slot-left {
+	border-left: 2px solid #999;
+	float: none;
+	margin-bottom: -1.2em;
+	width: auto;
+	background: transparent;
+	border-right: 1px solid #aaa;
+}
+
+.crud2go .v-table-focus-slot-right {
+	border-right: 2px solid #999;
+	margin-left: -2px;
+}
+
+.crud2go .v-table-header-drag {
+	position: absolute;
+	background: #efefef;
+	border: 1px solid #eee;
+	opacity: 0.9;
+	filter: alpha(opacity=90);
+	margin-top: 20px;
+	z-index: 30000;
+}
+
+.crud2go .v-table-header-drag .v-icon {
+	vertical-align: middle;
+}
+
+.crud2go .v-table-scrollposition {
+	width: 160px;
+	background: #eee;
+	border: 1px solid #aaa;
+}
+
+.crud2go .v-table-scrollposition span {
+	display: block;
+	text-align: center;
+}
+
+.crud2go .v-table-body:focus, .crud2go .v-table-body-wrapper:focus {
+	outline: none;
+}
+
+.crud2go .v-table-body.focused {
+	border-color: #388ddd;
+}
+
+.crud2go .v-table-focus .v-table-cell-content {
+	border-top: 1px dotted #0066bd;
+	border-bottom: 1px dotted #0066bd;
+}
+
+.crud2go .v-table-focus .v-table-cell-wrapper {
+	margin-top: -1px;
+	margin-bottom: -1px;
+}
+
+.crud2go .v-off {
+	color: #ddd;
+}
+
+.crud2go .v-table-drag .v-table-body {
+	border-color: #1d9dff;
+}
+
+.crud2go .v-table-row-drag-middle .v-table-cell-content {
+	background-color: #bcdcff;
+}
+
+.crud2go .v-table-row-drag-top .v-table-cell-content {
+	border-top: 2px solid #1d9dff;
+}
+
+.crud2go .v-table-row-drag-top .v-table-cell-wrapper {
+	margin-top: -2px;
+}
+
+.crud2go .v-table-row-drag-bottom .v-table-cell-content {
+	border-bottom: 2px solid #1d9dff;
+}
+
+.crud2go .v-table-row-drag-bottom .v-table-cell-wrapper {
+	margin-bottom: -2px;
+}
+
+.crud2go .v-table-row-drag-top .v-table-cell-content:first-child:before, .crud2go .v-table-row-drag-bottom .v-table-cell-content:first-child:after {
+	display: block;
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	margin-top: -4px;
+	margin-left: -6px;
+	background: transparent url(../base/common/img/drag-slot-dot.png);
+}
+
+.v-ff .crud2go .v-table-row-drag-bottom .v-table-cell-content:first-child:after, .v-ie .crud2go .v-table-row-drag-bottom .v-table-cell-content:first-child:after {
+	margin-top: -2px;
+}
+
+.crud2go .v-tabsheet, .crud2go .v-tabsheet-content, .crud2go .v-tabsheet-deco {
+	outline: none;
+	text-align: left;
+}
+
+.crud2go .v-tabsheet-tabs {
+	empty-cells: hide;
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	width: 100%;
+	overflow: hidden;
+}
+
+.crud2go .v-tabsheet-tabitemcell:focus {
+	outline: none;
+}
+
+.crud2go .v-tabsheet-tabitemcell, .crud2go .v-tabsheet-spacertd {
+	margin: 0;
+	padding: 0;
+	vertical-align: bottom;
+}
+
+.crud2go .v-tabsheet-spacertd {
+	width: 100%;
+}
+
+.crud2go .v-tabsheet-spacertd div {
+	border-left: 1px solid #aaa;
+	border-bottom: 1px solid #aaa;
+	height: 1em;
+	padding: 0.2em 0;
+}
+
+.crud2go .v-tabsheet-hidetabs > .v-tabsheet-tabcontainer {
+	display: none;
+}
+
+.crud2go .v-tabsheet-scroller {
+	white-space: nowrap;
+	text-align: right;
+	margin-top: -1em;
+}
+
+.crud2go .v-disabled .v-tabsheet-scroller {
+	display: none;
+}
+
+.crud2go .v-tabsheet-scrollerPrev, .crud2go .v-tabsheet-scrollerNext, .crud2go .v-tabsheet-scrollerPrev-disabled, .crud2go .v-tabsheet-scrollerNext-disabled {
+	border: 1px solid #aaa;
+	background: #fff;
+	width: 12px;
+	height: 1em;
+	cursor: pointer;
+}
+
+.crud2go .v-tabsheet-scrollerPrev-disabled, .crud2go .v-tabsheet-scrollerNext-disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.crud2go .v-tabsheet-tabs .v-caption, .crud2go .v-tabsheet-tabs .v-caption span {
+	white-space: nowrap;
+}
+
+.crud2go .v-tabsheet-caption-close {
+	display: inline;
+	display: inline-block;
+	zoom: 1;
+	width: 16px;
+	height: 16px;
+	text-align: center;
+	font-weight: bold;
+	cursor: pointer;
+	vertical-align: middle;
+	user-select: none;
+	-khtml-user-select: none;
+	-ms-user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+
+.crud2go .v-tabsheet .v-disabled .v-tabsheet-caption-close {
+	cursor: default;
+	visibility: hidden;
+}
+
+.crud2go .v-tabsheet-tabitem:hover .v-tabsheet-caption-close {
+	visibility: visible;
+}
+
+.crud2go .v-tabsheet-tabitem {
+	border: 1px solid #aaa;
+	border-right: none;
+	cursor: pointer;
+	padding: 0.2em 0.5em;
+}
+
+.crud2go .v-tabsheet-tabitem .v-caption {
+	cursor: inherit;
+}
+
+.crud2go .v-tabsheet.v-disabled .v-tabsheet-tabitem, .crud2go .v-tabsheet-tabitemcell-disabled .v-tabsheet-tabitem {
+	cursor: default;
+}
+
+.crud2go .v-tabsheet-tabitem-selected {
+	cursor: default;
+	border-bottom-color: #fff;
+}
+
+.crud2go .v-tabsheet-tabitem-selected .v-caption {
+	cursor: default;
+}
+
+.crud2go .v-tabsheet-content {
+	border: 1px solid #aaa;
+	border-top: none;
+	border-bottom: none;
+	position: relative;
+}
+
+.crud2go .v-tabsheet-deco {
+	height: 1px;
+	background: #aaa;
+	overflow: hidden;
+}
+
+.crud2go .v-tabsheet-hidetabs .v-tabsheet-content {
+	border: none;
+}
+
+.crud2go .v-tabsheet-hidetabs .v-tabsheet-deco {
+	height: 0;
+}
+
+.crud2go .v-textfield {
+	text-align: left;
+}
+
+.crud2go .v-textarea {
+	resize: none;
+	white-space: pre-wrap;
+}
+
+.crud2go input.v-textfield-prompt, .crud2go textarea.v-textarea-prompt {
+	color: #999;
+	font-style: italic;
+}
+
+.crud2go input.v-textfield-readonly, .crud2go textarea.v-textarea-readonly {
+	background: transparent;
+	border: none;
+	resize: none;
+}
+
+.crud2go input.v-disabled, .crud2go textarea.v-disabled {
+	resize: none;
+}
+
+.crud2go input.v-textfield-readonly:focus, .crud2go textarea.v-textarea-readonly:focus {
+	outline: none;
+}
+
+.v-sa .crud2go input:focus, .v-sa .crud2go textarea:focus {
+	outline-width: medium;
+}
+
+.crud2go .v-richtextarea {
+	border: 1px solid #aaa;
+	overflow: hidden;
+}
+
+.crud2go .v-richtextarea .gwt-RichTextArea {
+	background: #fff;
+	border: none;
+}
+
+.crud2go .v-richtextarea .gwt-HTML {
+	height: 100%;
+	font-size: 11px;
+}
+
+.crud2go .v-richtextarea .gwt-RichTextToolbar {
+	white-space: nowrap;
+	background: #959595 url(../base/textfield/img/richtext-toolbar-bg.png) repeat-x 0 -42px;
+	border-bottom: 1px solid #7d7d7d;
+	padding: 2px;
+	overflow: hidden;
+}
+
+.crud2go .v-richtextarea .gwt-RichTextToolbar-top {
+	padding-bottom: 1px;
+	overflow: hidden;
+	white-space: normal;
+}
+
+.crud2go .v-richtextarea .gwt-RichTextToolbar-bottom {
+	clear: left;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.crud2go .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton, .crud2go .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton {
+	float: left;
+	display: inline;
+	width: 22px;
+	height: 21px;
+	overflow: hidden;
+	background: transparent url(../base/textfield/img/richtext-toolbar-bg.png) repeat-x;
+	cursor: pointer;
+	margin-right: 2px;
+	text-align: center;
+}
+
+.crud2go .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton-down, .crud2go .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton-down, .crud2go .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton-down-hovering, .crud2go .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton-down-hovering {
+	background-position: 0 -21px;
+}
+
+.crud2go .v-richtextarea .gwt-RichTextToolbar .gwt-ListBox {
+	width: 24.5%;
+	margin-right: 2px;
+}
+
+.crud2go .v-richtextarea-readonly {
+	border: none;
+}
+
+.crud2go .v-tree {
+	text-align: left;
+	padding: 1px 0;
+	outline: none;
+}
+
+.crud2go .v-tree-node {
+	background: transparent url(../base/common/img/sprites.png) no-repeat 5px -37px;
+	padding: 1px 0;
+}
+
+.crud2go .v-tree-node-caption:focus {
+	outline: none;
+}
+
+.crud2go div.v-tree-node-leaf {
+	background: transparent;
+}
+
+.crud2go .v-tree-node-expanded {
+	background: transparent url(../base/common/img/sprites.png) no-repeat -5px -10px;
+}
+
+.crud2go .v-tree-node-caption {
+	margin-left: 1em;
+}
+
+.crud2go .v-tree-node span {
+	cursor: pointer;
+}
+
+.crud2go .v-tree-node-caption div {
+	white-space: nowrap;
+}
+
+.crud2go .v-tree-node-caption span, .crud2go .v-tree-node-caption .v-icon {
+	vertical-align: middle;
+}
+
+.crud2go .v-tree-node-selected span {
+	background: #999;
+	color: #fff;
+}
+
+.crud2go .v-tree-node-children {
+	padding-left: 1em;
+}
+
+.crud2go .v-tree .v-tree-node-drag-top {
+	border-top: 2px solid #1d9dff;
+	margin-top: -1px;
+	padding-top: 0;
+}
+
+.crud2go .v-tree .v-tree-node-drag-bottom {
+	border-bottom: 2px solid #1d9dff;
+	margin-bottom: -1px;
+	padding-bottom: 0;
+}
+
+.crud2go .v-tree .v-tree-node-drag-top:before, .crud2go .v-tree .v-tree-node-drag-bottom:after, .crud2go .v-tree .v-tree-node-caption-drag-center:after {
+	display: block;
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	margin-top: -4px;
+	background: transparent url(../base/common/img/drag-slot-dot.png);
+}
+
+.crud2go .v-tree .v-tree-node-drag-bottom:after {
+	margin-top: -2px;
+}
+
+.crud2go .v-tree .v-tree-node-caption-drag-center:after {
+	margin-left: 14px;
+}
+
+.v-ff .crud2go .v-tree .v-tree-node-caption-drag-center:after, .v-ie .crud2go .v-tree .v-tree-node-caption-drag-center:after {
+	margin-top: -2px;
+}
+
+.crud2go .v-tree .v-tree-node-drag-top {
+	background-position: 5px -38px;
+}
+
+.crud2go .v-tree .v-tree-node-drag-top.v-tree-node-expanded {
+	background-position: -5px -11px;
+}
+
+.crud2go .v-tree .v-tree-node-caption-drag-center div {
+	border: 2px solid #1d9dff;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	margin: -2px 2px -2px -2px;
+	background-color: #bcdcff;
+}
+
+.crud2go .v-tree .v-tree-node-caption-drag-center div {
+	background-color: rgba(169, 209, 255, 0.6);
+}
+
+.crud2go .v-tree .v-tree-node-caption-drag-center div, .crud2go .v-tree .v-tree-node-drag-top, .crud2go .v-tree .v-tree-node-drag-bottom {
+	border-color: rgba(0, 109, 232, 0.6);
+}
+
+.crud2go .v-tree-connectors .v-tree-node-caption {
+	padding-top: 1px;
+}
+
+.crud2go .v-tree-connectors .v-tree-node {
+	background: transparent url(../base/tree/img/connector-expand.png) no-repeat 2px -52px;
+}
+
+.crud2go .v-tree-connectors .v-tree-node-expanded {
+	background: transparent url(../base/tree/img/connector-collapse.png) no-repeat 2px -52px;
+}
+
+.crud2go .v-tree-connectors .v-tree-node-last {
+	background: transparent url(../base/tree/img/connector-expand-last.png) no-repeat 2px -52px;
+}
+
+.crud2go .v-tree-connectors .v-tree-node-expanded.v-tree-node-last {
+	background: transparent url(../base/tree/img/connector-collapse-last.png) no-repeat 2px -52px;
+}
+
+.crud2go .v-tree-connectors .v-tree-node-leaf {
+	background: transparent url(../base/tree/img/connector-leaf.png) repeat-y 2px 50%;
+}
+
+.crud2go .v-tree-connectors .v-tree-node-leaf-last {
+	background: transparent url(../base/tree/img/connector-leaf-last.png) repeat-y 2px 50%;
+}
+
+.crud2go .v-tree-connectors .v-tree-node-children {
+	background: transparent url(../base/tree/img/connector.png) repeat-y 2px 0;
+}
+
+.crud2go .v-tree-connectors .v-tree-node-children-last {
+	background: transparent;
+}
+
+.crud2go .v-tree-connectors .v-tree-node-drag-top, .crud2go .v-tree-connectors .v-tree-node-expanded.v-tree-node-drag-top {
+	background-position: 2px -53px;
+}
+
+.crud2go .v-tree-connectors .v-tree-node-drag-top.v-tree-node-leaf {
+	background-position: 2px 50%;
+}
+
+.crud2go .v-treetable-treespacer {
+	display: inline-block;
+	background: transparent;
+	height: 10px;
+	width: 18px;
+	position: absolute;
+	left: 0;
+	top: 5px;
+}
+
+.crud2go .v-treetable-node-closed {
+	background: url(../base/treetable/img/arrow-right.png) right top no-repeat;
+}
+
+.crud2go .v-treetable-node-open {
+	background: url(../base/treetable/img/arrow-down.png) right top no-repeat;
+}
+
+.crud2go .v-treetable .v-checkbox {
+	display: inline-block;
+	padding-bottom: 4px;
+}
+
+.crud2go .v-treetable .v-table-row .v-table-cell-content, .crud2go .v-treetable .v-table-row-odd .v-table-cell-content {
+	position: relative;
+	z-index: 10;
+}
+
+.crud2go .v-treetable .v-table-cell-wrapper {
+	position: relative;
+}
+
+.crud2go .v-treetable .v-table-body .v-table-table .v-table-row-animating {
+	zoom: 1;
+	z-index: 1;
+}
+
+.crud2go .v-treetable .v-table-body .v-table-table .v-table-row-animating, .crud2go .v-treetable .v-table-body .v-table-table .v-table-row-animating .v-table-cell-content {
+	background: transparent;
+}
+
+.crud2go .v-treetable-animation-clone {
+	border-spacing: 0;
+	zoom: 1;
+}
+
+.crud2go div.v-treetable-animation-clone-wrapper {
+	position: absolute;
+	z-index: 2;
+	background-color: #fff;
+}
+
+.crud2go div.v-treetable-animation-clone-wrapper table.v-treetable-animation-clone {
+	background-color: #fff;
+}
+
+.crud2go div table.v-treetable-animation-clone tr.v-table-row, .crud2go div table.v-treetable-animation-clone tr.v-table-row-odd, .crud2go div table.v-treetable-animation-clone tr.v-table-row td.v-table-cell-content, .crud2go div table.v-treetable-animation-clone tr.v-table-row-odd td.v-table-cell-content {
+	visibility: visible;
+}
+
+.crud2go .v-upload {
+	white-space: nowrap;
+}
+
+.crud2go .v-upload-immediate {
+	position: relative;
+	margin: 0;
+	overflow: hidden;
+}
+
+.v-ff .crud2go .v-upload-immediate, .v-op .crud2go .v-upload-immediate {
+	display: inline-block;
+}
+
+.crud2go .v-upload-immediate input {
+	opacity: 0;
+	filter: alpha(opacity=0);
+	z-index: 2;
+	position: absolute;
+	right: 0;
+	height: 21px;
+	text-align: right;
+	border: none;
+	background: transparent;
+}
+
+.crud2go .v-upload-immediate button {
+	position: relative;
+	left: 0;
+	top: 0;
+	width: 100%;
+	text-align: left;
+}
+
+.crud2go .v-window {
+	background: #fff;
+}
+
+.crud2go .v-window-contents {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-window.v-has-width > div.popupContent, .crud2go .v-window.v-has-width .v-window-wrap, .crud2go .v-window.v-has-width .v-window-contents, .crud2go .v-window.v-has-width .v-window-contents > div {
+	width: 100%;
+}
+
+.crud2go .v-window.v-has-height > div.popupContent, .crud2go .v-window.v-has-height .v-window-wrap, .crud2go .v-window.v-has-height .v-window-contents, .crud2go .v-window.v-has-height .v-window-contents > div {
+	height: 100%;
+}
+
+.crud2go .v-window-outerheader {
+	padding: 0.3em 1em;
+	height: 1.6em;
+	position: relative;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.crud2go .v-window-outerheader, .crud2go .v-window-draggingCurtain {
+	cursor: move;
+}
+
+.crud2go .v-window-header {
+	font-weight: bold;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ie-user-select: none;
+	user-select: none;
+}
+
+.crud2go div.v-window-header {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	-ms-text-overflow: ellipsis;
+	overflow: hidden;
+	padding: 0;
+}
+
+.crud2go .v-window-header .v-icon {
+	vertical-align: middle;
+}
+
+.crud2go .v-window-contents > div {
+	outline: none;
+}
+
+.crud2go .v-window-footer {
+	overflow: hidden;
+	zoom: 1;
+	height: 10px;
+	position: relative;
+	cursor: move;
+}
+
+.crud2go .v-window-resizebox {
+	width: 10px;
+	height: 10px;
+	background: #ddd;
+	overflow: hidden;
+	position: absolute;
+	right: 0;
+}
+
+.crud2go .v-window-resizebox, .crud2go .v-window-resizingCurtain {
+	cursor: se-resize;
+}
+
+.crud2go .v-window div.v-window-footer-noresize {
+	height: 0;
+}
+
+.crud2go .v-window-resizebox-disabled, .crud2go .v-window-restorebox-disabled, .crud2go .v-window-maximizebox-disabled {
+	cursor: default;
+	display: none;
+}
+
+.crud2go .v-window-closebox, .crud2go .v-window-restorebox, .crud2go .v-window-maximizebox {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 1em;
+	height: 1em;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.crud2go .v-window-maximizebox, .crud2go .v-window-restorebox {
+	right: 1.1em;
+}
+
+.crud2go .v-window-closebox {
+	background: red;
+}
+
+.crud2go .v-window-maximizebox {
+	background: blue;
+}
+
+.crud2go .v-window-restorebox {
+	background: yellow;
+}
+
+.crud2go .v-window-modalitycurtain {
+	top: 0;
+	left: 0;
+	background: #999;
+	opacity: 0.5;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	filter: alpha(opacity=50);
+}
+
+.crud2go .v-shadow-window {
+	position: absolute;
+}
+
+.crud2go .v-shadow-window .top-left {
+	position: absolute;
+	overflow: hidden;
+	top: -10px;
+	left: -15px;
+	width: 28px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/top-left.png);
+}
+
+.crud2go .v-shadow-window .top {
+	position: absolute;
+	overflow: hidden;
+	top: -10px;
+	left: 13px;
+	height: 28px;
+	right: 13px;
+	background: transparent url(../base/window/img/shadow/top.png);
+}
+
+.crud2go .v-shadow-window .top-right {
+	position: absolute;
+	overflow: hidden;
+	top: -10px;
+	right: -15px;
+	width: 28px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/top-right.png);
+}
+
+.crud2go .v-shadow-window .left {
+	position: absolute;
+	overflow: hidden;
+	top: 18px;
+	left: -15px;
+	width: 28px;
+	bottom: 10px;
+	background: transparent url(../base/window/img/shadow/left.png);
+}
+
+.crud2go .v-shadow-window .center {
+	position: absolute;
+	overflow: hidden;
+	top: 18px;
+	left: 13px;
+	bottom: 10px;
+	right: 13px;
+	background: transparent url(../base/window/img/shadow/center.png);
+}
+
+.crud2go .v-shadow-window .right {
+	position: absolute;
+	overflow: hidden;
+	top: 18px;
+	right: -15px;
+	width: 28px;
+	bottom: 10px;
+	background: transparent url(../base/window/img/shadow/right.png);
+}
+
+.crud2go .v-shadow-window .bottom-left {
+	position: absolute;
+	overflow: hidden;
+	bottom: -18px;
+	left: -15px;
+	width: 28px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/bottom-left.png);
+}
+
+.crud2go .v-shadow-window .bottom {
+	position: absolute;
+	overflow: hidden;
+	bottom: -18px;
+	left: 13px;
+	right: 13px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/bottom.png);
+}
+
+.crud2go .v-shadow-window .bottom-right {
+	position: absolute;
+	overflow: hidden;
+	bottom: -18px;
+	right: -15px;
+	width: 28px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/bottom-right.png);
+}
+
+.crud2go .v-accordion {
+	border: 1px solid #999;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.crud2go .v-accordion-item-caption {
+	color: #222;
+	text-shadow: 1px 1px #FFFFFF;
+	font-weight: bold;
+	background: #c0c2c5 url(/html/themes/classic/images/application/panel_header_bg.png) repeat-x scroll 0 0;
+	border-top: 1px solid #999;
+	border-bottom: none;
+	padding: 4px 5px 5px 5px;
+}
+
+.crud2go .v-accordion-item-caption .v-caption {
+	font-size: 12px;
+}
+
+.crud2go .v-accordion-item-first .v-accordion-item-caption {
+	border-top: none;
+	-webkit-border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	border-radius: 4px 4px 0 0;
+}
+
+.crud2go .v-accordion-item-open .v-accordion-item-caption {
+	border-bottom: 1px solid #999;
+}
+
+.crud2go .v-button:focus {
+	outline: none;
+}
+
+.crud2go .v-button:hover .v-button-wrap {
+	background: #b9ced9 url(/html/themes/classic/images/application/state_hover_bg.png) repeat-x 0 0;
+	border-color: #627782;
+	color: #369;
+}
+
+.crud2go .v-button:active .v-button-wrap, .crud2go .v-button.v-pressed .v-button-wrap, .crud2go .v-button:focus .v-button-wrap {
+	background: #ebebeb url(/html/themes/classic/images/application/state_active_bg.png) repeat-x 0 0;
+	border-color: #555;
+}
+
+.crud2go .v-button {
+	padding: 0;
+	border: none;
+	height: 26px;
+	overflow: hidden;
+}
+
+.crud2go .v-nativebutton {
+	font-size: 11px;
+}
+
+.crud2go .v-button .v-button-wrap, .crud2go .v-disabled.v-button .v-button-wrap {
+	display: block;
+	font-size: 11px;
+	font-weight: bold;
+	border: 1px solid #c8c9ca;
+	border-right-color: #9e9e9e;
+	border-bottom-color: #9e9e9e;
+	background: #d4d4d4 url(/html/themes/classic/images/portlet/header_bg.png) repeat-x 0 0;
+	-webkit-background-origin: padding;
+	-moz-background-origin: padding;
+	padding: 4px 4px 0px 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	line-height: 16px;
+	min-height: 16px;
+	text-shadow: 1px 1px #fff;
+	color: #34404f;
+	text-overflow: ellipsis;
+	height: 20px;
+}
+
+.crud2go .v-button-caption {
+	line-height: 16px;
+}
+
+.crud2go .v-button-link, .crud2go .v-disabled.v-button-link, .crud2go .v-button-link:focus, .crud2go .v-button-link:active, .crud2go .v-button-link:hover, .crud2go .v-button-link-pressed, .crud2go button.v-nativebutton-link, .crud2go .v-disabled.v-nativebutton-link, .crud2go button.v-nativebutton-link:focus, .crud2go button.v-nativebutton-link:active, .crud2go button.v-nativebutton-link:hover, .crud2go button.v-nativebutton-link-pressed, .crud2go .v-button.v-button-link .v-button-wrap, .crud2go .v-button.v-button-link:focus .v-button-wrap, .crud2go .v-button.v-button-link:active .v-button-wrap, .crud2go .v-disabled.v-button.v-button-link .v-button-wrap {
+	color: #5B677D;
+	font-weight: normal;
+	border: none;
+	border-style: none;
+	background: transparent;
+	padding: 0;
+	font-size: 11px;
+	-webkit-box-shadow: none;
+	-mox-box-shadow: none;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	text-shadow: none;
+	height: auto;
+}
+
+.crud2go .v-button-link:hover {
+	color: #0066cc;
+	text-decoration: none;
+}
+
+.crud2go .v-button-link:focus, .v-sa .crud2go .v-button-link:focus {
+	outline: 1px dotted #1b699f;
+	outline-offset: -1px;
+}
+
+.v-sa .crud2go .v-button-link:focus {
+	outline-offset: -1px;
+}
+
+.crud2go .v-checkbox input {
+	margin-right: 3px;
+}
+
+.crud2go .v-colorpicker-button-color {
+	border: 1px solid #999999;
+}
+
+.crud2go .v-colorpicker-popup {
+	width: 252px;
+}
+
+.crud2go .v-colorpicker-popup .v-tabsheet .v-colorpicker-grid {
+	height: 312px;
+}
+
+.crud2go .v-colorpicker-popup .v-filterselect {
+	padding-right: 24px;
+}
+
+body .crud2go.v-app {
+	background-color: transparent;
+}
+
+.crud2go .v-caption {
+	font-weight: bold;
+}
+
+.crud2go .v-tooltip {
+	background-color: #fffcdd;
+	border: 1px solid #b8b295;
+	font-size: 11px;
+	color: #222;
+}
+
+.crud2go .v-tooltip-text {
+	padding: 2px 4px;
+}
+
+.crud2go .v-tooltip .v-errormessage {
+	padding: 3px 4px;
+	background: #ffecc6;
+	color: #b74100;
+	border: none;
+	border-top: 1px solid #fff3dc;
+}
+
+.crud2go .v-tooltip .v-errormessage h2 {
+	font-size: 16px;
+	font-weight: normal;
+	color: #ab3101;
+	margin: 2px 0 8px 0;
+}
+
+.crud2go .v-tooltip .v-errormessage h3 {
+	font-size: 13px;
+	font-weight: bold;
+	margin: 1px 0 4px 0;
+}
+
+.crud2go .v-contextmenu {
+	background: #ccc9c9 url(/html/themes/classic/images/application/menu_bg.png) repeat-x 0 0;
+	border: 1px solid;
+	border-color: #aeafb1 #777879 #777879 #aeafb1;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.crud2go .v-contextmenu table {
+	border-collapse: separate;
+}
+
+.crud2go .v-contextmenu .gwt-MenuItem {
+	padding: 3px 8px 2px 8px;
+	height: 16px;
+	color: #2c2f34;
+	text-shadow: -1px -1px #fff;
+	font-weight: bold;
+	border-bottom: 1px solid #bcbbbb;
+	border-top: 1px solid #eee;
+}
+
+.crud2go .v-contextmenu tr:last-child .gwt-MenuItem {
+	border-bottom-width: 0;
+}
+
+.crud2go .v-contextmenu .gwt-MenuItem img {
+	margin-right: 4px;
+}
+
+.crud2go .v-contextmenu .gwt-MenuItem-selected {
+	background-color: #5b677d;
+	color: #FFF;
+	text-shadow: -1px -1px #2c2f34;
+}
+
+.crud2go .v-contextmenu .gwt-MenuItem-selected div {
+	background: transparent;
+}
+
+.crud2go .v-datefield-popup {
+	padding: 3px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.crud2go .v-datefield-calendarpanel-header {
+	height: 28px;
+}
+
+.crud2go .v-datefield-calendarpanel:focus {
+	outline: none;
+}
+
+.crud2go .v-datefield-calendarpanel-body {
+	text-align: right;
+	vertical-align: top;
+}
+
+.crud2go .v-datefield-popupcalendar .v-datefield-button {
+	background: transparent url(../liferay/common/buttons_sprites.png) no-repeat 0 -48px;
+	width: 24px;
+	height: 24px;
+	border: none;
+}
+
+.crud2go .v-datefield-popupcalendar .v-datefield-button:hover {
+	background-position: 0px -72px;
+}
+
+.crud2go .v-datefield-popupcalendar .v-datefield-button:focus {
+	background-position: 0px -96px;
+}
+
+.crud2go .v-datefield-month .v-datefield-calendarpanel-month, .crud2go .v-datefield-day .v-datefield-calendarpanel-month, .crud2go .v-datefield-full .v-datefield-calendarpanel-month {
+	width: 124px;
+}
+
+.crud2go .v-datefield-year .v-datefield-calendarpanel-month {
+	width: 35px;
+}
+
+.crud2go .v-datefield-calendarpanel-month {
+	background: transparent url(../liferay/datefield/datefield_sprites.png) repeat-x 0 -112px;
+	font-weight: bold;
+}
+
+.crud2go span.v-datefield-calendarpanel-month {
+	display: block;
+	text-align: center;
+	background: transparent;
+	overflow: hidden;
+	padding: 1px 3px 0;
+}
+
+.crud2go .v-datefield-calendarpanel-prevyear, .crud2go .v-datefield-calendarpanel-nextyear {
+	width: 22px;
+}
+
+.crud2go .v-datefield-calendarpanel-prevyear button, .crud2go .v-datefield-calendarpanel-prevmonth button, .crud2go .v-datefield-calendarpanel-nextmonth button, .crud2go .v-datefield-calendarpanel-nextyear button {
+	width: 22px;
+	height: 28px;
+	border: none;
+	background: transparent;
+	background-repeat: no-repeat;
+	background-image: url(../liferay/datefield/datefield_sprites.png);
+	background-position: 0 0;
+	overflow: hidden;
+	padding: 0;
+	text-indent: -9999px;
+	outline: none;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+}
+
+.v-ie .crud2go .v-datefield-calendarpanel-prevyear button, .v-ie .crud2go .v-datefield-calendarpanel-nextyear button, .v-ie .crud2go .v-datefield-calendarpanel-prevmonth button, .v-ie .crud2go .v-datefield-calendarpanel-nextmonth button {
+	text-indent: 0;
+	font-size: 1px;
+}
+
+.crud2go .v-datefield-calendarpanel-prevmonth button {
+	background-position: 0 -56px;
+}
+
+.crud2go .v-datefield-calendarpanel-prevmonth {
+	background: transparent url(../liferay/datefield/datefield_sprites.png) repeat-x 0 -112px;
+}
+
+.crud2go .v-datefield-calendarpanel-nextyear button {
+	background-position: 0 -28px;
+	width: 100%;
+	min-width: 22px;
+}
+
+.crud2go .v-datefield-calendarpanel-nextmonth button {
+	background-position: 0 -84px;
+}
+
+.crud2go .v-datefield-calendarpanel-nextmonth {
+	background: transparent url(../liferay/datefield/datefield_sprites.png) repeat-x 0 -112px;
+}
+
+.crud2go .v-datefield-calendarpanel-prevyear button {
+	width: 100%;
+	min-width: 22px;
+}
+
+.crud2go .v-datefield-calendarpanel-day {
+	display: block;
+	width: 22px;
+	margin: 0 0 3px 3px;
+	text-align: center;
+	background: #d4d4d4 url(/html/themes/classic/images/application/state_default_bg.png) repeat-x 0 0;
+	border-color: #c8c9ca #9e9e9e #9e9e9e #c8c9ca;
+	border-style: solid;
+	border-width: 1px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.crud2go .v-datefield-calendarpanel-day-today {
+	font-weight: bold;
+}
+
+.crud2go .v-datefield-calendarpanel-day-selected {
+	background: #b5b5b5 url(/html/themes/classic/images/application/state_active_bg.png) repeat-x 0 0;
+	color: #000;
+	border-color: #555;
+}
+
+.crud2go .v-datefield-calendarpanel-day-focused {
+	outline: 1px dotted #555;
+}
+
+.crud2go .v-datefield-calendarpanel-weekdays {
+	text-align: center;
+}
+
+.crud2go .v-datefield-calendarpanel-weekdays strong {
+	font-weight: normal;
+}
+
+.crud2go .v-datefield-calendarpanel-weeknumber {
+	display: block;
+	border: none;
+	padding: 2px 0 2px 0;
+	margin: 0;
+	font-size: 9.9px;
+}
+
+.crud2go .v-datefield-calendarpanel-body table {
+	margin: 0 auto;
+	width: 200px;
+}
+
+.crud2go .v-inline-datefield-popup {
+	padding: 3px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-header {
+	height: 28px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel:focus {
+	outline: none;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-body {
+	text-align: right;
+	vertical-align: top;
+}
+
+.crud2go .v-inline-datefield-popupcalendar .v-inline-datefield-button {
+	background: transparent url(../liferay/common/buttons_sprites.png) no-repeat 0 -48px;
+	width: 24px;
+	height: 24px;
+	border: none;
+}
+
+.crud2go .v-inline-datefield-popupcalendar .v-inline-datefield-button:hover {
+	background-position: 0px -72px;
+}
+
+.crud2go .v-inline-datefield-popupcalendar .v-inline-datefield-button:focus {
+	background-position: 0px -96px;
+}
+
+.crud2go .v-inline-datefield-month .v-inline-datefield-calendarpanel-month, .crud2go .v-inline-datefield-day .v-inline-datefield-calendarpanel-month, .crud2go .v-inline-datefield-full .v-inline-datefield-calendarpanel-month {
+	width: 124px;
+}
+
+.crud2go .v-inline-datefield-year .v-inline-datefield-calendarpanel-month {
+	width: 35px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-month {
+	background: transparent url(../liferay/datefield/datefield_sprites.png) repeat-x 0 -112px;
+	font-weight: bold;
+}
+
+.crud2go span.v-inline-datefield-calendarpanel-month {
+	display: block;
+	text-align: center;
+	background: transparent;
+	overflow: hidden;
+	padding: 1px 3px 0;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-prevyear, .crud2go .v-inline-datefield-calendarpanel-nextyear {
+	width: 22px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-prevyear button, .crud2go .v-inline-datefield-calendarpanel-prevmonth button, .crud2go .v-inline-datefield-calendarpanel-nextmonth button, .crud2go .v-inline-datefield-calendarpanel-nextyear button {
+	width: 22px;
+	height: 28px;
+	border: none;
+	background: transparent;
+	background-repeat: no-repeat;
+	background-image: url(../liferay/datefield/datefield_sprites.png);
+	background-position: 0 0;
+	overflow: hidden;
+	padding: 0;
+	text-indent: -9999px;
+	outline: none;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+}
+
+.v-ie .crud2go .v-inline-datefield-calendarpanel-prevyear button, .v-ie .crud2go .v-inline-datefield-calendarpanel-nextyear button, .v-ie .crud2go .v-inline-datefield-calendarpanel-prevmonth button, .v-ie .crud2go .v-inline-datefield-calendarpanel-nextmonth button {
+	text-indent: 0;
+	font-size: 1px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-prevmonth button {
+	background-position: 0 -56px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-prevmonth {
+	background: transparent url(../liferay/datefield/datefield_sprites.png) repeat-x 0 -112px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-nextyear button {
+	background-position: 0 -28px;
+	width: 100%;
+	min-width: 22px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-nextmonth button {
+	background-position: 0 -84px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-nextmonth {
+	background: transparent url(../liferay/datefield/datefield_sprites.png) repeat-x 0 -112px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-prevyear button {
+	width: 100%;
+	min-width: 22px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day {
+	display: block;
+	width: 22px;
+	margin: 0 0 3px 3px;
+	text-align: center;
+	background: #d4d4d4 url(/html/themes/classic/images/application/state_default_bg.png) repeat-x 0 0;
+	border-color: #c8c9ca #9e9e9e #9e9e9e #c8c9ca;
+	border-style: solid;
+	border-width: 1px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day-today {
+	font-weight: bold;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day-selected {
+	background: #b5b5b5 url(/html/themes/classic/images/application/state_active_bg.png) repeat-x 0 0;
+	color: #000;
+	border-color: #555;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-day-focused {
+	outline: 1px dotted #555;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-weekdays {
+	text-align: center;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-weekdays strong {
+	font-weight: normal;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-weeknumber {
+	display: block;
+	border: none;
+	padding: 2px 0 2px 0;
+	margin: 0;
+	font-size: 9.9px;
+}
+
+.crud2go .v-inline-datefield-calendarpanel-body table {
+	margin: 0 auto;
+	width: 200px;
+}
+
+.crud2go .v-inline-datefield {
+	line-height: 19px;
+}
+
+.crud2go .v-formlayout .v-caption {
+	font-weight: normal;
+}
+
+.crud2go .v-menubar {
+	background: #97A1AE url(/html/themes/classic/images/dockbar/dockbar_bg.png) repeat-x 0 0;
+	border-bottom: 1px solid #636364;
+}
+
+.crud2go .v-menubar-separator span {
+	display: none;
+}
+
+.crud2go .v-menubar-menuitem {
+	padding: 3px 8px;
+	line-height: 16px;
+	font-weight: bold;
+	color: #2c2f34;
+	text-shadow: -1px -1px #FFF;
+}
+
+.crud2go .v-menubar-menuitem-selected {
+	color: #FFF;
+	text-shadow: -1px -1px #2c2f34;
+}
+
+.crud2go .v-menubar-submenu {
+	background: #CCC9C9 url(/html/themes/classic/images/application/menu_bg.png) repeat-x 0 0;
+	border: 1px solid;
+	border-color: #aeafb1 #777879 #777879 #aeafb1;
+	-webkit-border-radius: 0 0 4px 4px;
+	-moz-border-radius: 0 0 4px 4px;
+	border-radius: 0 0 4px 4px;
+	padding: 2px 0;
+}
+
+.crud2go .v-menubar-submenu .v-menubar-submenu-indicator {
+	font-size: 9.9px;
+}
+
+.crud2go .v-menubar-submenu .v-menubar-menuitem {
+	color: #2c2f34;
+	font-weight: bold;
+	text-shadow: 1px 1px #fff;
+	padding: 1px 26px 1px 10px;
+	line-height: 16px;
+	border-bottom: 1px solid #bcbbbb;
+	border-top: 1px solid #eee;
+}
+
+.crud2go .v-menubar-submenu .v-menubar-menuitem:last-child {
+	border-bottom-width: 0;
+}
+
+.crud2go .v-menubar-submenu .v-menubar-menuitem-caption * {
+	vertical-align: middle;
+}
+
+.crud2go .v-menubar .v-menubar-menuitem-selected, .crud2go .v-menubar-submenu .v-menubar-menuitem-selected {
+	color: #fff;
+	text-shadow: 1px 1px #000;
+	background-color: #5b677d;
+}
+
+.crud2go .v-menubar-menuitem-disabled, .crud2go .v-menubar-submenu .v-menubar-menuitem-disabled, .crud2go .v-menubar span.v-menubar-menuitem-disabled:hover, .crud2go .v-menubar span.v-menubar-menuitem-disabled:focus, .crud2go .v-menubar span.v-menubar-menuitem-disabled:active {
+	color: #999;
+}
+
+.crud2go .v-Notification {
+	background: #dff4ff;
+	color: #34404F;
+	font-weight: bold;
+	cursor: pointer;
+	overflow: hidden;
+	padding: 1em;
+	max-width: 85%;
+	border: 1px solid #a7cedf;
+}
+
+.crud2go .v-Notification h1, .crud2go .v-Notification p, .crud2go .v-Notification-error h1, .crud2go .v-Notification-error p, .crud2go .v-Notification-warning h1, .crud2go .v-Notification-warning p {
+	display: inline;
+	margin: 0 0.5em 0 0;
+}
+
+.crud2go .v-Notification-warning {
+	background: #ffc;
+	border-color: #fc0;
+}
+
+.crud2go .v-Notification-error {
+	background-color: #ffdddd;
+	border-color: #ff0000;
+}
+
+.crud2go .v-Notification-tray {
+	color: #111111;
+	background-color: #e5e5e5;
+	border-color: #b5b5b5;
+}
+
+.crud2go .v-Notification-tray h1 {
+	display: block;
+}
+
+.crud2go .v-Notification-tray p {
+	display: block;
+}
+
+.crud2go .v-Notification-system {
+	background-color: #ffdddd;
+	border-color: #ff0000;
+}
+
+.crud2go .v-Notification-system h1 {
+	display: block;
+	margin: 0;
+}
+
+.crud2go .v-panel {
+	background: transparent url(../liferay/panel/top-left.png) no-repeat;
+}
+
+.crud2go .v-panel-caption, .crud2go .v-panel-nocaption {
+	text-shadow: 1px 1px #fff;
+	font-size: 12px;
+	color: #222;
+	margin-left: 4px;
+	background: transparent url(../liferay/panel/top-right.png) no-repeat right top;
+	padding: 5px 5px 10px 2px;
+	height: 12px;
+}
+
+.crud2go .v-panel-caption .v-icon {
+	padding-right: 2px;
+}
+
+.crud2go .v-panel-content {
+	border: 1px solid #999;
+	-webkit-border-radius: 0 0 4px 4px;
+	-moz-border-radius: 0 0 4px 4px;
+	border-radius: 0 0 4px 4px;
+}
+
+.crud2go .v-panel-light {
+	background: transparent;
+}
+
+.crud2go .v-panel-caption-light, .crud2go .v-panel-nocaption-light {
+	margin: 0;
+	border: none;
+	background: none;
+}
+
+.crud2go .v-panel-caption-light {
+	border-bottom: 1px solid #999;
+}
+
+.crud2go .v-panel-nocaption-light {
+	padding: 0;
+	height: 0;
+}
+
+.crud2go .v-panel-content-light {
+	border: none;
+}
+
+.crud2go .v-panel-content-light > div {
+	background: transparent;
+}
+
+.crud2go .v-panel-deco {
+	height: 0;
+	overflow: hidden;
+}
+
+.v-ie .crud2go .v-panel {
+	background: transparent;
+}
+
+.v-ie .crud2go .v-panel-caption, .v-ie .crud2go .v-panel-nocaption {
+	border: 1px solid #999;
+	border-bottom: none;
+	background: #c0c2c5 url(/html/themes/classic/images/application/panel_header_bg.png) repeat-x 0 0;
+	margin: 0;
+	padding-left: 5px;
+}
+
+.v-ie .crud2go .v-panel-caption-light, .v-ie .crud2go .v-panel-nocaption-light {
+	border: none;
+	background: transparent;
+}
+
+.v-ie .crud2go .v-panel-caption-light {
+	border-bottom: 1px solid #999;
+}
+
+.crud2go .v-popupview-popup {
+	background: #d4d4d4 url(/html/themes/classic/images/application/state_default_bg.png) repeat-x 0 0;
+	padding: 8px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	border: 1px solid #c8c9ca;
+	border-color: #c8c9ca #9e9e9e #9e9e9e #c8c9ca;
+}
+
+.crud2go .v-progressindicator-wrapper {
+	background: #dfe2e4 url(../reindeer/progressindicator/img/base.gif) repeat-x;
+	border: 1px solid #bfbfbf;
+}
+
+.crud2go .v-disabled .v-progressindicator-wrapper {
+	background-image: url(../reindeer/progressindicator/img/disabled.gif);
+}
+
+.crud2go .v-progressindicator-indicator {
+	background: #f7f9f9 url(../reindeer/progressindicator/img/progress.png);
+}
+
+.crud2go .v-progressindicator-wrapper {
+	background: #dfe2e4 url(../reindeer/progressindicator/img/base.gif) repeat-x;
+	border: 1px solid #bfbfbf;
+}
+
+.crud2go .v-disabled .v-progressindicator-wrapper {
+	background-image: url(../reindeer/progressindicator/img/disabled.gif);
+}
+
+.crud2go .v-progressindicator-indicator {
+	background: #f7f9f9 url(../reindeer/progressindicator/img/progress.png);
+}
+
+.crud2go.v-app select, .crud2go .v-window select {
+	padding: 1px;
+}
+
+.crud2go select {
+	background-color: #fff;
+}
+
+.crud2go .v-filterselect {
+	padding-right: 24px;
+}
+
+.crud2go .v-filterselect-button {
+	width: 24px;
+	margin-right: -24px;
+	height: 24px;
+	background: transparent url(../liferay/common/buttons_sprites.png) no-repeat 0 0;
+}
+
+.crud2go .v-filterselect-button:hover {
+	background-position: 0px -24px;
+}
+
+.crud2go .v-filterselect-suggestpopup {
+	border: 1px solid #98C0F4;
+}
+
+.crud2go .v-filterselect-suggestmenu {
+	min-height: 2px;
+}
+
+.crud2go .v-filterselect-prevpage, .crud2go .v-filterselect-prevpage-off, .crud2go .v-filterselect-nextpage, .crud2go .v-filterselect-nextpage-off {
+	background-color: #fff;
+}
+
+.crud2go .v-filterselect-prevpage span, .crud2go .v-filterselect-prevpage-off span, .crud2go .v-filterselect-nextpage span, .crud2go .v-filterselect-nextpage-off span {
+	display: block;
+	height: 8px;
+	width: 16px;
+	margin-left: auto;
+	margin-right: auto;
+	text-indent: -99999px;
+}
+
+.crud2go .v-filterselect-prevpage span, .crud2go .v-filterselect-nextpage span {
+	background: transparent no-repeat 0 -4px;
+	background-image: url(/html/themes/classic/images/aui/icon_sprite.png);
+}
+
+.crud2go .v-filterselect-nextpage span {
+	background-position: -65px -4px;
+}
+
+.crud2go .v-filterselect-suggestmenu .gwt-MenuItem span {
+	display: block;
+	width: 100%;
+	height: 18px;
+	border: 1px solid #fff;
+	border-style: solid none;
+}
+
+.crud2go .v-filterselect-suggestmenu .gwt-MenuItem-selected span {
+	color: #000;
+	background: #dfe8f6;
+	border-color: #a3bae9;
+}
+
+.crud2go .v-filterselect-suggestmenu .gwt-MenuItem .v-icon {
+	float: left;
+}
+
+.crud2go .v-select-twincol-buttons .v-button-wrap {
+	padding-left: 11px;
+	padding-right: 11px;
+}
+
+.crud2go .v-slider {
+	border: 1px solid #9e9e9e;
+	border-right: 1px solid #c8c9ca;
+	border-bottom: 1px solid #c8c9ca;
+	margin: 4px 0;
+}
+
+.crud2go .v-slider-base {
+	height: 1px;
+}
+
+.crud2go .v-slider-vertical {
+	margin: 0 5px;
+	width: 2px;
+}
+
+.crud2go .v-slider-vertical .v-slider-base {
+	width: 1px;
+}
+
+.crud2go .v-slider-handle {
+	background: transparent url(/html/themes/classic/images/aui/icon_sprite.png) no-repeat -115px -147px;
+	width: 10px;
+	height: 10px;
+}
+
+.crud2go .v-splitpanel-hsplitter, .crud2go .v-splitpanel-hsplitter-locked {
+	font-size: 1px;
+	width: 3px;
+	background-color: #c8c9ca;
+}
+
+.crud2go .v-splitpanel-hsplitter div {
+	font-size: 1px;
+	width: 3px;
+	background: transparent;
+	background-repeat: no-repeat;
+	background-image: url(../liferay/splitpanel/hsplit.png);
+	background-position: center;
+}
+
+.crud2go .v-splitpanel-hsplitter-locked div {
+	font-size: 1px;
+	width: 3px;
+}
+
+.crud2go .v-splitpanel-vsplitter, .crud2go .v-splitpanel-vsplitter-locked {
+	font-size: 1px;
+	height: 3px;
+}
+
+.crud2go .v-splitpanel-vsplitter div {
+	font-size: 1px;
+	height: 3px;
+	background: transparent;
+	background-color: #c8c9ca;
+	background-repeat: no-repeat;
+	background-image: url(../liferay/splitpanel/vsplit.png);
+	background-position: center;
+}
+
+.crud2go .v-splitpanel-vsplitter-locked, .crud2go .v-splitpanel-vsplitter-locked div {
+	font-size: 1px;
+	height: 3px;
+	background-color: #c8c9ca;
+}
+
+.crud2go .v-splitpanel-hsplitter-small, .crud2go .v-splitpanel-hsplitter-small div, .crud2go .v-splitpanel-hsplitter-small-locked, .crud2go .v-splitpanel-hsplitter-small-locked div {
+	font-size: 1px;
+	width: 1px;
+	background: #c8c9ca;
+}
+
+.crud2go .v-splitpanel-vsplitter-small, .crud2go .v-splitpanel-vsplitter-small div, .crud2go .v-splitpanel-vsplitter-small-locked, .crud2go .v-splitpanel-vsplitter-small-locked div {
+	font-size: 1px;
+	height: 1px;
+	background: #c8c9ca;
+}
+
+.crud2go .v-table-body {
+	border: 1px solid #999;
+}
+
+.crud2go .v-table-body:focus, .crud2go .v-table-body-wrapper:focus {
+	outline: none;
+}
+
+.crud2go .v-table-body.focused {
+	border-color: #555;
+}
+
+.crud2go .v-table-focus .v-table-cell-content {
+	border-top: 1px dotted #555;
+	border-bottom: 1px dotted #555;
+}
+
+.crud2go .v-table-header-wrap, .crud2go .v-table-footer-wrap {
+	border-color: #999;
+	background: #c0c2c5 url(/html/themes/classic/images/application/panel_header_bg.png) repeat-x 0 0;
+	height: 26px;
+}
+
+.crud2go .v-table-footer-wrap {
+	border: 1px solid #999;
+	border-top: none;
+}
+
+.crud2go .v-table-footer td {
+	height: 100%;
+	border-right: 1px solid #999;
+	padding-bottom: 5px;
+	padding-top: 5px;
+}
+
+.crud2go .v-table-footer-container {
+	height: 16px;
+	float: right;
+	padding-right: 7px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.crud2go .v-table-caption-container {
+	color: #336699;
+	font-weight: bold;
+	font-size: 11px;
+	padding-left: 0px;
+	padding-top: 6px;
+}
+
+.crud2go .v-table-caption-container-align-right {
+	margin-left: 0;
+	margin-right: 6px;
+	padding-left: 0;
+}
+
+.crud2go .v-table-caption-container .v-icon {
+	height: 16px;
+	margin: -4px 3px 0 0;
+}
+
+.v-ie .crud2go .v-table-caption-container .v-icon {
+	margin-top: -2px;
+}
+
+.crud2go .v-table-header-cell-asc .v-table-sort-indicator {
+	background: transparent url(/html/themes/control_panel/images/arrows/05_up.png) no-repeat right 8px;
+	height: 26px;
+}
+
+.crud2go .v-table-header-cell-desc .v-table-sort-indicator {
+	background: transparent url(/html/themes/control_panel/images/arrows/05_down.png) no-repeat right 10px;
+	height: 26px;
+}
+
+.crud2go .v-table-resizer {
+	height: 26px;
+	background: #999;
+}
+
+.crud2go .v-table-focus-slot-left {
+	margin-bottom: -26px;
+	background: transparent;
+}
+
+.crud2go .v-table-column-selector {
+	background: transparent url(../liferay/table/columnselect.png);
+	width: 16px;
+	height: 26px;
+	margin: -26px 0 0;
+}
+
+.crud2go .v-table-row-odd {
+	background: #dde1e6;
+}
+
+.crud2go .v-table-row {
+	background: #eef0f2;
+}
+
+.crud2go .v-table-generated-row {
+	color: #336699;
+	font-weight: bold;
+	font-size: 11px;
+	padding-left: 0px;
+	padding-top: 6px;
+	background: #c0c2c5;
+}
+
+.crud2go .v-table .v-selected {
+	background-color: #5B677D;
+	color: #FFF;
+	text-shadow: -1px -1px #2C2F34;
+}
+
+.crud2go .v-table-cell-wrapper {
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+.crud2go .v-table-cell-content {
+	border-right: 1px solid #999;
+	padding: 0 6px;
+}
+
+.crud2go .v-table-cell-content:last-child {
+	border-right-color: transparent;
+}
+
+.crud2go .v-off {
+	color: #999;
+}
+
+.crud2go .v-tabsheet-content {
+	border: none;
+}
+
+.crud2go .v-tabsheet-deco {
+	background: transparent;
+}
+
+.crud2go .v-tabsheet-tabitem {
+	border: none;
+}
+
+.crud2go .v-tabsheet-tabitem .v-caption {
+	height: 14px;
+	padding: 3px 10px;
+}
+
+.crud2go .v-tabsheet-tabitem .v-captiontext {
+	color: #336699;
+	font-size: 11px;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+.crud2go .v-tabsheet-tabitem-selected .v-caption {
+	background: none repeat scroll 0 0 #333;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.crud2go .v-tabsheet-tabitem-selected .v-captiontext {
+	color: #fff;
+	text-decoration: none;
+	text-shadow: -1px -1px #000;
+}
+
+.crud2go .v-tabsheet-tabitem-selected {
+	position: relative;
+}
+
+.crud2go .v-tabsheet-tabitem-selected:after {
+	border: 10px solid;
+	border-bottom-width: 0;
+	border-color: #333 transparent transparent;
+	bottom: -6px;
+	content: "-";
+	display: block;
+	height: 0;
+	left: 50%;
+	margin-left: -10px;
+	position: absolute;
+	text-indent: -9999px;
+	width: 0;
+}
+
+.crud2go .v-tabsheet-tabs {
+	height: 35px;
+}
+
+.crud2go .v-tabsheet-tabcontainer, .crud2go .v-tabsheet-tabs {
+	overflow: visible !important;
+}
+
+.crud2go .v-tabsheet-tabitemcell-first .v-tabsheet-tabitem {
+	border-left: 1px solid #c8c9ca;
+	-webkit-border-radius: 4px 0 0 4px;
+	-moz-border-radius: 4px 0 0 4px;
+	border-radius: 4px 0 0 4px;
+}
+
+.crud2go .v-tabsheet-tabitemcell, .crud2go .v-tabsheet-spacertd {
+	vertical-align: top;
+}
+
+.crud2go .v-tabsheet-spacertd div {
+	height: 28px;
+	border: 1px solid #c8c9ca;
+	border-left: none;
+	-webkit-border-radius: 0 4px 4px 0;
+	-moz-border-radius: 0 4px 4px 0;
+	border-radius: 0 4px 4px 0;
+	padding: 0;
+}
+
+.crud2go .v-tabsheet-tabitem {
+	height: 20px;
+	border-top: 1px solid #c8c9ca;
+	border-bottom: 1px solid #c8c9ca;
+	padding: 4px;
+}
+
+.crud2go .v-tabsheet-scroller {
+	float: right;
+	width: 33px;
+	height: 28px;
+	margin-top: -35px;
+	background-color: #eef0f2;
+	border: 1px solid #c8c9ca;
+	border-left: none;
+	-webkit-border-radius: 0 4px 4px 0;
+	-moz-border-radius: 0 4px 4px 0;
+	border-radius: 0 4px 4px 0;
+	position: relative;
+}
+
+.crud2go .v-tabsheet-scroller button {
+	padding: 0;
+	margin-top: 6px;
+	width: 16px;
+	height: 16px;
+	border: none;
+	background: transparent;
+}
+
+.crud2go .v-tabsheet-scroller .v-tabsheet-scrollerPrev, .crud2go .v-tabsheet-scroller .v-tabsheet-scrollerPrev-disabled {
+	background: transparent url(/html/themes/classic/images/aui/icon_sprite.png) no-repeat -80px -192px;
+}
+
+.crud2go .v-tabsheet-scroller .v-tabsheet-scrollerNext, .crud2go .v-tabsheet-scroller .v-tabsheet-scrollerNext-disabled {
+	background: transparent url(/html/themes/classic/images/aui/icon_sprite.png) no-repeat -48px -192px;
+}
+
+.crud2go .v-tabsheet-scrollerPrev-disabled, .crud2go .v-tabsheet-scrollerNext-disabled {
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+}
+
+.crud2go .v-tabsheet-caption-close {
+	background: transparent url(../liferay/tabsheet/close.png) no-repeat right top;
+	cursor: default;
+	float: right;
+	margin: 3px -1px 0;
+	overflow: hidden;
+	text-indent: -999px;
+	width: 13px;
+	height: 9px;
+}
+
+.v-ff .crud2go .v-tabsheet-caption-close {
+	margin-top: -10px;
+}
+
+.v-ff .crud2go .v-tabsheet-caption-close:only-child {
+	margin-top: -1px;
+}
+
+.crud2go.v-app input[type="text"], .crud2go.v-app input[type="password"], .crud2go.v-app input[type="reset"], .crud2go.v-app textarea, .crud2go .v-window input[type="text"], .crud2go .v-window input[type="password"], .crud2go .v-window input[type="reset"], .crud2go .v-window textarea {
+	padding: 5px 1px;
+}
+
+.crud2go input.v-textfield-prompt, .crud2go textarea.v-textarea-prompt {
+	font-style: normal;
+}
+
+.crud2go .v-tree-node {
+	background: transparent url(../liferay/tree/arrows_sprites.png) no-repeat -42px 1px;
+}
+
+.crud2go .v-tree-node span {
+	color: #336699;
+	padding: 1px 2px;
+	display: inline-block;
+}
+
+.crud2go .v-tree-node:hover {
+	background-position: -14px -30px;
+}
+
+.crud2go .v-tree-node-expanded {
+	background-position: -28px -14px;
+}
+
+.crud2go .v-tree-node-expanded:hover {
+	background-position: 0 -47px;
+}
+
+.crud2go .v-tree .v-tree-node-drag-top {
+	background-position: -42px 0px;
+}
+
+.crud2go .v-tree .v-tree-node-drag-top.v-tree-node-expanded {
+	background-position: -28px -15px;
+}
+
+.crud2go .v-tree-node-selected {
+	background: #333;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.crud2go .v-tree-node-selected span {
+	display: inline-block;
+	background: transparent;
+	color: #fff;
+	text-shadow: -1px -1px #000;
+	padding: 1px 2px;
+}
+
+.crud2go .v-tree-node-caption {
+	margin-left: 14px;
+	padding: 1px;
+}
+
+.crud2go .v-tree-node-focused {
+	border: 1px dotted #555;
+	padding: 0;
+}
+
+.crud2go .v-tree-node-children {
+	padding-left: 14px;
+}
+
+.crud2go .v-window {
+	background: transparent;
+}
+
+.crud2go .v-window-wrap {
+	border: 1px solid #c8c9ca;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	background: #fff url(../liferay/window/top-left.png) no-repeat;
+}
+
+.crud2go .v-window-outerheader {
+	height: 38px;
+	margin-left: 9px;
+	padding: 10px 40px 12px 2px;
+	background: transparent url(../liferay/window/top-right.png) no-repeat right top;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.crud2go .v-window-header {
+	color: #000;
+	font-size: 12px;
+	text-shadow: 1px 1px #fff;
+}
+
+.crud2go .v-window-contents {
+	padding: 0 5px 0 5px;
+}
+
+.crud2go .v-window-footer {
+	height: 5px;
+	overflow: visible;
+}
+
+.crud2go .v-window div.v-window-footer-noresize {
+	height: 5px;
+}
+
+.crud2go .v-window-restorebox, .crud2go .v-window-maximizebox, .crud2go .v-window-closebox {
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	top: 8px;
+}
+
+.crud2go .v-window-restorebox:hover, .crud2go .v-window-maximizebox:hover, .crud2go .v-window-closebox:hover {
+	background-position: 0 -24px;
+}
+
+.crud2go .v-window-restorebox:active, .crud2go .v-window-maximizebox:active, .crud2go .v-window-closebox:active {
+	background-position: 0 -48px;
+}
+
+.crud2go .v-window-closebox {
+	right: 9px;
+	background: url(../liferay/window/closebutton_sprites.png) no-repeat scroll 0 0 transparent;
+}
+
+.crud2go .v-window-restorebox, .crud2go .v-window-maximizebox {
+	right: 36px;
+}
+
+.crud2go .v-window-restorebox {
+	background: url(../liferay/window/restore_sprites.png) no-repeat scroll 0 0 transparent;
+}
+
+.crud2go .v-window-maximizebox {
+	background: url(../liferay/window/maximize_sprites.png) no-repeat scroll 0 0 transparent;
+}
+
+.crud2go .v-window-resizebox {
+	background: transparent url(/html/themes/classic/images/aui/icon_sprite.png) no-repeat scroll -69px -229px;
+	width: 10px;
+	height: 10px;
+	bottom: 0;
+}
+
+.crud2go .v-datefield-popupcalendar {
+	padding-right: 24px;
+}
+
+.crud2go .v-datefield-button {
+	margin-right: -24px;
+}
+
+.crud2go .v-csslayout-actions .v-button + .v-button {
+	margin-left: 5px;
+}
+
+.crud2go .v-label-crudPortletId, .crud2go .v-label-crudPortletCommunityId {
+	display: none;
+}
+
+.crud2go div.crudTable .v-checkbox {
+	display: inline;
+}
+
+.crud2go div.crudTable .v-csslayout .v-caption {
+	display: none;
+}
+
+.crud2go div.crudTable td div.v-table-cell-wrapper {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	box-sizing: border-box;
+	display: block;
+}
+
+.crud2go div.crudEditMode tr.v-table-row {
+	background: #ffdddd;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd {
+	background: #ffbbbb;
+}
+
+.crud2go tbody tr.v-table-row.v-selected td {
+	background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
+}
+
+.crud2go tbody tr.v-table-row-odd.v-selected td {
+	background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
+}
+
+.crud2go div.crudEditMode tbody tr.v-table-row.v-selected td {
+	background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
+}
+
+.crud2go div.crudEditMode tbody tr.v-table-row-odd.v-selected td {
+	background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
+}
+
+.crud2go .v-table-header {
+	text-transform: none;
+}
+
+.crud2go .wordwrap {
+	white-space: normal;
+}
+
+.crud2go .v-textfield-prompt {
+	color: #999999;
+}
+
+.crud2go .crudEditMode div.v-label {
+	color: #000000;
+	text-shadow: 0 0px 0;
+}
+
+.crud2go td.v-table-cell-content-warn {
+	background: #F3F781;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-warn {
+	background: #E3E771;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-warn {
+	background: #F3F781;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-warn {
+	background: #E3E771;
+}
+
+.crud2go tr.v-table-row-warn {
+	background: #F3F781;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-warn {
+	background: #E3E771;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-warn {
+	background: #F3F781;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-warn {
+	background: #E3E771;
+}
+
+.crud2go td.v-table-cell-content-ok {
+	background: #00A57D;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-ok {
+	background: #00956D;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-ok {
+	background: #00A57D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-ok {
+	background: #00956D;
+}
+
+.crud2go tr.v-table-row-ok {
+	background: #00A57D;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-ok {
+	background: #00956D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-ok {
+	background: #00A57D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-ok {
+	background: #00956D;
+}
+
+.crud2go td.v-table-cell-content-error {
+	background: #DF013A;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-error {
+	background: #CF012A;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-error {
+	background: #DF013A;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-error {
+	background: #CF012A;
+}
+
+.crud2go tr.v-table-row-error {
+	background: #DF013A;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-error {
+	background: #CF012A;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-error {
+	background: #DF013A;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-error {
+	background: #CF012A;
+}
+
+.crud2go td.v-table-cell-content-freigabe-ok {
+	background: #00A57D;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-freigabe-ok {
+	background: #00956D;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-freigabe-ok {
+	background: #00A57D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-freigabe-ok {
+	background: #00956D;
+}
+
+.crud2go tr.v-table-row-freigabe-ok {
+	background: #00A57D;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-freigabe-ok {
+	background: #00956D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-freigabe-ok {
+	background: #00A57D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-freigabe-ok {
+	background: #00956D;
+}
+
+.crud2go td.v-table-cell-content-freigabe-none {
+	background: #FFF000;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-freigabe-none {
+	background: #EFE000;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-freigabe-none {
+	background: #FFF000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-freigabe-none {
+	background: #EFE000;
+}
+
+.crud2go tr.v-table-row-freigabe-none {
+	background: #FFF000;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-freigabe-none {
+	background: #EFE000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-freigabe-none {
+	background: #FFF000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-freigabe-none {
+	background: #EFE000;
+}
+
+.crud2go td.v-table-cell-content-freigabe-discarded {
+	background: #FF0000;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-freigabe-discarded {
+	background: #EF0000;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-freigabe-discarded {
+	background: #FF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-freigabe-discarded {
+	background: #EF0000;
+}
+
+.crud2go tr.v-table-row-freigabe-discarded {
+	background: #FF0000;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-freigabe-discarded {
+	background: #EF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-freigabe-discarded {
+	background: #FF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-freigabe-discarded {
+	background: #EF0000;
+}
+
+.crud2go td.v-table-cell-content-empty-cell {
+	background: #FF0000;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-empty-cell {
+	background: #EF0000;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-empty-cell {
+	background: #FF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-empty-cell {
+	background: #EF0000;
+}
+
+.crud2go tr.v-table-row-empty-cell {
+	background: #FF0000;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-empty-cell {
+	background: #EF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-empty-cell {
+	background: #FF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-empty-cell {
+	background: #EF0000;
+}
+
+.crud2go td.v-table-cell-content-changed-cell {
+	background: #FF0000;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-changed-cell {
+	background: #EF0000;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-changed-cell {
+	background: #FF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-changed-cell {
+	background: #EF0000;
+}
+
+.crud2go tr.v-table-row-changed-cell {
+	background: #FF0000;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-changed-cell {
+	background: #EF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-changed-cell {
+	background: #FF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-changed-cell {
+	background: #EF0000;
+}
+
+.crud2go td.v-table-cell-content-primaer_05 {
+	background: #E6EBF1;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-primaer_05 {
+	background: #DDE5ED;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-primaer_05 {
+	background: #E6EBF1;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-primaer_05 {
+	background: #DDE5ED;
+}
+
+.crud2go tr.v-table-row-primaer_05 {
+	background: #E6EBF1;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-primaer_05 {
+	background: #DDE5ED;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-primaer_05 {
+	background: #E6EBF1;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-primaer_05 {
+	background: #DDE5ED;
+}
+
+.crud2go td.v-table-cell-content-primaer_10 {
+	background: #DDE5ED;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-primaer_10 {
+	background: #C5D2E2;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-primaer_10 {
+	background: #DDE5ED;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-primaer_10 {
+	background: #C5D2E2;
+}
+
+.crud2go tr.v-table-row-primaer_10 {
+	background: #DDE5ED;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-primaer_10 {
+	background: #C5D2E2;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-primaer_10 {
+	background: #DDE5ED;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-primaer_10 {
+	background: #C5D2E2;
+}
+
+.crud2go td.v-table-cell-content-primaer_20 {
+	background: #C5D2E2;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-primaer_20 {
+	background: #A7BCD5;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-primaer_20 {
+	background: #C5D2E2;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-primaer_20 {
+	background: #A7BCD5;
+}
+
+.crud2go tr.v-table-row-primaer_20 {
+	background: #C5D2E2;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-primaer_20 {
+	background: #A7BCD5;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-primaer_20 {
+	background: #C5D2E2;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-primaer_20 {
+	background: #A7BCD5;
+}
+
+.crud2go td.v-table-cell-content-primaer_35 {
+	background: #A7BCD5;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-primaer_35 {
+	background: #8DA8C5;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-primaer_35 {
+	background: #A7BCD5;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-primaer_35 {
+	background: #8DA8C5;
+}
+
+.crud2go tr.v-table-row-primaer_35 {
+	background: #A7BCD5;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-primaer_35 {
+	background: #8DA8C5;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-primaer_35 {
+	background: #A7BCD5;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-primaer_35 {
+	background: #8DA8C5;
+}
+
+.crud2go td.v-table-cell-content-primaer_40 {
+	background: #8DA8C5;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-primaer_40 {
+	background: #5884AE;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-primaer_40 {
+	background: #8DA8C5;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-primaer_40 {
+	background: #5884AE;
+}
+
+.crud2go tr.v-table-row-primaer_40 {
+	background: #8DA8C5;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-primaer_40 {
+	background: #5884AE;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-primaer_40 {
+	background: #8DA8C5;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-primaer_40 {
+	background: #5884AE;
+}
+
+.crud2go td.v-table-cell-content-primaer_55 {
+	background: #5884AE;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-primaer_55 {
+	background: #226796;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-primaer_55 {
+	background: #5884AE;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-primaer_55 {
+	background: #226796;
+}
+
+.crud2go tr.v-table-row-primaer_55 {
+	background: #5884AE;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-primaer_55 {
+	background: #226796;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-primaer_55 {
+	background: #5884AE;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-primaer_55 {
+	background: #226796;
+}
+
+.crud2go td.v-table-cell-content-primaer_75 {
+	background: #226796;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-primaer_75 {
+	background: #003F74;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-primaer_75 {
+	background: #226796;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-primaer_75 {
+	background: #003F74;
+}
+
+.crud2go tr.v-table-row-primaer_75 {
+	background: #226796;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-primaer_75 {
+	background: #003F74;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-primaer_75 {
+	background: #226796;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-primaer_75 {
+	background: #003F74;
+}
+
+.crud2go td.v-table-cell-content-ergaenzung_gruen {
+	background: #AEC6A1;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-ergaenzung_gruen {
+	background: #88AC77;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-ergaenzung_gruen {
+	background: #AEC6A1;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-ergaenzung_gruen {
+	background: #88AC77;
+}
+
+.crud2go tr.v-table-row-ergaenzung_gruen {
+	background: #AEC6A1;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-ergaenzung_gruen {
+	background: #88AC77;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-ergaenzung_gruen {
+	background: #AEC6A1;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-ergaenzung_gruen {
+	background: #88AC77;
+}
+
+.crud2go td.v-table-cell-content-ergaenzung_grau {
+	background: #D1D3D2;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-ergaenzung_grau {
+	background: #A6AAAD;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-ergaenzung_grau {
+	background: #D1D3D2;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-ergaenzung_grau {
+	background: #A6AAAD;
+}
+
+.crud2go tr.v-table-row-ergaenzung_grau {
+	background: #D1D3D2;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-ergaenzung_grau {
+	background: #A6AAAD;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-ergaenzung_grau {
+	background: #D1D3D2;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-ergaenzung_grau {
+	background: #A6AAAD;
+}
+
+.crud2go td.v-table-cell-content-auszeichnung_ocker {
+	background: #FBD69B;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-auszeichnung_ocker {
+	background: #FAB94D;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-auszeichnung_ocker {
+	background: #FBD69B;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-auszeichnung_ocker {
+	background: #FAB94D;
+}
+
+.crud2go tr.v-table-row-auszeichnung_ocker {
+	background: #FBD69B;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-auszeichnung_ocker {
+	background: #FAB94D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-auszeichnung_ocker {
+	background: #FBD69B;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-auszeichnung_ocker {
+	background: #FAB94D;
+}
+
+.crud2go td.v-table-cell-content-auszeichnung_rot {
+	background: #E0A0A0;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-auszeichnung_rot {
+	background: #BF3954;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-auszeichnung_rot {
+	background: #E0A0A0;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-auszeichnung_rot {
+	background: #BF3954;
+}
+
+.crud2go tr.v-table-row-auszeichnung_rot {
+	background: #E0A0A0;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-auszeichnung_rot {
+	background: #BF3954;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-auszeichnung_rot {
+	background: #E0A0A0;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-auszeichnung_rot {
+	background: #BF3954;
+}
+
+.crud2go td.v-table-cell-content-risiko_geringe {
+	background: #019BF4;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-risiko_geringe {
+	background: #017DC3;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-risiko_geringe {
+	background: #019BF4;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-risiko_geringe {
+	background: #017DC3;
+}
+
+.crud2go tr.v-table-row-risiko_geringe {
+	background: #019BF4;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-risiko_geringe {
+	background: #017DC3;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-risiko_geringe {
+	background: #019BF4;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-risiko_geringe {
+	background: #017DC3;
+}
+
+.crud2go td.v-table-cell-content-risiko_moderate {
+	background: #00D6A1;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-risiko_moderate {
+	background: #00A57D;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-risiko_moderate {
+	background: #00D6A1;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-risiko_moderate {
+	background: #00A57D;
+}
+
+.crud2go tr.v-table-row-risiko_moderate {
+	background: #00D6A1;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-risiko_moderate {
+	background: #00A57D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-risiko_moderate {
+	background: #00D6A1;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-risiko_moderate {
+	background: #00A57D;
+}
+
+.crud2go td.v-table-cell-content-risiko_erhoehte {
+	background: #FFF899;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-risiko_erhoehte {
+	background: #FFF000;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-risiko_erhoehte {
+	background: #FFF899;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-risiko_erhoehte {
+	background: #FFF000;
+}
+
+.crud2go tr.v-table-row-risiko_erhoehte {
+	background: #FFF899;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-risiko_erhoehte {
+	background: #FFF000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-risiko_erhoehte {
+	background: #FFF899;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-risiko_erhoehte {
+	background: #FFF000;
+}
+
+.crud2go td.v-table-cell-content-risiko_hohe {
+	background: #FCBC69;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-risiko_hohe {
+	background: #FA9B1E;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-risiko_hohe {
+	background: #FCBC69;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-risiko_hohe {
+	background: #FA9B1E;
+}
+
+.crud2go tr.v-table-row-risiko_hohe {
+	background: #FCBC69;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-risiko_hohe {
+	background: #FA9B1E;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-risiko_hohe {
+	background: #FCBC69;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-risiko_hohe {
+	background: #FA9B1E;
+}
+
+.crud2go td.v-table-cell-content-risiko_sehr_hohe {
+	background: #FF6666;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-risiko_sehr_hohe {
+	background: #FF0000;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-risiko_sehr_hohe {
+	background: #FF6666;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-risiko_sehr_hohe {
+	background: #FF0000;
+}
+
+.crud2go tr.v-table-row-risiko_sehr_hohe {
+	background: #FF6666;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-risiko_sehr_hohe {
+	background: #FF0000;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-risiko_sehr_hohe {
+	background: #FF6666;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-risiko_sehr_hohe {
+	background: #FF0000;
+}
+
+.crud2go td.v-table-cell-content-finanzgruppe_44 {
+	background: #0091FF;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-finanzgruppe_44 {
+	background: #0066B3;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-finanzgruppe_44 {
+	background: #0091FF;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-finanzgruppe_44 {
+	background: #0066B3;
+}
+
+.crud2go tr.v-table-row-finanzgruppe_44 {
+	background: #0091FF;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-finanzgruppe_44 {
+	background: #0066B3;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-finanzgruppe_44 {
+	background: #0091FF;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-finanzgruppe_44 {
+	background: #0066B3;
+}
+
+.crud2go td.v-table-cell-content-finanzgruppe_08 {
+	background: #FF944D;
+}
+
+.crud2go tr.v-table-row-odd td.v-table-cell-content-finanzgruppe_08 {
+	background: #FF6600;
+}
+
+.crud2go div.crudEditMode td.v-table-cell-content-finanzgruppe_08 {
+	background: #FF944D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd td.v-table-cell-content-finanzgruppe_08 {
+	background: #FF6600;
+}
+
+.crud2go tr.v-table-row-finanzgruppe_08 {
+	background: #FF944D;
+}
+
+.crud2go tr.v-table-row-odd.v-table-row-finanzgruppe_08 {
+	background: #FF6600;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-finanzgruppe_08 {
+	background: #FF944D;
+}
+
+.crud2go div.crudEditMode tr.v-table-row-odd.v-table-row-finanzgruppe_08 {
+	background: #FF6600;
+}
+
+.crud2go td.v-table-cell-content-align_center {
+	text-align: center;
+}
+
+.crud2go td.v-table-cell-content-align_center input {
+	text-align: center;
+}
+
+.crud2go td.v-table-cell-content-align_right {
+	text-align: right;
+}
+
+.crud2go td.v-table-cell-content-align_right input {
+	text-align: right;
+}
+
+.crud2go .v-caption-crudRegion {
+	font-weight: bold;
+}
