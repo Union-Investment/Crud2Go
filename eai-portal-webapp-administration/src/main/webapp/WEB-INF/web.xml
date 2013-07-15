@@ -6,7 +6,7 @@
 	<context-param>
 		<description>Vaadin production mode</description>
 		<param-name>productionMode</param-name>
-		<param-value>false</param-value>
+		<param-value>true</param-value>
 	</context-param>
 
 	<context-param>
@@ -27,7 +27,7 @@
 	</listener>
 
 	<servlet>
-		<servlet-name>CrudPortletApplication</servlet-name>
+		<servlet-name>CrudUI</servlet-name>
 		<servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
 		<init-param>
 			<param-name>UI</param-name>
@@ -40,11 +40,11 @@
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>CrudPortletApplication</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<servlet-name>CrudUI</servlet-name>
+		<url-pattern>/CrudUI/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>CrudPortletApplication</servlet-name>
+		<servlet-name>CrudUI</servlet-name>
 		<url-pattern>/VAADIN/*</url-pattern>
 	</servlet-mapping>
 
