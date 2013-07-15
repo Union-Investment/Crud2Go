@@ -22,10 +22,11 @@ import java.util.List;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.FormFieldFactory;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 
 /**
@@ -97,20 +98,12 @@ public interface RowEditingFormView extends PanelContentView {
 	}
 
 	/**
-	 * Setzt die FormFieldFactory.
-	 * 
-	 * @param formFieldFactory
-	 *            Factory-Klasse zum erzeugen der Felder.
-	 */
-	void setFormFieldFactory(FormFieldFactory formFieldFactory);
-
-	/**
 	 * Initialisiert die View.
 	 * 
 	 * @param presenter
 	 *            EditingForm-Presenter
 	 */
-	void initialize(Presenter presenter);
+	void initialize(Presenter presenter, Table tableModel);
 
 	/**
 	 * Zeigt einen Datensatz im Formular-Dialog an.
@@ -125,19 +118,19 @@ public interface RowEditingFormView extends PanelContentView {
 	 * @param item
 	 *            Datensatz
 	 */
-	void displayRow(Item row, boolean editable, boolean deletable);
-
-	/**
-	 * Gibt das Formular zurück.
-	 * 
-	 * @return Formular
-	 */
-	Form getForm();
+	void displayRow(ContainerRow row, boolean editable, boolean deletable);
 
 	boolean isFieldModifed(String fieldName);
 
 	public void addBlobField(TableColumn tableColumn,
 			ContainerBlob containerBlob, boolean readonly);
 
-	public void addClobField(TableColumn tableColumn, Property property);
+	void discard();
+
+	void commit() throws CommitException;
+
+	void showError(String message);
+
+	void addClobField(TableColumn tableColumn, boolean readOnly);
+
 }

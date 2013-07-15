@@ -254,8 +254,6 @@ public class PresenterFactory {
 				rowEditingFormView, model, parentPanel, dialogId, table,
 				tablePresenter);
 
-		rowEditingFormView.initialize(rowEditingFormPresenter);
-
 		return rowEditingFormPresenter;
 	}
 

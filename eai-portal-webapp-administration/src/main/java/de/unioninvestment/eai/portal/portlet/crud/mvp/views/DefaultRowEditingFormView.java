@@ -25,8 +25,11 @@ import org.springframework.util.Assert;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.StreamResource;
+import com.vaadin.server.UserError;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -34,8 +37,10 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.FormFieldFactory;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
@@ -43,11 +48,17 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FileMetadata;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudFieldFactory;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.DefaultCrudFieldFactory;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFactoryWrapper;
 
 /**
  * Beschreibt die Erwartungen des Presenters an die View.
@@ -60,7 +71,6 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 
 	private static final long serialVersionUID = 1L;
 
-	private Form form;
 	private Presenter presenter;
 	private Upload upload;
 
@@ -71,6 +81,12 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	private Button nextRowButton;
 
 	private Button previousRowButton;
+
+	private FieldGroup binder;
+
+	private FormLayout fieldLayout;
+
+	private CrudFieldFactory fieldFactory;
 
 	/**
 	 * Konstruktor.
@@ -91,125 +107,119 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 			boolean useHorizontalLayout, String width, String height) {
 
 		super(withMargin, useHorizontalLayout, width, height);
-
-		form = new Form() {
-			/**
-			 * Label vor der Checkbox hinzufügen.
-			 */
-			protected void attachField(Object propertyId,
-					com.vaadin.ui.Field field) {
-				if (field instanceof CheckBox) {
-					HorizontalLayout checkboxLayout = new HorizontalLayout();
-					checkboxLayout.setCaption(field.getCaption());
-					field.setCaption(null);
-					checkboxLayout.addComponent(field);
-					getLayout().addComponent(checkboxLayout);
-				} else {
-					super.attachField(propertyId, field);
-				}
-			}
-		};
 	}
 
 	@Override
-	public void initialize(Presenter presenter) {
+	public void initialize(Presenter presenter, Table tableModel) {
 		this.presenter = presenter;
 
+		prepareFieldFactory(tableModel);
 		buildViewComponents();
 	}
 
+	private void prepareFieldFactory(Table tableModel) {
+		DefaultCrudFieldFactory fac = new DefaultCrudFieldFactory(null,
+				tableModel);
+		ValidationFieldFactoryWrapper validationWrapper = new ValidationFieldFactoryWrapper(
+				tableModel.getContainer(), fac, tableModel.getColumns());
+		this.fieldFactory = validationWrapper;
+	}
+
 	private void buildViewComponents() {
-		form.setBuffered(true);
-		addComponent(form);
+		fieldLayout = new FormLayout();
+		addComponent(fieldLayout);
 
 		CssLayout footerLayout = new CssLayout();
 		footerLayout.setStyleName("actions");
-		form.setFooter(footerLayout);
+		addComponent(footerLayout);
 
 		saveButton = new Button("Speichern");
-		saveButton.addListener(new ClickListener() {
+		saveButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				DefaultRowEditingFormView.this.presenter.save();
+				presenter.save();
 			}
 		});
-		form.getFooter().addComponent(saveButton);
+		footerLayout.addComponent(saveButton);
 
 		resetButton = new Button("Zurücksetzen");
-		resetButton.addListener(new ClickListener() {
+		resetButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				DefaultRowEditingFormView.this.presenter.resetFields();
+				presenter.resetFields();
 			}
 		});
-		form.getFooter().addComponent(resetButton);
+		footerLayout.addComponent(resetButton);
 
 		deleteButton = new Button("Löschen");
-		deleteButton.addListener(new ClickListener() {
+		deleteButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				DefaultRowEditingFormView.this.presenter.delete();
+				presenter.delete();
 			}
 		});
-		form.getFooter().addComponent(deleteButton);
+		footerLayout.addComponent(deleteButton);
 
 		previousRowButton = new Button("Vorheriger");
-		previousRowButton.addListener(new ClickListener() {
+		previousRowButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				DefaultRowEditingFormView.this.presenter.previousRow();
+				presenter.previousRow();
 			}
 		});
-		form.getFooter().addComponent(previousRowButton);
+		footerLayout.addComponent(previousRowButton);
 
 		nextRowButton = new Button("Nächster");
-		nextRowButton.addListener(new ClickListener() {
+		nextRowButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				DefaultRowEditingFormView.this.presenter.nextRow();
+				presenter.nextRow();
 			}
 		});
-		form.getFooter().addComponent(nextRowButton);
+		footerLayout.addComponent(nextRowButton);
 
 		Button cancelButton = new Button("Abbrechen");
-		cancelButton.addListener(new ClickListener() {
+		cancelButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				DefaultRowEditingFormView.this.presenter.cancel();
+				presenter.cancel();
 			}
 		});
-		form.getFooter().addComponent(cancelButton);
-		form.setErrorHandler(new ErrorHandler() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void error(com.vaadin.server.ErrorEvent event) {
-				System.out
-						.println("Error handler:" + this.getClass().getName());
-				// FIXME return true;
-			}
-		});
+		footerLayout.addComponent(cancelButton);
 	}
 
 	@Override
-	public void displayRow(Item item, boolean editable, boolean deletable) {
-		Assert.notNull(item, "Row cannot be null");
-		form.getLayout().removeAllComponents();
-		form.setItemDataSource(item, presenter.getVisibleFields());
-		presenter.addClobFields(item);
+	public void displayRow(ContainerRow row, boolean editable, boolean deletable) {
+		Assert.notNull(row, "Row cannot be null");
+		Item item = row.getInternalRow();
+
+		fieldLayout.removeAllComponents();
+		try {
+			binder = new FieldGroup(row.getFormItem());
+			for (String fieldName : presenter.getVisibleFields()) {
+				Field<?> field = fieldFactory.createField(item, fieldName);
+				if (field != null) {
+					binder.bind(field, fieldName);
+					addFieldToLayout(field);
+				}
+			}
+			presenter.addClobFields(item);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
 
 		saveButton.setEnabled(editable);
 		resetButton.setEnabled(editable);
@@ -218,18 +228,37 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		nextRowButton.setEnabled(presenter.hasNextRow());
 	}
 
-	@Override
-	public void setFormFieldFactory(FormFieldFactory formFieldFactory) {
-		form.setFormFieldFactory(formFieldFactory);
+	private void addFieldToLayout(Field<?> field) {
+		if (field instanceof CheckBox) {
+			HorizontalLayout checkboxLayout = new HorizontalLayout();
+			checkboxLayout.setCaption(field.getCaption());
+			field.setCaption(null);
+			checkboxLayout.addComponent(field);
+
+			fieldLayout.addComponent(checkboxLayout);
+		} else {
+			fieldLayout.addComponent(field);
+		}
 	}
 
-	public Form getForm() {
-		return form;
+	@Override
+	public void commit() throws CommitException {
+		binder.commit();
+	}
+
+	@Override
+	public void discard() {
+		binder.discard();
+	}
+
+	@Override
+	public void showError(String message) {
+		fieldLayout.setComponentError(new UserError(message));
 	}
 
 	@Override
 	public boolean isFieldModifed(String fieldName) {
-		com.vaadin.ui.Field field = form.getField(fieldName);
+		Field<?> field = binder.getField(fieldName);
 		if (field != null && field.isModified()) {
 			return true;
 		}
@@ -262,7 +291,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 			Upload upload = buildUpload(containerBlob, metadata);
 			blobField.addComponent(upload);
 		}
-		form.getLayout().addComponent(blobField);
+		fieldLayout.addComponent(blobField);
 	}
 
 	private Upload buildUpload(final ContainerBlob containerBlob,
@@ -312,26 +341,29 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	}
 
 	@Override
-	public void addClobField(TableColumn tableColumn, Property property) {
+	public void addClobField(TableColumn tableColumn, boolean readOnly) {
+		String columnName = tableColumn.getName();
+
 		TextArea area = new TextArea();
 		if (tableColumn.getTitle() != null) {
 			area.setCaption(tableColumn.getTitle());
 		} else {
-			area.setCaption(tableColumn.getName());
+			area.setCaption(columnName);
 		}
 
 		if (tableColumn.getWidth() != null) {
-			area.setWidth(tableColumn.getWidth(), Component.UNITS_PIXELS);
+			area.setWidth(tableColumn.getWidth(), Unit.PIXELS);
 		}
 		if (tableColumn.getRows() != null) {
 			area.setRows(tableColumn.getRows());
 		}
 		area.setNullRepresentation("");
-		area.setReadOnly(property.isReadOnly()
-				|| !tableColumn.getDefaultEditable());
-		area.setPropertyDataSource(property);
-		area.setWidth(100.0f, Window.UNITS_PERCENTAGE);
-		form.addField(tableColumn.getName(), area);
+		area.setReadOnly(readOnly || !tableColumn.getDefaultEditable());
+		area.setWidth(100.0f, Unit.PERCENTAGE);
+
+		binder.bind(area, columnName);
+		
+		addFieldToLayout(area);
 	}
 
 	public class BlobUploadReceiver implements Receiver {

@@ -28,6 +28,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -50,7 +51,6 @@ import de.unioninvestment.eai.portal.portlet.crud.datatypes.StringDataType;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxTableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
-import de.unioninvestment.eai.portal.support.vaadin.junit.Answers;
 
 public class CrudTableColumnGeneratorTest {
 
@@ -192,7 +192,7 @@ public class CrudTableColumnGeneratorTest {
 		when(tableColumnsMock.getCheckBox(anyString())).thenReturn(
 				checkBoxModelMock);
 		when(propertyMock.getValue()).thenReturn("true");
-		when(propertyMock.getType()).thenAnswer(Answers.object(String.class));
+		doReturn(String.class).when(propertyMock).getType();
 		when(itemMock.getItemProperty(columnId)).thenReturn(propertyMock);
 		when(tableMock.getPropertyValue(itemId, columnId, propertyMock))
 				.thenReturn(new Object());

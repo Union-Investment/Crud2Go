@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,7 +59,7 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest {
 
 	@Mock
-	private CrudFieldFactory delegateMock;
+	private DefaultCrudFieldFactory delegateMock;
 	@Mock
 	private Component uiContextMock;
 	@Mock
@@ -87,10 +88,8 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		MockitoAnnotations.initMocks(this);
 
 		when(comboBoxMock.getPropertyDataSource()).thenReturn(null);
-		when(delegateMock.createField(containerMock, 1, "test", uiContextMock))
-				.thenReturn(comboBoxMock);
-		when(delegateMock.createField(itemMock, "test", uiContextMock))
-				.thenReturn(comboBoxMock);
+		doReturn(comboBoxMock).when(delegateMock).createField(containerMock, 1, "test", uiContextMock);
+		doReturn(comboBoxMock).when(delegateMock).createField(itemMock, "test");
 
 		when(databaseContainer.convertItemToRow(itemMock, false, true))
 				.thenReturn(containerRowMock);
@@ -132,9 +131,9 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		ValidationFieldFactoryWrapper wrapper = new ValidationFieldFactoryWrapper(
 				databaseContainer, delegateMock, tableColumns);
 
-		Field field = wrapper.createField(itemMock, "test", uiContextMock);
+		Field field = wrapper.createField(itemMock, "test");
 
-		verify(delegateMock).createField(itemMock, "test", uiContextMock);
+		verify(delegateMock).createField(itemMock, "test");
 		assertEquals(comboBoxMock, field);
 	}
 

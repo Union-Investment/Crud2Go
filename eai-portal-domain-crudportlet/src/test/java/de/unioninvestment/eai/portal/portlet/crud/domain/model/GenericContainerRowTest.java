@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.util.Arrays;
@@ -37,9 +37,6 @@ import de.unioninvestment.eai.portal.support.vaadin.container.GenericProperty;
 public class GenericContainerRowTest extends ContainerRowTest {
 
 	@Mock
-	private DataContainer containerMock;
-
-	@Mock
 	private GenericItem rowItemMock;
 
 	@Mock
@@ -51,9 +48,9 @@ public class GenericContainerRowTest extends ContainerRowTest {
 	@Test
 	public void shouldCheckReadonly() {
 		// given
-		Mockito.when(containerMock.isUpdateable()).thenReturn(false);
+		Mockito.when(dataContainerMock.isUpdateable()).thenReturn(false);
 		Mockito.when(rowItemMock.getId()).thenReturn(itemIdMock);
-		Mockito.when(containerMock.convertInternalRowId(itemIdMock))
+		Mockito.when(dataContainerMock.convertInternalRowId(itemIdMock))
 				.thenReturn(containerRowIdMock);
 		GenericContainerRow row = createContainerRow();
 
@@ -67,9 +64,9 @@ public class GenericContainerRowTest extends ContainerRowTest {
 	@Test
 	public void shouldCheckReadonlyOnUpdateableContainer() {
 		// given
-		Mockito.when(containerMock.isUpdateable()).thenReturn(true);
+		Mockito.when(dataContainerMock.isUpdateable()).thenReturn(true);
 		Mockito.when(rowItemMock.getId()).thenReturn(itemIdMock);
-		Mockito.when(containerMock.convertInternalRowId(itemIdMock))
+		Mockito.when(dataContainerMock.convertInternalRowId(itemIdMock))
 				.thenReturn(containerRowIdMock);
 		GenericContainerRow row = createContainerRow();
 
@@ -114,7 +111,7 @@ public class GenericContainerRowTest extends ContainerRowTest {
 				property1Mock);
 
 		ContainerRow clone = Mockito.mock(ContainerRow.class);
-		Mockito.when(containerMock.addRow()).thenReturn(clone);
+		Mockito.when(dataContainerMock.addRow()).thenReturn(clone);
 		GenericContainerRow row = createContainerRow();
 
 		// when
@@ -124,7 +121,7 @@ public class GenericContainerRowTest extends ContainerRowTest {
 		Assert.assertNotNull(result);
 		Assert.assertEquals(clone, result);
 
-		Mockito.verify(containerMock).addRow();
+		Mockito.verify(dataContainerMock).addRow();
 
 		ArgumentCaptor<String> valueCaptor = ArgumentCaptor
 				.forClass(String.class);
@@ -137,6 +134,7 @@ public class GenericContainerRowTest extends ContainerRowTest {
 
 	@Override
 	GenericContainerRow createContainerRow() {
-		return new GenericContainerRow(rowItemMock, containerMock, true, true);
+		return new GenericContainerRow(rowItemMock, dataContainerMock, true,
+				true);
 	}
 }

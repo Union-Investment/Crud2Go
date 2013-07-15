@@ -6,7 +6,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.support;
  * 
  * @author carsten.mjartan
  */
-public interface CrudUI {
+public interface InitializingUI {
 
 	/**
 	 * @return <code>true</code>, if the Application is currently initializing a

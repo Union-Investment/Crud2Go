@@ -263,6 +263,6 @@ public class PresenterFactoryTest {
 						tableMock, tablePresenterMock);
 
 		// then
-		verify(rowEditingFormViewMock).initialize(presenter);
+		assertThat(presenter.getView(), is((View)rowEditingFormViewMock));
 	}
 }

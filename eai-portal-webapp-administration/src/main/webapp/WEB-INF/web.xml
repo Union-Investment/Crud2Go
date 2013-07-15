@@ -28,10 +28,10 @@
 
 	<servlet>
 		<servlet-name>CrudPortletApplication</servlet-name>
-		<servlet-class>ru.xpoft.vaadin.SpringVaadinServlet</servlet-class>
+		<servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
 		<init-param>
 			<param-name>UI</param-name>
-			<param-value>de.unioninvestment.eai.portal.portlet.crud.CrudPortletApplication</param-value>
+			<param-value>de.unioninvestment.eai.portal.portlet.crud.CrudUI</param-value>
 		</init-param>
 		<init-param>
 			<param-name>widgetset</param-name>
@@ -53,12 +53,4 @@
 		<mime-type>text/x-component</mime-type>
 	</mime-mapping>
 
-	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-		<welcome-file>index.htm</welcome-file>
-		<welcome-file>index.jsp</welcome-file>
-		<welcome-file>default.html</welcome-file>
-		<welcome-file>default.htm</welcome-file>
-		<welcome-file>default.jsp</welcome-file>
-	</welcome-file-list>
 </web-app>

@@ -55,16 +55,13 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 	private RowItem rowItem;
 
 	@Mock
-	private DataContainer containerMock;
-
-	@Mock
 	private DatabaseContainerRowId containerRowId;
 
 	@Mock
 	private RowId rowIdMock;
 
 	@Mock
-	private SQLContainer sqlContainerMock;
+	private SQLContainer sqldataContainerMock;
 
 	private ColumnProperty columnProperty;
 
@@ -77,7 +74,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 		MockitoAnnotations.initMocks(this);
 		columnProperty = new ColumnProperty("id", true, true, true, "1",
 				String.class);
-		rowItem = new RowItem(sqlContainerMock, rowIdMock,
+		rowItem = new RowItem(sqldataContainerMock, rowIdMock,
 				Arrays.asList(columnProperty));
 
 		containerRow = createContainerRow();
@@ -93,10 +90,10 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 		// callback.doInTransaction();
 		// return null;
 		// }
-		// }).when(containerMock).withExistingTransaction(
+		// }).when(dataContainerMock).withExistingTransaction(
 		// any(DatabaseContainer.TransactionCallback.class));
 		when(
-				containerMock
+				dataContainerMock
 						.withExistingTransaction(any(DataContainer.TransactionCallback.class)))
 				.thenAnswer(new Answer<Object>() {
 
@@ -109,7 +106,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 						return callback.doInTransaction();
 					}
 				});
-		when(containerMock.isUpdateable()).thenReturn(true);
+		when(dataContainerMock.isUpdateable()).thenReturn(true);
 	}
 
 	@Test
@@ -123,7 +120,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 	@Test
 	public void shouldSetNonTransactionalPropertyValue() {
 		containerRow = new DatabaseContainerRow(rowItem, containerRowId,
-				containerMock, false, false);
+				dataContainerMock, false, false);
 		columnProperty.setReadOnly(false);
 		containerRow.setValue("id", "2");
 		assertThat((String) columnProperty.getValue(), is("2"));
@@ -138,7 +135,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 	@Test(expected = ContainerException.class)
 	public void shouldFailWithExceptionToSetAValueOfAnImmutableRow() {
 		containerRow = new DatabaseContainerRow(rowItem, containerRowId,
-				containerMock, false, true);
+				dataContainerMock, false, true);
 
 		columnProperty.setReadOnly(false);
 		containerRow.setValue("id", "2");
@@ -147,7 +144,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 	@Test
 	public void shouldGetNonTransactionalPropertyValue() {
 		containerRow = new DatabaseContainerRow(rowItem, containerRowId,
-				containerMock, false, false);
+				dataContainerMock, false, false);
 		columnProperty.setReadOnly(false);
 		assertThat((String) containerRow.getValue("id"), is("1"));
 	}
@@ -165,7 +162,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 						.getArguments()[0];
 				return callback.doInTransaction();
 			}
-		}).when(containerMock).withExistingTransaction(
+		}).when(dataContainerMock).withExistingTransaction(
 				any(DataContainer.TransactionCallback.class));
 
 		assertThat((String) containerRow.getValue("id"), is("1"));
@@ -180,7 +177,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 	@Test
 	public void shouldCloneRow() throws CloneNotSupportedException {
 		ContainerRow cloneMock = mock(DatabaseContainerRow.class);
-		when(containerMock.addRow()).thenReturn(cloneMock);
+		when(dataContainerMock.addRow()).thenReturn(cloneMock);
 		DatabaseContainerRow clone = (DatabaseContainerRow) containerRow
 				.clone();
 
@@ -189,7 +186,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 
 	@Test
 	public void shouldSetText() {
-		when(containerMock.findEditor(anyString())).thenReturn(
+		when(dataContainerMock.findEditor(anyString())).thenReturn(
 				editorSupportMock);
 
 		columnProperty.setReadOnly(false);
@@ -201,7 +198,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 	@Test
 	public void shouldSetValue() {
 		containerRow = new DatabaseContainerRow(rowItem, containerRowId,
-				containerMock, false, false);
+				dataContainerMock, false, false);
 		columnProperty.setReadOnly(false);
 
 		containerRow.setValue("id", "newValue");
@@ -213,7 +210,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 	@Test(expected = NoSuchElementException.class)
 	public void shouldNotSetValueOnNonExistingField() {
 		containerRow = new DatabaseContainerRow(rowItem, containerRowId,
-				containerMock, false, false);
+				dataContainerMock, false, false);
 
 		containerRow.setValue("keinFeld", "newValue");
 	}
@@ -221,7 +218,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 	@Test
 	public void shouldCreateFields() {
 		containerRow = new DatabaseContainerRow(rowItem, containerRowId,
-				containerMock, false, false);
+				dataContainerMock, false, false);
 
 		Map<String, ContainerField> fields = containerRow.getFields();
 
@@ -233,19 +230,19 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 
 	@Test
 	public void shouldBeReadonlyIfUpdatesAreNotSupported() {
-		when(containerMock.isUpdateable()).thenReturn(false);
+		when(dataContainerMock.isUpdateable()).thenReturn(false);
 		assertThat(containerRow.isReadonly(), is(true));
 	}
 
 	@Test
 	public void shouldBeWritableForExistingRowsIfUpdatesAreAllowed() {
-		when(containerMock.isUpdateable()).thenReturn(true);
+		when(dataContainerMock.isUpdateable()).thenReturn(true);
 		assertThat(containerRow.isReadonly(), is(false));
 	}
 
 	@Test
 	public void shouldBeWritableForNewRows() {
-		when(containerMock.isUpdateable()).thenReturn(false);
+		when(dataContainerMock.isUpdateable()).thenReturn(false);
 		when(containerRowId.getInternalId()).thenReturn(
 				new TemporaryRowId(new Object[] { 1 }));
 		assertThat(containerRow.isReadonly(), is(false));
@@ -269,7 +266,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 
 	@Override
 	DatabaseContainerRow createContainerRow() {
-		return new DatabaseContainerRow(rowItem, containerRowId, containerMock,
+		return new DatabaseContainerRow(rowItem, containerRowId, dataContainerMock,
 				true, false);
 	}
 

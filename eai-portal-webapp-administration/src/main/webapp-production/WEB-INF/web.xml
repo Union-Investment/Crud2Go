@@ -25,13 +25,16 @@
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+
 	<servlet>
 		<servlet-name>CrudPortletApplication</servlet-name>
-		<servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+		<servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
 		<init-param>
-			<description>Vaadin application class to start</description>
-			<param-name>application</param-name>
-			<param-value>de.uit.eai.portal.portlet.crud.CrudPortletApplication</param-value>
+			<param-name>UI</param-name>
+			<param-value>de.unioninvestment.eai.portal.portlet.crud.CrudUI</param-value>
 		</init-param>
 		<init-param>
 			<param-name>widgetset</param-name>
@@ -41,14 +44,16 @@
 
 	<servlet-mapping>
 		<servlet-name>CrudPortletApplication</servlet-name>
-		<url-pattern>/CrudPortletApplicationServlet/*</url-pattern>
+		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
-	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-		<welcome-file>index.htm</welcome-file>
-		<welcome-file>index.jsp</welcome-file>
-		<welcome-file>default.html</welcome-file>
-		<welcome-file>default.htm</welcome-file>
-		<welcome-file>default.jsp</welcome-file>
-	</welcome-file-list>
+	<servlet-mapping>
+		<servlet-name>CrudPortletApplication</servlet-name>
+		<url-pattern>/VAADIN/*</url-pattern>
+	</servlet-mapping>
+
+	<mime-mapping>
+		<extension>htc</extension>
+		<mime-type>text/x-component</mime-type>
+	</mime-mapping>
+
 </web-app>

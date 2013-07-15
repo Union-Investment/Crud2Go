@@ -49,8 +49,7 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
  * 
  * @author carsten.mjartan
  */
-public class ValidationFieldFactoryWrapper implements TableFieldFactory,
-		FormFieldFactory {
+public class ValidationFieldFactoryWrapper implements CrudFieldFactory {
 
 	private final class LoggingErrorHandler implements ErrorHandler {
 		private final Field<?> field;
@@ -83,7 +82,7 @@ public class ValidationFieldFactoryWrapper implements TableFieldFactory,
 	 *            Tabellenspaltenkonfiguration
 	 */
 	public ValidationFieldFactoryWrapper(DataContainer databaseContainer,
-			CrudFieldFactory delegate, TableColumns columns) {
+			DefaultCrudFieldFactory delegate, TableColumns columns) {
 		this.dataContainer = databaseContainer;
 		this.delegate = delegate;
 		this.columns = columns;
@@ -100,10 +99,9 @@ public class ValidationFieldFactoryWrapper implements TableFieldFactory,
 	}
 
 	@Override
-	public Field<?> createField(Item item, Object propertyId,
-			Component uiContext) {
+	public Field<?> createField(Item item, Object propertyId) {
 		final Field<?> field = delegate
-				.createField(item, propertyId, uiContext);
+				.createField(item, propertyId);
 
 		if (field != null) {
 			if (field.getClass().isAssignableFrom(AbstractField.class)) {

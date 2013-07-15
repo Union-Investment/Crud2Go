@@ -81,7 +81,7 @@ import de.unioninvestment.eai.portal.portlet.crud.export.ExportDialog;
 import de.unioninvestment.eai.portal.portlet.crud.export.ExportTask;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BLobColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudCellStyleGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudFieldFactory;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.DefaultCrudFieldFactory;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTable;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTableColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.VaadinCustomColumnGenerator;
@@ -400,7 +400,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void initializeTableFieldFactory() {
-		CrudFieldFactory fieldFactory = new CrudFieldFactory(table, tableModel);
+		DefaultCrudFieldFactory fieldFactory = new DefaultCrudFieldFactory(table, tableModel);
 
 		fieldFactory.setCreateFormFieldForTable(!presenter.isFormEditEnabled());
 

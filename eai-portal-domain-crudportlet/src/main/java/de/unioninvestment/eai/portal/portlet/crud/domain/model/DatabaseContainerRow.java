@@ -21,6 +21,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 import java.util.Collection;
 import java.util.Map;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.util.sqlcontainer.ColumnProperty;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
@@ -37,8 +38,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.support.map.ValueTransf
 public class DatabaseContainerRow extends ContainerRow {
 
 	private final RowItem rowItem;
-
-	private final DataContainer container;
 
 	private boolean immutable;
 
@@ -60,8 +59,8 @@ public class DatabaseContainerRow extends ContainerRow {
 	 */
 	public DatabaseContainerRow(RowItem rowItem, DatabaseContainerRowId id,
 			DataContainer container, boolean transactional, boolean immutable) {
+		super(container);
 		this.rowItem = rowItem;
-		this.container = container;
 		this.transactional = transactional;
 		this.immutable = immutable;
 
@@ -104,7 +103,7 @@ public class DatabaseContainerRow extends ContainerRow {
 	}
 
 	@Override
-	public RowItem getInternalRow() {
+	public Item getInternalRow() {
 		return rowItem;
 	}
 

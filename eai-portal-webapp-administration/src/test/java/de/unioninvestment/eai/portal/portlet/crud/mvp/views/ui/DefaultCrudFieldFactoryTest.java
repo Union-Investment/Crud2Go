@@ -27,6 +27,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -68,12 +69,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
-import de.unioninvestment.eai.portal.support.vaadin.junit.Answers;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 
-public class CrudFieldFactoryTest extends SpringPortletContextTest {
+public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
-	private CrudFieldFactory crudTableFieldFactory;
+	private DefaultCrudFieldFactory crudTableFieldFactory;
 
 	@Mock
 	private Table vaadinTableMock;
@@ -147,7 +147,7 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 				true);
 		when(modelTableMock.getContainer()).thenReturn(databaseContainerMock);
 
-		crudTableFieldFactory = new CrudFieldFactory(vaadinTableMock,
+		crudTableFieldFactory = new DefaultCrudFieldFactory(vaadinTableMock,
 				modelTableMock);
 
 		when(databaseContainerMock.convertItemToRow(itemMock, false, true))
@@ -182,9 +182,8 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
 
-		when(
-				displaySupportMock.createField(String.class, "test", false,
-						null, null)).thenAnswer(Answers.object(fieldMock));
+		doReturn(fieldMock).when(displaySupportMock).createField(String.class,
+				"test", false, null, null);
 
 		TextField result = (TextField) crudTableFieldFactory.createField(
 				containerMock, "1", "test", componentMock);
@@ -254,9 +253,8 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
 
-		when(
-				displaySupportMock.createField(String.class, "test", true,
-						null, null)).thenAnswer(Answers.object(textAreaMock));
+		doReturn(textAreaMock).when(displaySupportMock).createField(
+				String.class, "test", true, null, null);
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
@@ -400,10 +398,8 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
 		when(tableColumnsMock.isMultiline("test")).thenReturn(true);
 		when(tableColumnsMock.getInputPrompt("test")).thenReturn("testPrompt");
-		when(
-				displaySupportMock.createField(String.class, "test", true,
-						"testPrompt", null)).thenAnswer(
-				Answers.object(fieldMock));
+		doReturn(fieldMock).when(displaySupportMock).createField(String.class,
+				"test", true, "testPrompt", null);
 
 		TextField result = (TextField) crudTableFieldFactory.createField(
 				containerMock, "1", "test", componentMock);
@@ -426,9 +422,8 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
 
-		when(
-				displaySupportMock.createField(String.class, "test", false,
-						null, null)).thenAnswer(Answers.object(fieldMock));
+		doReturn(fieldMock).when(displaySupportMock).createField(String.class,
+				"test", false, null, null);
 
 		TextField result = (TextField) crudTableFieldFactory.createField(
 				containerMock, "1", "test", componentMock);
@@ -447,9 +442,8 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
 
-		when(
-				displaySupportMock.createField(String.class, "test", false,
-						null, null)).thenAnswer(Answers.object(fieldMock));
+		doReturn(fieldMock).when(displaySupportMock).createField(String.class,
+				"test", false, null, null);
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
@@ -472,9 +466,8 @@ public class CrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
 
-		when(
-				displaySupportMock.createField(String.class, "test", false,
-						null, null)).thenAnswer(Answers.object(fieldMock));
+		doReturn(fieldMock).when(displaySupportMock).createField(String.class,
+				"test", false, null, null);
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);

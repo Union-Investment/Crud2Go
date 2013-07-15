@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.util.PropertysetItem;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
 
@@ -32,6 +33,12 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerExce
  * 
  */
 public abstract class ContainerRow implements Cloneable {
+
+	protected final DataContainer container;
+
+	public ContainerRow(DataContainer container) {
+		this.container = container;
+	}
 
 	/**
 	 * Gibt die Primärschlüssel zurück.
@@ -54,11 +61,29 @@ public abstract class ContainerRow implements Cloneable {
 	abstract void setFields(Map<String, ContainerField> singletonMap);
 
 	/**
-	 * Gibt die interne Zeile zurück.
+	 * Liefert ähnlich {@link #getInternalRow()} ein Item für die Zeile zurück,
+	 * ersetzt aber CLob-Properties, so dass sie sich nach außen wie
+	 * String-Properties verhalten.
 	 * 
-	 * @return Interne Zeile
+	 * @return ein Item
 	 */
 	public abstract Item getInternalRow();
+
+	public Item getFormItem() {
+		Item item = getInternalRow();
+		Item wrapper = new PropertysetItem();
+		for (Object id : item.getItemPropertyIds()) {
+			String columnName = (String) id;
+			if (container.isCLob(columnName)) {
+				ContainerClob clob = container.getCLob(getId(), columnName);
+				wrapper.addItemProperty(columnName, clob.getPropertyValue());
+			} else {
+				wrapper.addItemProperty(columnName,
+						item.getItemProperty(columnName));
+			}
+		}
+		return wrapper;
+	}
 
 	/**
 	 * Erstellt einen Klon der aktuellen Zeile. Dabei werden nur die Felder

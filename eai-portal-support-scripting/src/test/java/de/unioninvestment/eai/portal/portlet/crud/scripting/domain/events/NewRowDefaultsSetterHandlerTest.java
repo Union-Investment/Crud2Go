@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.domain.events;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -43,7 +44,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.support.vaadin.junit.Answers;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class NewRowDefaultsSetterHandlerTest {
@@ -84,12 +84,10 @@ public class NewRowDefaultsSetterHandlerTest {
 		// when(gString1.toString()).thenReturn("2");
 		when(gString1.call(any())).thenReturn("2");
 
-		when(sourceMock.getType(anyString())).thenAnswer(
-				Answers.object(Timestamp.class));
+		doReturn(Timestamp.class).when(sourceMock).getType(anyString());
 
 		when(sourceMock.findEditor(anyString())).thenReturn(editorSupportMock);
-		when(editorSupportMock.createFormatter(Timestamp.class, null))
-				.thenAnswer(Answers.object(propertyFormatterMock));
+		doReturn(propertyFormatterMock).when(editorSupportMock).createFormatter(Timestamp.class, null);
 		when(
 				propertyFormatterMock.convertToModel("2", Timestamp.class,
 						Locale.GERMANY)).thenReturn(

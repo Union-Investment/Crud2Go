@@ -84,7 +84,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilt
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
-import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudUI;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
 import de.unioninvestment.eai.portal.support.vaadin.support.NumberFormatter;
 
 /**
@@ -155,7 +155,7 @@ public class SearchFormAction implements ActionHandler {
 	}
 
 	private boolean policyAllowsFiltering(Table table) {
-		CrudUI application = (CrudUI) UI.getCurrent();
+		InitializingUI application = (InitializingUI) UI.getCurrent();
 		if (application != null && application.isInitializing()) {
 			FilterPolicy policy = table.getContainer().getFilterPolicy();
 			if (policy == FilterPolicy.NOTHING

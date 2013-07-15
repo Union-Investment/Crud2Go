@@ -30,11 +30,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.portlet.PortletMode;
@@ -86,12 +86,10 @@ import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTe
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
-public class CrudPortletApplicationTest extends SpringPortletContextTest {
-
-	private URL applicationUrl;
+public class CrudUITest extends SpringPortletContextTest {
 
 	@InjectMocks
-	private CrudPortletApplication app = new CrudPortletApplication();
+	private CrudUI app = new CrudUI();
 
 	@Mock
 	private Settings settingsMock;
@@ -156,8 +154,6 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 	@Before
 	public void setUp() throws MalformedURLException {
 		liferayContext.initialize();
-
-		applicationUrl = new URL("http://xxx");
 
 		MockitoAnnotations.initMocks(this);
 
@@ -429,7 +425,7 @@ public class CrudPortletApplicationTest extends SpringPortletContextTest {
 		when(
 				scriptModelFactoryMock.getBuilder(any(EventBus.class),
 						any(Portlet.class),
-						any((new HashMap<Object, Object>()).getClass())))
+						any((Map.class))))
 				.thenAnswer(new Answer<ScriptModelBuilder>() {
 					@Override
 					public ScriptModelBuilder answer(InvocationOnMock invocation)

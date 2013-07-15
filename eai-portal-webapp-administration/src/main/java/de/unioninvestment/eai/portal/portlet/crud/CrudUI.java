@@ -66,7 +66,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
-import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudUI;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.DatasourceInfoPresenter;
@@ -97,15 +97,16 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationExcepti
 @Theme("crud2go")
 @PreserveOnRefresh
 @Configurable(preConstruction = true, dependencyCheck = true)
-public class CrudPortletApplication extends LiferayUI implements
-		PortletListener, ShowPopupEventHandler, CrudUI {
+@SuppressWarnings("deprecation")
+public class CrudUI extends LiferayUI implements
+		PortletListener, ShowPopupEventHandler, InitializingUI {
 
 	private static final long serialVersionUID = 1L;
 
 	public static final String ROLE_ADMIN = "portlet-crud-adm";
 
 	private static final org.slf4j.Logger LOG = LoggerFactory
-			.getLogger(CrudPortletApplication.class);
+			.getLogger(CrudUI.class);
 
 	private Portlet portletDomain;
 	private PortletPresenter portletGui;
@@ -543,8 +544,8 @@ public class CrudPortletApplication extends LiferayUI implements
 		this.portletDomain = portletDomain;
 	}
 
-	public static CrudPortletApplication getCurrent() {
-		return (CrudPortletApplication) UI.getCurrent();
+	public static CrudUI getCurrent() {
+		return (CrudUI) UI.getCurrent();
 	}
 
 	public boolean isInitializing() {

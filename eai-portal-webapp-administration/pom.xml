@@ -408,9 +408,6 @@
 						<configuration>
 							<webResources>
 								<resource>
-									<directory>${basedir}/src/main/webapp-vaadin</directory>
-								</resource>
-								<resource>
 									<directory>${basedir}/src/main/webapp-production</directory>
 								</resource>
 							</webResources>

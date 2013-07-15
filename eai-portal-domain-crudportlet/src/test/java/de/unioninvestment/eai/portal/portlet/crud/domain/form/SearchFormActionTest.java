@@ -123,11 +123,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilt
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
-import de.unioninvestment.eai.portal.portlet.crud.domain.support.CrudUI;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
 
 public class SearchFormActionTest {
 
-	static abstract class UIMock extends UI implements CrudUI {
+	static abstract class UIMock extends UI implements InitializingUI {
 	}
 
 	private SearchFormAction searchAction;

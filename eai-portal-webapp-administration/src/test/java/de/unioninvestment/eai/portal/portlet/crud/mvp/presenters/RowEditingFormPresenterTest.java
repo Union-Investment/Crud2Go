@@ -38,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Form;
@@ -90,13 +91,7 @@ public class RowEditingFormPresenterTest {
 	private ContainerRow containerRowMock;
 
 	@Mock
-	private Form formMock;
-
-	@Mock
 	private ContainerRowId containerRowIdMock;
-
-	@Mock
-	private Item itemMock;
 
 	@Mock
 	private ContainerField containerFieldMock;
@@ -110,7 +105,6 @@ public class RowEditingFormPresenterTest {
 
 		when(tableMock.getContainer()).thenReturn(containerMock);
 		when(tableMock.getColumns()).thenReturn(tableColumnsMock);
-		when(viewMock.getForm()).thenReturn(formMock);
 		when(viewMock.addBackButton(anyString(), any(ClickListener.class)))
 				.thenReturn(backButtonMock);
 		when(containerRowMock.getId()).thenReturn(containerRowIdMock);
@@ -148,10 +142,10 @@ public class RowEditingFormPresenterTest {
 	}
 
 	@Test
-	public void shouldCommitFormOnSave() {
+	public void shouldCommitFormOnSave() throws CommitException {
 		presenter.save();
 
-		verify(formMock).commit();
+		verify(viewMock).commit();
 	}
 
 	@Test
@@ -172,7 +166,7 @@ public class RowEditingFormPresenterTest {
 	public void shouldDiscardFormFieldsOnReset() {
 		presenter.resetFields();
 
-		verify(formMock).discard();
+		verify(viewMock).discard();
 	}
 
 	@Test

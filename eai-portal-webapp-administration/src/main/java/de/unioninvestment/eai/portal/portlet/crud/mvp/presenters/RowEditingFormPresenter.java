@@ -48,7 +48,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Panel;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PanelContentView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.RowEditingFormView;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudFieldFactory;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.DefaultCrudFieldFactory;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFactoryWrapper;
 
 /**
@@ -108,14 +108,11 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	}
 
 	private void initialize() {
-		CrudFieldFactory fac = new CrudFieldFactory(null, table);
-		ValidationFieldFactoryWrapper validationWrapper = new ValidationFieldFactoryWrapper(
-				table.getContainer(), fac, table.getColumns());
 
-		getView().setFormFieldFactory(validationWrapper);
+		getView().initialize(this, table);
 
 		table.addTableDoubleClickEventHandler(this);
-		backButton.addListener(new ClickListener() {
+		backButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -135,10 +132,8 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 						fieldName);
 				boolean isReadOnly = isReadOnly(containerRow, fieldName);
 
-				Property property = clob.getPropertyValue();
-				property.setReadOnly(isReadOnly);
 				getView().addClobField(table.getColumns().get(fieldName),
-						property);
+						isReadOnly);
 			} else if (container.isBLob(fieldName)) {
 				ContainerBlob blob = container.getBLob(containerRow.getId(),
 						fieldName);
@@ -180,7 +175,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 			parentPanel.attachDialog(dialogId);
 
-			getView().displayRow(currentContainerRow.getInternalRow(),
+			getView().displayRow(currentContainerRow,
 					table.isRowEditable(currentContainerRow),
 					tablePresenter.isDeleteable());
 
@@ -201,7 +196,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	public void save() {
 		try {
 			List<String> modifiedFieldNames = getModifiedFieldNames();
-			getView().getForm().commit();
+			getView().commit();
 			Map<String, Object> modifiedColumnNames = getModifiedFieldValues(modifiedFieldNames);
 
 			try {
@@ -212,8 +207,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 				parentPanel.detachDialog();
 
 			} catch (Exception e) {
-				getView().getForm().setComponentError(
-						new UserError(e.getMessage()));
+				getView().showError(e.getMessage());
 				throw e;
 			}
 
@@ -312,7 +306,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		if (nextRowId != null) {
 			currentContainerRow = container.getRow(nextRowId, false, true);
 			table.changeSelection(singleton(nextRowId));
-			getView().displayRow(currentContainerRow.getInternalRow(),
+			getView().displayRow(currentContainerRow,
 					!isRowReadonly(currentContainerRow),
 					container.isDeleteable());
 			return true;
@@ -328,7 +322,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		if (previousRowId != null) {
 			currentContainerRow = container.getRow(previousRowId, false, true);
 			table.changeSelection(singleton(previousRowId));
-			getView().displayRow(currentContainerRow.getInternalRow(),
+			getView().displayRow(currentContainerRow,
 					!isRowReadonly(currentContainerRow),
 					container.isDeleteable());
 			return true;
@@ -338,7 +332,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 	@Override
 	public void resetFields() {
-		getView().getForm().discard();
+		getView().discard();
 	}
 
 	@Override
