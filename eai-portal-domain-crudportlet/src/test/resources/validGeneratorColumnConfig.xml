@@ -70,11 +70,11 @@
 		def imageButton(values) {
 			def btn = new Button()
 			btn.addListener({ showDetailsPopup(values) } as Button.ClickListener)
-			btn.styleName = Button.STYLE_LINK // wenn nur das Icon ohne Rahmen sichtbar sein soll
+			btn.styleName = "link" // wenn nur das Icon ohne Rahmen sichtbar sein soll
 			// Theme Icon
-			btn.icon = new com.vaadin.terminal.ThemeResource("../runo/icons/16/trash.png")
+			btn.icon = new com.vaadin.server.ThemeResource("../runo/icons/16/trash.png")
 			// External Icon
-			// btn.icon = new com.vaadin.terminal.ExternalResource('/html/themes/_unstyled/images/dock/add_content.png')
+			// btn.icon = new com.vaadin.server.ExternalResource('/html/themes/_unstyled/images/dock/add_content.png')
 			return btn
 		}
 		

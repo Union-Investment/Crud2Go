@@ -33,21 +33,22 @@
 				]]></insert>
 				<update><![CDATA[
 					UPDATE TEST_CRUD2 SET 
+						ID			  = $row.values.ID,
 						CNUMBER5_2	  = $row.values.CNUMBER5_2,
 						CDATE	      = $row.values.CDATE,
 						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
 						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
 						CDATE_NN	  = $row.values.CDATE_NN,
 						TESTDATA      = $row.values.TESTDATA
-					WHERE ID          = $row.values.ID
+					WHERE ID          = $row.id.ID
 				]]></update>
 				<delete><![CDATA[
 					DELETE FROM TEST_CRUD2
-					WHERE ID = $row.values.ID
+					WHERE ID = $row.id.ID
 				]]></delete>
 			</database-query>
 			<columns>
-				<column name="ID" title="ID" primary-key="true"/>
+				<column name="ID" title="ID" primary-key="true" editable="true"/>
 				<column name="CNUMBER5_2" title="Zahl" editable="true" />
 				<column name="CDATE" editable="false" />
 				<column name="CTIMESTAMP" />
