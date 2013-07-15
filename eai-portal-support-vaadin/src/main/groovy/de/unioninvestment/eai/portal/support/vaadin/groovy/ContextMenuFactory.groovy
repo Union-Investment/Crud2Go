@@ -19,7 +19,7 @@
 package de.unioninvestment.eai.portal.support.vaadin.groovy
 
 import org.vaadin.peter.contextmenu.ContextMenu
-import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuOpenedListener.ComponentListener
+import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItemClickListener;
 
 import com.vaadin.ui.UI
 
@@ -39,12 +39,31 @@ class ContextMenuFactory extends AbstractBeanFactory {
 	}
 
 	void handleAttributeOnclick(FactoryBuilderSupport builder, ContextMenu component, Closure handler) {
-		component.addContextMenuComponentListener(handler as ComponentListener)
+		component.addItemClickListener(handler as ContextMenuItemClickListener)
 	}
 
-	void handleAttributeItems(FactoryBuilderSupport builder, ContextMenu component, List<String> names) {
-		names.each() { name ->
-			component.addItem(name)
+	void handleAttributeItems(FactoryBuilderSupport builder, ContextMenu component, Closure config) {
+		config.delegate = new ContextMenuConfigurer(component) 
+		config.resolveStrategy = Closure.DELEGATE_FIRST
+		config.call()
+	}
+}
+
+class ContextMenuConfigurer {
+	private ContextMenu menu
+	
+	ContextMenuConfigurer(ContextMenu menu) {
+		this.menu = menu
+	}
+	
+	void item(String caption) {
+		menu.addItem(caption)
+	}
+	
+	void item(Map params, String caption) {
+		def item = menu.addItem(caption)
+		if (params.data) {
+			item.data = params.data
 		}
 	}
 }

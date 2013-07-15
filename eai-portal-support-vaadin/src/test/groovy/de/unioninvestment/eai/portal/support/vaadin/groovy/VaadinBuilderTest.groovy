@@ -203,8 +203,17 @@ class VaadinBuilderTest {
 
 	@Test
 	void shouldCreateContextMenu() {
-		ContextMenu menu = builder.contextMenu();
+		ContextMenu menu = builder.contextMenu(
+			items: {
+				item('Test')
+				item('Test2', data: 4711)
+			}
+		);
 		assert menu != null
+		
+		def items = menu.getState().getRootItems()
+		assert items[0].caption == 'Test'
+		assert items[1].caption == 'Test2'
 	}
 
 	@Test @Ignore

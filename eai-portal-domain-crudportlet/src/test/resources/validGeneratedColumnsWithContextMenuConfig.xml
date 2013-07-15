@@ -27,9 +27,13 @@
 		
 			contextMenu = builder.contextMenu( 
 				onclick: { event ->
-					log.info "Angeklickt: $event.clickedItem.name mit Context $contextMenuContext"
+					log.info "Angeklickt: $event.source.data mit Context $contextMenuContext"
 				},
-				items: ["Action 1", "Action 2", "Action 3"]
+				items: {
+					item("Action 1", data: 1)
+					item("Action 2", data: 2)
+					item("Action 3", data: 3)
+				}
 			)
 		}
 	
@@ -37,7 +41,7 @@
 		def initializeTableColumn(table) {
 			def columnName = 'generiert'
 		   	table.addGeneratedColumn(columnName) { row, builder ->
-				def rowId = row.id.containerRowId.internalId.toString()
+				def rowId = row.id.asMap()
 				def cellId = "$columnName ~ $rowId"
 				def localContextMenu = getContextMenu(builder)
 				
@@ -50,9 +54,14 @@
 
 							log.info "Right mouse button clicked on $cellId"
 							log.info "localContextMenu: $localContextMenu"
+							log.info "${event.dump()}"
 
 							contextMenuContext = [rowId: rowId, cellId: cellId]
-							localContextMenu.show(event.source);
+							try {
+								localContextMenu.open(event.clientX, event.clientY)
+							} catch (e) {
+								e.printStackTrace()
+							}
 						}
 		   		})
 		   		return embedded

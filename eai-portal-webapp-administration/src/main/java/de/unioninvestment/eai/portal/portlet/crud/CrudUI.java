@@ -45,6 +45,7 @@ import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinPortletService;
 import com.vaadin.server.VaadinPortletSession;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.server.VaadinPortletSession.PortletListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.WebBrowser;
@@ -164,7 +165,7 @@ public class CrudUI extends LiferayUI implements
 		VaadinPortletSession portletSession = (VaadinPortletSession) VaadinPortletSession
 				.getCurrent();
 
-		setErrorHandler(new CrudErrorHandler());
+		VaadinSession.getCurrent().setErrorHandler(new CrudErrorHandler());
 
 		applyBrowserLocale();
 
