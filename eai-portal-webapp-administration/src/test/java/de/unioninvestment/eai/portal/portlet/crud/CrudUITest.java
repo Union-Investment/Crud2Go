@@ -220,43 +220,18 @@ public class CrudUITest extends SpringPortletContextTest {
 	}
 
 	@Test
-	public void shouldDisplayErrorsAsNotifications() {
+	public void shouldRegisterFallbackErrorHandler() {
 		provideUserWithRoles();
 		initializeUI();
 
 		RuntimeException rootCause = new RuntimeException("MyMessage");
 		ErrorEvent event = new ErrorEvent(rootCause);
 
-		app.getErrorHandler().error(event);
-
-		liferayContext.shouldShowNotification("MyMessage", null,
-				Notification.Type.ERROR_MESSAGE);
-	}
-
-	private void initializeWindowSpy() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Test
-	public void shouldDisplayRootCauseErrorsAsNotifications() {
-		provideUserWithRoles();
-		initializeUI();
-
-		RuntimeException rootCause = new RuntimeException("MyMessage");
-		RuntimeException higherCause = new RuntimeException(rootCause);
-
-		ErrorEvent event = new ErrorEvent(higherCause);
-
-		app.getErrorHandler().error(event);
-
-		liferayContext.shouldShowNotification("MyMessage", null,
-				Notification.Type.ERROR_MESSAGE);
+		verify(liferayContext.getVaadinSessionMock()).setErrorHandler(isA(CrudErrorHandler.class));
 	}
 
 	private void initializeUI() {
 		app.init(liferayContext.getVaadinPortletRequestMock());
-		initializeWindowSpy();
 	}
 
 	@Test

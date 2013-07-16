@@ -100,14 +100,13 @@ public class ValidationFieldFactoryWrapper implements CrudFieldFactory {
 
 	@Override
 	public Field<?> createField(Item item, Object propertyId) {
-		final Field<?> field = delegate
-				.createField(item, propertyId);
+		final Field<?> field = delegate.createField(item, propertyId);
 
 		if (field != null) {
-			if (field.getClass().isAssignableFrom(AbstractField.class)) {
-				((AbstractTextField) field)
-						.setErrorHandler(new LoggingErrorHandler(field));
-			}
+//			if (field.getClass().isAssignableFrom(AbstractField.class)) {
+//				((AbstractTextField) field)
+//						.setErrorHandler(new LoggingErrorHandler(field));
+//			}
 			addFieldValidators(item, propertyId, field);
 		}
 		return field;

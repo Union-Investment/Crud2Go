@@ -46,9 +46,13 @@
 /* This contains all of your theme.*/
 /* If somebody wants to extend the theme she will include this mixin. */
 @mixin crud2go {
-  /* Include all the styles from the liferay theme */
-  @include liferay;
+	/* Include all the styles from the liferay theme */
+  	@include liferay;
 
+	
+	$error: #ff0000;
+	
+	
 	/* Liferay theme bugfix */
 	
 	.v-datefield-popupcalendar {
@@ -102,19 +106,19 @@
 	/* Markierte Zeile */
 	
 	tbody tr.v-table-row.v-selected td {
-		background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
+		background: url("images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
 	}
 	
 	tbody tr.v-table-row-odd.v-selected td {
-		background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
+		background: url("images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
 	}
 	
 	div.crudEditMode tbody tr.v-table-row.v-selected td {
-		background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
+		background: url("images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
 	}
 	
 	div.crudEditMode tbody tr.v-table-row-odd.v-selected td {
-		background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
+		background: url("images/sel-bg.png") repeat-x scroll 0 0 #4D749F;;
 	}
 	
 	/*deaktiviert den uppercase column header*/
@@ -128,6 +132,15 @@
 	
 	.v-textfield-prompt {
 		color: #999999;
+	}
+	
+	.v-textfield-error {
+    	border-color: $error;
+	}
+
+	.v-label-error {
+		color: $error;
+    	font-weight: bold;
 	}
 	
 	.crudEditMode div.v-label {
@@ -153,10 +166,10 @@
 	@include tablebackground(changed-cell, #FF0000, #EF0000);
 	
 	
-	/* CSS-Klassen für die Union CI */
+	/* CSS-Klassen fuer die Union CI */
 	
 	
-	/*Primäres Farbklima */
+	/*Primaeres Farbklima */
 	
 	/* 5X% UI-Blau*/
 	@include tablebackground(primaer_05, #E6EBF1, #DDE5ED);

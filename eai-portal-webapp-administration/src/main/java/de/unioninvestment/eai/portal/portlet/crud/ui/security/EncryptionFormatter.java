@@ -45,8 +45,14 @@ public class EncryptionFormatter implements Converter<String, String> {
 	public String convertToPresentation(String value,
 			Class<? extends String> targetType, Locale locale)
 			throws com.vaadin.data.util.converter.Converter.ConversionException {
+
 		if (StringUtils.isNotBlank(value)) {
-			return cryptor.decrypt(value);
+			try {
+				return cryptor.decrypt(value);
+			} catch (RuntimeException e) {
+				throw new ConversionException("Cannot decrypt: "
+						+ e.getMessage());
+			}
 		} else {
 			return null;
 		}

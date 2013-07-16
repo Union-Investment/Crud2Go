@@ -5,7 +5,7 @@
 		<tabs>
 			<tab title="Tabelle mit Form-Edit" id="tabId01" onShow="it.elements[0].refresh()">
 				<table row-height="30" edit-form="true">
-					<database-query datasource="eai">
+					<database-query datasource="test">
 						<query><![CDATA[
 							SELECT * FROM test_crud2
 						]]></query>
@@ -66,7 +66,7 @@
 			<tab title="Tabelle mit hidden column - Global" id="tabId02"
 				onShow="it.elements[0].refresh()">
 				<table row-height="30" edit-form="true">
-					<database-query datasource="eai">
+					<database-query datasource="test">
 						<query><![CDATA[
 							SELECT * FROM test_crud2
 						]]></query>
@@ -127,7 +127,7 @@
 			<tab title="Tabelle mit hidden column - Im Formular" id="tabId03"
 				onShow="it.elements[0].refresh()">
 				<table row-height="30" edit-form="true">
-					<database-query datasource="eai">
+					<database-query datasource="test">
 						<query><![CDATA[
 							SELECT * FROM test_crud2
 						]]></query>
@@ -188,7 +188,7 @@
 			<tab title="Tabelle mit hidden column - Auf der Tabelle" id="tabId04"
 				onShow="it.elements[0].refresh()">
 				<table row-height="30" edit-form="false">
-					<database-query datasource="eai">
+					<database-query datasource="test">
 						<query><![CDATA[
 							SELECT * FROM test_crud2
 						]]></query>

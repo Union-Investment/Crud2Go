@@ -5071,19 +5071,19 @@ body .crud2go.v-app {
 }
 
 .crud2go tbody tr.v-table-row.v-selected td {
-	background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
+	background: url("images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
 }
 
 .crud2go tbody tr.v-table-row-odd.v-selected td {
-	background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
+	background: url("images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
 }
 
 .crud2go div.crudEditMode tbody tr.v-table-row.v-selected td {
-	background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
+	background: url("images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
 }
 
 .crud2go div.crudEditMode tbody tr.v-table-row-odd.v-selected td {
-	background: url("../images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
+	background: url("images/sel-bg.png") repeat-x scroll 0 0 #4D749F;
 }
 
 .crud2go .v-table-header {
@@ -5096,6 +5096,15 @@ body .crud2go.v-app {
 
 .crud2go .v-textfield-prompt {
 	color: #999999;
+}
+
+.crud2go .v-textfield-error {
+	border-color: #ff0000;
+}
+
+.crud2go .v-label-error {
+	color: #ff0000;
+	font-weight: bold;
 }
 
 .crud2go .crudEditMode div.v-label {

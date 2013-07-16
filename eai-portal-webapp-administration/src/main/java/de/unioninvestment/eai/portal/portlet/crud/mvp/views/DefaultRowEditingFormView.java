@@ -31,6 +31,7 @@ import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.UserError;
 import com.vaadin.server.StreamResource.StreamSource;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -42,6 +43,7 @@ import com.vaadin.ui.Form;
 import com.vaadin.ui.FormFieldFactory;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
@@ -86,6 +88,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 
 	private FormLayout fieldLayout;
 
+	private Label errorLabel;
+
 	private CrudFieldFactory fieldFactory;
 
 	/**
@@ -128,6 +132,11 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	private void buildViewComponents() {
 		fieldLayout = new FormLayout();
 		addComponent(fieldLayout);
+
+		errorLabel = new Label();
+		errorLabel.setStyleName("error");
+		errorLabel.setVisible(false);
+		addComponent(errorLabel);
 
 		CssLayout footerLayout = new CssLayout();
 		footerLayout.setStyleName("actions");
@@ -211,6 +220,9 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 			for (String fieldName : presenter.getVisibleFields()) {
 				Field<?> field = fieldFactory.createField(item, fieldName);
 				if (field != null) {
+					if (field instanceof AbstractField) {
+						((AbstractField<?>) field).setValidationVisible(true);
+					}
 					binder.bind(field, fieldName);
 					addFieldToLayout(field);
 				}
@@ -252,8 +264,15 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	}
 
 	@Override
-	public void showError(String message) {
-		fieldLayout.setComponentError(new UserError(message));
+	public void showFormError(String message) {
+		errorLabel.setVisible(true);
+		errorLabel.setValue(message);
+	}
+
+	@Override
+	public void hideFormError() {
+		errorLabel.setVisible(false);
+		errorLabel.setValue(null);
 	}
 
 	@Override
@@ -362,7 +381,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		area.setWidth(100.0f, Unit.PERCENTAGE);
 
 		binder.bind(area, columnName);
-		
+
 		addFieldToLayout(area);
 	}
 

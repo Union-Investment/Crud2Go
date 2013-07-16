@@ -25,13 +25,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.server.UserError;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -39,7 +39,6 @@ import com.vaadin.ui.Button.ClickListener;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerClob;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
@@ -48,8 +47,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Panel;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PanelContentView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.RowEditingFormView;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.DefaultCrudFieldFactory;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFactoryWrapper;
 
 /**
  * Presenter für das Formular zum editieren einer Tabellenzeile.
@@ -128,12 +125,10 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 				false, true);
 		for (String fieldName : getVisibleFields()) {
 			if (container.isCLob(fieldName)) {
-				ContainerClob clob = container.getCLob(containerRow.getId(),
-						fieldName);
 				boolean isReadOnly = isReadOnly(containerRow, fieldName);
-
 				getView().addClobField(table.getColumns().get(fieldName),
 						isReadOnly);
+
 			} else if (container.isBLob(fieldName)) {
 				ContainerBlob blob = container.getBLob(containerRow.getId(),
 						fieldName);
@@ -147,12 +142,12 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	private boolean isReadOnly(ContainerRow containerRow, String fieldName) {
 		boolean isReadOnly = containerRow.getFields().get(fieldName)
 				.isReadonly()
-				|| isRowReadonly(containerRow);
+				|| isTableRowReadonly(containerRow);
 
 		return isReadOnly;
 	}
 
-	private boolean isRowReadonly(ContainerRow containerRow) {
+	private boolean isTableRowReadonly(ContainerRow containerRow) {
 		return !table.isRowEditable(containerRow);
 	}
 
@@ -175,6 +170,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 			parentPanel.attachDialog(dialogId);
 
+			getView().hideFormError();
 			getView().displayRow(currentContainerRow,
 					table.isRowEditable(currentContainerRow),
 					tablePresenter.isDeleteable());
@@ -207,20 +203,25 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 				parentPanel.detachDialog();
 
 			} catch (Exception e) {
-				getView().showError(e.getMessage());
-				throw e;
+				LOG.error("Error during form commit: {}", e.getMessage());
+				getView().showFormError(e.getMessage());
 			}
 
 		} catch (Buffered.SourceException e) {
-			Throwable[] causes = e.getCauses();
-			int i = 1;
-			for (Throwable throwable : causes) {
-				LOG.error("******* " + i + ") Error during form commit!",
-						throwable);
-			}
+			String rootCauseMessage = ExceptionUtils.getRootCause(e)
+					.getMessage();
+			LOG.error("Error during form commit: {}", rootCauseMessage);
+			getView().showFormError(rootCauseMessage);
+
+		} catch (CommitException e) {
+			String rootCauseMessage = ExceptionUtils.getRootCause(e)
+					.getMessage();
+			LOG.error("Error during form commit: {}", rootCauseMessage);
+			getView().showFormError(rootCauseMessage);
 
 		} catch (Exception e) {
 			LOG.error("Error during form commit!", e);
+			getView().showFormError(ExceptionUtils.getRootCause(e).toString());
 		}
 
 	}
@@ -302,13 +303,8 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	public boolean nextRow() {
 		ContainerRowId nextRowId = container.nextRowId(currentContainerRow
 				.getId());
-
 		if (nextRowId != null) {
-			currentContainerRow = container.getRow(nextRowId, false, true);
-			table.changeSelection(singleton(nextRowId));
-			getView().displayRow(currentContainerRow,
-					!isRowReadonly(currentContainerRow),
-					container.isDeleteable());
+			switchToRow(nextRowId);
 			return true;
 		}
 		return false;
@@ -320,18 +316,25 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 				.previousRowId(currentContainerRow.getId());
 
 		if (previousRowId != null) {
-			currentContainerRow = container.getRow(previousRowId, false, true);
-			table.changeSelection(singleton(previousRowId));
-			getView().displayRow(currentContainerRow,
-					!isRowReadonly(currentContainerRow),
-					container.isDeleteable());
+			switchToRow(previousRowId);
 			return true;
 		}
 		return false;
 	}
 
+	private void switchToRow(ContainerRowId otherRowId) {
+		currentContainerRow = container.getRow(otherRowId, false, true);
+
+		getView().hideFormError();
+		table.changeSelection(singleton(otherRowId));
+		getView().displayRow(currentContainerRow,
+				!isTableRowReadonly(currentContainerRow),
+				container.isDeleteable());
+	}
+	
 	@Override
 	public void resetFields() {
+		getView().hideFormError();
 		getView().discard();
 	}
 

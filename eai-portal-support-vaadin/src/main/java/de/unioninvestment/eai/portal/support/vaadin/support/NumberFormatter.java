@@ -22,6 +22,7 @@ import java.lang.reflect.Constructor;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import com.vaadin.data.Validator;
 import com.vaadin.data.util.converter.Converter;
 
 /**
@@ -108,7 +109,7 @@ public class NumberFormatter implements Converter<String, Number> {
 			return (T) constructor.newInstance(number.toString());
 
 		} catch (Exception e) {
-			throw new NumberFormatException(
+			throw new ConversionException(
 					"Bitte geben Sie einge gültige Zahl vom Typ '"
 							+ targetClass.getSimpleName() + "' an.");
 		}

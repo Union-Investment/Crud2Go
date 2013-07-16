@@ -21,7 +21,6 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 import java.util.List;
 
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
@@ -129,8 +128,10 @@ public interface RowEditingFormView extends PanelContentView {
 
 	void commit() throws CommitException;
 
-	void showError(String message);
+	void showFormError(String message);
 
 	void addClobField(TableColumn tableColumn, boolean readOnly);
+
+	void hideFormError();
 
 }

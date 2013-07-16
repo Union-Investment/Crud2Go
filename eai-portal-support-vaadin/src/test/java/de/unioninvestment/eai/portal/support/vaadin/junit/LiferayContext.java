@@ -185,4 +185,8 @@ public class LiferayContext extends TestWatchman {
 	public PortletPreferences getPortletPreferencesMock() {
 		return portletPreferencesMock;
 	}
+
+	public VaadinPortletSession getVaadinSessionMock() {
+		return vaadinPortletSessionMock;
+	}
 }

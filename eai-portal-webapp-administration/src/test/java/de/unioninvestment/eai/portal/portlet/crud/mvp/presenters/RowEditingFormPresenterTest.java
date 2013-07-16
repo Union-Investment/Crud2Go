@@ -19,15 +19,22 @@
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +98,9 @@ public class RowEditingFormPresenterTest {
 	private ContainerRow containerRowMock;
 
 	@Mock
+	private ContainerRow otherRowMock;
+
+	@Mock
 	private ContainerRowId containerRowIdMock;
 
 	@Mock
@@ -98,6 +108,9 @@ public class RowEditingFormPresenterTest {
 
 	@Mock
 	private Button backButtonMock;
+
+	@Mock
+	private ContainerRowId otherRowIdMock;
 
 	@Before
 	public void setUp() throws Exception {
@@ -146,6 +159,39 @@ public class RowEditingFormPresenterTest {
 		presenter.save();
 
 		verify(viewMock).commit();
+	}
+
+	@Test
+	public void shouldDisplayExceptionsFromStorageAsFormError() {
+		doThrow(new RuntimeException("Bla")).when(containerMock).commit();
+
+		presenter.save();
+
+		verify(viewMock).showFormError("Bla");
+	}
+
+	@Test
+	public void shouldDisplayRootCauseExceptionOfCommitAsFormError()
+			throws CommitException {
+		CommitException exception = new CommitException("Commit failed",
+				new RuntimeException("Bla"));
+		doThrow(exception).when(viewMock).commit();
+
+		presenter.save();
+
+		verify(viewMock).showFormError("Bla");
+	}
+
+	@Test
+	public void shouldDisplayUnexpectedExceptionsIncludingClassAsFormError()
+			throws CommitException {
+		RuntimeException exception = new RuntimeException("Unexpected error",
+				new RuntimeException("Bla"));
+		doThrow(exception).when(viewMock).commit();
+
+		presenter.save();
+
+		verify(viewMock).showFormError("java.lang.RuntimeException: Bla");
 	}
 
 	@Test
@@ -245,5 +291,120 @@ public class RowEditingFormPresenterTest {
 				.getModifiedFieldValues(modifiedFieldNames);
 
 		assertThat(modifiedFields, is(singletonMap("B", null)));
+	}
+
+	@Test
+	public void shouldTellThatNextRowDoesNotExists() {
+		presenter.showDialog(containerRowMock);
+		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(null);
+
+		boolean result = presenter.hasNextRow();
+
+		assertFalse(result);
+	}
+
+	@Test
+	public void shouldTellThatNextRowExists() {
+		presenter.showDialog(containerRowMock);
+		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(
+				otherRowIdMock);
+
+		boolean result = presenter.hasNextRow();
+
+		assertTrue(result);
+	}
+
+	@Test
+	public void shouldTellThatPreviousRowDoesNotExists() {
+		presenter.showDialog(containerRowMock);
+		when(containerMock.previousRowId(containerRowIdMock)).thenReturn(null);
+
+		boolean result = presenter.hasPreviousRow();
+
+		assertFalse(result);
+	}
+
+	@Test
+	public void shouldTellThatPreviousRowExists() {
+		presenter.showDialog(containerRowMock);
+		when(containerMock.previousRowId(containerRowIdMock)).thenReturn(
+				otherRowIdMock);
+
+		boolean result = presenter.hasPreviousRow();
+
+		assertTrue(result);
+	}
+	
+	@Test
+	public void shouldDoNothingIfNextRowDoesNotExist() {
+		presenter.showDialog(containerRowMock);
+		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(
+				null);
+		reset(viewMock, tableMock);
+		
+		boolean switched = presenter.nextRow();
+
+		verifyNoMoreInteractions(viewMock, tableMock);
+		assertFalse(switched);
+	}
+
+	@Test
+	public void shouldDoNothingIfPreviousRowDoesNotExist() {
+		presenter.showDialog(containerRowMock);
+		when(containerMock.previousRowId(containerRowIdMock)).thenReturn(
+				null);
+		reset(viewMock, tableMock);
+		
+		boolean switched = presenter.previousRow();
+
+		verifyNoMoreInteractions(viewMock, tableMock);
+		assertFalse(switched);
+	}
+
+	@Test
+	public void shouldSwitchToPreviousRowIfItExists() {
+		presenter.showDialog(containerRowMock);
+		when(containerMock.previousRowId(containerRowIdMock)).thenReturn(
+				otherRowIdMock);
+		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(otherRowMock);
+		reset(viewMock, tableMock);
+		
+		boolean switched = presenter.previousRow();
+		
+		verify(tableMock).changeSelection(singleton(otherRowIdMock));
+		verify(viewMock).hideFormError();
+		verify(viewMock).displayRow(otherRowMock, false, false);
+		assertTrue(switched);
+	}
+
+	@Test
+	public void shouldSwitchToNextRowIfItExists() {
+		presenter.showDialog(containerRowMock);
+		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(
+				otherRowIdMock);
+		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(otherRowMock);
+		reset(viewMock, tableMock);
+		
+		boolean switched = presenter.nextRow();
+		
+		verify(tableMock).changeSelection(singleton(otherRowIdMock));
+		verify(viewMock).hideFormError();
+		verify(viewMock).displayRow(otherRowMock, false, false);
+		assertTrue(switched);
+	}
+
+	@Test
+	public void shouldPassEditableAndDeletableStatusForNextRow() {
+		presenter.showDialog(containerRowMock);
+		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(
+				otherRowIdMock);
+		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(otherRowMock);
+		when(tableMock.isRowEditable(otherRowMock)).thenReturn(true);
+		when(containerMock.isDeleteable()).thenReturn(true);
+		reset(viewMock);
+		
+		presenter.nextRow();
+		
+		verify(viewMock).displayRow(otherRowMock, true, true);
 	}
 }

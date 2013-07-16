@@ -64,6 +64,7 @@ import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import de.unioninvestment.eai.portal.portlet.crud.CrudErrorHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
@@ -853,12 +854,14 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	 */
 	@SuppressWarnings("serial")
 	protected void setupErrorHandling() {
-		table.setErrorHandler(new ErrorHandler() {
+		table.setErrorHandler(new CrudErrorHandler() {
 			@Override
 			public void error(com.vaadin.server.ErrorEvent event) {
 				Throwable throwable = event.getThrowable();
 				if (throwable instanceof SourceException) {
 					onError(throwable);
+				} else {
+					super.error(event);
 				}
 			}
 		});
