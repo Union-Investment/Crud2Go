@@ -27,7 +27,7 @@ import com.vaadin.ui.AbstractField
 abstract class AbstractFieldFactory extends AbstractComponentFactory {
 
 	void handleAttributeOnvaluechange(FactoryBuilderSupport builder, AbstractField component, Closure listener) {
-		component.addListener(listener as ValueChangeListener)
+		component.addValueChangeListener(listener as ValueChangeListener)
 	}
 }
 

@@ -34,11 +34,14 @@ import com.vaadin.event.MouseEvents.ClickEvent
 import com.vaadin.server.ExternalResource
 import com.vaadin.server.Sizeable
 import com.vaadin.server.StreamResource
+import com.vaadin.server.Sizeable.Unit
 import com.vaadin.ui.Button
+import com.vaadin.ui.CheckBox
 import com.vaadin.ui.Embedded
 import com.vaadin.ui.HorizontalLayout
 import com.vaadin.ui.Label
 import com.vaadin.ui.Link
+import com.vaadin.ui.Select
 import com.vaadin.ui.Table
 import com.vaadin.ui.Tree
 import com.vaadin.ui.Upload
@@ -88,11 +91,12 @@ class VaadinBuilderTest {
 		assert isListenerCalled;
 	}
 
+	@Test
 	void shouldCreateCheckBoxWithOnvaluechangeHandler() {
 		def isListenerCalled;
-		Button button = builder.checkBox(onvaluechange: { isListenerCalled = true; });
+		CheckBox checkBox = builder.checkBox(immediate: true, onvaluechange: { isListenerCalled = true; });
 
-		button.fireClick()
+		checkBox.value = true
 		assert isListenerCalled;
 	}
 
@@ -162,7 +166,15 @@ class VaadinBuilderTest {
 		Label label = builder.label(caption: 'text', width:'100%');
 
 		assert label.width == 100f
-		assert label.widthUnits == Sizeable.UNITS_PERCENTAGE
+		assert label.widthUnits == Unit.PERCENTAGE
+	}
+
+	@Test
+	void shouldAssignStringHeight() {
+		Label label = builder.label(caption: 'text', height:'100%');
+
+		assert label.height == 100f
+		assert label.heightUnits == Unit.PERCENTAGE
 	}
 
 	@Test
@@ -204,13 +216,13 @@ class VaadinBuilderTest {
 	@Test
 	void shouldCreateContextMenu() {
 		ContextMenu menu = builder.contextMenu(
-			items: {
-				item('Test')
-				item('Test2', data: 4711)
-			}
-		);
+				items: {
+					item('Test')
+					item('Test2', data: 4711)
+				}
+				);
 		assert menu != null
-		
+
 		def items = menu.getState().getRootItems()
 		assert items[0].caption == 'Test'
 		assert items[1].caption == 'Test2'
@@ -229,6 +241,22 @@ class VaadinBuilderTest {
 	}
 
 	@Test
+	void shouldCreatePanelWithContent() {
+		def panel = builder.panel {
+			verticalLayout { label(caption:'Test') }
+		}
+		assert panel.content instanceof VerticalLayout
+	}
+
+	@Test(expected=AssertionError.class)
+	void shouldFailOnPanelWithTwoComponents() {
+		def panel = builder.panel {
+			label(caption:'Ok')
+			label(caption:'Fail')
+		}
+	}
+
+	@Test
 	void shouldCreateChartWithWidth() {
 		JFreeChartWrapper chart = builder.chart(width: '100%');
 		assert chart.width == 100f
@@ -244,6 +272,13 @@ class VaadinBuilderTest {
 		assert isListenerCalled;
 	}
 
+	@Test
+	void shouldCreateComboBoxWithItems() {
+		Select select = builder.select(items: [a:'1',b:'2',c:'3'])
+		assert select.getItem('a') != null
+		assert select.getItemCaption('a') == '1'
+	}
+	
 	@Test
 	void shouldCreateUploadWithListeners() {
 		def isUploadSuccessCalled;

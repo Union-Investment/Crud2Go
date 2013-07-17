@@ -18,12 +18,10 @@
 */
 package de.unioninvestment.eai.portal.support.vaadin.groovy
 
-import groovy.util.FactoryBuilderSupport
+import com.vaadin.ui.AbstractOrderedLayout
 
-import com.vaadin.ui.Layout
-
-abstract class AbstractLayoutFactory extends AbstractComponentFactory {
-	void handleAttributeMargin(FactoryBuilderSupport builder, Layout layout, boolean value) {
+abstract class AbstractOrderedLayoutFactory extends AbstractComponentFactory {
+	void handleAttributeMargin(FactoryBuilderSupport builder, AbstractOrderedLayout layout, boolean value) {
 		layout.setMargin(value);
 	}
 }

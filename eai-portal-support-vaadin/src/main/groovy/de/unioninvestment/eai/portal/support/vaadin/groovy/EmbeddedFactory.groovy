@@ -24,6 +24,7 @@ import groovy.util.FactoryBuilderSupport
 
 import com.vaadin.event.MouseEvents.ClickListener
 import com.vaadin.event.MouseEvents
+import com.vaadin.shared.MouseEventDetails.MouseButton;
 import com.vaadin.ui.Embedded
 
 class EmbeddedFactory extends AbstractComponentFactory{
@@ -33,12 +34,12 @@ class EmbeddedFactory extends AbstractComponentFactory{
 	}
 
 	void handleAttributeOnclick(FactoryBuilderSupport builder, Embedded component, Closure listener) {
-		component.addListener(listener as ClickListener)
+		component.addClickListener(listener as ClickListener)
 	}
 
 	void handleAttributeOnLeftClick(FactoryBuilderSupport builder, Embedded component, Closure listener) {
-		component.addListener({ MouseEvents.ClickEvent event ->
-			if (event.button == MouseEvents.ClickEvent.BUTTON_LEFT) {
+		component.addClickListener({ MouseEvents.ClickEvent event ->
+			if (event.button == MouseButton.LEFT) {
 				listener(event)
 			}
 		} as ClickListener)

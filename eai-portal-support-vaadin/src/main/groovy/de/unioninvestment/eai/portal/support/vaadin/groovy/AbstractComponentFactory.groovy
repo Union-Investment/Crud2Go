@@ -22,12 +22,18 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import com.vaadin.ui.Component
+import com.vaadin.ui.SingleComponentContainer;
 
 abstract class AbstractComponentFactory extends AbstractBeanFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractComponentFactory.class);
 
 	void setParent(FactoryBuilderSupport builder,  parent,  child) {
-		parent.addComponent child
+		if (parent instanceof SingleComponentContainer) {
+			assert parent.content == null : "${parent.getClass().getSimpleName()} can only contain one component"
+			parent.content = child
+		} else {
+			parent.addComponent child
+		}
 	}
 
 	@Override

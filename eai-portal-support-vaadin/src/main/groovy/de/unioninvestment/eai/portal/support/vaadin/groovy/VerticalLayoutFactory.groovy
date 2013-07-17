@@ -21,7 +21,7 @@ package de.unioninvestment.eai.portal.support.vaadin.groovy
 import com.vaadin.ui.Component
 import com.vaadin.ui.VerticalLayout
 
-class VerticalLayoutFactory extends AbstractLayoutFactory {
+class VerticalLayoutFactory extends AbstractOrderedLayoutFactory {
 
 	@Override
 	public Component createComponent() {

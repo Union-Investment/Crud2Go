@@ -24,10 +24,10 @@ import groovy.util.FactoryBuilderSupport
 import com.vaadin.ui.Button
 import com.vaadin.ui.CheckBox
 
-class CheckBoxFactory extends ButtonFactory {
+class CheckBoxFactory extends AbstractFieldFactory {
 
 	@Override
-	public Button createComponent() {
+	public CheckBox createComponent() {
 		return new CheckBox();
 	}
 }
