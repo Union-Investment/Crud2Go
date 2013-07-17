@@ -43,10 +43,6 @@
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>/VAADIN/widgetsets/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
 		<servlet-name>CrudUI</servlet-name>
 		<url-pattern>/CrudUI/*</url-pattern>
 	</servlet-mapping>
