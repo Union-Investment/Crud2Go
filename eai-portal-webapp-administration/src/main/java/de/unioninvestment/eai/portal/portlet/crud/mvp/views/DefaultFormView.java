@@ -44,6 +44,7 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
@@ -60,6 +61,7 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.OptionListContain
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.FormSelectionContext;
 import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
+import de.unioninvestment.eai.portal.support.vaadin.support.ConvertablePropertyWrapper;
 import de.unioninvestment.eai.portal.support.vaadin.support.DateToTimestampConverter;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 
@@ -78,7 +80,7 @@ public class DefaultFormView extends CustomComponent implements FormView {
 	private static final long serialVersionUID = 1L;
 	private Presenter presenter;
 	private FormAction searchAction;
-	
+
 	private VerticalLayout rootLayout;
 	private Layout fieldLayout;
 
@@ -102,7 +104,7 @@ public class DefaultFormView extends CustomComponent implements FormView {
 
 		rootLayout = new VerticalLayout();
 		setCompositionRoot(rootLayout);
-		
+
 		if (columns > 1) {
 			fieldLayout = layoutAsGrid(columns, fields.count());
 		} else {
@@ -110,7 +112,7 @@ public class DefaultFormView extends CustomComponent implements FormView {
 		}
 		populateFields(fields, columns);
 		rootLayout.addComponent(fieldLayout);
-		
+
 		createFooterAndPopulateActions(actions);
 	}
 
@@ -162,8 +164,11 @@ public class DefaultFormView extends CustomComponent implements FormView {
 
 		datetime.setResolution(DateUtils.getVaadinResolution(dff
 				.getResolution()));
-		datetime.setConverter(new DateToTimestampConverter(dff.getResolution()));
-		datetime.setPropertyDataSource(dff.getProperty());
+
+		ConvertablePropertyWrapper<Date, String> wrapper = new ConvertablePropertyWrapper<Date, String>(
+				dff.getProperty(), dff.getConverter(), UI.getCurrent()
+						.getLocale());
+		datetime.setPropertyDataSource(wrapper);
 		datetime.setImmediate(true);
 		datetime.addStyleName(field.getName());
 
@@ -185,7 +190,7 @@ public class DefaultFormView extends CustomComponent implements FormView {
 	}
 
 	private void addFieldToLayout(FormField field, Field<?> vaadinField) {
-		
+
 		fieldLayout.addComponent(vaadinField);
 
 		if (fieldLayout instanceof GridLayout) {
@@ -196,7 +201,8 @@ public class DefaultFormView extends CustomComponent implements FormView {
 							.getTitle());
 				}
 			}
-			((GridLayout)fieldLayout).setComponentAlignment(vaadinField, Alignment.BOTTOM_LEFT);
+			((GridLayout) fieldLayout).setComponentAlignment(vaadinField,
+					Alignment.BOTTOM_LEFT);
 		}
 	}
 
