@@ -19,7 +19,7 @@
 		}
 		
 		def buildSVG(builder) {
-			def start = Calendar.instance.time.time
+			def start = java.util.Calendar.instance.time.time
 			
 			def result = builder.svgComponent(
 				source: builder.streamResource(
@@ -33,7 +33,7 @@
 				onSvgMessage: { event -> println "Event empfangen: ${event}" }
 			);
 			
-			def end = Calendar.instance.time.time
+			def end = java.util.Calendar.instance.time.time
 			
 			println "Transformation: ${end - start} ms"
 			

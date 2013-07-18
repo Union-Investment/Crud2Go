@@ -35,6 +35,7 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -99,8 +100,8 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationExcepti
 @PreserveOnRefresh
 @Configurable(preConstruction = true, dependencyCheck = true)
 @SuppressWarnings("deprecation")
-public class CrudUI extends LiferayUI implements
-		PortletListener, ShowPopupEventHandler, InitializingUI {
+public class CrudUI extends LiferayUI implements PortletListener,
+		ShowPopupEventHandler, InitializingUI {
 
 	private static final long serialVersionUID = 1L;
 
@@ -184,17 +185,25 @@ public class CrudUI extends LiferayUI implements
 	private void tryToSetPortletTitle(String title) {
 		String realTitle = title != null ? title
 				: getMessage("portlet.crud.window.name");
+		String escapedTitle = StringEscapeUtils.escapeJavaScript(realTitle);
 
 		PortletResponse portletResponse = VaadinPortletService
 				.getCurrentResponse().getPortletResponse();
 		if (portletResponse instanceof RenderResponse) {
-			((RenderResponse) portletResponse).setTitle(realTitle);
+			((RenderResponse) portletResponse).setTitle(escapedTitle);
 		} else {
-			String titleUpdate = "document.getElementById('portlet_"
+			// document.querySelectorAll("#portlet_crudportlet_WAR_eaiadministration_INSTANCE_qeH6QK9czlb6 .portlet-title-text")[0].childNodes[0].nodeValue
+			// = 'Releaseplaner - Applikationen'
+			String ie8plusUpdate = "document.querySelectorAll('#portlet_"
+					+ getPortletId() + " .portlet-title-text')[0]"
+					+ ".childNodes[0].nodeValue = '" + escapedTitle + "'";
+			String defaultUpdate = "document.getElementById('portlet_"
 					+ getPortletId()
 					+ "').getElementsByClassName('portlet-title-text')[0]"
-					+ ".childNodes[0].nodeValue = '" + realTitle + "'";
-			JavaScript.getCurrent().execute(titleUpdate);
+					+ ".childNodes[0].nodeValue = '" + escapedTitle + "'";
+			String all = "if (document.querySelectorAll) { " + ie8plusUpdate
+					+ " } else { " + defaultUpdate + " };";
+			JavaScript.getCurrent().execute(all);
 		}
 	}
 

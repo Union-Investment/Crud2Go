@@ -1,0 +1,27 @@
+<html>
+<head>
+<style type="text/css">
+html, body {padding:0;margin:0; border:0;}
+</style>
+<script type="text/javascript" src="svg.js" data-path="./"></script>
+<script type="text/javascript">
+	function showSvg() {
+		
+		var rw = window;
+		
+		var svgurl = window.location.search.split("=")[1];
+		obj = document.createElement('object', true);
+		obj.setAttribute('type', 'image/svg+xml');
+		obj.setAttribute('data', svgurl);
+		obj.setAttribute('style', 'width:100%; height:100%;');
+		obj.addEventListener('SVGLoad', function() {
+			this.updateToVaadin = function(str) {
+				rw.updateToVaadin(str);
+			}
+		}, false);
+		svgweb.appendChild(obj, document.body);
+	}
+</script>
+</head>
+<body onsvgload="showSvg();"></body>
+</html>
