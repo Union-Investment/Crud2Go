@@ -153,8 +153,6 @@ public class CrudUITest extends SpringPortletContextTest {
 
 	@Before
 	public void setUp() throws MalformedURLException {
-		liferayContext.initialize();
-
 		MockitoAnnotations.initMocks(this);
 
 		when(settingsMock.getHelpUrl()).thenReturn("http://help.us");

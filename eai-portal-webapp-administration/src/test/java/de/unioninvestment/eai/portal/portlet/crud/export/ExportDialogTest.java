@@ -57,8 +57,6 @@ public class ExportDialogTest extends SpringPortletContextTest {
 
 	@Before
 	public void setUp() {
-		liferayContext.initialize();
-
 		MockitoAnnotations.initMocks(this);
 		when(vaadinTableMock.getUI()).thenReturn(UI.getCurrent());
 

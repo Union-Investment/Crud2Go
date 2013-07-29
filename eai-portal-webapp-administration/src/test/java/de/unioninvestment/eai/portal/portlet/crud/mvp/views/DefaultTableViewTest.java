@@ -90,7 +90,6 @@ public class DefaultTableViewTest extends DomainSpringPortletContextTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-		liferayContext.initialize();
 		when(liferayContext.getPageMock().getStyles()).thenReturn(stylesMock);
 
 		initializeView();

@@ -82,24 +82,18 @@ public class LiferayContext extends TestWatchman {
 	@Mock
 	private JavaScript javascriptMock;
 
-	private boolean initialized = false;
-
 	public LiferayContext() {
+		initialize();
 	}
 
 	public LiferayContext(String portletId, long communityId) {
 		this.portletId = portletId;
 		this.communityId = communityId;
+
+		initialize();
 	}
 
-	@Override
-	public void starting(FrameworkMethod method) {
-		if (!initialized) {
-			initialize();
-		}
-	}
-
-	public void initialize() {
+	private void initialize() {
 		MockitoAnnotations.initMocks(this);
 
 		UI.setCurrent(uiMock);
@@ -112,7 +106,7 @@ public class LiferayContext extends TestWatchman {
 		when(uiMock.getConnectorTracker()).thenReturn(connectorTrackerMock);
 
 		when(pageMock.getJavaScript()).thenReturn(javascriptMock);
-		
+
 		CurrentInstance.set(VaadinResponse.class, vaadinPortletResponseMock);
 		when(vaadinPortletResponseMock.getPortletResponse()).thenReturn(
 				portletResponseMock);
@@ -130,13 +124,11 @@ public class LiferayContext extends TestWatchman {
 				new DefaultConverterFactory());
 
 		CurrentInstance.set(VaadinSession.class, vaadinPortletSessionMock);
-		initialized = true;
 	}
 
 	@Override
 	public void finished(FrameworkMethod method) {
 		CurrentInstance.clearAll();
-		initialized = false;
 	}
 
 	public void noCurrentRequest() {

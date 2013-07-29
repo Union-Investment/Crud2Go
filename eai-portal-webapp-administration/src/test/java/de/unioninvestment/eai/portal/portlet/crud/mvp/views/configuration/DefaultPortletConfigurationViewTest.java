@@ -57,7 +57,6 @@ public class DefaultPortletConfigurationViewTest extends
 	public void prepareMocks() {
 		MockitoAnnotations.initMocks(this);
 
-		liferayContext.initialize();
 		view = new DefaultPortletConfigurationView();
 
 		when(roleMock1.getName()).thenReturn("role1");

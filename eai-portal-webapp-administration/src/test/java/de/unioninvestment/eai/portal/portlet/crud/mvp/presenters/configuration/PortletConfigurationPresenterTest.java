@@ -105,7 +105,6 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 	@Before
 	public void setUp() throws SQLException {
 		MockitoAnnotations.initMocks(this);
-		liferayContext.initialize();
 
 		when(liferayContext.getVaadinPortletRequestMock().getRemoteUser())
 				.thenReturn("horst");

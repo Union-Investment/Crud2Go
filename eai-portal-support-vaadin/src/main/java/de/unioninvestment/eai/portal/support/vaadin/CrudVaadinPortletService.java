@@ -34,26 +34,6 @@ public class CrudVaadinPortletService extends VaadinPortletService {
 		super(portlet, deploymentConfiguration);
 	}
 
-	// /**
-	// * Move the PortletUIInitHandler to the last(first after reverse) position
-	// * so that the UI instance is available to portlet listeners.
-	// */
-	// @Override
-	// protected List<RequestHandler> createRequestHandlers()
-	// throws ServiceException {
-	// List<RequestHandler> handlers = super.createRequestHandlers();
-	// Iterator<RequestHandler> it = handlers.iterator();
-	// while (it.hasNext()) {
-	// RequestHandler handler = it.next();
-	// if (handler instanceof PortletUIInitHandler) {
-	// it.remove();
-	// handlers.add(handler);
-	// break;
-	// }
-	// }
-	// return handlers;
-	// }
-
 	/**
 	 * Self-Contained WAR.
 	 * 
