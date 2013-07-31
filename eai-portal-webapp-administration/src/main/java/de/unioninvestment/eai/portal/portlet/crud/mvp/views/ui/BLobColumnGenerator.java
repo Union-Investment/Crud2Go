@@ -62,7 +62,7 @@ public class BLobColumnGenerator implements ColumnGenerator {
 		ContainerBlob containerBlob = (ContainerBlob) containerRow.getFields()
 				.get(columnId).getValue();
 
-		if (containerBlob.hasData()) {
+		if (!containerBlob.isEmpty()) {
 			return buildBlobLink(columnId.toString(), containerBlob);
 		}
 

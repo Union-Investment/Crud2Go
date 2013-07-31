@@ -67,6 +67,7 @@ public class ScriptClob {
 		return containerClob.getReader();
 	}
 
+	
 	/**
 	 * Liefert ob sich der Feldinhalt des CLobs gändert hat
 	 * 
@@ -82,6 +83,10 @@ public class ScriptClob {
 	public void commit() {
 		containerClob.commit();
 
+	}
+
+	public boolean isEmpty() {
+		return containerClob.getValue() == null;
 	}
 
 }

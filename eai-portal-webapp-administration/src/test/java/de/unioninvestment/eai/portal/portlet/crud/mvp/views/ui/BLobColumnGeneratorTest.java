@@ -88,7 +88,7 @@ public class BLobColumnGeneratorTest {
 		when(containerRowMock.getFields()).thenReturn(fieldsMock);
 		when(fieldsMock.get("blobField")).thenReturn(containerFieldMock);
 		when(containerFieldMock.getValue()).thenReturn(containerBlobMock);
-		when(containerBlobMock.hasData()).thenReturn(false);
+		when(containerBlobMock.isEmpty()).thenReturn(true);
 		Component downloadLink = bLobColumnGenerator.generateCell(tableMock,
 				itemIdMock, "blobField");
 		assertThat(downloadLink, nullValue());
@@ -103,7 +103,7 @@ public class BLobColumnGeneratorTest {
 		when(containerRowMock.getFields()).thenReturn(fieldsMock);
 		when(fieldsMock.get("blobField")).thenReturn(containerFieldMock);
 		when(containerFieldMock.getValue()).thenReturn(containerBlobMock);
-		when(containerBlobMock.hasData()).thenReturn(true);
+		when(containerBlobMock.isEmpty()).thenReturn(false);
 		when(columnsMock.get(anyString())).thenReturn(tableColumnMock);
 		when(tableColumnMock.getFileMetadata()).thenReturn(fileMetadataMock);
 		when(fileMetadataMock.getDownloadCaption()).thenReturn("Download");

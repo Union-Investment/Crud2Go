@@ -18,6 +18,8 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
+import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
@@ -248,15 +250,17 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 
 		blobField.setSpacing(true);
 
-		StreamSource streamSource = containerBlob.getStreamSource();
 		final FileMetadata metadata = tableColumn.getFileMetadata();
-		StreamResource resource = new StreamResource(streamSource,
-				metadata.getFileName(),
-				CrudPortletApplication.getCurrentApplication());
-		resource.setMIMEType(metadata.getMineType());
-		Link link = buildDownloadLink(metadata, resource);
+		if (!containerBlob.isEmpty()) {
+			StreamSource streamSource = containerBlob.getStreamSource();
+			StreamResource resource = new StreamResource(streamSource,
+					metadata.getFileName(),
+					CrudPortletApplication.getCurrentApplication());
+			resource.setMIMEType(metadata.getMineType());
+			Link link = buildDownloadLink(metadata, resource);
 
-		blobField.addComponent(link);
+			blobField.addComponent(link);			
+		}
 
 		if (!readonly) {
 			Upload upload = buildUpload(containerBlob, metadata);

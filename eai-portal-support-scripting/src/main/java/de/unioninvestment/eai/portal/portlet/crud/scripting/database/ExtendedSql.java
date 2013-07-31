@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.database;
 
 import groovy.lang.GString;
@@ -104,49 +104,56 @@ public class ExtendedSql extends Sql {
 		return super.executeInsert(gstring);
 	}
 
-	private void replaceScriptLob(GString gstring) throws SQLException {
+	void replaceScriptLob(GString gstring) throws SQLException {
 		Object[] values = gstring.getValues();
 		for (int i = 0; i < values.length; i++) {
 			Object o = values[i];
 			if (o instanceof ScriptClob) {
 				ScriptClob scriptClob = (ScriptClob) o;
-				if (scriptClob.getValue() != null) {
-				oracle.sql.CLOB oracleCLOB;
-				try {
-					oracleCLOB = oracle.sql.CLOB.createTemporary(
-							unwrappedJBossConnection(), false,
-							oracle.sql.CLOB.DURATION_SESSION);
-				} catch (Exception e) {
-					oracleCLOB = oracle.sql.CLOB.createTemporary(
-							unwrappedDbcpConnection(), false,
-							oracle.sql.CLOB.DURATION_SESSION);
-				}
-				try {
-						writeClobData(oracleCLOB, scriptClob);
-				} catch (IOException e) {
-					throw new SQLException("Exception while writing CLob: ", e);
-				}
-				values[i] = oracleCLOB;
-				} else {
+				if (scriptClob.isEmpty()) {
 					values[i] = null;
+				} else {
+					oracle.sql.CLOB oracleCLOB;
+					try {
+						oracleCLOB = oracle.sql.CLOB.createTemporary(
+								unwrappedJBossConnection(), false,
+								oracle.sql.CLOB.DURATION_SESSION);
+					} catch (Exception e) {
+						oracleCLOB = oracle.sql.CLOB.createTemporary(
+								unwrappedDbcpConnection(), false,
+								oracle.sql.CLOB.DURATION_SESSION);
+					}
+					try {
+						writeClobData(oracleCLOB, scriptClob);
+					} catch (IOException e) {
+						throw new SQLException(
+								"Exception while writing CLob: ", e);
+					}
+					values[i] = oracleCLOB;
 				}
 			} else if (o instanceof ScriptBlob) {
-				oracle.sql.BLOB oracleBLOB;
-				try {
-					oracleBLOB = oracle.sql.BLOB.createTemporary(
-							unwrappedJBossConnection(), false,
-							oracle.sql.BLOB.DURATION_SESSION);
-				} catch (Exception e) {
-					oracleBLOB = oracle.sql.BLOB.createTemporary(
-							unwrappedDbcpConnection(), false,
-							oracle.sql.BLOB.DURATION_SESSION);
+				ScriptBlob scriptBlob = (ScriptBlob) o;
+				if (scriptBlob.isEmpty()) {
+					values[i] = null;
+				} else {
+					oracle.sql.BLOB oracleBLOB;
+					try {
+						oracleBLOB = oracle.sql.BLOB.createTemporary(
+								unwrappedJBossConnection(), false,
+								oracle.sql.BLOB.DURATION_SESSION);
+					} catch (Exception e) {
+						oracleBLOB = oracle.sql.BLOB.createTemporary(
+								unwrappedDbcpConnection(), false,
+								oracle.sql.BLOB.DURATION_SESSION);
+					}
+					try {
+						writeBlobData(oracleBLOB, scriptBlob);
+					} catch (IOException e) {
+						throw new SQLException(
+								"Exception while writing BLob: ", e);
+					}
+					values[i] = oracleBLOB;
 				}
-				try {
-					writeBlobData(oracleBLOB, (ScriptBlob) o);
-				} catch (IOException e) {
-					throw new SQLException("Exception while writing BLob: ", e);
-				}
-				values[i] = oracleBLOB;
 			}
 		}
 	}
@@ -169,11 +176,9 @@ public class ExtendedSql extends Sql {
 			Writer clobWriter = clob.setCharacterStream(1L);
 
 			char[] buffer = new char[65536];
-			int count = 0;
 			int n = 0;
 			while (-1 != (n = reader.read(buffer))) {
 				clobWriter.write(buffer, 0, n);
-				count += n;
 			}
 			reader.close();
 			clobWriter.close();
@@ -187,11 +192,9 @@ public class ExtendedSql extends Sql {
 		OutputStream outputStream = blob.setBinaryStream(0L);
 
 		byte[] buffer = new byte[65536];
-		int count = 0;
 		int n = 0;
 		while (-1 != (n = inputStream.read(buffer))) {
 			outputStream.write(buffer, 0, n);
-			count += n;
 		}
 		inputStream.close();
 		outputStream.close();

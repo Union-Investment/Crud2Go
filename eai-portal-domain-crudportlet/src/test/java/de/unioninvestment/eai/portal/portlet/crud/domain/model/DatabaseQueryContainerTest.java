@@ -315,7 +315,7 @@ public class DatabaseQueryContainerTest
 
 		assertThat(container.isBLobModified(containerRowIdMock, "TestCol"),
 				is(false));
-		assertThat(newBlob.hasData(), is(false));
+		assertThat(newBlob.isEmpty(), is(true));
 	}
 
 	@Test
