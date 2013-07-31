@@ -48,6 +48,10 @@ public class ScriptBlob implements Serializable {
 		containerBlob.setValue(value);
 	}
 
+	public boolean isEmpty() {
+		return containerBlob.isEmpty();
+	}
+	
 	/**
 	 * Liefert ob sich der Feldinhalt des BLobs gändert hat
 	 * 

@@ -95,11 +95,11 @@ public class ContainerBlob {
 		isModified = true;
 	}
 
-	public boolean hasData() {
+	public boolean isEmpty() {
 		if (isInitialized) {
-			return data != null;
+			return data == null;
 		} else {
-			return queryDelegate.hasBlobData(
+			return !queryDelegate.hasBlobData(
 					(RowId) containerRowId.getInternalId(), columnName);
 		}
 	}
