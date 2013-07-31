@@ -83,7 +83,7 @@ public class ContainerBlobTest {
 		byte[] data = new byte[] { 1, 2 };
 		containerBlob.setValue(data);
 
-		assertThat(containerBlob.hasData(), is(true));
+		assertThat(containerBlob.isEmpty(), is(false));
 		assertThat(containerBlob.isModified(), is(true));
 		assertThat(containerBlob.getValue(), is(data));
 	}
@@ -99,6 +99,6 @@ public class ContainerBlobTest {
 	@Test
 	public void shouldInitializeEmptyBlob() {
 		containerBlob = new ContainerBlob();
-		assertThat(containerBlob.hasData(), is(false));
+		assertThat(containerBlob.isEmpty(), is(true));
 	}
 }

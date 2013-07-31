@@ -64,4 +64,13 @@ public class ScriptBlobTest {
 		scriptBlob.commit();
 		verify(containerBlobMock).commit();
 	}
+	
+	@Test
+	public void shouldDelegateEmptyInformation() {
+		when(containerBlobMock.isEmpty()).thenReturn(true);
+		assertThat(scriptBlob.isEmpty(), is(true));
+		
+		when(containerBlobMock.isEmpty()).thenReturn(false);
+		assertThat(scriptBlob.isEmpty(), is(false));
+	}
 }

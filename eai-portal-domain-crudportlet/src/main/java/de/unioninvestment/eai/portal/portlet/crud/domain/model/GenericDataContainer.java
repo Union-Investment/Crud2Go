@@ -194,8 +194,8 @@ public class GenericDataContainer extends AbstractDataContainer {
 	public boolean isBLobEmpty(ContainerRowId rowId, String columnName) {
 		ContainerBlob blob = getBLob(rowId, columnName);
 		if (blob != null)
-			return blob.hasData();
-		return false;
+			return blob.isEmpty();
+		return true;
 	}
 
 	public void setDelegate(GenericDelegate backend) {
