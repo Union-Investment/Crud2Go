@@ -26,8 +26,10 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.LiferayTheme;
@@ -47,7 +49,7 @@ public class ExportDialog extends Window implements ExportFrontend {
 
 	private final ExportTask exportTask;
 
-	private ProgressIndicator indicator;
+	private ProgressBar indicator;
 
 	private final Table table;
 
@@ -80,17 +82,17 @@ public class ExportDialog extends Window implements ExportFrontend {
 		setCaption(getMessage("portlet.crud.dialog.export.title"));
 		setModal(true);
 		setResizable(false);
-		addListener(new CloseListener() {
+		setWidth("400px");
+		addCloseListener(new CloseListener() {
 			@Override
 			public void windowClose(CloseEvent e) {
-				if (!exportTask.isFinished()) {
-					exportTask.cancel();
-				}
-				table.setEnabled(true);
+				handleWindowCloseEvent();
 			}
 		});
 
-		indicator = new ProgressIndicator(0.0f);
+		indicator = new ProgressBar(0.0f);
+		indicator.setWidth("100%");
+		UI.getCurrent().setPollInterval(1000);
 
 		if (automaticDownload) {
 			VerticalLayout layout = new VerticalLayout();
@@ -100,22 +102,32 @@ public class ExportDialog extends Window implements ExportFrontend {
 			setContent(layout);
 		} else {
 			HorizontalLayout layout = new HorizontalLayout();
+			layout.setWidth("100%");
 			layout.setMargin(true);
 			layout.setSpacing(true);
-			layout.addComponent(indicator);
-			layout.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
 
 			downloadLink = new Link();
 			downloadLink.setStyleName(LiferayTheme.BUTTON_LINK);
 			downloadLink
 					.setCaption(getMessage("portlet.crud.dialog.export.download"));
 			downloadLink.setEnabled(false);
-			layout.addComponent(downloadLink);
+			
+			layout.addComponents(indicator, downloadLink);
+			layout.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
 			layout.setComponentAlignment(downloadLink, Alignment.MIDDLE_CENTER);
-
+			layout.setExpandRatio(indicator, 1f);
+			
 			setContent(layout);
 		}
 
+	}
+
+	protected void handleWindowCloseEvent() {
+		UI.getCurrent().setPollInterval(-1);
+		if (!exportTask.isFinished()) {
+			exportTask.cancel();
+		}
+		table.setEnabled(true);		
 	}
 
 	@Override
@@ -154,7 +166,7 @@ public class ExportDialog extends Window implements ExportFrontend {
 	/**
 	 * @return indicator for testing
 	 */
-	ProgressIndicator getIndicator() {
+	ProgressBar getIndicator() {
 		return indicator;
 	}
 

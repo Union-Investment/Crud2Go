@@ -226,7 +226,7 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	public void shouldInformFrontendOnFinish() {
 		task.setFrontend(frontendMock);
 		task.run();
-		verify(frontendMock).updateProgress(100.0f);
+		verify(frontendMock).updateProgress(1.0f);
 		verify(frontendMock).finished();
 	}
 

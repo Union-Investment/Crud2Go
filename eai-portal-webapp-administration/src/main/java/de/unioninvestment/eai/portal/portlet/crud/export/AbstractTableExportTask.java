@@ -182,7 +182,7 @@ public abstract class AbstractTableExportTask implements ExportTask {
 				// needed for IE7/8
 				export.sendConverted();
 			}
-			frontend.updateProgress(100f);
+			frontend.updateProgress(1.0f);
 		}
 	}
 

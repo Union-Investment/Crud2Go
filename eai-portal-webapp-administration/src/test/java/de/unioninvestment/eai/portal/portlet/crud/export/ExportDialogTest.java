@@ -63,9 +63,9 @@ public class ExportDialogTest extends SpringPortletContextTest {
 		dialog = new ExportDialog(vaadinTableMock, exportTaskMock, true) {
 			private static final long serialVersionUID = 1L;
 
-			public void addListener(CloseListener listener) {
+			public void addCloseListener(CloseListener listener) {
 				closeListener = listener;
-				super.addListener(listener);
+				super.addCloseListener(listener);
 			};
 		};
 		dialog.setParent(UI.getCurrent());
