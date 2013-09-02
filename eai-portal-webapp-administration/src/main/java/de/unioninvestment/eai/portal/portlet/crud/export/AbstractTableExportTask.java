@@ -83,8 +83,8 @@ public abstract class AbstractTableExportTask implements ExportTask {
 
 	@Override
 	public void run() {
-		UI previousUI = UI.getCurrent();
 		try {
+			ui.getSession().getLockInstance().lock();
 			UI.setCurrent(ui);
 
 			filename = createFilename();
@@ -114,7 +114,8 @@ public abstract class AbstractTableExportTask implements ExportTask {
 
 		} finally {
 			finished = true;
-			UI.setCurrent(previousUI);
+			ui.getSession().getLockInstance().unlock();
+			UI.setCurrent(null);
 		}
 	}
 

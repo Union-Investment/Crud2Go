@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.export;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -26,8 +27,13 @@ import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.util.concurrent.locks.Lock;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -36,6 +42,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.context.MessageSource;
 
 import com.vaadin.addon.tableexport.TableExport;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
@@ -43,6 +50,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrud
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 
@@ -64,11 +72,14 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	private ExportFrontend frontendMock;
 
 	@Mock
-	private UI applicationMock;
+	private UI uiMock;
 
 	@Mock
-	private UI previousApplicationMock;
+	private Lock lockMock;
 
+	@Mock
+	private VaadinSession vaadinSessionMock;
+	
 	private final class TestExportTask extends AbstractTableExportTask {
 
 		public TestExportTask(UI application, com.vaadin.ui.Table vaadinTable,
@@ -90,11 +101,13 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		UI.setCurrent(previousApplicationMock);
-		task = new TestExportTask(applicationMock, vaadinTableMock,
+		task = new TestExportTask(uiMock, vaadinTableMock,
 				tableModelMock, true);
 		task.setMessageSource(messageSourceMock);
 
+		when(uiMock.getSession()).thenReturn(vaadinSessionMock);
+		when(vaadinSessionMock.getLockInstance()).thenReturn(lockMock);
+		
 		mockExportCallbackCall();
 	}
 
@@ -151,7 +164,7 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 		doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
-				assertThat(UI.getCurrent(), is(applicationMock));
+				assertThat(UI.getCurrent(), is(uiMock));
 				return null;
 			}
 		}).when(tableExportMock).convertTable();
@@ -159,9 +172,24 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	}
 
 	@Test
+	public void shouldLockVaadinSession() {
+		doAnswer(new Answer<Object>() {
+			@Override
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				verify(lockMock).lock();
+				verifyNoMoreInteractions(lockMock);
+				return null;
+			}
+		}).when(tableExportMock).convertTable();
+		task.run();
+		
+		verify(lockMock).unlock();
+	}
+
+	@Test
 	public void shouldRevertToPreviousVaadinApplicationAfterFinishing() {
 		task.run();
-		assertThat(UI.getCurrent(), is(previousApplicationMock));
+		assertThat(UI.getCurrent(), is(nullValue()));
 	}
 
 	private void callCheckMethodOnConvertTable() {
