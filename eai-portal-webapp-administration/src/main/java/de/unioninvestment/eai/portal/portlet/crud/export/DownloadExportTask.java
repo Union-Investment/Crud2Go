@@ -6,12 +6,21 @@ package de.unioninvestment.eai.portal.portlet.crud.export;
 import java.io.InputStream;
 import java.io.Serializable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.addon.tableexport.TableExport;
 import com.vaadin.server.Page;
+import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
+
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download.Status;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTable;
 
 /**
  * Export-Task that is intended to be given its download-content asynchronously
@@ -24,133 +33,143 @@ import com.vaadin.ui.UI;
  * @author Jan Malcomess
  * @since 1.46
  */
-public class DownloadExportTask extends AbstractTableExportTask implements
+public class DownloadExportTask extends AbstractExportTask implements
 		ExportTask {
 
-	/**
-	 * The downloaded file's name.
-	 */
-	private final String filename;
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(DownloadExportTask.class);
 
-	/**
-	 * The downloaded file's MIME-Type.
-	 */
-	private final String mimeType;
+	private de.unioninvestment.eai.portal.portlet.crud.domain.model.Table tableModel;
+	private Download download;
 
-	/**
-	 * The downloaded file's content.
-	 */
 	private InputStream content;
+
+	private volatile boolean finished;
+	private volatile boolean cancelled;
+	private volatile boolean started = false;
 
 	/**
 	 * @param ui
 	 *            the ui the corresponding table belongs to.
-	 * @param vaadinTable
-	 *            the table the corresponding download-action belongs to.
 	 * @param tableModel
 	 *            the table's model.
 	 * @param automaticDownload
 	 *            <code>true</code> if browser supports automatic download.
-	 * @param filename
-	 *            The downloaded file's name.
-	 * @param mimeType
-	 *            The downloaded file's MIME-Type.
 	 */
 	public DownloadExportTask(
 			UI ui,
-			Table vaadinTable,
 			de.unioninvestment.eai.portal.portlet.crud.domain.model.Table tableModel,
-			boolean automaticDownload, String filename, String mimeType) {
-		super(ui, vaadinTable, tableModel, automaticDownload);
-		this.filename = filename;
-		this.mimeType = mimeType;
+			Download download, boolean automaticDownloadIsPossible) {
+		super(ui, automaticDownloadIsPossible);
+		this.tableModel = tableModel;
+		this.download = download;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	protected TableExport createExport() {
-		TableExport result = new TableExport(this.vaadinTable) {
+	public void run() {
+		LOGGER.info("Started export thread for report '{}'",
+				download.getFilename());
+		started = true;
+		try {
+			doWithExportSettingsAndProperLocking(tableModel, new ExportWithExportSettings() {
 
+				public void export() {
+					LOGGER.info("Building Report");
+					try {
+						Status status = new Download.Status() {
+							@Override
+							public void updateProgress(float progress) {
+								checkForInterruption();
+								informFrontendAboutProgress(progress);
+							}
+						};
+						content = download.build(status);
+
+						finished = true;
+						informFrontendAboutFinish();
+						LOGGER.info("Finished Building Report '{}'",
+								download.getFilename());
+
+					} catch (ExportInterruptionException e) {
+						LOGGER.info("Report generation was cancelled/interrupted");
+						cancelled = true;
+					}
+				}
+			});
+			LOGGER.info("Finished export thread for report '{}'",
+					download.getFilename());
+
+		} catch (Exception e) {
+			finished = true;
+			LOGGER.error("Error during report generation", e);
+			informFrontendAboutException(e);
+
+		} finally {
+			finished = true;
+		}
+	}
+
+	@Override
+	public void cancel() {
+		cancelled = true;
+		if (started) {
+			waitForFinishing();
+		}
+	}
+
+	protected void checkForInterruption() {
+		if (cancelled || Thread.currentThread().isInterrupted()) {
+			cancelled = true;
+			throw new ExportInterruptionException();
+		}
+	}
+
+	private void waitForFinishing() {
+		while (true) {
+			if (finished) {
+				return;
+			}
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				return;
+			}
+		}
+	}
+
+	@Override
+	public boolean isFinished() {
+		return finished;
+	}
+
+	@Override
+	public void sendToClient(String exportWindow) {
+		if (finished && !cancelled) {
+			StreamResource resource = createResourceForContent();
+
+			Page.getCurrent().open(resource, exportWindow,
+					!"_self".equals(exportWindow));
+		} else {
+			throw new IllegalStateException(
+					"Cannot send export to client when not finished");
+		}
+	}
+
+	@Override
+	protected StreamResource createResourceForContent() {
+		StreamResource resource = new StreamResource(new StreamSource() {
 			/**
 			 * @see Serializable
 			 */
 			private static final long serialVersionUID = 1L;
 
-			/**
-			 * {@inheritDoc}
-			 */
 			@Override
-			public void convertTable() {
-				try {
-					while (DownloadExportTask.this.content == null) {
-						checkForInterruption();
-
-						Thread.sleep(100);
-					}
-				} catch (InterruptedException x) {
-					throw new ExportInterruptionException();
-				}
+			public InputStream getStream() {
+				return content;
 			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public boolean sendConverted() {
-				StreamResource resource = new StreamResource(
-						new StreamSource() {
-							/**
-							 * @see Serializable
-							 */
-							private static final long serialVersionUID = 1L;
-
-							@Override
-							public InputStream getStream() {
-								return DownloadExportTask.this.content;
-							}
-						}, DownloadExportTask.this.filename);
-				resource.setMIMEType(getMimeType());
-				if (isAutomaticDownload()) {
-					Page.getCurrent().open(resource, exportWindow,
-							!"_self".equals(exportWindow));
-					return true;
-				} else {
-					DownloadExportTask.this.frontend.finished(resource);
-					return true;
-				}
-			}
-		};
-		result.setExportWindow("_blank");
-		result.setMimeType(mimeType);
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected String createFilename() {
-		return this.filename;
-	}
-
-	/**
-	 * 
-	 * @param progress
-	 */
-	public void updateProgress(float progress) {
-		if (this.frontend != null) {
-			this.frontend.updateProgress(progress);
-		}
-	}
-
-	/**
-	 * @param The
-	 *            downloaded file's content.
-	 */
-	public void setContent(InputStream content) {
-		this.content = content;
+		}, download.getFilename());
+		resource.setMIMEType(download.getMimeType());
+		return resource;
 	}
 
 }

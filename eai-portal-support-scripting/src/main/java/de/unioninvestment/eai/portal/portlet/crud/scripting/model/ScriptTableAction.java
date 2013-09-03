@@ -70,14 +70,10 @@ public class ScriptTableAction {
 										+ action.getId()
 										+ "'. Please provide one in the generator attribute");
 					}
-					if (action.getDownloadActionCallback() == null) {
-						throw new IllegalStateException(
-								"Programming error: no DownloadActionCallback has been provided for the download-action.");
-					}
+					ScriptDownloadFactory factory = new ScriptDownloadFactory(action.getTable());
 					downloadGenerator.call(
 							ScriptTableAction.this,
-							new ScriptDownloadActionCallback(action
-									.getDownloadActionCallback()));
+							factory, factory);
 				}
 			}
 		});

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel Tabellen Export">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+			<action title="Download">
+				<download generator="doExport(factory)"/>
+			</action>
+		</table>
+	</page>
+	<script><![CDATA[
+		def doExport(factory) {
+			factory.create("export.txt", "text/plain", 100) {
+				def writer = new StringWriter();
+				
+				100.times { line ->
+					writer.write("Exported line $line\n")
+					Thread.sleep(100)
+					advanceProgress()
+				}
+								
+				return new ByteArrayInputStream(writer.toString().getBytes('UTF-8'))
+			}
+		}
+	]]></script>
+</portlet>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -58,7 +58,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.EmptyColumnGenerator;
@@ -115,7 +115,7 @@ public class TableTest {
 	private Table.Presenter presenterMock;
 
 	@Mock
-	private ExportCallback exportMock;
+	private ExportWithExportSettings exportMock;
 
 	@Mock
 	private Portlet portletMock;

@@ -57,7 +57,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQuery
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
 
@@ -357,7 +357,7 @@ public class DatabaseQueryContainerTest
 
 	@Test
 	public void shouldChangePageLengthOnExport() {
-		container.withExportSettings(new ExportCallback() {
+		container.withExportSettings(new ExportWithExportSettings() {
 			@Override
 			public void export() {
 				verify(vaadinContainerMock).setPageLength(1000);

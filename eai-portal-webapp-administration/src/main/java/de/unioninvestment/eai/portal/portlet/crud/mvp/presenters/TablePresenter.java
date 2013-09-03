@@ -37,6 +37,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowEventHandler
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
@@ -308,6 +309,11 @@ public class TablePresenter extends
 		LOG.debug("Column [" + columnId + "] removed.");
 	}
 
+	@Override
+	public void download(Download download) {
+		getView().download(download);
+	}
+	
 	@Override
 	public void renderOnce(DynamicColumnChanges changes) {
 		boolean tableContentRefreshWasEnabled = getView()

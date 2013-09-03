@@ -18,50 +18,33 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.export;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.vaadin.addon.tableexport.TableExport;
-
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 
 public class DownloadExportTaskTest {
 
-	private com.vaadin.ui.Table vaadinTable = new com.vaadin.ui.Table();
+	private DownloadExportTask task;
 
 	@Mock
 	private Table tableModelMock;
 
-	private DownloadExportTask task;
+	@Mock
+	private Download downloadMock;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		task = new DownloadExportTask(null, vaadinTable, tableModelMock, true,
-				"abc", "text/plain");
+		task = new DownloadExportTask(null, tableModelMock,
+				downloadMock, true);
 	}
 
 	@Test
-	public void shouldCreateTableExport() {
-		TableExport export = task.createExport();
-
-		assertThat(export.getMimeType(), is("text/plain"));
-		assertThat(export.getTable(), sameInstance(vaadinTable));
-	}
-
-	/**
-	 * Benötigt für IE / Firefox(?)
-	 */
-	@Test
-	public void shouldExportToNewWindow() {
-		TableExport export = task.createExport();
-
-		assertThat(export.getExportWindow(), is("_blank"));
+	public void shouldExist() {
+		
 	}
 }

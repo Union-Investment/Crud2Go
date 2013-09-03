@@ -69,10 +69,10 @@ public class ExcelExportTask extends AbstractTableExportTask implements
 			double size = itemIds.size();
 			for (final Object itemId : itemIds) {
 				checkForInterruption();
-				if (frontend != null) {
-					float progress = (float) (count / size);
-					frontend.updateProgress(progress);
-				}
+				
+				float progress = (float) (count / size);
+				informFrontendAboutProgress(progress);
+				
 				addDataRow(sheetToAddTo, itemId, localRow);
 				count++;
 				localRow++;

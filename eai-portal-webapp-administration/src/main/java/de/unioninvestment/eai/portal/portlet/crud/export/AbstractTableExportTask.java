@@ -23,19 +23,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.MessageSource;
 
 import com.vaadin.addon.tableexport.TableExport;
+import com.vaadin.server.StreamResource;
 import com.vaadin.ui.UI;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 
 /**
@@ -43,26 +41,20 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
  * 
  * @author carsten.mjartan
  */
-@Configurable
-public abstract class AbstractTableExportTask implements ExportTask {
+
+public abstract class AbstractTableExportTask extends AbstractExportTask
+		implements ExportTask {
 
 	final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-	private TableExport export;
 	private String filename;
 
 	private volatile boolean cancelled = false;
 	private volatile boolean finished = false;
 
-	private final UI ui;
+	protected TableExport export;
 	protected final com.vaadin.ui.Table vaadinTable;
 	protected final Table tableModel;
-	protected volatile ExportFrontend frontend;
-
-	@Autowired
-	private MessageSource messageSource;
-
-	private final boolean automaticDownload;
 
 	/**
 	 * @param application
@@ -75,23 +67,20 @@ public abstract class AbstractTableExportTask implements ExportTask {
 	 */
 	public AbstractTableExportTask(UI ui, com.vaadin.ui.Table vaadinTable,
 			Table tableModel, boolean automaticDownload) {
-		this.ui = ui;
+		super(ui, automaticDownload);
 		this.vaadinTable = vaadinTable;
 		this.tableModel = tableModel;
-		this.automaticDownload = automaticDownload;
 	}
 
 	@Override
 	public void run() {
 		try {
-			ui.getSession().getLockInstance().lock();
-			UI.setCurrent(ui);
 
 			filename = createFilename();
 			LOGGER.info("Started export thread for report '{}'", filename);
 			export = createExport();
 
-			tableModel.withExportSettings(new ExportCallback() {
+			doWithExportSettingsAndProperLocking(tableModel, new ExportWithExportSettings() {
 				public void export() {
 					LOGGER.info("Building Report");
 					try {
@@ -109,13 +98,12 @@ public abstract class AbstractTableExportTask implements ExportTask {
 			LOGGER.info("Finished export thread for report '{}'", filename);
 
 		} catch (Exception e) {
+			finished = true;
 			LOGGER.error("Error during report generation", e);
 			informFrontendAboutException(e);
 
 		} finally {
 			finished = true;
-			ui.getSession().getLockInstance().unlock();
-			UI.setCurrent(null);
 		}
 	}
 
@@ -149,11 +137,6 @@ public abstract class AbstractTableExportTask implements ExportTask {
 	}
 
 	@Override
-	public void setFrontend(ExportFrontend frontend) {
-		this.frontend = frontend;
-	}
-
-	@Override
 	public boolean isFinished() {
 		return finished;
 	}
@@ -173,33 +156,6 @@ public abstract class AbstractTableExportTask implements ExportTask {
 		}
 	}
 
-	private void informFrontendAboutFinish() {
-		if (frontend != null) {
-			if (automaticDownload) {
-				frontend.finished();
-			} else {
-				// this has to indirectly trigger the finish - not nice but
-				// needed for IE7/8
-				export.sendConverted();
-			}
-			frontend.updateProgress(1.0f);
-		}
-	}
-
-	private void informFrontendAboutException(Exception e) {
-		if (frontend != null) {
-			if (e instanceof BusinessException) {
-				frontend.handleException(e);
-			} else {
-				frontend.handleException(new TechnicalCrudPortletException(
-						messageSource.getMessage(
-								"portlet.crud.error.export.internal", null,
-								"Es ist ein technischer Fehler aufgetreten",
-								null)));
-			}
-		}
-	}
-
 	private void waitForFinishing() {
 		while (true) {
 			if (finished) {
@@ -213,6 +169,30 @@ public abstract class AbstractTableExportTask implements ExportTask {
 		}
 	}
 
+	protected void informFrontendAboutFinish() {
+		if (frontend != null) {
+			ui.access(new Runnable() {
+				@Override
+				public void run() {
+					if (automaticDownload) {
+						frontend.finished();
+					} else {
+						// this has to indirectly trigger the finish - not nice
+						// but needed for IE7/8
+						export.sendConverted();
+					}
+					frontend.updateProgress(1.0f);
+				}
+			});
+		}
+	}
+
+	@Override
+	protected StreamResource createResourceForContent() {
+		throw new UnsupportedOperationException(
+				"Not needed as informFrontendAboutFinish() is overridden");
+	}
+
 	/**
 	 * For Testing
 	 * 
@@ -221,16 +201,6 @@ public abstract class AbstractTableExportTask implements ExportTask {
 	 */
 	void setFilename(String filename) {
 		this.filename = filename;
-	}
-
-	/**
-	 * For Testing.
-	 * 
-	 * @param messageSource
-	 *            die Übersetzungstabelle
-	 */
-	void setMessageSource(MessageSource messageSource) {
-		this.messageSource = messageSource;
 	}
 
 	protected boolean isAutomaticDownload() {

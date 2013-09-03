@@ -907,7 +907,7 @@ public abstract class AbstractDataContainer implements DataContainer,
 	}
 
 	@Override
-	public void withExportSettings(ExportCallback exportCallback) {
+	public void withExportSettings(ExportWithExportSettings exportCallback) {
 		exportCallback.export();
 	}
 

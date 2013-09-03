@@ -28,8 +28,8 @@
 				<sequence>
 					<element name="roles" type="tns:RolesConfig" minOccurs="0"
 						maxOccurs="1" />
-					<element name="preferences" type="tns:PreferencesConfig" minOccurs="0"
-						maxOccurs="1" />
+					<element name="preferences" type="tns:PreferencesConfig"
+						minOccurs="0" maxOccurs="1" />
 					<element name="authentication" type="tns:AuthenticationConfig"
 						minOccurs="0" maxOccurs="1" />
 					<choice>
@@ -1574,30 +1574,8 @@
 		<complexContent>
 			<extension base="tns:AbstractActionConfig">
 				<choice minOccurs="0">
-					<element name="export">
-						<complexType>
-							<attribute name="target" type="tns:TableExportType">
-								<annotation>
-									<documentation>
-										Allows export of table-data in a supported
-										format.
-									</documentation>
-								</annotation>
-							</attribute>
-						</complexType>
-					</element>
-					<element name="download">
-						<complexType>
-							<attribute name="generator" type="tns:groovy">
-								<annotation>
-									<documentation>
-										Allows download of generated content (e.g.
-										table-data in a custom format).
-									</documentation>
-								</annotation>
-							</attribute>
-						</complexType>
-					</element>
+					<element name="export" type="tns:TableExportConfig" />
+					<element name="download" type="tns:TableDownloadConfig" />
 				</choice>
 				<attribute name="onExecution" type="tns:groovy">
 					<annotation>
@@ -1608,6 +1586,38 @@
 				</attribute>
 			</extension>
 		</complexContent>
+	</complexType>
+
+	<complexType name="TableExportConfig">
+		<annotation>
+			<documentation>
+				Option for exporting to a supported format.
+			</documentation>
+		</annotation>
+		<attribute name="target" type="tns:TableExportType">
+			<annotation>
+				<documentation>
+					Allows export of table-data in a supported
+					format.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="TableDownloadConfig">
+		<annotation>
+			<documentation>
+				Option for downloading custom content
+			</documentation>
+		</annotation>
+		<attribute name="generator" type="tns:groovy">
+			<annotation>
+				<documentation>
+					Allows download of generated content (e.g.
+					table-data	in a custom format).
+				</documentation>
+			</annotation>
+		</attribute>
 	</complexType>
 
 	<simpleType name="groovy">

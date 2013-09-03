@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
 import org.junit.Before;
@@ -47,7 +48,7 @@ import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
@@ -108,19 +109,33 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 		when(uiMock.getSession()).thenReturn(vaadinSessionMock);
 		when(vaadinSessionMock.getLockInstance()).thenReturn(lockMock);
 		
+		executeUiAccessRunnables();
+		
 		mockExportCallbackCall();
+	}
+
+	private void executeUiAccessRunnables() {
+		when(uiMock.access(isA(Runnable.class))).thenAnswer(new Answer<Future<Void>>() {
+			@Override
+			public Future<Void> answer(InvocationOnMock invocation)
+					throws Throwable {
+				Runnable arg = (Runnable) invocation.getArguments()[0];
+				arg.run();
+				return null;
+			}
+		});
 	}
 
 	private void mockExportCallbackCall() {
 		doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
-				ExportCallback callback = (ExportCallback) invocation
+				ExportWithExportSettings callback = (ExportWithExportSettings) invocation
 						.getArguments()[0];
 				callback.export();
 				return null;
 			}
-		}).when(tableModelMock).withExportSettings(any(ExportCallback.class));
+		}).when(tableModelMock).withExportSettings(any(ExportWithExportSettings.class));
 	}
 
 	@Test
@@ -157,33 +172,6 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	private void interruptUsingCheckMethod() {
 		task.cancel();
 		callCheckMethodOnConvertTable();
-	}
-
-	@Test
-	public void shouldRegisterVaadinApplicationAsThreadLocal() {
-		doAnswer(new Answer<Object>() {
-			@Override
-			public Object answer(InvocationOnMock invocation) throws Throwable {
-				assertThat(UI.getCurrent(), is(uiMock));
-				return null;
-			}
-		}).when(tableExportMock).convertTable();
-		task.run();
-	}
-
-	@Test
-	public void shouldLockVaadinSession() {
-		doAnswer(new Answer<Object>() {
-			@Override
-			public Object answer(InvocationOnMock invocation) throws Throwable {
-				verify(lockMock).lock();
-				verifyNoMoreInteractions(lockMock);
-				return null;
-			}
-		}).when(tableExportMock).convertTable();
-		task.run();
-		
-		verify(lockMock).unlock();
 	}
 
 	@Test

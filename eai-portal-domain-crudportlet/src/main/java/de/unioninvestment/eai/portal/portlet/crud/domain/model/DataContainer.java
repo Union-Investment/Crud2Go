@@ -112,7 +112,7 @@ public interface DataContainer extends Serializable {
 	 * 
 	 * @author carsten.mjartan
 	 */
-	public interface ExportCallback {
+	public interface ExportWithExportSettings {
 		/**
 		 * Callback Methode
 		 */
@@ -545,7 +545,7 @@ public interface DataContainer extends Serializable {
 	 * @param exportCallback
 	 *            Callback im Kontext bestimmter Container-Anpassungen.
 	 */
-	void withExportSettings(ExportCallback exportCallback);
+	void withExportSettings(ExportWithExportSettings exportCallback);
 
 	/**
 	 * Wendet die konfigurierte Default-Sortierung auf den Container an (dies

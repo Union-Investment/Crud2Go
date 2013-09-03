@@ -73,7 +73,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEventHandl
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
@@ -127,7 +127,7 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 	protected EditorSupport editorSupportMock;
 
 	@Mock
-	private ExportCallback exportMock;
+	private ExportWithExportSettings exportMock;
 
 	@Mock
 	private EventBus eventBusMock;

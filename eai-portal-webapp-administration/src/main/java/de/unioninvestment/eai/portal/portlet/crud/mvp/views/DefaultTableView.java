@@ -22,7 +22,6 @@ import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessa
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,7 +48,6 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.Page;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.shared.ui.MultiSelectMode;
@@ -69,10 +67,10 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction.DownloadActionCallback;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.export.CsvExportTask;
@@ -82,9 +80,9 @@ import de.unioninvestment.eai.portal.portlet.crud.export.ExportDialog;
 import de.unioninvestment.eai.portal.portlet.crud.export.ExportTask;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BLobColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudCellStyleGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.DefaultCrudFieldFactory;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTable;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTableColumnGenerator;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.DefaultCrudFieldFactory;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.VaadinCustomColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.VaadinExportableColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFactoryWrapper;
@@ -195,7 +193,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		table.setMultiSelectMode(MultiSelectMode.DEFAULT);
 
 		if (!tableModel.isSortingEnabled()) {
-			table.setSortDisabled(true);
+			table.setSortEnabled(false);
 		}
 
 		table.addStyleName("crudViewMode");
@@ -222,7 +220,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		setExpandRatio(table, 1);
 
 		Layout buttonBar = initButtonBar();
-		if (buttonBar.getComponentIterator().hasNext()) {
+		if (buttonBar.iterator().hasNext()) {
 			addComponent(buttonBar);
 		}
 
@@ -277,7 +275,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void addSelectionChangeListener() {
-		table.addListener(new Property.ValueChangeListener() {
+		table.addValueChangeListener(new Property.ValueChangeListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -288,7 +286,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void addDoubleClickListener() {
-		table.addListener(new ItemClickEvent.ItemClickListener() {
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			public void itemClick(ItemClickEvent event) {
@@ -301,7 +299,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void addCrudButtonListeners() {
-		editButton.addListener(new Button.ClickListener() {
+		editButton.addClickListener(new Button.ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -309,7 +307,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 				onChangeMode();
 			}
 		});
-		revertButton.addListener(new Button.ClickListener() {
+		revertButton.addClickListener(new Button.ClickListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -318,7 +316,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			}
 		});
 		if (presenter.isInsertable()) {
-			insertButton.addListener(new Button.ClickListener() {
+			insertButton.addClickListener(new Button.ClickListener() {
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -328,7 +326,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			});
 		}
 		if (presenter.isDeleteable()) {
-			removeButton.addListener(new Button.ClickListener() {
+			removeButton.addClickListener(new Button.ClickListener() {
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -341,7 +339,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 	private void addExportButtonListeners() {
 		if (presenter.isExcelExport()) {
-			excelExportButton.addListener(new Button.ClickListener() {
+			excelExportButton.addClickListener(new Button.ClickListener() {
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -353,7 +351,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		}
 
 		if (presenter.isCSVExport()) {
-			csvExportButton.addListener(new Button.ClickListener() {
+			csvExportButton.addClickListener(new Button.ClickListener() {
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -368,7 +366,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		if (!actionButtons.isEmpty()) {
 			for (Button button : actionButtons.values()) {
 				final TableAction action = buttonToTableActionMap.get(button);
-				button.addListener(new Button.ClickListener() {
+				button.addClickListener(new Button.ClickListener() {
 
 					private static final long serialVersionUID = 42L;
 
@@ -769,33 +767,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 						"table-action-" + tableActionDummyIdCounter++,
 						actionButton);
 			}
-			if (action.isDownloadAction()) {
-				action.setDownloadActionCallback(new DownloadActionCallback() {
-					/**
-					 * Provides thread- and resource-handling.
-					 */
-					private DownloadExportTask exportTask;
-
-					@Override
-					public void start(String filename, String mimeType) {
-						exportTask = new DownloadExportTask(UI.getCurrent(),
-								table, tableModel,
-								automaticDownloadIsPossible(), filename,
-								mimeType);
-						executeExport(exportTask);
-					}
-
-					@Override
-					public void updateProgess(float progress) {
-						exportTask.updateProgress(progress);
-					}
-
-					@Override
-					public void finish(InputStream stream) {
-						exportTask.setContent(stream);
-					}
-				});
-			}
 			buttonToTableActionMap.put(actionButton, action);
 			buttonbar.addComponent(actionButton);
 		}
@@ -969,6 +940,11 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 				automaticDownloadIsPossible()));
 	}
 
+	@Override
+	public void download(Download download) {
+		executeExport(new DownloadExportTask(UI.getCurrent(), tableModel, download, automaticDownloadIsPossible()));
+	}
+	
 	private void executeExport(ExportTask exportTask) {
 		table.setEnabled(false);
 		boolean automaticDownload = automaticDownloadIsPossible();

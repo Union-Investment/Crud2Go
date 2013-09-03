@@ -42,7 +42,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.EmptyColumnGenerator;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 
@@ -197,6 +197,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 		 *            dazugehörigen Values sind die Werte in der Zeile.
 		 */
 		public ContainerRow createNewRow(Map<String, Object> values);
+
+		void download(Download download);
 	}
 
 	/**
@@ -700,11 +702,15 @@ public class Table extends Component implements Component.ExpandableComponent,
 		presenter.setTableActionVisibility(id, visible);
 	}
 
+	public void download(Download download) {
+		presenter.download(download);
+	}
+
 	/**
 	 * @param exportCallback
 	 *            Callback im Kontext bestimmter Container-Anpassungen.
 	 */
-	public void withExportSettings(ExportCallback exportCallback) {
+	public void withExportSettings(ExportWithExportSettings exportCallback) {
 		container.withExportSettings(exportCallback);
 	}
 

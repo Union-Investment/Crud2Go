@@ -315,7 +315,7 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 	}
 
 	@Override
-	public void withExportSettings(ExportCallback exportCallback) {
+	public void withExportSettings(ExportWithExportSettings exportCallback) {
 		try {
 			getVaadinContainer().setPageLength(exportPageLength);
 			super.withExportSettings(exportCallback);

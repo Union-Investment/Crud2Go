@@ -228,8 +228,9 @@ public class ConfigurationScriptsCompiler {
 			compileClosure(action.getOnExecution(), location + "/action[" + i++
 					+ "]/onExecution");
 			if (action.getDownload() != null) {
+				// "export" for backwards compatibility (deprecated) 
 				compileClosure(action.getDownload().getGenerator(),
-						"it,export", location + "/action[" + i
+						"it,factory,export", location + "/action[" + i
 								+ "]/download/generator");
 			}
 		}
