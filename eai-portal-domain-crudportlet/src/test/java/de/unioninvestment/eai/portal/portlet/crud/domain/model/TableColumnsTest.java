@@ -50,7 +50,7 @@ public class TableColumnsTest {
 				.longTitle("Long Title 1").hiddenStatus(Hidden.FALSE)
 				.editableDefault(false).primaryKey(true).multiline(false)
 				.width(100).inputPrompt("prompt1").build();
-		column2 = new TableColumn.Builder()
+		column2 = new SelectionTableColumn.Builder()
 				.name("name2")
 				.title("title2")
 				.longTitle("Long Title 2")
@@ -163,8 +163,8 @@ public class TableColumnsTest {
 
 	@Test
 	public void shouldReturnDropdownFlagByName() {
-		assertThat(tableColumns.isDropdown("name2"), is(true));
-		assertThat(tableColumns.isDropdown("name3"), is(false));
+		assertThat(tableColumns.isComboBox("name2"), is(true));
+		assertThat(tableColumns.isComboBox("name3"), is(false));
 	}
 
 	@Test

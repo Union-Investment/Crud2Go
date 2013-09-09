@@ -18,10 +18,19 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.datatypes;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.vaadin.tokenfield.TokenField;
+
+import com.vaadin.shared.ui.combobox.FilteringMode;
+import com.vaadin.ui.Field;
+
+import de.unioninvestment.eai.portal.support.vaadin.support.MultiValueJoinerConverter;
 
 public class StringDataTypeTest extends AbstractDataTypeTest<StringDataType> {
 
@@ -39,5 +48,17 @@ public class StringDataTypeTest extends AbstractDataTypeTest<StringDataType> {
 	@Test
 	public void shouldSupportWriting() {
 		assertFalse(type.isReadonly());
+	}
+	
+	@Test
+	public void shouldProvideATokenField() {
+		Field<?> field = type.createTokenField(String.class, "test", ";", null);
+
+		assertThat(field, instanceOf(TokenField.class));
+		TokenField tokens = (TokenField) field;
+		assertThat(tokens.isNewTokensAllowed(), is(false));
+		assertThat(tokens.isReadOnly(), is(false));
+		assertThat(tokens.getFilteringMode(), is(FilteringMode.CONTAINS));
+		assertThat(tokens.getConverter(), instanceOf(MultiValueJoinerConverter.class));
 	}
 }

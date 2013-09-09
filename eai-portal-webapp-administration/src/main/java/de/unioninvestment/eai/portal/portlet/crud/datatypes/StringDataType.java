@@ -20,12 +20,18 @@ package de.unioninvestment.eai.portal.portlet.crud.datatypes;
 
 import java.text.Format;
 
+import org.vaadin.tokenfield.TokenField;
+
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.CheckBoxSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.TokenFieldSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.SelectSupport;
+import de.unioninvestment.eai.portal.support.vaadin.support.MultiValueJoinerConverter;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 
 /**
@@ -37,7 +43,7 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
  */
 @org.springframework.stereotype.Component("stringDataType")
 public class StringDataType extends AbstractDataType implements DisplaySupport,
-		EditorSupport, SelectSupport, CheckBoxSupport {
+		EditorSupport, SelectSupport, TokenFieldSupport, CheckBoxSupport {
 
 	@Override
 	public boolean supportsDisplaying(Class<?> clazz) {
@@ -53,6 +59,17 @@ public class StringDataType extends AbstractDataType implements DisplaySupport,
 	public AbstractSelect createSelect(Class<?> type, Object propertyId,
 			Format format) {
 		return super.createSelect(type, propertyId, format);
+	}
+
+	@Override
+	public TokenField createTokenField(Class<?> type, Object propertyId,
+			String delimiter, Format format) {
+		TokenField field = new TokenField();
+		field.setConverter(new MultiValueJoinerConverter(delimiter));
+		field.setReadOnly(isReadonly());
+		field.setNewTokensAllowed(false);
+		field.setFilteringMode(FilteringMode.CONTAINS);
+		return field;
 	}
 
 	@Override

@@ -27,20 +27,15 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.ErrorHandler;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.FormFieldFactory;
-import com.vaadin.ui.TableFieldFactory;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
-import de.unioninvestment.eai.portal.portlet.crud.validation.FormattingValidator;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 
 /**
@@ -149,12 +144,6 @@ public class ValidationFieldFactoryWrapper implements CrudFieldFactory {
 				field.setRequiredError(getMessage(
 						"portlet.crud.table.field.mandatory", propertyId));
 			}
-		}
-		if (field instanceof AbstractField) {
-			AbstractField<?> abstractField = (AbstractField<?>) field;
-			FormattingValidator validator = new FormattingValidator(
-					abstractField);
-			field.addValidator(validator);
 		}
 	}
 }

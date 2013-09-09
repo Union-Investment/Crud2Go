@@ -911,6 +911,30 @@
 		</restriction>
 	</simpleType>
 
+	<simpleType name="SelectDisplayType">
+		<annotation>
+			<documentation>
+				Darstellung eine (Mehrfach-)Auswahl
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="combobox">
+				<annotation>
+					<documentation>
+						Einfache Auswahl per ComboBox
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="tokens">
+				<annotation>
+					<documentation>
+						Mehrfachauswahl über Tokens/Tags
+					</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
 	<complexType name="AbstractActionConfig" abstract="true">
 		<annotation>
 			<documentation>
@@ -1614,7 +1638,8 @@
 			<annotation>
 				<documentation>
 					Allows download of generated content (e.g.
-					table-data	in a custom format).
+					table-data
+					in a custom format).
 				</documentation>
 			</annotation>
 		</attribute>
@@ -2547,6 +2572,21 @@
 			<annotation>
 				<documentation>
 					Die im XML eindeutige ID.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="display" type="tns:SelectDisplayType"
+			default="combobox">
+			<annotation>
+				<documentation>
+					Auswahl-Eingabeart
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="separator" type="string" default=";">
+			<annotation>
+				<documentation>
+					Trenner für Mehrfahrauswahl
 				</documentation>
 			</annotation>
 		</attribute>

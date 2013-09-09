@@ -22,7 +22,6 @@ import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,7 +51,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
-import de.unioninvestment.eai.portal.portlet.crud.validation.FormattingValidator;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 
@@ -176,23 +174,6 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		verify(field).setRequiredError(
 				"Es wird eine Eingabe im Feld test benötigt");
 		verify((AbstractSelect) field).setNullSelectionAllowed(false);
-	}
-
-	@Test
-	public void shouldAddFormatterValidatorFromContainer() {
-		createTestColumn("test", null);
-
-		containerReturnsPropertyWithFieldNullable(true);
-
-		ValidationFieldFactoryWrapper wrapper = new ValidationFieldFactoryWrapper(
-				databaseContainer, delegateMock, tableColumns);
-
-		when(comboBoxMock.getPropertyDataSource()).thenReturn(formatterMock);
-
-		Field field = wrapper.createField(containerMock, 1, "test",
-				uiContextMock);
-
-		verify(field).addValidator(any(FormattingValidator.class));
 	}
 
 	private void containerReturnsPropertyWithFieldNullable(boolean nullable) {

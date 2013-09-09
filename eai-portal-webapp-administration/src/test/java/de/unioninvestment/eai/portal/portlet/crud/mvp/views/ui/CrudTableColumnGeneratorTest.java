@@ -267,7 +267,7 @@ public class CrudTableColumnGeneratorTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldGeneratedTitlePropertyForExportOfDropdowns() {
-		when(tableColumnsMock.isDropdown(columnId)).thenReturn(true);
+		when(tableColumnsMock.isComboBox(columnId)).thenReturn(true);
 		setupColumnGenerator();
 		when(itemMock.getItemProperty(columnId)).thenReturn(propertyMock);
 		propertyMockReturnsType(propertyMock, Integer.class);

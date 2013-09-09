@@ -21,6 +21,8 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 import java.awt.Checkbox;
 import java.util.Set;
 
+import org.vaadin.tokenfield.TokenField;
+
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -41,12 +43,14 @@ import com.vaadin.ui.UI;
 import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.CheckBoxSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.DatePickerSupport;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.TokenFieldSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.SelectSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.TableColumnSelectionContext;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
@@ -57,7 +61,8 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
  * 
  * @author markus.bonsch
  */
-public class DefaultCrudFieldFactory implements TableFieldFactory, CrudFieldFactory {
+public class DefaultCrudFieldFactory implements TableFieldFactory,
+		CrudFieldFactory {
 
 	private enum Target {
 		FORM, TABLE
@@ -151,14 +156,32 @@ public class DefaultCrudFieldFactory implements TableFieldFactory, CrudFieldFact
 
 	private void fillSelections(AbstractSelect select, ContainerRowId rowId,
 			Object propertyId) {
+		OptionListContainer container = createOptionListContainer(rowId,
+				propertyId);
+
+		select.setContainerDataSource(container);
+		select.setItemCaptionMode(ItemCaptionMode.ITEM);
+	}
+
+	private void fillSelections(TokenField tokens, ContainerRowId rowId,
+			Object propertyId) {
+		OptionListContainer container = createOptionListContainer(rowId,
+				propertyId);
+
+		tokens.setContainerDataSource(container);
+		tokens.setTokenCaptionMode(ItemCaptionMode.ITEM);
+	}
+
+
+	private OptionListContainer createOptionListContainer(ContainerRowId rowId,
+			Object propertyId) {
 		SelectionContext context = new TableColumnSelectionContext(rowId,
 				propertyId.toString());
 		OptionList selection = modelTable.getColumns().getDropdownSelections(
 				(String) propertyId);
-
-		select.setContainerDataSource(new OptionListContainer(selection,
-				context));
-		select.setItemCaptionMode(ItemCaptionMode.ITEM);
+		OptionListContainer container = new OptionListContainer(selection,
+				context);
+		return container;
 	}
 
 	private boolean isSelectedRow(Object itemId) {
@@ -172,12 +195,22 @@ public class DefaultCrudFieldFactory implements TableFieldFactory, CrudFieldFact
 	private Field<?> getFieldFromDisplayer(Class<?> type, ContainerRow row,
 			Object propertyId, DisplaySupport displayer, Property<?> property,
 			boolean readonly) {
-		if (isDropDown(propertyId, displayer)) {
+		if (isComboBox(propertyId, displayer)) {
 			AbstractSelect select = ((SelectSupport) displayer).createSelect(
 					type, propertyId,
 					dataContainer.getFormat(propertyId.toString()));
 			fillSelections(select, row.getId(), propertyId);
 			return select;
+
+		} else if (isTokenField(propertyId, displayer)) {
+			String delimiter = ((SelectionTableColumn) modelTable.getColumns()
+					.get((String) propertyId)).getSeparator();
+			TokenField tokens = ((TokenFieldSupport) displayer)
+					.createTokenField(type, propertyId, delimiter,
+							dataContainer.getFormat(propertyId.toString()));
+			fillSelections(tokens, row.getId(), propertyId);
+			return tokens;
+			
 		} else if (isCheckbox(propertyId, displayer)) {
 
 			de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxTableColumn checkBoxModel = modelTable
@@ -191,8 +224,8 @@ public class DefaultCrudFieldFactory implements TableFieldFactory, CrudFieldFact
 			if (readonly) {
 				checkBox.setEnabled(false);
 			}
-
 			return checkBox;
+			
 		} else if (!readonly && isDatePicker(propertyId, displayer)) {
 			String format = modelTable.getColumns() == null ? null : modelTable
 					.getColumns().get(propertyId.toString()).getDisplayFormat();
@@ -243,10 +276,16 @@ public class DefaultCrudFieldFactory implements TableFieldFactory, CrudFieldFact
 		return DEFAULT_ROWS;
 	}
 
-	private boolean isDropDown(Object propertyId, DisplaySupport displayer) {
+	private boolean isComboBox(Object propertyId, DisplaySupport displayer) {
 		return modelTable.getColumns() != null
-				&& modelTable.getColumns().isDropdown(propertyId.toString())
+				&& modelTable.getColumns().isComboBox(propertyId.toString())
 				&& displayer instanceof SelectSupport;
+	}
+
+	private boolean isTokenField(Object propertyId, DisplaySupport displayer) {
+		return modelTable.getColumns() != null
+				&& modelTable.getColumns().isTokenfield(propertyId.toString())
+				&& displayer instanceof TokenFieldSupport;
 	}
 
 	private boolean isEditForm() {

@@ -73,7 +73,7 @@ public class CrudTable extends BufferedTable {
 			if (displayer != null) {
 				String value = displayer.formatPropertyValue(property,
 						dataContainer.getFormat(columnName));
-				if (columns != null && columns.isDropdown(columnName)) {
+				if (columns != null && columns.isComboBox(columnName)) {
 					return getDropdownTitle(rowId, columnName, value);
 				}
 				return value;

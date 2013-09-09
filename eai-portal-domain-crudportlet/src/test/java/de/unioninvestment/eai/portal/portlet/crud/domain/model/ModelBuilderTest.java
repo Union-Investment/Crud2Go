@@ -22,6 +22,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -418,17 +419,17 @@ public class ModelBuilderTest {
 				instanceOf(DatabaseQueryContainer.class));
 
 		assertTrue(((Table) build.getPage().getElements().get(0)).getColumns()
-				.isDropdown("CNUMBER5_2"));
+				.isComboBox("CNUMBER5_2"));
 		assertTrue(((Table) build.getPage().getElements().get(0)).getColumns()
-				.isDropdown("CVARCHAR5_NN"));
+				.isComboBox("CVARCHAR5_NN"));
 		assertTrue(((Table) build.getPage().getElements().get(0)).getColumns()
-				.isDropdown("CDATE_NN"));
+				.isComboBox("CDATE_NN"));
 		assertTrue(((Table) build.getPage().getElements().get(0)).getColumns()
-				.isDropdown("TESTDATA"));
+				.isComboBox("TESTDATA"));
 		assertFalse(((Table) build.getPage().getElements().get(0)).getColumns()
-				.isDropdown("CDATE"));
+				.isComboBox("CDATE"));
 		assertFalse(((Table) build.getPage().getElements().get(0)).getColumns()
-				.isDropdown("CTIMESTAMP"));
+				.isComboBox("CTIMESTAMP"));
 	}
 
 	@Test
@@ -450,18 +451,16 @@ public class ModelBuilderTest {
 
 		assertThat(build.getPage().getElements().get(0),
 				instanceOf(Table.class));
-		assertThat(
-				((Table) build.getPage().getElements().get(0)).getContainer(),
-				instanceOf(DatabaseQueryContainer.class));
 
-		assertTrue(((Table) build.getPage().getElements().get(0)).getColumns()
-				.isDropdown("CVARCHAR5_NN"));
-		assertNotNull(((Table) build.getPage().getElements().get(0))
-				.getColumns().get("CVARCHAR5_NN").getOptionList()
-				.getTitle("TEST", null));
-		assertNotNull(((Table) build.getPage().getElements().get(0))
-				.getColumns().get("CVARCHAR5_NN").getOptionList()
-				.getTitle("PROD", null));
+		Table table = (Table) build.getPage().getElements().get(0);
+		assertThat(table.getContainer(),
+				instanceOf(DatabaseQueryContainer.class));
+		assertTrue(table.getColumns().isComboBox("CVARCHAR5_NN"));
+
+		SelectionTableColumn column = (SelectionTableColumn) table.getColumns()
+				.get("CVARCHAR5_NN");
+		assertNotNull(column.getOptionList().getTitle("TEST", null));
+		assertNotNull(column.getOptionList().getTitle("PROD", null));
 	}
 
 	@Test
@@ -484,12 +483,11 @@ public class ModelBuilderTest {
 
 		assertThat(build.getPage().getElements().get(0),
 				instanceOf(Table.class));
-		assertThat(
-				((Table) build.getPage().getElements().get(0)).getContainer(),
+		Table table = (Table) build.getPage().getElements().get(0);
+		assertThat(table.getContainer(),
 				instanceOf(DatabaseQueryContainer.class));
 
-		assertFalse(((Table) build.getPage().getElements().get(0)).getColumns()
-				.get("CNUMBER5_2").isSelectable());
+		assertThat(table.getColumns().get("CNUMBER5_2"), instanceOf(SelectionTableColumn.class));
 	}
 
 	@Test

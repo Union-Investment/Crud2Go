@@ -104,7 +104,7 @@ public class CrudTableColumnGenerator implements ExportableColumnGenerator {
 		}
 		this.multilineColumn = multilineCols.contains(columnName);
 		this.returnsComponent = isReturningComponent(columnName);
-		this.dropdownColumn = columns != null && columns.isDropdown(columnName);
+		this.dropdownColumn = columns != null && columns.isComboBox(columnName);
 	}
 
 	private boolean isReturningComponent(String columnName) {

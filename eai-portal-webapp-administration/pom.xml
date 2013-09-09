@@ -133,10 +133,6 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-themes</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.vaadin.external.atmosphere</groupId>
-			<artifactId>atmosphere-runtime</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.vaadin.addon</groupId>
@@ -158,6 +154,11 @@
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>contextmenu</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>tokenfield</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

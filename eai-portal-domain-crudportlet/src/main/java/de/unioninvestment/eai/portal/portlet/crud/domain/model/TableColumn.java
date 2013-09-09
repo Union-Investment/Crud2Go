@@ -54,7 +54,6 @@ public class TableColumn implements Serializable {
 	private Integer width;
 	private String inputPrompt;
 	protected String displayFormat;
-	private OptionList optionList;
 	private FileMetadata fileMetadata;
 
 	private List<FieldValidator> validators;
@@ -94,7 +93,6 @@ public class TableColumn implements Serializable {
 		this.width = builder.width;
 		this.inputPrompt = builder.inputPrompt;
 		this.displayFormat = builder.displayFormat;
-		this.optionList = builder.optionList;
 		this.fileMetadata = builder.fileMetadata;
 		this.validators = builder.validators;
 		this.columnStyleRenderer = builder.columnStyleRenderer;
@@ -180,29 +178,6 @@ public class TableColumn implements Serializable {
 	 */
 	public List<FieldValidator> getValidators() {
 		return validators;
-	}
-
-	/**
-	 * @return <code>true</code>, wenn die Eingabe als Dropdown-Select-Box
-	 *         erfolgen soll
-	 */
-	public boolean isSelectable() {
-		return optionList != null;
-	}
-
-	/**
-	 * @return Liste der Einträge in der Auswahlbox bei Dropdown-Eingabe
-	 */
-	public OptionList getOptionList() {
-		return optionList;
-	}
-
-	/**
-	 * @param optionList
-	 *            die Optionsliste
-	 */
-	public void setOptionList(OptionList optionList) {
-		this.optionList = optionList;
 	}
 
 	/**
@@ -323,7 +298,6 @@ public class TableColumn implements Serializable {
 		protected Integer width;
 		protected String inputPrompt;
 		protected String displayFormat;
-		protected OptionList optionList;
 		protected FileMetadata fileMetadata;
 		protected List<FieldValidator> validators;
 		protected ColumnStyleRenderer columnStyleRenderer;
@@ -430,15 +404,6 @@ public class TableColumn implements Serializable {
 		 */
 		public T displayFormat(String displayFormat) {
 			this.displayFormat = displayFormat;
-			return self();
-		}
-
-		/**
-		 * @param optionList
-		 * @return den builder
-		 */
-		public T optionList(OptionList optionList) {
-			this.optionList = optionList;
 			return self();
 		}
 

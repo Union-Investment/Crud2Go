@@ -3,6 +3,8 @@
 
 	<!-- <set-property name="user.agent" value="gecko1_8,ie9,safari"/> -->
 
+	<inherits name="org.vaadin.tokenfield.TokenfieldWidgetset" />
+	
 	<inherits name="org.vaadin.peter.contextmenu.ContextmenuWidgetset" />
 
 	<inherits name="org.vaadin.jouni.animator.AnimatorWidgetset" />

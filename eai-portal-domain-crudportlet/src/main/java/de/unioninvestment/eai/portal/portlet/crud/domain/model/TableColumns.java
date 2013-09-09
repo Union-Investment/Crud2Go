@@ -185,9 +185,9 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 	 *            Name
 	 * @return isDropdown
 	 */
-	public boolean isDropdown(String columnName) {
-		return get(columnName).isSelectable();
-
+	public boolean isComboBox(String columnName) {
+		TableColumn column = get(columnName);
+		return (column instanceof SelectionTableColumn) && ((SelectionTableColumn)column).isComboBox();
 	}
 
 	/**
@@ -220,8 +220,9 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 	 * @return DropdownSelections
 	 */
 	public OptionList getDropdownSelections(String columnName) {
-		if (isDropdown(columnName)) {
-			return get(columnName).getOptionList();
+		TableColumn tableColumn = get(columnName);
+		if (tableColumn instanceof SelectionTableColumn) {
+			return ((SelectionTableColumn) tableColumn).getOptionList();
 		}
 		return null;
 	}
@@ -264,5 +265,10 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 	 */
 	public boolean contains(String columnName) {
 		return columns.containsKey(columnName);
+	}
+
+	public boolean isTokenfield(String columnName) {
+		TableColumn column = get(columnName);
+		return (column instanceof SelectionTableColumn) && ((SelectionTableColumn)column).isTokenfield();
 	}
 }

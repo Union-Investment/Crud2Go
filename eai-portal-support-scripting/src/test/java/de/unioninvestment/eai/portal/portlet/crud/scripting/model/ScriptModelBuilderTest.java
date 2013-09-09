@@ -53,9 +53,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.ColumnStyleRenderer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.RowStyleRenderer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
@@ -412,7 +414,9 @@ public class ScriptModelBuilderTest extends ModelSupport {
 
 		Table table = (Table) portlet.getPage().getElements().get(0);
 
-		assertThat(table.getColumns().get("CNUMBER5_2").getOptionList(),
+		SelectionTableColumn tableColumn = (SelectionTableColumn) table
+				.getColumns().get("CNUMBER5_2");
+		assertThat(tableColumn.getOptionList(),
 				instanceOf(DynamicOptionList.class));
 	}
 

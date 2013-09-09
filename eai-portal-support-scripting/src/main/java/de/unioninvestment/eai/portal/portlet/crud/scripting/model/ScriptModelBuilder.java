@@ -67,6 +67,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Page;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Region;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
@@ -471,10 +472,12 @@ public class ScriptModelBuilder {
 	private void registerOptionLists(Table table) {
 		if (table.getColumns() != null) {
 			for (TableColumn column : table.getColumns()) {
-				OptionList optionList = column.getOptionList();
-				if (optionList != null && optionList.getId() != null) {
-					scriptPortlet.addElementById(optionList.getId(),
-							new ScriptOptionList(optionList));
+				if (column instanceof SelectionTableColumn) {
+					OptionList optionList = ((SelectionTableColumn) column).getOptionList();
+					if (optionList != null && optionList.getId() != null) {
+						scriptPortlet.addElementById(optionList.getId(),
+								new ScriptOptionList(optionList));
+					}
 				}
 
 			}
@@ -581,7 +584,7 @@ public class ScriptModelBuilder {
 					DynamicOptionList optionList = factory
 							.getDynamicOptionList(dynamicSelectionClosure,
 									columnConfig.getSelect(), table, eventBus);
-					table.getColumns().get(columnConfig.getName())
+					((SelectionTableColumn)table.getColumns().get(columnConfig.getName()))
 							.setOptionList(optionList);
 				}
 			}

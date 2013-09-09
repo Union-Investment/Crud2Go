@@ -215,7 +215,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		when(containerMock.getItem(any())).thenReturn(itemMock);
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
-		when(tableColumnsMock.isDropdown("test")).thenReturn(true);
+		when(tableColumnsMock.isComboBox("test")).thenReturn(true);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
 		when(tableColumnMock.isEditable(rowMock)).thenReturn(true);
 		Map<String, String> options = new HashMap<String, String>();
@@ -356,7 +356,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		when(containerMock.getItem(any())).thenReturn(itemMock);
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
-		when(tableColumnsMock.isDropdown("test")).thenReturn(false);
+		when(tableColumnsMock.isComboBox("test")).thenReturn(false);
 		when(tableColumnsMock.isCheckbox("test")).thenReturn(true);
 		when(tableColumnsMock.getCheckBox("test"))
 				.thenReturn(modelCheckBoxMock);

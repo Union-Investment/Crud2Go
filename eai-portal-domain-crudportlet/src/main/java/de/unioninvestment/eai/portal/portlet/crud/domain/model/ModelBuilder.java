@@ -53,6 +53,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.SelectDisplayType;
 import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
@@ -568,20 +569,6 @@ public class ModelBuilder {
 
 			Integer width = c.getWidth();
 
-			OptionList optionList = null;
-			if (c.getSelect() != null && c.getSelect().getDynamic() == null) {
-				try {
-					optionList = buildOptionList(c.getSelect(), dataSource);
-					if (width == null) {
-						width = defaultSelectWidth;
-					}
-				} catch (Exception e) {
-					LOG.warn(
-							"Fehler beim erzeugen einer Auswahl für die Spalte: "
-									+ c.getName(), e);
-				}
-			}
-
 			Hidden hs = Hidden.valueOf(c.getHidden().toString());
 			if (!currentUser.hasPermission(c, TableColumn.Permission.DISPLAY,
 					true)) {
@@ -608,7 +595,29 @@ public class ModelBuilder {
 
 			Init<?> builder = null;
 
-			if (c.getCheckbox() != null) {
+			if (c.getSelect() != null) {
+				OptionList optionList = null;
+				if (c.getSelect().getDynamic() == null) {
+					try {
+						optionList = buildOptionList(c.getSelect(), dataSource);
+						if (width == null) {
+							width = defaultSelectWidth;
+						}
+					} catch (Exception e) {
+						LOG.warn(
+								"Fehler beim erzeugen einer Auswahl für die Spalte: "
+										+ c.getName(), e);
+					}
+				}
+
+				SelectionTableColumn.Builder selectionBuilder = new SelectionTableColumn.Builder();
+				selectionBuilder //
+						.displayType(c.getSelect().getDisplay()) //
+						.separator(c.getSelect().getSeparator()) //
+						.multiselect(c.getSelect().getDisplay() == SelectDisplayType.TOKENS) //
+						.optionList(optionList);
+				builder = selectionBuilder;
+			} else  if (c.getCheckbox() != null) {
 				CheckBoxTableColumn.Builder checkboxBuilder = new CheckBoxTableColumn.Builder();
 				checkboxBuilder //
 						.checkedValue(c.getCheckbox().getCheckedValue()) //
@@ -634,7 +643,6 @@ public class ModelBuilder {
 					.width(width) //
 					.inputPrompt(c.getInputPrompt()) //
 					.validators(validators) //
-					.optionList(optionList) //
 					.displayFormat(c.getDisplayFormat()) //
 					.fileMetadata(fileMetadata) //
 					.generatedType(generatedType) //
