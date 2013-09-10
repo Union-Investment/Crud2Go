@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud;
 
+import org.codehaus.groovy.runtime.StackTraceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,15 +36,13 @@ public class CrudErrorHandler extends DefaultErrorHandler {
 	@Override
 	public void error(ErrorEvent event) {
 		Throwable throwable = event.getThrowable();
-		LOGGER.error("Internal error", throwable);
-		while (throwable.getCause() != null) {
-			throwable = throwable.getCause();
-		}
-		String message = throwable.getMessage();
+		LOGGER.error("Internal error", StackTraceUtils.deepSanitize(throwable));
+		Throwable rootCause = StackTraceUtils.extractRootCause(throwable);
+		String message = rootCause.getMessage();
 		if (message != null) {
 			Notification.show(message, Notification.Type.ERROR_MESSAGE);
 		} else {
-			Notification.show(throwable.getClass().getSimpleName(), Notification.Type.ERROR_MESSAGE);
+			Notification.show(rootCause.getClass().getSimpleName(), Notification.Type.ERROR_MESSAGE);
 		}
 	}
 }
