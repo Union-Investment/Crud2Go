@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.ehcache.event.NotificationScope;
+
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 
+import de.unioninvestment.eai.portal.portlet.crud.CrudUI;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
@@ -170,11 +173,15 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 			parentPanel.attachDialog(dialogId);
 
-			getView().hideFormError();
-			getView().displayRow(currentContainerRow,
-					table.isRowEditable(currentContainerRow),
-					tablePresenter.isDeleteable());
-
+			try {
+				getView().hideFormError();
+				getView().displayRow(currentContainerRow,
+						table.isRowEditable(currentContainerRow),
+						tablePresenter.isDeleteable());
+			} catch (RuntimeException e) {
+				parentPanel.detachDialog();
+				throw e;
+			}
 		}
 	}
 
@@ -331,7 +338,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 				!isTableRowReadonly(currentContainerRow),
 				container.isDeleteable());
 	}
-	
+
 	@Override
 	public void resetFields() {
 		getView().hideFormError();

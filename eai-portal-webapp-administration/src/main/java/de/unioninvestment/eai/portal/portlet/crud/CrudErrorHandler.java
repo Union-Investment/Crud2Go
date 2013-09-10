@@ -42,6 +42,8 @@ public class CrudErrorHandler extends DefaultErrorHandler {
 		String message = throwable.getMessage();
 		if (message != null) {
 			Notification.show(message, Notification.Type.ERROR_MESSAGE);
+		} else {
+			Notification.show(throwable.getClass().getSimpleName(), Notification.Type.ERROR_MESSAGE);
 		}
 	}
 }

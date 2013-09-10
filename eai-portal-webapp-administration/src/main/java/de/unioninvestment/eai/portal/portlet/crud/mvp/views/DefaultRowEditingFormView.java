@@ -23,6 +23,8 @@ import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessa
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import com.vaadin.data.Item;
@@ -73,6 +75,9 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFa
  */
 public class DefaultRowEditingFormView extends DefaultPanelContentView
 		implements RowEditingFormView {
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(DefaultRowEditingFormView.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -218,23 +223,19 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		Item item = row.getInternalRow();
 
 		fieldLayout.removeAllComponents();
-		try {
-			binder = new FieldGroup(row.getFormItem());
-			for (String fieldName : presenter.getVisibleFields()) {
-				Field<?> field = fieldFactory.createField(item, fieldName);
-				if (field != null) {
-					if (field instanceof AbstractField) {
-						((AbstractField<?>) field).setValidationVisible(true);
-					}
-					binder.bind(field, fieldName);
-					addFieldToLayout(field);
+
+		binder = new FieldGroup(row.getFormItem());
+		for (String fieldName : presenter.getVisibleFields()) {
+			Field<?> field = fieldFactory.createField(item, fieldName);
+			if (field != null) {
+				if (field instanceof AbstractField) {
+					((AbstractField<?>) field).setValidationVisible(true);
 				}
+				binder.bind(field, fieldName);
+				addFieldToLayout(field);
 			}
-			presenter.addClobFields(item);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
 		}
+		presenter.addClobFields(item);
 
 		saveButton.setEnabled(editable);
 		resetButton.setEnabled(editable);
@@ -301,6 +302,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		blobField.setSpacing(true);
 
 		final FileMetadata metadata = tableColumn.getFileMetadata();
+		Assert.notNull(metadata, "Missing file metadata for field '" + tableColumn.getName() + "'");
 		if (!containerBlob.isEmpty()) {
 			StreamSource streamSource = containerBlob.getStreamSource();
 			StreamResource resource = new StreamResource(streamSource,
