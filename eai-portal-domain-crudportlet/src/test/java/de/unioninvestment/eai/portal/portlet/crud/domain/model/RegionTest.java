@@ -55,6 +55,9 @@ public class RegionTest {
 	@Mock
 	private ExpandEventHandler expandHandlerMock;
 
+	@Mock
+	private Panel panelMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -114,5 +117,19 @@ public class RegionTest {
 
 		verify(expandHandlerMock, times(1)).onExpand(any(ExpandEvent.class));
 		verify(this.busMock, times(1)).fireEvent(any(ExpandEvent.class));
+	}
+	
+	@Test
+	public void shouldLetParentPanelAttachDialogs() {
+		region.setPanel(panelMock);
+		region.attachDialog("4711");
+		verify(panelMock).attachDialog("4711");
+	}
+	
+	@Test
+	public void shouldLetParentPanelDetachDialogs() {
+		region.setPanel(panelMock);
+		region.detachDialog();
+		verify(panelMock).detachDialog();
 	}
 }

@@ -128,4 +128,14 @@ public class Region extends Panel implements Component.ExpandableComponent {
 	protected RegionConfig getConfig() {
 		return (RegionConfig) super.getConfig();
 	}
+	
+	@Override
+	public void attachDialog(String dialogId) {
+		getPanel().attachDialog(dialogId);
+	}
+	
+	@Override
+	public void detachDialog() {
+		getPanel().detachDialog();
+	}
 }
