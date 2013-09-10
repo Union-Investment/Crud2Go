@@ -19,6 +19,7 @@
 
 package de.unioninvestment.eai.portal.support.vaadin.support;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -28,8 +29,7 @@ import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.vaadin.data.util.converter.Converter;
 
 @SuppressWarnings("rawtypes")
-public class MultiValueJoinerConverter implements
-		Converter<Set, String> {
+public class MultiValueJoinerConverter implements Converter<Set, String> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,16 +40,23 @@ public class MultiValueJoinerConverter implements
 	}
 
 	@Override
-	public String convertToModel(Set value,
-			Class<? extends String> targetType, Locale locale)
+	public String convertToModel(Set value, Class<? extends String> targetType,
+			Locale locale)
 			throws com.vaadin.data.util.converter.Converter.ConversionException {
-		return Joiner.on(delimiter).join(value);
+		if (value == null || value.isEmpty()) {
+			return null;
+		} else {
+			return Joiner.on(delimiter).join(value);
+		}
 	}
 
 	@Override
 	public Set convertToPresentation(String value,
 			Class<? extends Set> targetType, Locale locale)
 			throws com.vaadin.data.util.converter.Converter.ConversionException {
+		if (value == null || value.isEmpty()) {
+			return new HashSet<String>();
+		}
 		Iterable<String> elements = Splitter.on(delimiter).split(value);
 		LinkedHashSet<Object> results = new LinkedHashSet<Object>();
 		for (String element : elements) {

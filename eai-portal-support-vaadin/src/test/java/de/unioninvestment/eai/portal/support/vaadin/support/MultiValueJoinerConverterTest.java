@@ -20,11 +20,15 @@
 package de.unioninvestment.eai.portal.support.vaadin.support;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.EMPTY_SET;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import org.junit.Before;
@@ -62,12 +66,31 @@ public class MultiValueJoinerConverterTest {
 		select.setValue(new LinkedHashSet<Object>(asList("a", "b")));
 		assertThat(property.getValue(), is("a,b"));
 	}
-	
+
+	@Test
+	public void shouldJoinEmptySetToNull() {
+		select.setValue(EMPTY_SET);
+		assertThat(property.getValue(), nullValue());
+	}
+
+
 	@Test
 	public void shouldSplitSingleValue() {
 		assertThat(select.getValue(), equalTo((Object)singleton("a")));
 	}
 	
+	@Test
+	public void shouldSplitNullToEmptySet() {
+		property.setValue(null);
+		assertThat(select.getValue(), equalTo((Object)EMPTY_SET));
+	}
+
+	@Test
+	public void shouldSplitEmptyStringToEmptySet() {
+		property.setValue("");
+		assertThat(select.getValue(), equalTo((Object)EMPTY_SET));
+	}
+
 	@Test
 	public void shouldSplitMultipleValues() {
 		property.setValue("a,b");
