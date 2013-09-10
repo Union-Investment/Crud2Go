@@ -7,7 +7,7 @@
 }
 
 .v-vaadin-version:after {
-	content: "7.1.0";
+	content: "7.1.5";
 }
 
 .v-generated-body {
@@ -1295,7 +1295,7 @@ body .crud2go.v-app .v-app-loading {
 	line-height: normal;
 }
 
-.v-ios.v-sa6 .crud2go .v-scrollable {
+.v-ios6.v-webkit .crud2go .v-scrollable {
 	-webkit-overflow-scrolling: touch;
 }
 

@@ -25,7 +25,7 @@
 		<springframework.version>3.2.3.RELEASE</springframework.version>
 		<liferay.version>6.1.1</liferay.version>
 
-		<vaadin.version>7.1.4</vaadin.version>
+		<vaadin.version>7.1.5</vaadin.version>
 
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 	</properties>
@@ -531,7 +531,7 @@
 											vaadin-maven-plugin
 										</artifactId>
 										<versionRange>
-											[7.1.4,)
+											[7.1.5,)
 										</versionRange>
 										<goals>
 											<goal>resources</goal>

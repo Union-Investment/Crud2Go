@@ -231,7 +231,14 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				if (field instanceof AbstractField) {
 					((AbstractField<?>) field).setValidationVisible(true);
 				}
-				binder.bind(field, fieldName);
+				// see https://dev.vaadin.com/ticket/11753
+				boolean initiallyReadonly = field.isReadOnly();
+				if (initiallyReadonly) {
+					field.setPropertyDataSource(binder.getItemDataSource().getItemProperty(fieldName));
+				} else {
+					// only bind if not readonly, so that readonly fields are not part of the commit()
+					binder.bind(field, fieldName);
+				}
 				addFieldToLayout(field);
 			}
 		}
@@ -386,7 +393,14 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		area.setReadOnly(readOnly || !tableColumn.getDefaultEditable());
 		area.setWidth(100.0f, Unit.PERCENTAGE);
 
-		binder.bind(area, columnName);
+		// see https://dev.vaadin.com/ticket/11753
+		boolean initiallyReadonly = area.isReadOnly();
+		if (initiallyReadonly) {
+			area.setPropertyDataSource(binder.getItemDataSource().getItemProperty(columnName));
+		} else {
+			// only bind if not readonly, so that readonly fields are not part of the commit()
+			binder.bind(area, columnName);
+		}
 
 		addFieldToLayout(area);
 	}
