@@ -57,7 +57,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableCol
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.ColumnStyleRenderer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.RowStyleRenderer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;

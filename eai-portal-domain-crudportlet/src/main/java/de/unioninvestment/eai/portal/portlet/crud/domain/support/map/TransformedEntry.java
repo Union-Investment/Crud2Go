@@ -35,7 +35,6 @@ import java.util.Map.Entry;
  */
 public class TransformedEntry<A, B, C> implements Map.Entry<A, C> {
 
-	private static final long serialVersionUID = 1L;
 	private final Entry<A, B> delegate;
 	private final ValueTransformer<B, C> transformer;
 

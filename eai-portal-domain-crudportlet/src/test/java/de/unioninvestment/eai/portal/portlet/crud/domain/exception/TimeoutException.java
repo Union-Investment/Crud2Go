@@ -20,6 +20,8 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.exception;
 
 public class TimeoutException extends BusinessException {
 
+	private static final long serialVersionUID = 1L;
+
 	public TimeoutException(String code, Object... args) {
 		super(code, args);
 	}

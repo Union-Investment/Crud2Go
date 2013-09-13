@@ -41,6 +41,7 @@ import de.unioninvestment.eai.portal.portlet.crud.ui.security.EncryptionFormatte
 import de.unioninvestment.eai.portal.portlet.crud.ui.security.SecurePasswordField;
 
 @Configurable
+@SuppressWarnings("serial")
 public class DefaultPreferencesView extends CustomComponent implements
 		PreferencesView {
 
@@ -70,6 +71,7 @@ public class DefaultPreferencesView extends CustomComponent implements
 		this.presenter = presenter;
 	}
 
+	
 	private Form createForm() {
 		final Form form = new Form();
 		form.setBuffered(true);

@@ -37,5 +37,5 @@ public interface FieldValidator {
 	 * @param field
 	 *            ein Eingabefeld
 	 */
-	void apply(Field field);
+	void apply(Field<?> field);
 }

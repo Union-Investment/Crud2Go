@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -143,9 +143,12 @@ public abstract class EventWrapperTest {
 	public void shouldFireRemoveEvent() throws UnsupportedOperationException,
 			SQLException {
 		rowItem = new RowItem(sqlContainer, new RowId(new Object[] { 1 }),
-				Arrays.asList(new ColumnProperty("ID", false, true, false, 1,
-						Long.class), new ColumnProperty("TESTSTRING", false,
-						true, false, "TESTVAL", String.class)));
+				Arrays.asList(
+						//
+						new ColumnProperty("ID", false, true, false, false, 1,
+								Long.class), //
+						new ColumnProperty("TESTSTRING", false, true, false,
+								false, "TESTVAL", String.class)));
 
 		wrapper.removeRow(rowItem);
 
@@ -161,7 +164,8 @@ public abstract class EventWrapperTest {
 			SQLException {
 		rowItem = new RowItem(sqlContainer, new TemporaryRowId(
 				new Object[] { 1 }), Arrays.asList(new ColumnProperty(
-				"TESTSTRING", false, true, false, "TESTVAL", String.class)));
+				"TESTSTRING", false, true, false, false, "TESTVAL",
+				String.class)));
 
 		wrapper.storeRow(rowItem);
 
@@ -176,9 +180,12 @@ public abstract class EventWrapperTest {
 	public void shouldFireUpdateEvent() throws UnsupportedOperationException,
 			SQLException {
 		rowItem = new RowItem(sqlContainer, new RowId(new Object[] { 1 }),
-				Arrays.asList(new ColumnProperty("ID", false, false, false, 1,
-						Long.class), new ColumnProperty("TESTSTRING", false,
-						true, false, "TESTVAL", String.class)));
+				Arrays.asList(
+						//
+						new ColumnProperty("ID", false, false, false, false, 1,
+								Long.class), //
+						new ColumnProperty("TESTSTRING", false, true, false,
+								false, "TESTVAL", String.class)));
 
 		wrapper.storeRow(rowItem);
 
@@ -204,8 +211,9 @@ public abstract class EventWrapperTest {
 			throws SQLException {
 		return connectionPool;
 	}
-	
-	private static class MyJDBCConnectionPool extends SimpleJDBCConnectionPool implements ConnectionPool {
+
+	private static class MyJDBCConnectionPool extends SimpleJDBCConnectionPool
+			implements ConnectionPool {
 
 		private static final long serialVersionUID = 42L;
 
@@ -226,8 +234,8 @@ public abstract class EventWrapperTest {
 		}
 
 		@Override
-		public <T> T querySingleResultWithJdbcTemplate(StatementHelper statementHelper,
-				RowMapper<T> callback) {
+		public <T> T querySingleResultWithJdbcTemplate(
+				StatementHelper statementHelper, RowMapper<T> callback) {
 			throw new RuntimeException("not supported for test");
 		}
 	}

@@ -111,7 +111,7 @@ public class BufferedTable extends Table {
 	 */
 	@Override
 	public Object getPropertyValue(Object rowId, Object colId,
-			com.vaadin.data.Property property) {
+			@SuppressWarnings("rawtypes") com.vaadin.data.Property property) {
 		Object value = super.getPropertyValue(rowId, colId, property);
 		if (value instanceof Field) {
 			Field<?> field = (Field<?>) value;

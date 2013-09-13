@@ -31,8 +31,6 @@ import de.unioninvestment.eai.portal.support.vaadin.container.GenericProperty;
  */
 public class AuditLogger {
 
-	private static final long serialVersionUID = 42L;
-
 	private org.slf4j.Logger logger;
 
 	private String currentUserName;
@@ -85,7 +83,7 @@ public class AuditLogger {
 	 *            JMX Property
 	 */
 	public void auditMBeanPropertyChange(String server, String mbeanName, String propertyId,
-			GenericProperty itemProperty) {
+			GenericProperty<?> itemProperty) {
 		String itemPropertyValue = "";
 		if (itemProperty.getValue() != null) {
 			itemPropertyValue = itemProperty.getValue().toString();

@@ -23,17 +23,11 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import de.unioninvestment.eai.portal.portlet.crud.config.CheckboxConfig;
 
 public class CheckBoxTableColumnTest {
 
 	private CheckBoxTableColumn boxTableColumn;
-
-	@Mock
-	private CheckboxConfig checkboxConfigMock;
 
 	@Before
 	public void setUp() {

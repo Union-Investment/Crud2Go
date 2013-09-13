@@ -127,6 +127,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
 
 public class SearchFormActionTest {
 
+	@SuppressWarnings("serial")
 	static abstract class UIMock extends UI implements InitializingUI {
 	}
 
@@ -442,6 +443,7 @@ public class SearchFormActionTest {
 		return new Timestamp(new GregorianCalendar(i, j, k).getTimeInMillis());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldNotFilterOnInitializationIfTableHasANothingPolicy() {
 		mockPageWithFormAndTable();
@@ -461,6 +463,7 @@ public class SearchFormActionTest {
 				eq(false));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldNotFilterOnInitializationIfTableHasANothingAtAllPolicy() {
 		mockPageWithFormAndTable();

@@ -19,7 +19,6 @@
 
 package de.unioninvestment.eai.portal.support.vaadin.support;
 
-import java.util.LinkedList;
 import java.util.Locale;
 
 import com.vaadin.data.Property;
@@ -47,8 +46,6 @@ public class ConvertablePropertyWrapper<P, M> extends AbstractProperty<P>
 	private Property<M> backingProperty;
 	private Converter<P, M> converter;
 	private Locale locale;
-
-	private LinkedList<ValueChangeListener> valueChangeListeners = null;
 
 	public ConvertablePropertyWrapper(Property<M> backingProperty,
 			Converter<P, M> converter, Locale locale) {

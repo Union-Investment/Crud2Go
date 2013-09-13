@@ -28,6 +28,8 @@ import de.unioninvestment.crud2go.spi.security.Cryptor;
 
 public class EncryptionFormatter implements Converter<String, String> {
 
+	private static final long serialVersionUID = 1L;
+	
 	private Cryptor cryptor;
 
 	public EncryptionFormatter(Cryptor cryptor) {

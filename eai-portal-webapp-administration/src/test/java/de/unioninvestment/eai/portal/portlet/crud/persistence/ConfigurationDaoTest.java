@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.persistence;
 
 import static org.junit.Assert.assertEquals;
@@ -34,12 +34,12 @@ import java.util.Date;
 
 import javax.xml.bind.JAXBException;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -59,10 +59,12 @@ public class ConfigurationDaoTest {
 
 	private static final String testPortletId = "TestID-1";
 	private static final long COMMUNITY_ID = 18005L;
+	
+	private static ClassPathXmlApplicationContext ctx;
 
 	@BeforeClass
 	public static void init() {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(
+		ctx = new ClassPathXmlApplicationContext(
 				"eai-portal-web-test-applicationcontext.xml");
 		JdbcTemplate template = ctx.getBean("jdbcTemplate", JdbcTemplate.class);
 		template.execute("CREATE TABLE ADM_CONFIG" + "("
@@ -76,6 +78,11 @@ public class ConfigurationDaoTest {
 		configurationDaoDerby = ctx.getBean(ConfigurationDao.class);
 	}
 
+	@AfterClass
+	public static void destroy() {
+		ctx.close();
+	}
+	
 	@Before
 	public void setUp() throws JAXBException, SAXException {
 		MockitoAnnotations.initMocks(this);
@@ -94,8 +101,9 @@ public class ConfigurationDaoTest {
 
 	@Test
 	public void shouldCheckIfConfigIsAvailable() {
-		when(mockJdbcTemplate.queryForInt(anyString(), anyString(), anyLong()))
-				.thenReturn(1);
+		when(
+				mockJdbcTemplate.queryForObject(anyString(), eq(Integer.class),
+						anyString(), anyLong())).thenReturn(1);
 		boolean isConfigAv = configurationDao.hasConfigData(testPortletId,
 				COMMUNITY_ID);
 		assertTrue(isConfigAv);
@@ -103,8 +111,9 @@ public class ConfigurationDaoTest {
 
 	@Test
 	public void shouldCheckIfConfigIsNotAvailable() {
-		when(mockJdbcTemplate.queryForInt(anyString(), anyString()))
-				.thenReturn(0);
+		when(
+				mockJdbcTemplate.queryForObject(anyString(), eq(Integer.class),
+						anyString(), anyLong())).thenReturn(0);
 		boolean isConfigAv = configurationDao.hasConfigData(testPortletId,
 				COMMUNITY_ID);
 		assertFalse(isConfigAv);
@@ -120,6 +129,7 @@ public class ConfigurationDaoTest {
 		assertEquals(new Long(1), id);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldLoadMetaData() {
 		when(
@@ -136,10 +146,12 @@ public class ConfigurationDaoTest {
 
 	@Test
 	public void shouldUpdateAExistingConfig() {
-		when(mockJdbcTemplate.queryForInt(anyString(), anyString()))
-				.thenReturn(1);
-		when(mockJdbcTemplate.queryForLong(anyString(), anyString()))
-				.thenReturn(new Long(10));
+		when(
+				mockJdbcTemplate.queryForObject(anyString(), eq(Integer.class),
+						anyString())).thenReturn(1);
+		when(
+				mockJdbcTemplate.queryForObject(anyString(), eq(Long.class),
+						anyString())).thenReturn(new Long(10));
 		configurationDao.saveOrUpdateConfigData(testPortletId, COMMUNITY_ID,
 				"testConfig.xml", null, "testUser");
 		verify(mockJdbcTemplate).execute(any(String.class),
@@ -149,8 +161,9 @@ public class ConfigurationDaoTest {
 
 	@Test
 	public void shouldInsertANewConfig() {
-		when(mockJdbcTemplate.queryForInt(anyString(), anyString()))
-				.thenReturn(0);
+		when(
+				mockJdbcTemplate.queryForObject(anyString(), eq(Integer.class),
+						anyString())).thenReturn(0);
 		configurationDao.saveOrUpdateConfigData(testPortletId, COMMUNITY_ID,
 				"testConfig.xml", null, "testUser");
 		verify(mockJdbcTemplate).execute(any(String.class),
@@ -158,14 +171,15 @@ public class ConfigurationDaoTest {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldLoadConfigData() {
 		PortletConfig config = new PortletConfig();
 		config.setTitle("testTitel");
 		when(
-				mockJdbcTemplate.queryForObject(any(String.class),
-						any(RowMapper.class), eq(testPortletId),
-						eq(COMMUNITY_ID))).thenReturn(config);
+				mockJdbcTemplate.queryForObject(any(String.class), any(RowMapper.class),
+						eq(testPortletId), eq(COMMUNITY_ID)))
+				.thenReturn(config);
 
 		StreamProcessor<PortletConfig> processor = new StreamProcessor<PortletConfig>() {
 

@@ -115,6 +115,7 @@ public class JMXWrapperTest {
 		assertThat(groovyMBean, is(notNullValue()));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldReturnMBeanPropertyMap() throws NullPointerException,
 			IOException, JMException {

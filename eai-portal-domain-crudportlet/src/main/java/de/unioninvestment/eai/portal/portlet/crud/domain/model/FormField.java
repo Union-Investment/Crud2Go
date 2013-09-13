@@ -96,7 +96,7 @@ public class FormField implements Serializable {
 
 		this.config = null;
 
-		property.addListener(new HistoryAwareValueChangeListener());
+		property.addValueChangeListener(new HistoryAwareValueChangeListener());
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class FormField implements Serializable {
 		property.setValue(config.getDefault());
 
 		if (registerValueChangeListener) {
-			property.addListener(new HistoryAwareValueChangeListener());
+			property.addValueChangeListener(new HistoryAwareValueChangeListener());
 		}
 
 		name = config.getName();

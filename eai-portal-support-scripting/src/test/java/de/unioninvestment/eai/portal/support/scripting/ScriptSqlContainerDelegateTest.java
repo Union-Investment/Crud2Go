@@ -24,7 +24,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import groovy.lang.Closure;
 
-import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;

@@ -54,8 +54,6 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFac
 @Configuration
 public class SpringApplicationFactory {
 
-	private static final long serialVersionUID = 1L;
-
 	@Autowired
 	private ConfigurationDao configurationDao;
 

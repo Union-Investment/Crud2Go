@@ -37,32 +37,15 @@ import org.junit.Test;
 public class TimestampUtilsTest {
 
 	private Timestamp timestampMidnight;
-	private Timestamp timestampMidnightOneDayLater;
-	private Timestamp timestampMidnightOneMonthLater;
-	private Timestamp timestampMidnightOneYearLater;
 	private Timestamp timestampNanos;
 
 	private Timestamp timestamp1;
-	private Timestamp timestamp2;
 
 	@Before
 	public void setUp() {
-		Calendar cal = new GregorianCalendar();
 		long timeMidnight = new GregorianCalendar(2011, 0, 1, 0, 0, 0)
 				.getTime().getTime();
 		timestampMidnight = new Timestamp(timeMidnight);
-
-		cal.setTimeInMillis(timeMidnight);
-		cal.add(Calendar.DAY_OF_MONTH, 1);
-		timestampMidnightOneDayLater = new Timestamp(cal.getTimeInMillis());
-
-		cal.setTimeInMillis(timeMidnight);
-		cal.add(Calendar.MONTH, 1);
-		timestampMidnightOneMonthLater = new Timestamp(cal.getTimeInMillis());
-
-		cal.setTimeInMillis(timeMidnight);
-		cal.add(Calendar.YEAR, 1);
-		timestampMidnightOneYearLater = new Timestamp(cal.getTimeInMillis());
 
 		long time = new GregorianCalendar(2011, 0, 1, 15, 23, 22).getTime()
 				.getTime();
@@ -70,7 +53,6 @@ public class TimestampUtilsTest {
 		timestampNanos.setNanos(123456789);
 
 		timestamp1 = new Timestamp(time);
-		timestamp2 = new Timestamp(time + 1000);
 	}
 
 	@Test

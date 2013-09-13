@@ -25,12 +25,11 @@ import org.vaadin.tokenfield.TokenField;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ComboBox;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.CheckBoxSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
-import de.unioninvestment.eai.portal.portlet.crud.domain.container.TokenFieldSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.SelectSupport;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.TokenFieldSupport;
 import de.unioninvestment.eai.portal.support.vaadin.support.MultiValueJoinerConverter;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 
@@ -61,6 +60,7 @@ public class StringDataType extends AbstractDataType implements DisplaySupport,
 		return super.createSelect(type, propertyId, format);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public TokenField createTokenField(Class<?> type, Object propertyId,
 			String delimiter, Format format) {

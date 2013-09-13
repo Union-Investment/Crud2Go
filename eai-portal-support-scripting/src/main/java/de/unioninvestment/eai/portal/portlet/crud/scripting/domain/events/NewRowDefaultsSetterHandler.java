@@ -78,6 +78,7 @@ public class NewRowDefaultsSetterHandler implements CreateEventHandler {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private String calculateNow(DataContainer databaseContainer,
 			String columnName) {
 		EditorSupport editor = databaseContainer.findEditor(columnName);

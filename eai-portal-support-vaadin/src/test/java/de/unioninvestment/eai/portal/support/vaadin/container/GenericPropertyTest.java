@@ -44,7 +44,7 @@ public class GenericPropertyTest {
 	private Column allFalseColumn;
 	private Column allTrueColumn;
 	private Column requiredColumn;
-	private GenericProperty property;
+	private GenericProperty<Object> property;
 
 	@Before
 	public void setUp() {
@@ -56,14 +56,14 @@ public class GenericPropertyTest {
 		requiredColumn = new Column("TEST", String.class, false, true, false,
 				null);
 
-		property = new GenericProperty(allFalseColumn, null);
+		property = new GenericProperty<Object>(allFalseColumn, null);
 		property.setItem(item);
 		when(item.getContainer()).thenReturn(container);
 	}
 
 	@Test
 	public void shouldReturnRequiredByDelegatingToMetadata() {
-		assertThat(new GenericProperty(allTrueColumn, null).isRequired(),
+		assertThat(new GenericProperty<Object>(allTrueColumn, null).isRequired(),
 				is(true));
 	}
 
@@ -74,7 +74,7 @@ public class GenericPropertyTest {
 
 	@Test
 	public void shouldReturnReadOnlyByDelegatingToMetadata() {
-		assertThat(new GenericProperty(allTrueColumn, null).isReadOnly(),
+		assertThat(new GenericProperty<Object>(allTrueColumn, null).isReadOnly(),
 				is(true));
 	}
 
@@ -96,7 +96,7 @@ public class GenericPropertyTest {
 
 	@Test
 	public void shouldNotAllowSettingAPropertyToWritable() {
-		GenericProperty property = new GenericProperty(allTrueColumn, null);
+		GenericProperty<Object> property = new GenericProperty<Object>(allTrueColumn, null);
 		property.setReadOnly(false);
 		assertThat(property.isReadOnly(), is(true));
 	}
@@ -144,20 +144,21 @@ public class GenericPropertyTest {
 		assertThat((Class<String>) property.getType(), equalTo(String.class));
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test(expected = Exception.class)
 	public void shouldCheckForTypeOnUpdate() {
-		property.setValue(1);
+		((GenericProperty)property).setValue(1);
 	}
 
 	@Test(expected = ReadOnlyException.class)
 	public void shouldCheckForReadOnlyOnUpdate() {
-		GenericProperty property = new GenericProperty(allTrueColumn, null);
+		GenericProperty<Object> property = new GenericProperty<Object>(allTrueColumn, null);
 		property.setValue("abc");
 	}
 
 	@Test(expected = RequiredException.class)
 	public void shouldCheckForRequiredOnUpdate() {
-		GenericProperty property = new GenericProperty(requiredColumn, null);
+		GenericProperty<Object> property = new GenericProperty<Object>(requiredColumn, null);
 		property.setValue(null);
 	}
 
@@ -169,7 +170,7 @@ public class GenericPropertyTest {
 
 	@Test
 	public void shouldNotBeModifiedAfterInitializationWithNotNullValue() {
-		GenericProperty property = new GenericProperty(requiredColumn, "abc");
+		GenericProperty<Object> property = new GenericProperty<Object>(requiredColumn, "abc");
 		assertThat(property.isModified(), is(false));
 	}
 }

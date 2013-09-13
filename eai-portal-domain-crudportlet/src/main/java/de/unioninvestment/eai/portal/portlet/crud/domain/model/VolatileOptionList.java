@@ -10,6 +10,8 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 public abstract class VolatileOptionList implements OptionList,
 		PortletRefreshedEventHandler {
 
+	private static final long serialVersionUID = 1L;
+	
 	private EventRouter<OptionListChangeEventHandler, OptionListChangeEvent> changeEventRouter = new EventRouter<OptionListChangeEventHandler, OptionListChangeEvent>();
 
 	/**

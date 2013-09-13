@@ -98,7 +98,7 @@ public class MultiOptionListFormField extends OptionListFormField {
 			HashSet<Object> set = hashSetOf(config.getDefault());
 			listProperty.setValue(set);
 		}
-		listProperty.addListener(new HistoryAwareValueChangeListener());
+		listProperty.addValueChangeListener(new HistoryAwareValueChangeListener());
 
 	}
 

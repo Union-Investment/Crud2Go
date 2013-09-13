@@ -61,6 +61,7 @@ public class OptionListContainerTest {
 		container = new OptionListContainer(optionListMock, contextMock);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldReturnTitleAsPropertyId() {
 		assertThat((Collection<String>) container.getContainerPropertyIds(),
@@ -100,6 +101,7 @@ public class OptionListContainerTest {
 				nullValue());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldReturnItemIDs() {
 		assertThat((Collection<String>) container.getItemIds(),

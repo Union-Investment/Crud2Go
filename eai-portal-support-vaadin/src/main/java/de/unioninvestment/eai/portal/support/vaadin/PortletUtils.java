@@ -61,7 +61,6 @@ public final class PortletUtils {
 	 *            der Ziel-Modus
 	 * @return <code>true</code>, falls ein Wechsel erfolgen kann
 	 */
-	@SuppressWarnings("deprecation")
 	public static boolean switchPortletMode(PortletMode targetMode) {
 		try {
 			PortletResponse response = VaadinPortletService

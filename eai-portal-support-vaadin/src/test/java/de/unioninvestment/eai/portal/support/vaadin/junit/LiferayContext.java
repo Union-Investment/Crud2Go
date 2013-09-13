@@ -52,6 +52,7 @@ import com.vaadin.util.CurrentInstance;
 
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 
+@SuppressWarnings("deprecation")
 public class LiferayContext extends TestWatchman {
 
 	private String portletId;
@@ -135,11 +136,10 @@ public class LiferayContext extends TestWatchman {
 		finished(null);
 	}
 
-	@SuppressWarnings("deprecation")
 	public void shouldShowNotification(String caption, String description,
 			Type type) {
 		verify(pageMock).showNotification(
-				argThat(new NotificationMatcher(caption, description, type)));
+				argThat(new NotificationMatcher(caption, description)));
 	}
 
 	public LiferayUI getUiMock() {

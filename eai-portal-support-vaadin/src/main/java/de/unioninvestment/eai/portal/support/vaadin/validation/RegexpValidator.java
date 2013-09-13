@@ -31,7 +31,6 @@ import com.vaadin.ui.Field;
 @ValidatorKeyword("regexp")
 public class RegexpValidator implements FieldValidator {
 
-	private static final long serialVersionUID = 1L;
 	private com.vaadin.data.Validator vaadinValidator;
 
 	/**
@@ -47,7 +46,7 @@ public class RegexpValidator implements FieldValidator {
 	}
 
 	@Override
-	public void apply(Field field) {
+	public void apply(Field<?> field) {
 		field.addValidator(vaadinValidator);
 	}
 

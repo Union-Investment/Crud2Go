@@ -110,6 +110,7 @@ public class GenericProperty<T> implements Property<T> {
 		item.getContainer().itemChangeNotification(item);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Class<? extends T> getType() {
 		return (Class<? extends T>) metaData.getType();

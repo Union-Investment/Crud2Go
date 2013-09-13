@@ -31,7 +31,6 @@ import java.util.Map.Entry;
  * @author carsten.mjartan
  */
 public class TransformedKeyEntry<A, C> implements Entry<A, C> {
-	private static final long serialVersionUID = 1L;
 
 	private final A key;
 	private final ValueTransformer<A, C> transformer;

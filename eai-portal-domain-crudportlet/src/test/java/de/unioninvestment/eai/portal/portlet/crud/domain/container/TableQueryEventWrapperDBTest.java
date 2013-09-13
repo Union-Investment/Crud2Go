@@ -55,7 +55,7 @@ public class TableQueryEventWrapperDBTest extends EventWrapperTest {
 
 		rowItem = new RowItem(sqlContainer, new TemporaryRowId(
 				new Object[] { 1 }), Arrays.asList(new ColumnProperty(
-				"TESTSTRING", false, true, false, "TESTVAL", String.class)));
+				"TESTSTRING", false, true, false, false, "TESTVAL", String.class)));
 
 		((TableQueryEventWrapper) wrapper).storeRowImmediately(rowItem);
 

@@ -1,21 +1,21 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package de.unioninvestment.eai.portal.portlet.crud.services;
 
 import net.sf.ehcache.Ehcache;
@@ -69,16 +69,17 @@ public class ConfigurationCachingServiceAspect {
 	 *             bei Fehler
 	 */
 
-	@Around(value = "execution(* de.unioninvestment.eai.portal.portlet.crud.services.DefaultConfigurationService.getPortletConfig(..)) && args(windowId)")
-	public Object findInCache(ProceedingJoinPoint pjp, String windowId)
-			throws Throwable {
+	@Around(value = "execution(* de.unioninvestment.eai.portal.portlet.crud.services.DefaultConfigurationService.getPortletConfig(..)) && args(portletId, communityId)")
+	public Object findInCache(ProceedingJoinPoint pjp, String portletId,
+			long communityId) throws Throwable {
 		if (isCacheEnabled() && (cache != null)) {
-			Element cacheElement = cache.get(windowId);
+			String cacheKey = createKey(portletId, communityId);
+			Element cacheElement = cache.get(cacheKey);
 			if (cacheElement != null) {
 				return cacheElement.getObjectValue();
 			} else {
 				Config config = (Config) pjp.proceed();
-				cache.put(new Element(windowId, config));
+				cache.put(new Element(cacheKey, config));
 				return config;
 			}
 		} else {
@@ -99,12 +100,17 @@ public class ConfigurationCachingServiceAspect {
 	 * @param username
 	 *            der aktuelle NamedUser
 	 */
-	@After(value = "execution(* de.unioninvestment.eai.portal.portlet.crud.services.DefaultConfigurationService.storeConfigurationFile(..)) && args(filename,configXml,windowId,username)")
+	@After(value = "execution(* de.unioninvestment.eai.portal.portlet.crud.services.DefaultConfigurationService.storeConfigurationFile(..)) && args(filename,configXml,portletId,communityId,username)")
 	public void removeFromCache(String filename, byte[] configXml,
-			String windowId, String username) {
+			String portletId, long communityId, String username) {
 		if (isCacheEnabled() && cache != null) {
-			cache.remove(windowId);
+			cache.remove(createKey
+					(portletId, communityId));
 		}
+	}
+
+	private String createKey(String portletId, long communityId) {
+		return portletId + "." + communityId;
 	}
 
 	public void setCache(Ehcache cache) {

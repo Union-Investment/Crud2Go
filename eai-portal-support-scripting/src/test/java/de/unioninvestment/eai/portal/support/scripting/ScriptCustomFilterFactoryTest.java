@@ -29,15 +29,17 @@ public class ScriptCustomFilterFactoryTest {
 		MockitoAnnotations.initMocks(this);
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void shouldCreateCustomFilterFromConfig() {
 		ScriptCustomFilterFactory factory = new ScriptCustomFilterFactory(
-				scriptBuilderMock, formActionMock);
+				scriptBuilderMock);
 
 		CustomFilterConfig config = new CustomFilterConfig();
 		config.setFilter(new GroovyScript("abcde"));
 		final Closure<Object> closure = new Closure<Object>(
 				ScriptCustomFilterFactoryTest.this) {
+			@SuppressWarnings("unused")
 			public Object doCall(ScriptRow row) {
 				return true;
 			}

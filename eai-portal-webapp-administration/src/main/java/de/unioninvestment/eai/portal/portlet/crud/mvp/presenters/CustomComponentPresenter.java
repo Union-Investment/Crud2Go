@@ -51,7 +51,7 @@ public class CustomComponentPresenter extends
 		super(view, model);
 
 		if (model.getPanel() instanceof LazyInitializable) {
-			((LazyInitializable) model.getPanel()).addShowEventListener(this);
+			((LazyInitializable<Tab>) model.getPanel()).addShowEventListener(this);
 		} else {
 			onShow(null);
 		}

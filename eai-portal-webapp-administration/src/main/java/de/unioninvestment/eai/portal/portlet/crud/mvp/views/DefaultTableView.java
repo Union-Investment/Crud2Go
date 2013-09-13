@@ -853,7 +853,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		if (throwable instanceof SourceException
 				&& ((SourceException) throwable).getSource() instanceof Component) {
 			Buffered source = ((SourceException) throwable).getSource();
-			String sourceCaption = ((AbstractField) source).getCaption();
+			String sourceCaption = ((AbstractField<?>) source).getCaption();
 
 			LOG.debug("Field error for {}: {}", sourceCaption,
 					throwable.getMessage());

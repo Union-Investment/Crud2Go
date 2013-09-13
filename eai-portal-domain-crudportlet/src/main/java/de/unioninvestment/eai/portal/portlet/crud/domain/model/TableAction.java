@@ -18,8 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import java.io.InputStream;
-
 import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableExportType;
 

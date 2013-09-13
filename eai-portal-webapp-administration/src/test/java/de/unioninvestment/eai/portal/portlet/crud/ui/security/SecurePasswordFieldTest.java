@@ -31,20 +31,20 @@ public class SecurePasswordFieldTest {
 	@Test
 	public void shouldReturnNullOnNullPassword() {
 		SecurePasswordField field = new SecurePasswordField("Test",
-				new ObjectProperty(null, String.class));
+				new ObjectProperty<String>(null, String.class));
 		assertThat(field.getValue(), nullValue());
 	}
 
 	@Test
 	public void shouldReturnPlaceholderOnGivenPassword() {
 		SecurePasswordField field = new SecurePasswordField("Test",
-				new ObjectProperty("abcde", String.class));
+				new ObjectProperty<String>("abcde", String.class));
 		assertThat((String) field.getValue(), is("xxxxxxxx"));
 	}
 
 	@Test
 	public void shouldChangeRealPasswordToNull() {
-		ObjectProperty realDataSource = new ObjectProperty("abcde",
+		ObjectProperty<String> realDataSource = new ObjectProperty<String>("abcde",
 				String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
@@ -56,7 +56,7 @@ public class SecurePasswordFieldTest {
 
 	@Test
 	public void shouldChangeRealPasswordToNewValue() {
-		ObjectProperty realDataSource = new ObjectProperty("abcde",
+		ObjectProperty<String> realDataSource = new ObjectProperty<String>("abcde",
 				String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
@@ -68,7 +68,7 @@ public class SecurePasswordFieldTest {
 
 	@Test
 	public void shouldNotChangeRealPasswordIfPlaceholderIsSet() {
-		ObjectProperty realDataSource = new ObjectProperty("abcde",
+		ObjectProperty<String> realDataSource = new ObjectProperty<String>("abcde",
 				String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
@@ -80,7 +80,7 @@ public class SecurePasswordFieldTest {
 
 	@Test
 	public void shouldChangeRealPasswordIfPlaceholderIsSetAndPreviouslyNull() {
-		ObjectProperty realDataSource = new ObjectProperty(null, String.class);
+		ObjectProperty<String> realDataSource = new ObjectProperty<String>(null, String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
 
@@ -91,7 +91,7 @@ public class SecurePasswordFieldTest {
 
 	@Test
 	public void shouldNotChangeRealValueInWriteThroughMode() {
-		ObjectProperty realDataSource = new ObjectProperty("abcde",
+		ObjectProperty<String> realDataSource = new ObjectProperty<String>("abcde",
 				String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
@@ -104,7 +104,7 @@ public class SecurePasswordFieldTest {
 
 	@Test
 	public void shouldChangeRealValueOnlyOnCommitInWriteThroughMode() {
-		ObjectProperty realDataSource = new ObjectProperty("abcde",
+		ObjectProperty<String> realDataSource = new ObjectProperty<String>("abcde",
 				String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);
@@ -118,7 +118,7 @@ public class SecurePasswordFieldTest {
 
 	@Test
 	public void shouldRevertToOldValueInWriteThroughMode() {
-		ObjectProperty realDataSource = new ObjectProperty("abcde",
+		ObjectProperty<String> realDataSource = new ObjectProperty<String>("abcde",
 				String.class);
 		SecurePasswordField field = new SecurePasswordField("Test",
 				realDataSource);

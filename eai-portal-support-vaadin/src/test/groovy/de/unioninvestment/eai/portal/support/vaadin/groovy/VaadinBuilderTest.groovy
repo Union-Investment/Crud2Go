@@ -49,6 +49,7 @@ import com.vaadin.ui.VerticalLayout
 
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext
 
+@SuppressWarnings("deprecation")
 class VaadinBuilderTest {
 
 	@Rule

@@ -34,7 +34,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.vaadin.server.Page.UriFragmentChangedEvent;
-import com.vaadin.ui.Window;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
@@ -160,9 +159,7 @@ public class PortletUriFragmentUtilityTest {
 
 	@Test
 	public void shouldSetInitialFragment() {
-		Window mainWindow = mock(Window.class);
 		portletUriFragmentUtility.setInitialFragment();
-
 		verify(liferayContext.getPageMock(), times(1)).setUriFragment(fragment);
 	}
 

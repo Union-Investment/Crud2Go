@@ -62,8 +62,7 @@ public class XmlCreatorTest {
 	}
 
 	private XmlCreator newXmlCreator(ReSTContainerConfig config) {
-		XmlCreator creator = new XmlCreator(containerMock,
-				config, scriptBuilderMock);
+		XmlCreator creator = new XmlCreator(containerMock, scriptBuilderMock);
 		return creator;
 	}
 
@@ -73,15 +72,15 @@ public class XmlCreatorTest {
 		ReSTContainerConfig config = RestTestConfig.readwriteConfig();
 		XmlCreator creator = newXmlCreator(config);
 
-		when(scriptBuilderMock.buildClosure(config
-				.getInsert().getValue())).thenAnswer(new Answer<Object>() {
-			@Override
-			public Object answer(InvocationOnMock invocation)
-					throws Throwable {
-				GroovyShell shell = new GroovyShell();
-				return shell.evaluate("{ row -> a(3)}");
-			}
-		});
+		when(scriptBuilderMock.buildClosure(config.getInsert().getValue()))
+				.thenAnswer(new Answer<Object>() {
+					@Override
+					public Object answer(InvocationOnMock invocation)
+							throws Throwable {
+						GroovyShell shell = new GroovyShell();
+						return shell.evaluate("{ row -> a(3)}");
+					}
+				});
 
 		fakeInfosForCreationOfScriptRow();
 
@@ -102,8 +101,8 @@ public class XmlCreatorTest {
 		ReSTContainerConfig config = RestTestConfig.readwriteConfig();
 		XmlCreator creator = newXmlCreator(config);
 
-		when(scriptBuilderMock.buildClosure(config
-				.getInsert().getValue())).thenReturn(closureMock);
+		when(scriptBuilderMock.buildClosure(config.getInsert().getValue()))
+				.thenReturn(closureMock);
 		when(closureMock.call(any(ScriptRow.class))).thenReturn(
 				singletonMap("a", 3));
 

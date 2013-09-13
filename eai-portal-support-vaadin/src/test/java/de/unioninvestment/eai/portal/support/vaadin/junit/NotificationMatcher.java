@@ -22,18 +22,15 @@ import org.mockito.ArgumentMatcher;
 
 import com.google.gwt.thirdparty.guava.common.base.Objects;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 
 public class NotificationMatcher extends ArgumentMatcher<Notification> {
 
 	private String caption;
 	private String description;
-	private Type type;
 
-	public NotificationMatcher(String caption, String description, Type type) {
+	public NotificationMatcher(String caption, String description) {
 		this.caption = caption;
 		this.description = description;
-		this.type = type;
 	}
 
 	@Override

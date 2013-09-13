@@ -72,7 +72,7 @@ public class DatabaseContainerRowTest extends ContainerRowTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		columnProperty = new ColumnProperty("id", true, true, true, "1",
+		columnProperty = new ColumnProperty("id", true, true, true, false, "1",
 				String.class);
 		rowItem = new RowItem(sqldataContainerMock, rowIdMock,
 				Arrays.asList(columnProperty));

@@ -22,8 +22,6 @@ import java.text.Format;
 
 import org.vaadin.tokenfield.TokenField;
 
-import com.vaadin.ui.AbstractField;
-
 /**
  * Schnittstelle, die die Unterstützung von Multiselects für einen Datentypen
  * ermöglicht.

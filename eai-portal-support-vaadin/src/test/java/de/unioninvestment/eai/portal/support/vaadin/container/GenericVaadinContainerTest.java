@@ -50,6 +50,7 @@ import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.util.filter.Compare;
 
+@SuppressWarnings("unchecked")
 public class GenericVaadinContainerTest {
 
 	@Mock
@@ -83,7 +84,6 @@ public class GenericVaadinContainerTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldReturnPropertyIdsFromMetaData() {
 		when(delegateMock.getMetaData()).thenReturn(metaDataMock);
 		container = new GenericVaadinContainer(delegateMock);
@@ -94,7 +94,6 @@ public class GenericVaadinContainerTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldReturnTypeFromMetaData() {
 		when(delegateMock.getMetaData()).thenReturn(metaDataMock);
 		container = new GenericVaadinContainer(delegateMock);
@@ -172,7 +171,6 @@ public class GenericVaadinContainerTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldDeleteAddedItem() {
 		Object newItem = container.addItem();
 		container.removeItem(newItem);
@@ -217,6 +215,7 @@ public class GenericVaadinContainerTest {
 						.getItemProperty("COL2").getValue(), is("2"));
 	}
 
+	
 	@Test
 	public void shouldKeepModifiedItemsOnRefresh() {
 		GenericItem changedItem = container
@@ -233,7 +232,6 @@ public class GenericVaadinContainerTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldDropOrphanedModifiedItemsOnRefresh() {
 		GenericItem changedItem = container
 				.getUnfilteredItem(new GenericItemId(new Object[] { "3" }));
@@ -265,7 +263,7 @@ public class GenericVaadinContainerTest {
 
 	@Test
 	public void shouldFireContentChangeEventOnCommit() {
-		container.addListener(listenerMock);
+		container.addItemSetChangeListener(listenerMock);
 
 		container.commit();
 
@@ -279,7 +277,7 @@ public class GenericVaadinContainerTest {
 	public void shouldRefreshTheContainerAfterUpdateIfRequestedByDelegate() {
 		reset(delegateMock);
 
-		GenericItemId newItemId = (GenericItemId) container.addItem();
+		container.addItem();
 		doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -363,7 +361,6 @@ public class GenericVaadinContainerTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldClearModificationsOnRollback() {
 		GenericItemId deletedItemId = new GenericItemId(new Object[] { "3" });
 		container.getItem(deletedItemId);

@@ -27,14 +27,12 @@ import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -51,7 +49,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrud
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
-import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 

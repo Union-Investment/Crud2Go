@@ -50,7 +50,7 @@ public class DatasourceInfoView extends VerticalLayout implements View {
 
 		@Override
 		protected Object getPropertyValue(Object rowId, Object colId,
-				Property property) {
+				@SuppressWarnings("rawtypes") Property property) {
 			Object result = super.getPropertyValue(rowId, colId, property);
 			if (result == null) {
 				return defaultText;

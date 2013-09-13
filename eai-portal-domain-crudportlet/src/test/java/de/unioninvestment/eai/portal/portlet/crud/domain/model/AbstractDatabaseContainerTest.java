@@ -100,9 +100,6 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	private ContainerRowId containerRowId1Mock;
 
 	@Mock
-	private ContainerRowId containerRowId2Mock;
-
-	@Mock
 	private EachRowCallback eachRowCallbackMock;
 
 	@Captor
@@ -309,11 +306,11 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 				"ID", "INDEX", "NAME" }, editors, displayPatternMock, null);
 		RowId rowId = new RowId(new Object[] { 1, 2, "MY_NAME" });
 		ColumnProperty idProperty = new ColumnProperty("ID", false, false,
-				true, "ID", String.class);
+				true, false, "ID", String.class);
 		ColumnProperty indexProperty = new ColumnProperty("INDEX", false,
-				false, true, "ID", String.class);
+				false, true, false, "ID", String.class);
 		ColumnProperty nameProperty = new ColumnProperty("NAME", false, false,
-				true, "ID", String.class);
+				true, false, "ID", String.class);
 		Item item = new RowItem(vaadinContainerMock, rowId, Arrays.asList(
 				idProperty, indexProperty, nameProperty));
 
@@ -524,6 +521,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 		verify(vaadinContainerMock).removeItem(rowId2Mock);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldAddNewRow() {
 
@@ -704,14 +702,14 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 		when(vaadinContainerMock.firstItemId()).thenReturn(rowId1Mock);
 		ColumnProperty property = new ColumnProperty("id", false, false, true,
-				1, Integer.class);
+				false, 1, Integer.class);
 		RowItem rowItem1 = new RowItem((SQLContainer) vaadinContainerMock,
 				rowId1Mock, asList(property));
 		when(vaadinContainerMock.getItem(rowId1Mock)).thenReturn(rowItem1);
 
 		when(vaadinContainerMock.nextItemId(rowId1Mock)).thenReturn(rowId2Mock);
 		ColumnProperty property2 = new ColumnProperty("id", false, false, true,
-				1, Integer.class);
+				false, 1, Integer.class);
 		RowItem rowItem2 = new RowItem((SQLContainer) vaadinContainerMock,
 				rowId2Mock, asList(property2));
 		when(vaadinContainerMock.getItem(rowId2Mock)).thenReturn(rowItem2);

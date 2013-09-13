@@ -58,13 +58,11 @@ import org.springframework.mock.web.portlet.MockPortletURL;
 
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.Page;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
@@ -105,7 +103,6 @@ public class CrudUITest extends SpringPortletContextTest {
 	private GuiBuilder guiBuilderMock;
 
 	@Mock
-	@SuppressWarnings("unused")
 	private EventBus eventBusMock;
 
 	@Mock
@@ -121,7 +118,6 @@ public class CrudUITest extends SpringPortletContextTest {
 	private VerticalLayout viewPageMock;
 
 	@Mock(name = "editPage")
-	@SuppressWarnings("unused")
 	private ComponentContainer editPageMock;
 
 	@Mock
@@ -221,9 +217,6 @@ public class CrudUITest extends SpringPortletContextTest {
 	public void shouldRegisterFallbackErrorHandler() {
 		provideUserWithRoles();
 		initializeUI();
-
-		RuntimeException rootCause = new RuntimeException("MyMessage");
-		ErrorEvent event = new ErrorEvent(rootCause);
 
 		verify(liferayContext.getVaadinSessionMock()).setErrorHandler(isA(CrudErrorHandler.class));
 	}
@@ -353,6 +346,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		verify(eventBusMock).addHandler(ShowPopupEvent.class, app);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldProvideInformationIfInitializationIsInProgress() {
 

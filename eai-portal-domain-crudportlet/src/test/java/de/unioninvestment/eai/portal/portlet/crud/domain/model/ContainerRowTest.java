@@ -21,7 +21,6 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -58,6 +57,7 @@ abstract public class ContainerRowTest {
 	@Mock
 	private ContainerClob clobMock;
 
+	@SuppressWarnings("rawtypes")
 	@Mock
 	private Property clobPropertyMock;
 
@@ -138,6 +138,7 @@ abstract public class ContainerRowTest {
 		assertThat((Collection<String>) wrapper.getItemPropertyIds(), hasItems("text", "clob", "blob"));
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void shouldReturnFormItemWithReplacedClob() {
 		ContainerRow rowSpy = spy(createContainerRow());
@@ -146,7 +147,7 @@ abstract public class ContainerRowTest {
 		when(rowSpy.getInternalRow()).thenReturn(testItem);
 		when(dataContainerMock.isCLob("clob")).thenReturn(true);
 		when(dataContainerMock.getCLob(rowIdMock, "clob")).thenReturn(clobMock);
-		when(clobMock.getPropertyValue()).thenReturn(clobPropertyMock);
+		when(clobMock.getPropertyValue()).thenReturn((Property)clobPropertyMock);
 		
 		Item wrapper = rowSpy.getFormItem();
 		

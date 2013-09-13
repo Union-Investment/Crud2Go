@@ -135,10 +135,10 @@ public class ScriptDatabaseQueryDelegateTest extends
 		temporaryId = new TemporaryRowId(new Object[] { 1 });
 
 		newColumnProperties = new LinkedList<ColumnProperty>();
-		newColumnProperties.add(new ColumnProperty("id", true, false, false, 1,
-				Integer.class));
+		newColumnProperties.add(new ColumnProperty("id", true, false, false,
+				false, 1, Integer.class));
 		newColumnProperties.add(new ColumnProperty("col", false, true, true,
-				"Text", String.class));
+				false, "Text", String.class));
 
 		newRowItem = new RowItem(containerMock, temporaryId,
 				newColumnProperties);
@@ -149,9 +149,9 @@ public class ScriptDatabaseQueryDelegateTest extends
 		id = new RowId(new Object[] { 1 });
 		updatedColumnProperties = new LinkedList<ColumnProperty>();
 		updatedColumnProperties.add(new ColumnProperty("id", true, false,
-				false, 1, Integer.class));
+				false, false, 1, Integer.class));
 		updatedColumnProperties.add(new ColumnProperty("col", false, true,
-				true, "Text", String.class));
+				true, false, "Text", String.class));
 
 		existingRowItem = new RowItem(containerMock, id,
 				updatedColumnProperties);

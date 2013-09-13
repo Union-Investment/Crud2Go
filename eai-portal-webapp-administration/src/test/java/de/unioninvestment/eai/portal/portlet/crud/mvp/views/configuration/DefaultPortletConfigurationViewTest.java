@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
-import java.util.Iterator;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,7 +29,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification.Type;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
@@ -90,21 +88,6 @@ public class DefaultPortletConfigurationViewTest extends
 		view.showError("test.alert");
 		liferayContext.shouldShowNotification("test.alert", null,
 				Type.ERROR_MESSAGE);
-	}
-
-	private boolean tabsheetContains(String caption) {
-		return tabsheetComponent(caption) != null;
-	}
-
-	private Component tabsheetComponent(String caption) {
-		Iterator<Component> iterator = view.tabsheet.getComponentIterator();
-		while (iterator.hasNext()) {
-			Component component = iterator.next();
-			if (caption.equals(component.getCaption())) {
-				return component;
-			}
-		}
-		return null;
 	}
 
 }

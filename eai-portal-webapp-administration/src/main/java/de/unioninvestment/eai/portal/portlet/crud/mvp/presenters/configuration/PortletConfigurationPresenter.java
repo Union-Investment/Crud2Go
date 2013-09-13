@@ -132,7 +132,6 @@ public class PortletConfigurationPresenter extends
 		this.eventBus = eventBus;
 		this.settings = settings;
 		this.receiver = new ConfigurationReceiver();
-		getView().setPresenter(this);
 		getView().getUpload().setReceiver(receiver);
 		getView().getUpload().addFinishedListener(
 				new ConfigUploadFinishedListener());

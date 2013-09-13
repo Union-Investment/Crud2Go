@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.config.resource;
 
 import static java.util.Collections.unmodifiableMap;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
@@ -30,7 +31,9 @@ import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
  * @author max.hartmann
  * 
  */
-public class Config {
+public class Config implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private final PortletConfig portletConfig;
 	private Map<String, Long> roleResourceIDs;
 

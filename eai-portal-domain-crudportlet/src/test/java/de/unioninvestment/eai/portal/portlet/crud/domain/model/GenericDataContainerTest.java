@@ -78,7 +78,7 @@ public class GenericDataContainerTest
 	private MetaData metaDataMock;
 
 	@Mock
-	private Property propertyMock;
+	private Property<Object> propertyMock;
 
 	@Mock
 	private CharBuffer clobDataMock;
@@ -431,6 +431,7 @@ public class GenericDataContainerTest
 		assertThat((GenericItem) containerRow.getInternalRow(), is(row1));
 	}
 
+	@SuppressWarnings("rawtypes")
 	private GenericItem createRow(GenericItemId rowId) {
 		return new GenericItem(vaadinContainerMock, rowId,
 				new HashSet<GenericProperty>());

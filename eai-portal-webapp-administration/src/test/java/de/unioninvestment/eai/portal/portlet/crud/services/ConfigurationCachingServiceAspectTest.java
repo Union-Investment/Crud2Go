@@ -20,12 +20,17 @@ package de.unioninvestment.eai.portal.portlet.crud.services;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -50,19 +55,47 @@ public class ConfigurationCachingServiceAspectTest {
 	@Mock
 	private Config configMock;
 
+	@Captor
+	private ArgumentCaptor<Element> elementCaptor;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
-	public void shouldCacheReturnConfig() throws Throwable {
-		when(cacheMock.get("testPortletId")).thenReturn(null);
+	public void shouldStoreConfigInCache() throws Throwable {
+		when(cacheMock.get("testPortletId.4711")).thenReturn(null);
 		when(settingsMock.isCacheEnabled()).thenReturn(true);
 		when(jpMock.proceed()).thenReturn(configMock);
 
-		assertThat((Config) cachingAspect.findInCache(jpMock, "testPortletId"),
+		assertThat((Config) cachingAspect.findInCache(jpMock, "testPortletId", 4711L),
 				is(configMock));
+		
+		verify(cacheMock).put(elementCaptor.capture());
+		assertThat(elementCaptor.getValue().getObjectKey(), is((Object)"testPortletId.4711"));
+		assertThat(elementCaptor.getValue().getObjectValue(), is((Object)configMock));
 	}
 
+	@Test
+	public void shouldCallDelegateIfCacheIsDisabled() throws Throwable {
+		when(settingsMock.isCacheEnabled()).thenReturn(false);
+		when(jpMock.proceed()).thenReturn(configMock);
+
+		assertThat((Config) cachingAspect.findInCache(jpMock, "testPortletId", 4711L),
+				is(configMock));
+		
+		verifyZeroInteractions(cacheMock);
+	}
+
+	@Test
+	public void shouldReturnCachedConfig() throws Throwable {
+		when(cacheMock.get("testPortletId.4711")).thenReturn(new Element("testPortletId.4711", configMock));
+		when(settingsMock.isCacheEnabled()).thenReturn(true);
+
+		assertThat((Config) cachingAspect.findInCache(jpMock, "testPortletId", 4711L),
+				is(configMock));
+
+		verifyZeroInteractions(jpMock);
+	}
 }

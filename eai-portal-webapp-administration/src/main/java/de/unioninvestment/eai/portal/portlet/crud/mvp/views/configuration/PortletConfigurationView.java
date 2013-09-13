@@ -62,8 +62,6 @@ public interface PortletConfigurationView extends View {
 	 */
 	TextField getUploadVcsUri();
 
-	void setPresenter(PortletConfigurationView.Presenter presenter);
-
 	void displayTab(View view);
 
 	void removeTab(View view);

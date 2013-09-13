@@ -37,7 +37,6 @@ import org.mockito.MockitoAnnotations;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Validator;
-import com.vaadin.data.util.PropertyFormatter;
 import com.vaadin.data.util.sqlcontainer.ColumnProperty;
 import com.vaadin.data.validator.NullValidator;
 import com.vaadin.ui.AbstractSelect;
@@ -78,8 +77,6 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 
 	@Mock
 	private ContainerField containerFieldMock;
-	@Mock
-	private PropertyFormatter formatterMock;
 
 	@Before
 	public void setup() {
@@ -112,7 +109,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		ValidationFieldFactoryWrapper wrapper = new ValidationFieldFactoryWrapper(
 				databaseContainer, delegateMock, tableColumns);
 
-		Field field = wrapper.createField(containerMock, 1, "test",
+		Field<?> field = wrapper.createField(containerMock, 1, "test",
 				uiContextMock);
 
 		verify(delegateMock).createField(containerMock, 1, "test",
@@ -129,7 +126,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		ValidationFieldFactoryWrapper wrapper = new ValidationFieldFactoryWrapper(
 				databaseContainer, delegateMock, tableColumns);
 
-		Field field = wrapper.createField(itemMock, "test");
+		Field<?> field = wrapper.createField(itemMock, "test");
 
 		verify(delegateMock).createField(itemMock, "test");
 		assertEquals(comboBoxMock, field);
@@ -142,7 +139,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		createTestColumn("test",
 				Arrays.asList((FieldValidator) new FieldValidator() {
 					@Override
-					public void apply(Field field) {
+					public void apply(@SuppressWarnings("rawtypes") Field field) {
 						field.addValidator(vaadinValidator);
 					}
 				}));
@@ -152,7 +149,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		ValidationFieldFactoryWrapper wrapper = new ValidationFieldFactoryWrapper(
 				databaseContainer, delegateMock, tableColumns);
 
-		Field field = wrapper.createField(containerMock, 1, "test",
+		Field<?> field = wrapper.createField(containerMock, 1, "test",
 				uiContextMock);
 
 		verify(field).addValidator(vaadinValidator);
@@ -167,7 +164,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		ValidationFieldFactoryWrapper wrapper = new ValidationFieldFactoryWrapper(
 				databaseContainer, delegateMock, tableColumns);
 
-		Field field = wrapper.createField(containerMock, 1, "test",
+		Field<?> field = wrapper.createField(containerMock, 1, "test",
 				uiContextMock);
 
 		verify(field).setRequired(true);
@@ -178,7 +175,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 
 	private void containerReturnsPropertyWithFieldNullable(boolean nullable) {
 		ColumnProperty property = new ColumnProperty("test", true, false,
-				nullable, "1", String.class);
+				nullable, false,"1", String.class);
 		when(containerMock.getItem(1)).thenReturn(itemMock);
 		when(itemMock.getItemProperty("test")).thenReturn(property);
 		when(containerFieldMock.isRequired()).thenReturn(!nullable);
@@ -191,7 +188,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		createTestColumn("test2",
 				Arrays.asList((FieldValidator) new FieldValidator() {
 					@Override
-					public void apply(Field field) {
+					public void apply(@SuppressWarnings("rawtypes") Field field) {
 						fail("Should not be called");
 					}
 				}));
@@ -199,7 +196,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		ValidationFieldFactoryWrapper wrapper = new ValidationFieldFactoryWrapper(
 				databaseContainer, delegateMock, tableColumns);
 
-		Field field = wrapper.createField(containerMock, 1, "test2",
+		Field<?> field = wrapper.createField(containerMock, 1, "test2",
 				uiContextMock);
 
 		assertNull(field);
@@ -212,7 +209,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 
 		containerReturnsPropertyWithFieldNullable(true);
 
-		Field field = wrapper.createField(containerMock, 1, "test",
+		Field<?> field = wrapper.createField(containerMock, 1, "test",
 				uiContextMock);
 
 		verify(field).isRequired();
@@ -228,7 +225,7 @@ public class ValidationFieldFactoryWrapperTest extends SpringPortletContextTest 
 		ValidationFieldFactoryWrapper wrapper = new ValidationFieldFactoryWrapper(
 				databaseContainer, delegateMock, null);
 
-		Field field = wrapper.createField(containerMock, 1, "test",
+		Field<?> field = wrapper.createField(containerMock, 1, "test",
 				uiContextMock);
 
 		verify(field).isRequired();

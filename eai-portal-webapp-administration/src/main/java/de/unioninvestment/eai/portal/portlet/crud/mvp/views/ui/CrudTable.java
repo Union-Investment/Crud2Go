@@ -64,7 +64,7 @@ public class CrudTable extends BufferedTable {
 
 	@Override
 	public String formatPropertyValue(Object rowId, Object colId,
-			Property property) {
+			Property<?> property) {
 		if (property == null || property.getValue() == null) {
 			return "";
 		} else {
@@ -124,7 +124,7 @@ public class CrudTable extends BufferedTable {
 	}
 
 	@Override
-	protected void handleUnregisteredField(Field field) {
+	protected void handleUnregisteredField(Field<?> field) {
 		if (field instanceof AbstractSelect) {
 			AbstractSelect select = (AbstractSelect) field;
 			if (select.getContainerDataSource() instanceof OptionListContainer) {

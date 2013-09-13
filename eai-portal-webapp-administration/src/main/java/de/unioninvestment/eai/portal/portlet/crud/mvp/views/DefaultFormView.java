@@ -62,7 +62,6 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.FormSelection
 import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 import de.unioninvestment.eai.portal.support.vaadin.support.ConvertablePropertyWrapper;
-import de.unioninvestment.eai.portal.support.vaadin.support.DateToTimestampConverter;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 
 /**

@@ -82,7 +82,6 @@ public class ScriptTableSelectionTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void shouldCallClosureWithEachRow() {
 		Set<ContainerRowId> ids = new HashSet<ContainerRowId>(Arrays.asList(
 				rowId1Mock, rowId2Mock));

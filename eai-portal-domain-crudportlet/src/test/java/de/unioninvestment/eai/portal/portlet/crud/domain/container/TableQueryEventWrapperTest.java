@@ -169,12 +169,12 @@ public class TableQueryEventWrapperTest {
 		RowId id = new TemporaryRowId(new Object[] { "ID1" });
 
 		ColumnProperty cp1 = new ColumnProperty("ID1", true, true, true,
-				new Integer(1), Integer.TYPE);
+				false, new Integer(1), Integer.TYPE);
 		cp1.setReadOnly(false);
 		properties.add(cp1);
 
 		ColumnProperty cp2 = new ColumnProperty("value1", true, true, true,
-				new Integer(1), Integer.TYPE);
+				false, new Integer(1), Integer.TYPE);
 		cp2.setVersionColumn(true);
 		properties.add(cp2);
 
@@ -198,12 +198,12 @@ public class TableQueryEventWrapperTest {
 		RowId id = new TemporaryRowId(new Object[] { "ID1" });
 
 		ColumnProperty cp1 = new ColumnProperty("ID1", true, true, true,
-				new Integer(1), Integer.TYPE);
+				false, new Integer(1), Integer.TYPE);
 		cp1.setReadOnly(false);
 		properties.add(cp1);
 
 		ColumnProperty cp2 = new ColumnProperty("value1", true, true, true,
-				new Integer(1), Integer.TYPE);
+				false, new Integer(1), Integer.TYPE);
 		cp2.setVersionColumn(true);
 		properties.add(cp2);
 
@@ -227,12 +227,12 @@ public class TableQueryEventWrapperTest {
 		RowId id = new TemporaryRowId(new Object[] { "ID" });
 
 		ColumnProperty cp1 = new ColumnProperty("ID", false, true, true,
-				new Integer(1), Integer.TYPE);
+				false, new Integer(1), Integer.TYPE);
 		cp1.setReadOnly(true);
 		properties.add(cp1);
 
 		ColumnProperty cp2 = new ColumnProperty("value1", false, true, true,
-				new Integer(1), Integer.TYPE);
+				false, new Integer(1), Integer.TYPE);
 		cp2.setVersionColumn(true);
 		properties.add(cp2);
 

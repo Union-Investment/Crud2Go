@@ -18,33 +18,23 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
-
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
-import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.StreamResource;
-import com.vaadin.server.UserError;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.FormFieldFactory;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -54,10 +44,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.Receiver;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
-import de.unioninvestment.eai.portal.portlet.crud.CrudUI;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FileMetadata;
@@ -76,8 +63,6 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFa
 public class DefaultRowEditingFormView extends DefaultPanelContentView
 		implements RowEditingFormView {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(DefaultRowEditingFormView.class);
 
 	private static final long serialVersionUID = 1L;
 

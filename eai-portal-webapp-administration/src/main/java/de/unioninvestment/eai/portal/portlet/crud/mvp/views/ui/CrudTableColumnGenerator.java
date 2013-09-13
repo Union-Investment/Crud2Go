@@ -28,6 +28,7 @@ import com.vaadin.addon.tableexport.ExportableColumnGenerator;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
@@ -52,8 +53,6 @@ public class CrudTableColumnGenerator implements ExportableColumnGenerator {
 			.getLogger(CrudTableColumnGenerator.class);
 
 	private static final long serialVersionUID = 1L;
-
-	private static final int DEFAULT_COLUMN_HEIGHT = 15;
 
 	private final TableColumns columns;
 
@@ -121,7 +120,7 @@ public class CrudTableColumnGenerator implements ExportableColumnGenerator {
 
 	@Override
 	public Object generateCell(Table source, Object itemId, Object columnId) {
-		Property prop = source.getItem(itemId).getItemProperty(columnId);
+		Property<?> prop = source.getItem(itemId).getItemProperty(columnId);
 		if (prop == null) {
 			return null;
 		}
@@ -171,12 +170,12 @@ public class CrudTableColumnGenerator implements ExportableColumnGenerator {
 		return wrapForCustomHeight(component);
 	}
 
-	private Component buildReadOnlyCheckBox(Property prop) {
+	private Component buildReadOnlyCheckBox(Property<?> prop) {
 		de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxTableColumn checkBoxModel = columns
 				.getCheckBox(columnName);
 
 		if (prop.getValue() == null) {
-			return wrapForCustomHeight(new Label("", Label.CONTENT_XHTML));
+			return wrapForCustomHeight(new Label("", ContentMode.HTML));
 		}
 
 		String propertyValue = prop.getValue().toString();
@@ -193,18 +192,18 @@ public class CrudTableColumnGenerator implements ExportableColumnGenerator {
 			return wrapForCustomHeight(checkBox);
 		} else {
 			return wrapForCustomHeight(new Label(propertyValue,
-					Label.CONTENT_XHTML));
+					ContentMode.HTML));
 		}
 	}
 
 	@Override
-	public Property getGeneratedProperty(Object itemId, Object columnId) {
+	public Property<?> getGeneratedProperty(Object itemId, Object columnId) {
 		Item item = dataContainer.getDataSourceContainer().getItem(itemId);
 		if (item == null) {
 			LOG.warn("Das Item mit der ID {} wurde nicht gefunden.", itemId);
 			return null;
 		}
-		Property property = item.getItemProperty(columnId);
+		Property<?> property = item.getItemProperty(columnId);
 
 		if (dropdownColumn) {
 			return new ObjectProperty<String>(table.formatPropertyValue(itemId,

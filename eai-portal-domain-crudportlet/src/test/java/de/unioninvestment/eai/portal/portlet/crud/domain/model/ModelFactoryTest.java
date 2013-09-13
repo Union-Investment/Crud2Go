@@ -32,7 +32,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
@@ -54,9 +53,6 @@ public class ModelFactoryTest {
 
 	@Mock
 	private EventBus eventBus;
-
-	@Mock
-	private AuthenticationRealmConfig realmConfigMock;
 
 	@Mock
 	private ExecutorService prefetchExecutorMock;

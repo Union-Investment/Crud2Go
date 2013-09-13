@@ -115,6 +115,7 @@ public class DatabaseContainerField extends ContainerField {
 					container.getFormat((String) property.getPropertyId()));
 
 			if (formatter != null) {
+				@SuppressWarnings({ "unchecked", "rawtypes" })
 				Object converted = formatter
 						.convertToModel(value, (Class) property.getType(), UI
 								.getCurrent().getLocale());

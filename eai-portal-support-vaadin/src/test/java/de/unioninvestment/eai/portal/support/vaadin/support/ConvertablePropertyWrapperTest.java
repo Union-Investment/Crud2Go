@@ -40,7 +40,6 @@ import org.mockito.MockitoAnnotations;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ReadOnlyStatusChangeEvent;
 import com.vaadin.data.Property.ReadOnlyStatusChangeListener;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.converter.Converter;
@@ -86,6 +85,7 @@ public class ConvertablePropertyWrapperTest {
 				is(new GregorianCalendar(2013, 6, 18).getTime()));
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void shouldNotifyAboutFrontendChanges() {
 		wrapper.addValueChangeListener(listenerMock);
@@ -98,6 +98,7 @@ public class ConvertablePropertyWrapperTest {
 		verifyNoMoreInteractions(listenerMock);
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void shouldNotifyAboutBackendChanges() {
 		wrapper.addValueChangeListener(listenerMock);
@@ -122,6 +123,7 @@ public class ConvertablePropertyWrapperTest {
 		assertThat(backingProperty.isReadOnly(), is(true));
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void shouldNotifyAboutFrontendReadonlyChanges() {
 		wrapper.addReadOnlyStatusChangeListener(readonlyListenerMock);
@@ -134,6 +136,7 @@ public class ConvertablePropertyWrapperTest {
 		verifyNoMoreInteractions(readonlyListenerMock);
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void shouldNotifyAboutBackendReadonlyChanges() {
 		wrapper.addReadOnlyStatusChangeListener(readonlyListenerMock);

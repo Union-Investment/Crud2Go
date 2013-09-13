@@ -77,6 +77,7 @@ public class GenericContainerRowTest extends ContainerRowTest {
 		Assert.assertFalse(isReadonly);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldConstructGenericContainerRow() {
 		// given
@@ -96,14 +97,16 @@ public class GenericContainerRowTest extends ContainerRowTest {
 		Assert.assertEquals(rowItemMock, row.getInternalRow());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldCloneRow() throws Exception {
 		// given
+		@SuppressWarnings("rawtypes")
 		List ids = Arrays.asList("id-1");
 
 		Mockito.when(rowItemMock.getItemPropertyIds()).thenReturn(ids);
 
-		Property property1Mock = Mockito.mock(GenericProperty.class, Mockito
+		Property<String> property1Mock = Mockito.mock(GenericProperty.class, Mockito
 				.withSettings().extraInterfaces(Property.class));
 		Mockito.when(property1Mock.getValue()).thenReturn("value-1");
 

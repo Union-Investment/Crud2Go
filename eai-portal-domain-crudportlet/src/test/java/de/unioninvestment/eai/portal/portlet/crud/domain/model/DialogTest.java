@@ -61,6 +61,7 @@ public class DialogTest {
 		assertThat(dialog.getBackButtonCaption(), is("Zurück"));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldFireShowEvent() {
 		dialog.addShowEventListener(showEventListenerMock);

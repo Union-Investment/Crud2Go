@@ -126,6 +126,7 @@ public class GenericVaadinContainer extends
 		super.addFilter(filter);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Property getContainerProperty(Object itemId, Object propertyId) {
 		return getItem(itemId).getItemProperty(propertyId);
@@ -223,11 +224,12 @@ public class GenericVaadinContainer extends
 	 * @return die generierte Zeile
 	 */
 	public GenericItem createItem(GenericItemId id, Object[] cells) {
+		@SuppressWarnings("rawtypes")
 		Collection<GenericProperty> properties = new ArrayList<GenericProperty>(
 				cells.length);
 		int idx = 0;
 		for (Column column : metaData.getColumns()) {
-			properties.add(new GenericProperty(column, cells[idx++]));
+			properties.add(new GenericProperty<Object>(column, cells[idx++]));
 		}
 		return new GenericItem(this, id, properties);
 	}

@@ -22,8 +22,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
-import org.springframework.jdbc.support.lob.OracleLobHandler;
 
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
@@ -148,7 +148,7 @@ public class FreeformQueryEventWrapper extends CrudFreeformQuery implements
 	public byte[] getBLob(RowId rowId, final String columnName) {
 		DatabaseQueryDelegate delegate = (DatabaseQueryDelegate) getDelegate();
 		StatementHelper sh = delegate.getRowByIdStatement(rowId);
-		final LobHandler lobHandler = new OracleLobHandler();
+		final LobHandler lobHandler = createLobHandler();
 
 		byte[] blobBytes = connectionPool.querySingleResultWithJdbcTemplate(sh,
 				new RowMapper<byte[]>() {
@@ -159,6 +159,13 @@ public class FreeformQueryEventWrapper extends CrudFreeformQuery implements
 					}
 				});
 		return blobBytes;
+	}
+
+	private LobHandler createLobHandler() {
+		DefaultLobHandler lobHandler = new DefaultLobHandler();
+		lobHandler.setStreamAsLob(true);
+		lobHandler.setCreateTemporaryLob(true);
+		return lobHandler;
 	}
 
 	public boolean hasBlobData(RowId rowId, final String columnName) {
@@ -178,7 +185,7 @@ public class FreeformQueryEventWrapper extends CrudFreeformQuery implements
 	public String getCLob(RowId rowId, final String columnName) {
 		DatabaseQueryDelegate delegate = (DatabaseQueryDelegate) getDelegate();
 		StatementHelper sh = delegate.getRowByIdStatement(rowId);
-		final LobHandler lobHandler = new OracleLobHandler();
+		final LobHandler lobHandler = createLobHandler();
 
 		String clobString = connectionPool.querySingleResultWithJdbcTemplate(
 				sh, new RowMapper<String>() {

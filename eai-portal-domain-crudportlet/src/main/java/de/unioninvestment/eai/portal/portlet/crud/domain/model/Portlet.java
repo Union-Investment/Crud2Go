@@ -51,7 +51,6 @@ public class Portlet implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(Portlet.class);
 
 	/**

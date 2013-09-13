@@ -127,10 +127,10 @@ public class ContainerClob {
 	 * 
 	 * @return ein ObjectProperty mit dem CLob String als Datasource
 	 */
-	public Property getPropertyValue() {
+	public Property<?> getPropertyValue() {
 
 		property = new ObjectProperty<String>(getValue(), String.class);
-		property.addListener(new ValueChangeListener() {
+		property.addValueChangeListener(new ValueChangeListener() {
 
 			private static final long serialVersionUID = 1L;
 

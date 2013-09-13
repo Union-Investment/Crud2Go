@@ -21,14 +21,12 @@ package de.unioninvestment.eai.portal.support.vaadin.support;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_SET;
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import org.junit.Before;
@@ -43,6 +41,7 @@ public class MultiValueJoinerConverterTest {
 	private ListSelect select;
 	private ObjectProperty<String> property;
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Before
 	public void setup() {
 		select = new ListSelect();

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import com.vaadin.server.Sizeable;
+import com.vaadin.server.Sizeable.Unit;
 
 public class DefaultCustomComponentViewTest {
 
@@ -32,7 +33,7 @@ public class DefaultCustomComponentViewTest {
 		DefaultCustomComponentView view = new DefaultCustomComponentView(null,
 				null);
 		assertThat(view.getWidth(), is(100f));
-		assertThat(view.getWidthUnits(), is(Sizeable.UNITS_PERCENTAGE));
+		assertThat(view.getWidthUnits(), is(Unit.PERCENTAGE));
 		assertThat(view.getHeight(), is(Sizeable.SIZE_UNDEFINED));
 	}
 }

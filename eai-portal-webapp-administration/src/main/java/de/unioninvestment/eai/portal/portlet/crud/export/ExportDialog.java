@@ -27,7 +27,6 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -158,7 +157,6 @@ public class ExportDialog extends Window implements ExportFrontend {
 		close();
 	}
 
-	@SuppressWarnings("serial")
 	private void displayErrorMessage(final Exception e) {
 		Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 	}

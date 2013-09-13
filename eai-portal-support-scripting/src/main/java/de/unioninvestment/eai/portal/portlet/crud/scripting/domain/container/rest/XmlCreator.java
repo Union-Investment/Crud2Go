@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import com.liferay.portal.kernel.io.OutputStreamWriter;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.InvalidConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerRowId;
@@ -45,14 +44,12 @@ public class XmlCreator implements PayloadCreator {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(XmlCreator.class);
 
-	private ReSTContainerConfig config;
 	private ReSTContainer container;
 	private ScriptBuilder scriptBuilder;
 
-	public XmlCreator(ReSTContainer container, ReSTContainerConfig config,
+	public XmlCreator(ReSTContainer container,
 			ScriptBuilder scriptBuilder) {
 		this.container = container;
-		this.config = config;
 		this.scriptBuilder = scriptBuilder;
 	}
 

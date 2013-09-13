@@ -112,7 +112,7 @@ public class GenericVaadinContainerEventWrapperTest {
 				dataContainerMock.convertItemToRow(any(Item.class), eq(false),
 						eq(false))).thenReturn(rowMock);
 
-		Object addedItemId = container.addItem();
+		container.addItem();
 		verify(onCreateEventRouterMock).fireEvent(createEventCaptor.capture());
 		assertThat(createEventCaptor.getValue().getRow(), is(rowMock));
 	}

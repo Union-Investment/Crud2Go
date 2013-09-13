@@ -103,6 +103,7 @@ public abstract class AbstractDataTypeTest<T extends AbstractDataType> {
 		assertEquals(formatterMock, select.getConverter());
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void shouldProvideADefaultCheckBox() {
 		Field<?> field = simpleType.createCheckBox(Integer.class, "1", "0",

@@ -102,7 +102,7 @@ public class DatabaseContainerFieldTest extends ContainerFieldTest {
 				});
 
 		columnProperty = new ColumnProperty(propertyId, false, true, true,
-				propertyValue, String.class);
+				false, propertyValue, String.class);
 
 		rowItem = new RowItem(sqlContainerMock, rowIdMock,
 				Arrays.asList(columnProperty));
@@ -210,7 +210,7 @@ public class DatabaseContainerFieldTest extends ContainerFieldTest {
 
 	private void mockFormatter() {
 		when(editorSupportMock.createFormatter(String.class, null)).thenAnswer(
-				new Answer() {
+				new Answer<Object>() {
 
 					@Override
 					public Object answer(InvocationOnMock invocation)
@@ -256,7 +256,7 @@ public class DatabaseContainerFieldTest extends ContainerFieldTest {
 	@Test
 	public void shouldBeRequiredIfPropertyIsNotNullable() {
 		columnProperty = new ColumnProperty(propertyId, false, true, false,
-				propertyValue, String.class);
+				false, propertyValue, String.class);
 		databaseContainerField = new DatabaseContainerField(rowMock,
 				columnProperty, containerMock);
 
@@ -278,7 +278,7 @@ public class DatabaseContainerFieldTest extends ContainerFieldTest {
 	@Test
 	public void shouldReturnFormattedTextUsingDisplaySupport() {
 		columnProperty = new ColumnProperty(propertyId, false, true, false,
-				propertyValue, String.class);
+				false, propertyValue, String.class);
 		databaseContainerField = new DatabaseContainerField(rowMock,
 				columnProperty, containerMock);
 		when(containerMock.findDisplayer(propertyId)).thenReturn(
@@ -291,7 +291,7 @@ public class DatabaseContainerFieldTest extends ContainerFieldTest {
 	@Test
 	public void shouldReturnNullIfDisplaySupportIsMissing() {
 		columnProperty = new ColumnProperty(propertyId, false, true, false,
-				propertyValue, String.class);
+				false, propertyValue, String.class);
 		databaseContainerField = new DatabaseContainerField(rowMock,
 				columnProperty, containerMock);
 		assertThat(databaseContainerField.getText(), nullValue());

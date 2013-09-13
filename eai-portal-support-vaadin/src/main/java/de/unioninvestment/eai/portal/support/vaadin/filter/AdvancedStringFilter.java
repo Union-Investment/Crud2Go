@@ -56,7 +56,7 @@ public class AdvancedStringFilter implements Filter {
 			return delegateFilter.passesFilter(itemId, item);
 		}
 
-		final Property p = item.getItemProperty(propertyId);
+		final Property<?> p = item.getItemProperty(propertyId);
 		if (p == null || p.getValue() == null) {
 			return false;
 		}

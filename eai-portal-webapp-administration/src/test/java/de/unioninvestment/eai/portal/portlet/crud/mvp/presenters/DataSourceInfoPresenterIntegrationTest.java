@@ -95,6 +95,6 @@ public class DataSourceInfoPresenterIntegrationTest extends
 
 	@Test
 	public void shouldRetrieveConnectionData() {
-		presenter.updateModel(new HashSet(asList("test")));
+		presenter.updateModel(new HashSet<String>(asList("test")));
 	}
 }

@@ -20,10 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration;
 
 import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.vaadin.server.Sizeable;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -49,9 +46,6 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(DefaultPortletConfigurationView.class);
-
 	private Upload upload;
 
 	private HorizontalLayout uploadVcsLayout = new HorizontalLayout();
@@ -65,8 +59,6 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 	VerticalLayout rolesLayout;
 
 	VerticalLayout authenticationPreferencesLayout;
-
-	private Presenter presenter;
 
 	TabSheet tabsheet;
 
@@ -85,14 +77,14 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 	private VerticalLayout createStatusLayout() {
 
 		status = new Label();
-		status.setContentMode(Label.CONTENT_RAW);
+		status.setContentMode(ContentMode.HTML);
 
 		upload = new Upload();
 		upload.setImmediate(true);
 		upload.setButtonCaption(getMessage("portlet.crud.page.upload.button"));
 
 		uploadVcsUri = new TextField();
-		uploadVcsUri.setWidth(400, Sizeable.UNITS_PIXELS);
+		uploadVcsUri.setWidth(400, Unit.PIXELS);
 		uploadVcsButton = new Button();
 		uploadVcsButton
 				.setCaption(getMessage("portlet.crud.page.upload.vcs.button"));
@@ -156,11 +148,6 @@ public class DefaultPortletConfigurationView extends VerticalLayout implements
 	@Override
 	public void showError(String message) {
 		Notification.show(message, Type.ERROR_MESSAGE);
-	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
 	}
 
 }

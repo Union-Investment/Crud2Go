@@ -39,9 +39,6 @@ public class FormActionsTest {
 	private FormActions actions;
 
 	@Mock
-	private Form form;
-
-	@Mock
 	private ActionHandler actionHandlerMock;
 
 	@Mock

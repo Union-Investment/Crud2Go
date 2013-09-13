@@ -31,13 +31,10 @@ import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.DefaultPortletConfigurationView;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class BusinessExceptionMessageTest extends SpringPortletContextTest {
-
-	private DefaultPortletConfigurationView view;
 
 	@Rule
 	public LiferayContext liferayContext = new LiferayContext();
@@ -45,7 +42,6 @@ public class BusinessExceptionMessageTest extends SpringPortletContextTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		view = new DefaultPortletConfigurationView();
 	}
 
 	@Test

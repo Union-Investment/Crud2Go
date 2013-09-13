@@ -32,7 +32,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.vaadin.data.Property;
-import com.vaadin.ui.Select;
+import com.vaadin.ui.ComboBox;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
@@ -55,7 +55,7 @@ public class CrudTableTest {
 	List<DisplaySupport> displayHelpers = new ArrayList<DisplaySupport>();
 
 	@Mock
-	Property propertyMock;
+	Property<?> propertyMock;
 
 	CrudTable table;
 	Object rowId = "rowId";
@@ -83,7 +83,7 @@ public class CrudTableTest {
 
 	@Test
 	public void shouldCloseOptionListContainerOnUnregister() {
-		Select selectWithOptionList = mock(Select.class);
+		ComboBox selectWithOptionList = mock(ComboBox.class);
 		when(selectWithOptionList.getContainerDataSource()).thenReturn(
 				containerMock);
 

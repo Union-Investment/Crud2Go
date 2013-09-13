@@ -90,7 +90,7 @@ public class Tabs extends Component {
 	}
 
 	private void registerValueChangeListener() {
-		activeTabProperty.addListener(new ValueChangeListener() {
+		activeTabProperty.addValueChangeListener(new ValueChangeListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override

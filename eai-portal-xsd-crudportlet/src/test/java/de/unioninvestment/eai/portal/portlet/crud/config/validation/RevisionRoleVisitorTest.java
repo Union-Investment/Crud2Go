@@ -150,6 +150,7 @@ public class RevisionRoleVisitorTest {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Set<Class<? extends SecurableConfig>> findAllConfigClassesSubclassing(
 			Class<?> superType) {
 		Set<Class<? extends SecurableConfig>> classes = new HashSet<Class<? extends SecurableConfig>>();

@@ -20,13 +20,8 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 
 import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
-import com.vaadin.server.ErrorEvent;
-import com.vaadin.server.ErrorHandler;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
@@ -46,27 +41,11 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
  */
 public class ValidationFieldFactoryWrapper implements CrudFieldFactory {
 
-	private final class LoggingErrorHandler implements ErrorHandler {
-		private final Field<?> field;
-		private static final long serialVersionUID = 1L;
-
-		private LoggingErrorHandler(Field<?> field) {
-			this.field = field;
-		}
-
-		@Override
-		public void error(ErrorEvent event) {
-			LOG.debug("Error handler:" + field.getClass().getName());
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	private final DataContainer dataContainer;
 	private final CrudFieldFactory delegate;
 	private final TableColumns columns;
-	private static final Logger LOG = LoggerFactory
-			.getLogger(ValidationFieldFactoryWrapper.class);
 
 	/**
 	 * @param databaseContainer

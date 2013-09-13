@@ -59,7 +59,7 @@ public class DefaultTabsView extends TabSheet implements TabsView {
 
 	@Override
 	public void initialize(final Presenter tabsPresenter) {
-		this.addListener(new TabSheet.SelectedTabChangeListener() {
+		this.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
 			private static final long serialVersionUID = 42L;
 
 			@Override

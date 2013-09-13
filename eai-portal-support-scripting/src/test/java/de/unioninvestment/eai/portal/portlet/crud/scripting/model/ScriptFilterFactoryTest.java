@@ -53,7 +53,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
-import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler;
 
 public class ScriptFilterFactoryTest {
@@ -61,8 +60,6 @@ public class ScriptFilterFactoryTest {
 	private ScriptFilterFactory fac;
 
 	private List<Filter> filters;
-
-	private ScriptBuilder scriptBuilder;
 
 	private Map<String, Object> durableNamedArgument = new HashMap<String, Object>();
 

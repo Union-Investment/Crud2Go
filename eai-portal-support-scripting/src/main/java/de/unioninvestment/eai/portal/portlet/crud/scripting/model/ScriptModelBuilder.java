@@ -314,7 +314,6 @@ public class ScriptModelBuilder {
 		ScriptComponentConfig scc = (ScriptComponentConfig) configs
 				.get(component);
 		GroovyScript generatorScript = scc.getGenerator();
-		@SuppressWarnings("unchecked")
 		Closure<Object> generatorClosure = scriptBuilder
 				.buildClosure(generatorScript);
 		component.setGenerator(new CustomComponentGeneratorImpl(
@@ -364,7 +363,7 @@ public class ScriptModelBuilder {
 	private void registerCustomFilters(ScriptFormAction scriptFormAction,
 			SearchFormAction actionHandler) {
 		CustomFilterFactory filterFactory = new ScriptCustomFilterFactory(
-				scriptBuilder, scriptFormAction);
+				scriptBuilder);
 		actionHandler.setCustomFilterFactory(filterFactory);
 	}
 
@@ -436,7 +435,6 @@ public class ScriptModelBuilder {
 		return scriptTable;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void populateDynamicEditableClosures(Table table) {
 		TableConfig tc = (TableConfig) configs.get(table);
 		GroovyScript rowEditableScript = tc.getRowEditable();
@@ -591,7 +589,6 @@ public class ScriptModelBuilder {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void populateGeneratedColumnsClosures(Table table) {
 		if (table.getColumns() != null) {
 			for (TableColumn column : table.getColumns()) {
@@ -645,7 +642,6 @@ public class ScriptModelBuilder {
 	private void buildTableStyleRenderer(Table table) {
 		TableConfig tableConfig = (TableConfig) configs.get(table);
 		if (tableConfig.getRowStyle() != null) {
-			@SuppressWarnings("unchecked")
 			Closure<Object> rowStyleClosure = scriptBuilder
 					.buildClosure(tableConfig.getRowStyle());
 
@@ -658,7 +654,6 @@ public class ScriptModelBuilder {
 					.getColumn()) {
 				if (columnConfig.getStyle() != null) {
 
-					@SuppressWarnings("unchecked")
 					Closure<Object> columnClosure = scriptBuilder
 							.buildClosure(columnConfig.getStyle());
 
@@ -725,7 +720,6 @@ public class ScriptModelBuilder {
 	private void populateBackendToDataContainer(GenericDataContainer container) {
 		GroovyScript delegateScript = ((ScriptContainerConfig) configs
 				.get(container)).getDelegate();
-		@SuppressWarnings("unchecked")
 		Closure<Object> delegateClosure = scriptBuilder
 				.buildClosure(delegateScript);
 		Object delegate = delegateClosure.call();

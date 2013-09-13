@@ -49,6 +49,7 @@ public class SqlDateDataTypeTest extends AbstractDataTypeTest<SqlDateDataType> {
 
 	@Test
 	public void shouldCreateADateFormatter() {
+		@SuppressWarnings("unchecked")
 		Converter<String, java.util.Date> formatter = (Converter<String, java.util.Date>) type
 				.createFormatter(Date.class, new SimpleDateFormat("dd.MM.yyyy"));
 		assertThat(formatter, instanceOf(DateFormatter.class));

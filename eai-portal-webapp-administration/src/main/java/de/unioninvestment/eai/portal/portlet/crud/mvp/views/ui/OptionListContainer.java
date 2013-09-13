@@ -21,7 +21,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.AbstractContainer;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.filter.UnsupportedFilterException;
-import com.vaadin.ui.Select;
+import com.vaadin.ui.ComboBox;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEventHandler;
@@ -32,7 +32,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
  * Container for Option Lists. This class allows lazy initialization of the
  * backing {@link OptionList} by the vaadin framework. If lazy loading is
  * activated, the list is only loaded after the first filtering action (key
- * input on Vaadin {@link Select}). Up to then, the container behaves like
+ * input on Vaadin {@link ComboBox}). Up to then, the container behaves like
  * empty.
  * 
  * @author carsten.mjartan
@@ -128,7 +128,7 @@ public class OptionListContainer extends AbstractContainer implements
 		}
 
 		@Override
-		public boolean addItemProperty(Object id, Property property)
+		public boolean addItemProperty(Object id, @SuppressWarnings("rawtypes") Property property)
 				throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
@@ -198,7 +198,7 @@ public class OptionListContainer extends AbstractContainer implements
 	}
 
 	@Override
-	public Property getContainerProperty(Object itemId, Object propertyId) {
+	public Property<?> getContainerProperty(Object itemId, Object propertyId) {
 		refreshOptionListIfNeeded();
 		Option option = options.get(itemId);
 		if (option == null) {
@@ -422,12 +422,12 @@ public class OptionListContainer extends AbstractContainer implements
 
 	@Override
 	public void addListener(ItemSetChangeListener listener) {
-		super.addListener(listener);
+		super.addItemSetChangeListener(listener);
 	}
 
 	@Override
 	public void removeListener(ItemSetChangeListener listener) {
-		super.removeListener(listener);
+		super.removeItemSetChangeListener(listener);
 	}
 
 	@Override

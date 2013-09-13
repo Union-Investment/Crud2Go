@@ -69,6 +69,7 @@ public abstract class AbstractDataType implements DisplaySupport {
 		return textField;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected AbstractSelect createSelect(Class<?> type, Object propertyId,
 			Format format) {
 		AbstractSelect select = new ComboBox();
@@ -77,6 +78,7 @@ public abstract class AbstractDataType implements DisplaySupport {
 		return select;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected CheckBox createCheckBox(Class<?> type, String checkedValue,
 			String uncheckedValue, Format format) {
 		CheckBox checkBox = new CheckBox();
@@ -114,6 +116,7 @@ public abstract class AbstractDataType implements DisplaySupport {
 
 	@Override
 	@Deprecated
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public String formatPropertyValue(Property property, Format format) {
 		if (property == null || property.getValue() == null) {
 			return "";

@@ -179,7 +179,7 @@ public class JmxDelegate implements GenericDelegate {
 						.toString());
 
 				for (Object propertyID : item.getItemPropertyIds()) {
-					GenericProperty itemProperty = (GenericProperty) item
+					GenericProperty<?> itemProperty = (GenericProperty<?>) item
 							.getItemProperty(propertyID);
 					if (itemProperty.isModified()) {
 						mbeanProxy.setProperty(propertyID.toString(),

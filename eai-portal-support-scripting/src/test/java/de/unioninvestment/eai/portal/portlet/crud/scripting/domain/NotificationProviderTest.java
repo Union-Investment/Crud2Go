@@ -33,6 +33,7 @@ import com.vaadin.ui.Window;
 
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
+@SuppressWarnings("deprecation")
 public class NotificationProviderTest {
 
 	@Mock

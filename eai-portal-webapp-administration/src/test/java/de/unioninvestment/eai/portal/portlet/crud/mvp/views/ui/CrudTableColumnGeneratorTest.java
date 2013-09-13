@@ -69,7 +69,13 @@ public class CrudTableColumnGeneratorTest {
 	Item itemMock;
 
 	@Mock
-	private Property propertyMock;
+	private Property<String> propertyMock;
+
+	@Mock
+	private Property<BigDecimal> bigDecimalPropertyMock;
+
+	@Mock
+	private Property<Date> datePropertyMock;
 
 	@Mock
 	private TableColumns tableColumnsMock;
@@ -84,9 +90,6 @@ public class CrudTableColumnGeneratorTest {
 	private DataContainer containerMock;
 
 	private StringDataType editorSupportMock = new StringDataType();
-
-	@Mock
-	private com.vaadin.ui.CheckBox checkBoxMock;
 
 	@Before
 	public void setUp() {
@@ -252,13 +255,13 @@ public class CrudTableColumnGeneratorTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldGetGeneratedPropertyForExport() {
-		when(itemMock.getItemProperty(columnId)).thenReturn(propertyMock);
-		propertyMockReturnsType(propertyMock, BigDecimal.class);
-		when(propertyMock.getValue()).thenReturn(new BigDecimal("100.00"));
-		Property property = columnGenerator.getGeneratedProperty(itemId,
+		when(itemMock.getItemProperty(columnId)).thenReturn(bigDecimalPropertyMock);
+		propertyMockReturnsType(bigDecimalPropertyMock, BigDecimal.class);
+		when(bigDecimalPropertyMock.getValue()).thenReturn(new BigDecimal("100.00"));
+		Property<BigDecimal> property = (Property<BigDecimal>) columnGenerator.getGeneratedProperty(itemId,
 				columnId);
 
-		assertThat((Class<BigDecimal>) property.getType(),
+		assertThat((Class<BigDecimal>) bigDecimalPropertyMock.getType(),
 				equalTo(BigDecimal.class));
 		assertThat(property.getValue(), is((Object) new BigDecimal("100.00")));
 
@@ -274,7 +277,7 @@ public class CrudTableColumnGeneratorTest {
 		when(tableMock.formatPropertyValue(itemId, columnId, propertyMock))
 				.thenReturn("einsZweiDreiVier");
 
-		Property property = columnGenerator.getGeneratedProperty(itemId,
+		Property<?> property = columnGenerator.getGeneratedProperty(itemId,
 				columnId);
 
 		assertThat((Class<String>) property.getType(), equalTo(String.class));
@@ -282,7 +285,7 @@ public class CrudTableColumnGeneratorTest {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void propertyMockReturnsType(Property propertyMock,
+	private void propertyMockReturnsType(Property<?> propertyMock,
 			final Class<?> clazz) {
 		when(propertyMock.getType()).thenAnswer(new Answer<Class<Object>>() {
 			@Override
@@ -298,32 +301,33 @@ public class CrudTableColumnGeneratorTest {
 		when(itemMock.getItemProperty(columnId)).thenReturn(propertyMock);
 		propertyMockReturnsType(propertyMock, BigDecimal.class);
 		when(propertyMock.getValue()).thenReturn(null);
-		Property property = columnGenerator.getGeneratedProperty(itemId,
+		Property<?> property = columnGenerator.getGeneratedProperty(itemId,
 				columnId);
 
 		assertThat(property.getValue(), nullValue());
 
 	}
 
+	@SuppressWarnings({ "rawtypes" })
 	@Test
 	public void shouldGetPropertyTypeForExport() {
 		columnGenerator = new CrudTableColumnGenerator("Test", Date.class,
 				columnHeight, tableColumnsMock, columnId, tableMock,
 				containerMock, editorSupportMock);
-		when(itemMock.getItemProperty(columnId)).thenReturn(propertyMock);
-		propertyMockReturnsType(propertyMock, Date.class);
-		when(propertyMock.getValue()).thenReturn(new Date());
+		when(itemMock.getItemProperty(columnId)).thenReturn(datePropertyMock);
+		propertyMockReturnsType(datePropertyMock, Date.class);
+		when(datePropertyMock.getValue()).thenReturn(new Date());
 
-		Property property = columnGenerator.getGeneratedProperty(itemId,
+		Property<?> property = columnGenerator.getGeneratedProperty(itemId,
 				columnId);
 		Class<?> result = columnGenerator.getType();
-		assertThat(result.equals(Date.class), is(true));
+		assertThat((Class)result, equalTo((Class)property.getType()));
 	}
 
 	@Test
 	public void shouldGetGeneratedPropertyWithNullValueWhenItemIsNull() {
 		when(tableMock.getItem(itemId)).thenReturn(null);
-		Property property = columnGenerator.getGeneratedProperty(itemId,
+		Property<?> property = columnGenerator.getGeneratedProperty(itemId,
 				columnId);
 
 		assertThat(null, is(property));

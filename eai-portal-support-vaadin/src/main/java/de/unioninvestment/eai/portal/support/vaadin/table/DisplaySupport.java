@@ -70,5 +70,5 @@ public interface DisplaySupport {
 	 * @return der formatierte String zum Wert
 	 */
 	@Deprecated
-	String formatPropertyValue(Property property, Format format);
+	String formatPropertyValue(@SuppressWarnings("rawtypes") Property property, Format format);
 }

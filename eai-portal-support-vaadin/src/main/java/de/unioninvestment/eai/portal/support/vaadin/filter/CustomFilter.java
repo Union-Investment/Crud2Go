@@ -10,6 +10,8 @@ import com.vaadin.data.Item;
  */
 public class CustomFilter implements Filter {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Matcher Interface.
 	 * 

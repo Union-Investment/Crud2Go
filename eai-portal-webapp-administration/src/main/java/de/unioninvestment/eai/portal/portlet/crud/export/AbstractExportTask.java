@@ -78,8 +78,11 @@ public abstract class AbstractExportTask implements ExportTask {
 				@Override
 				public void export() {
 					ui.getSession().getLockInstance().unlock();
-					realExportWithExportSettings.export();
-					ui.getSession().getLockInstance().lock();
+					try {
+						realExportWithExportSettings.export();
+					} finally {
+						ui.getSession().getLockInstance().lock();
+					}
 				}
 			});
 		} finally {

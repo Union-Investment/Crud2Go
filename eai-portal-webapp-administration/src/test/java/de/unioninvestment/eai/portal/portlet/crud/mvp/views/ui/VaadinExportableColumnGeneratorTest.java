@@ -58,6 +58,7 @@ public class VaadinExportableColumnGeneratorTest {
 				dataContainerMock);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldReturnTypeFromModel() {
 		when(columnMock.getGeneratedType()).thenAnswer(new Answer<Object>() {
@@ -69,6 +70,7 @@ public class VaadinExportableColumnGeneratorTest {
 		assertThat((Class<String>) generator.getType(), equalTo(String.class));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldReturnValueFromGeneratorInModel() {
 		when(columnMock.getGeneratedValueGenerator()).thenReturn(generatorMock);
@@ -82,7 +84,7 @@ public class VaadinExportableColumnGeneratorTest {
 			}
 		});
 
-		Property property = generator.getGeneratedProperty("itemId", "col");
+		Property<?> property = generator.getGeneratedProperty("itemId", "col");
 
 		assertThat(property.getValue(), is((Object) "1234"));
 		assertThat((Class<String>) property.getType(), equalTo(String.class));

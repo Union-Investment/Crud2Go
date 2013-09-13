@@ -25,6 +25,7 @@ import com.vaadin.ui.Form
  *
  * @author Bastian Krol
  */
+@Deprecated
 class FormFactory extends AbstractComponentFactory {
 
 	/**

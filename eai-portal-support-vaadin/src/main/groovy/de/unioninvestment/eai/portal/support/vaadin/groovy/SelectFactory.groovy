@@ -18,11 +18,10 @@
 */
 package de.unioninvestment.eai.portal.support.vaadin.groovy
 
-import groovy.util.FactoryBuilderSupport;
-
 import com.vaadin.ui.Component
 import com.vaadin.ui.Select
 
+@Deprecated
 class SelectFactory extends AbstractFieldFactory {
 
 	@Override

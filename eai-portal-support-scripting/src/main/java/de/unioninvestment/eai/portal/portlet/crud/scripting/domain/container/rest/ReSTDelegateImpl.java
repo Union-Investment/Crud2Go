@@ -104,8 +104,6 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 	private AuditLogger auditLogger;
 
-	private Realm realm;
-
 	public ReSTDelegateImpl(ReSTContainerConfig containerConfig,
 			ReSTContainer container, Realm realm, ScriptBuilder scriptBuilder,
 			AuditLogger auditLogger) {
@@ -131,9 +129,9 @@ public class ReSTDelegateImpl implements ReSTDelegate {
 
 	private PayloadCreator createCreator() {
 		if (config.getFormat() == ReSTFormatConfig.JSON) {
-			return new JsonCreator(container, config, scriptBuilder);
+			return new JsonCreator(container, scriptBuilder);
 		} else if (config.getFormat() == ReSTFormatConfig.XML) {
-			return new XmlCreator(container, config, scriptBuilder);
+			return new XmlCreator(container, scriptBuilder);
 		} else {
 			throw new TechnicalCrudPortletException("Unknown ReST format: "
 					+ config.getFormat());

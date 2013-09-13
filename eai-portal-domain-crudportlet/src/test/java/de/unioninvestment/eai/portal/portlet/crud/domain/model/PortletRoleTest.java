@@ -20,8 +20,6 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,7 +63,6 @@ public class PortletRoleTest {
 	@Test
 	public void shouldCheckRoleIfUserIsMember() {
 		when(userMock.getName()).thenReturn("horst");
-		when(jdbcTemplateMock.queryForInt(anyString(), any())).thenReturn(4711);
 		when(
 				portalMock.hasPermission("horst", "MEMBER",
 						PortletRole.RESOURCE_KEY, "1")).thenReturn(true);

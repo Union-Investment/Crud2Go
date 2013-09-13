@@ -129,7 +129,6 @@ public class ScriptDatabaseQueryContainer extends ScriptDatabaseContainer {
 		int start = 0;
 		boolean inQuotes = false;
 		int length = queryString.length();
-		int last = length - 1;
 		for (int current = 0; current < length; current++) {
 			if (queryString.charAt(current) == '\'') {
 				inQuotes = !inQuotes; // toggle state

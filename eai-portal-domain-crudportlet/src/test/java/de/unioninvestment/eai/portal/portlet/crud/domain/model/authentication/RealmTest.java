@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -51,8 +50,6 @@ public class RealmTest {
 
 	@Mock
 	private PortletRequest requestMock;
-	@Mock
-	private PortletResponse responseMock;
 	@Mock
 	private PortletPreferences preferencesMock;
 	@Mock

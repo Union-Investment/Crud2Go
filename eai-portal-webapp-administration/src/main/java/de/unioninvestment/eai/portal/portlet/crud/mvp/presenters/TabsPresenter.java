@@ -50,7 +50,7 @@ public class TabsPresenter extends AbstractComponentPresenter<Tabs, TabsView>
 		super(tabsView, tabs);
 		getView().initialize(this);
 		if (tabs.getActiveTabProperty() != null) {
-			tabs.getActiveTabProperty().addListener(this);
+			tabs.getActiveTabProperty().addValueChangeListener(this);
 		}
 	}
 

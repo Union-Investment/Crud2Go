@@ -31,7 +31,6 @@ import com.vaadin.data.util.converter.Converter;
  * 
  * @author carsten.mjartan
  */
-@SuppressWarnings("unchecked")
 @org.springframework.stereotype.Component
 public class TimestampFormatter implements Converter<String, Timestamp> {
 

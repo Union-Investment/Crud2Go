@@ -50,7 +50,7 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.sqlcontainer.ColumnProperty;
-import com.vaadin.server.Sizeable;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
@@ -97,7 +97,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 	private Item itemMock;
 
 	@Mock
-	private Property propertyMock;
+	private Property<String> propertyMock;
 
 	@Mock
 	private DisplaySupport displaySupportMock;
@@ -125,9 +125,6 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 	// @Mock
 	// private TableColumn testColumnMock;
-
-	@Mock
-	private Map<String, ContainerField> fieldsMapMock;
 
 	@Before
 	public void setup() {
@@ -173,7 +170,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 	@Test
 	public void shouldReturnReadonlyFieldByContainerInfoIfNoTableColumns() {
 		ColumnProperty property = new ColumnProperty("test", true, false, true,
-				"1", String.class);
+				false, "1", String.class);
 		when(containerFieldMock.isReadonly()).thenReturn(true);
 
 		containerShouldReturnDataType(String.class);
@@ -230,8 +227,8 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		when(tableColumnsMock.getDropdownSelections(anyString())).thenReturn(
 				selectionMock);
 
-		Field result = crudTableFieldFactory.createField(containerMock, "foo",
-				"test", componentMock);
+		Field<?> result = crudTableFieldFactory.createField(containerMock,
+				"foo", "test", componentMock);
 
 		assertThat(result, new InstanceOf(AbstractSelect.class));
 
@@ -244,7 +241,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 	@Test
 	public void shouldCreateMultilineField() {
 		ColumnProperty property = new ColumnProperty("test", true, false, true,
-				"1", String.class);
+				false, "1", String.class);
 		when(containerFieldMock.isReadonly()).thenReturn(true);
 
 		containerShouldReturnDataType(String.class);
@@ -274,7 +271,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 		prepareCheckBoxTest(String.class, "1", false);
 
-		Field result = crudTableFieldFactory.createField(containerMock, "1",
+		Field<?> result = crudTableFieldFactory.createField(containerMock, "1",
 				"test", componentMock);
 
 		assertThat(result, new InstanceOf(com.vaadin.ui.CheckBox.class));
@@ -288,7 +285,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 		prepareCheckBoxTest(String.class, "1", true);
 
-		Field result = crudTableFieldFactory.createField(containerMock, "1",
+		Field<?> result = crudTableFieldFactory.createField(containerMock, "1",
 				"test", componentMock);
 
 		// assertThat(result, instanceOf(com.vaadin.ui.CheckBox.class));
@@ -304,7 +301,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 		prepareCheckBoxTest(Number.class, 1, false);
 
-		Field result = crudTableFieldFactory.createField(containerMock, 1,
+		Field<?> result = crudTableFieldFactory.createField(containerMock, 1,
 				"test", componentMock);
 
 		assertThat(result, instanceOf(com.vaadin.ui.CheckBox.class));
@@ -318,7 +315,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 		prepareCheckBoxTest(Number.class, 1, true);
 
-		Field result = crudTableFieldFactory.createField(containerMock, 1,
+		Field<?> result = crudTableFieldFactory.createField(containerMock, 1,
 				"test", componentMock);
 
 		// assertThat(result, instanceOf(com.vaadin.ui.CheckBox.class));
@@ -332,7 +329,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(containerFieldMock.isReadonly()).thenReturn(readonly);
 		ColumnProperty property = new ColumnProperty("test", readonly, false,
-				true, value, Number.class);
+				true, false, value, Number.class);
 
 		// set displayer support and value
 		DisplaySupport displayer = null;
@@ -372,13 +369,13 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 	@Test
 	public void shouldNotCreateFieldWithoutDisplaySupport() {
 		ColumnProperty property = new ColumnProperty("test", false, false,
-				true, "1", String.class);
+				true, false, "1", String.class);
 		containerShouldReturnDataType(List.class);
 
 		when(itemMock.getItemProperty(any())).thenReturn(property);
 		when(databaseContainerMock.findDisplayer(anyString())).thenReturn(null);
 
-		Field result = crudTableFieldFactory.createField(containerMock, "1",
+		Field<?> result = crudTableFieldFactory.createField(containerMock, "1",
 				"test", componentMock);
 		assertNull(result);
 	}
@@ -386,7 +383,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 	@Test
 	public void shouldCreateInputFieldWithCommonSettingsWhenDisplaySupportIsAvailable() {
 		ColumnProperty property = new ColumnProperty("test", false, false,
-				true, "1", String.class);
+				true, false, "1", String.class);
 		containerShouldReturnDataType(String.class);
 
 		when(itemMock.getItemProperty(any())).thenReturn(property);
@@ -406,14 +403,14 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 		assertThat(result, is(fieldMock));
 		verify(fieldMock).setCaption("Test");
-		verify(fieldMock).setWidth(100, Sizeable.UNITS_PERCENTAGE);
+		verify(fieldMock).setWidth(100, Unit.PERCENTAGE);
 		verify(fieldMock).setBuffered(true); // enable buffering
 	}
 
 	@Test
 	public void shouldUseFieldNameAsCaptionWhenUnconfigured() {
 		ColumnProperty property = new ColumnProperty("test", true, false, true,
-				"1", String.class);
+				false, "1", String.class);
 		when(containerFieldMock.isReadonly()).thenReturn(true);
 
 		containerShouldReturnDataType(String.class);
@@ -433,7 +430,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 	@Test
 	public void shouldUseConfiguredTitleAsCaption() {
 		ColumnProperty property = new ColumnProperty("test", true, false, true,
-				"1", String.class);
+				false, "1", String.class);
 		when(containerFieldMock.isReadonly()).thenReturn(true);
 
 		containerShouldReturnDataType(String.class);
@@ -457,7 +454,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 	@Test
 	public void shouldUseLongTitleAsDescriptionTooltip() {
 		ColumnProperty property = new ColumnProperty("test", true, false, true,
-				"1", String.class);
+				false, "1", String.class);
 		when(containerFieldMock.isReadonly()).thenReturn(true);
 
 		containerShouldReturnDataType(String.class);

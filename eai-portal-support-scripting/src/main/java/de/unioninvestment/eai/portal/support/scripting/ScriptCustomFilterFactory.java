@@ -19,24 +19,15 @@
 package de.unioninvestment.eai.portal.support.scripting;
 
 import groovy.lang.Closure;
-
-import org.slf4j.LoggerFactory;
-
 import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterFactory;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptFormAction;
 
 /**
  * Factoryklasse für SQLFilter.
  * 
  */
 public class ScriptCustomFilterFactory implements CustomFilterFactory {
-
-	private static final org.slf4j.Logger LOG = LoggerFactory
-			.getLogger(ScriptCustomFilterFactory.class);
-
-	private final ScriptFormAction formAction;
 
 	private final ScriptBuilder scriptBuilder;
 
@@ -48,14 +39,11 @@ public class ScriptCustomFilterFactory implements CustomFilterFactory {
 	 * @param formAction
 	 *            Script-FormAction Model
 	 */
-	public ScriptCustomFilterFactory(ScriptBuilder scriptBuilder,
-			ScriptFormAction formAction) {
-		this.formAction = formAction;
+	public ScriptCustomFilterFactory(ScriptBuilder scriptBuilder) {
 		this.scriptBuilder = scriptBuilder;
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public CustomFilter createCustomFilter(CustomFilterConfig config) {
 		Closure<Object> filterClosure = scriptBuilder
 				.buildClosure(config.getFilter());

@@ -84,7 +84,7 @@ public class QueryOptionListTest {
 	private OptionListChangeEventHandler listenerMock;
 
 	@Mock
-	private Future futureMock;
+	private Future<?> futureMock;
 
 	@Before
 	public void setUp() {
@@ -145,7 +145,7 @@ public class QueryOptionListTest {
 	public void shouldPrefetchOnLoadWithAsyncConfig() {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
 
-		VolatileOptionList queryOptionList = new QueryOptionList(config,
+		new QueryOptionList(config,
 				eventBusMock, connectionPool, executorMock);
 
 		verify(executorMock).submit(any(Callable.class));
@@ -202,7 +202,7 @@ public class QueryOptionListTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "serial" })
 	public void shouldLoadOptionsSynchronouslyIfFutureIsInterrupted()
 			throws InterruptedException, ExecutionException {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
@@ -220,6 +220,7 @@ public class QueryOptionListTest {
 		assertThat(queryOptionList.getOptions(null).get("A"), is("B"));
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void shouldRefresh() {
 		Map<String, String> options = new HashMap<String, String>();

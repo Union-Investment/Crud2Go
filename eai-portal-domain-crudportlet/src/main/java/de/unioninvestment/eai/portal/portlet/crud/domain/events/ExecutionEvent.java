@@ -29,18 +29,18 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.SourceEvent;
  * @author carsten.mjartan
  */
 public class ExecutionEvent implements
-		SourceEvent<ExecutionEventHandler, AbstractAction> {
+		SourceEvent<ExecutionEventHandler, AbstractAction<?>> {
 
 	private static final long serialVersionUID = 42L;
 
-	private final AbstractAction source;
+	private final AbstractAction<?> source;
 
 	/**
 	 * 
 	 * @param source
 	 *            die Event-Quelle
 	 */
-	public ExecutionEvent(AbstractAction source) {
+	public ExecutionEvent(AbstractAction<?> source) {
 		this.source = source;
 	}
 
@@ -50,7 +50,7 @@ public class ExecutionEvent implements
 	}
 
 	@Override
-	public AbstractAction getSource() {
+	public AbstractAction<?> getSource() {
 		return source;
 	}
 

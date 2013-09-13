@@ -22,9 +22,6 @@ import groovy.json.JsonSlurper;
 
 import java.io.Reader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 
@@ -34,9 +31,6 @@ import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
  * @author carsten.mjartan
  */
 public class JsonParser extends AbstractParser {
-
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(JsonParser.class);
 
 	/**
 	 * @param config

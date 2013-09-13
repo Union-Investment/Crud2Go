@@ -32,9 +32,6 @@ import static org.mockito.Mockito.when;
 import java.sql.SQLException;
 import java.util.Date;
 
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -87,12 +84,6 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 	@Mock
 	private Button uploadVcsButton = new Button();
-
-	@Mock
-	private ResourceResponse responseMock;
-
-	@Mock
-	private ResourceRequest requestMock;
 
 	@Mock
 	private Settings settingsMock;

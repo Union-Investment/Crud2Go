@@ -30,7 +30,6 @@ import com.vaadin.ui.Field;
 @ValidatorKeyword("maxlen")
 public class MaxlenValidator implements FieldValidator {
 
-	private static final long serialVersionUID = 1L;
 	private com.vaadin.data.Validator vaadinValidator;
 	private int maxLen;
 
@@ -47,7 +46,7 @@ public class MaxlenValidator implements FieldValidator {
 	}
 
 	@Override
-	public void apply(Field field) {
+	public void apply(Field<?> field) {
 		if (field instanceof AbstractTextField) {
 			((AbstractTextField)field).setMaxLength(maxLen);
 		}

@@ -87,7 +87,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public abstract class AbstractDataContainerTest<C extends AbstractDataContainer, V extends Ordered> {
 
@@ -128,9 +127,6 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 
 	@Mock
 	private ExportWithExportSettings exportMock;
-
-	@Mock
-	private EventBus eventBusMock;
 
 	@Rule
 	public LiferayContext liferayContext = new LiferayContext();
@@ -326,6 +322,7 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 						new Equal("ID", 1) })), Or.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldAddNotFilterWithAllSubfilter() {
 		container.setVaadinContainer(vaadinContainerMock);
@@ -361,6 +358,7 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 		}));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldAddNotFilterWithSingleSubfilter() {
 		container.setVaadinContainer(vaadinContainerMock);
@@ -482,6 +480,7 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 			String columnName, final Class<?> columnType) {
 		when(containerMock.getType(columnName)).thenAnswer(
 				new Answer<Class<Object>>() {
+					@SuppressWarnings("unchecked")
 					@Override
 					public Class<Object> answer(InvocationOnMock invocation)
 							throws Throwable {

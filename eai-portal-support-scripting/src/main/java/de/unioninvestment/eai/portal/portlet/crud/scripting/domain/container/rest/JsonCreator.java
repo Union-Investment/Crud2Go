@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.InvalidConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericContainerRowId;
@@ -41,14 +40,11 @@ public class JsonCreator implements PayloadCreator {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(JsonCreator.class);
 
-	private ReSTContainerConfig config;
 	private ReSTContainer container;
 	private ScriptBuilder scriptBuilder;
 
-	public JsonCreator(ReSTContainer container, ReSTContainerConfig config,
-			ScriptBuilder scriptBuilder) {
+	public JsonCreator(ReSTContainer container, ScriptBuilder scriptBuilder) {
 		this.container = container;
-		this.config = config;
 		this.scriptBuilder = scriptBuilder;
 	}
 

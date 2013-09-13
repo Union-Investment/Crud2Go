@@ -40,7 +40,7 @@ public class AdvancedStringFilterTest {
 	private Item itemMock;
 
 	@Mock
-	private Property propertyMock;
+	private Property<String> propertyMock;
 
 	@Before
 	public void setUp() {

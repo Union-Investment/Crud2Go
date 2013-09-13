@@ -13,7 +13,6 @@ import groovy.lang.Closure;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,13 +86,12 @@ public class AbstractParserTest {
 
 	@Test
 	public void shouldDelegateParsingToTheSubclass() throws IOException {
-		StringReader reader = new StringReader(REQUEST_CONTENT);
 		TestParser parser = createParser(RestTestConfig.readonlyConfig(),
 				new ArrayList<Object[]>());
 		when(responseMock.getEntity()).thenReturn(
 				new StringEntity(REQUEST_CONTENT, "UTF-8"));
 
-		List<Object[]> rows = parser.getRows(responseMock);
+		parser.getRows(responseMock);
 
 		assertThat(new BufferedReader(parser.getReader()).readLine(),
 				is(REQUEST_CONTENT));

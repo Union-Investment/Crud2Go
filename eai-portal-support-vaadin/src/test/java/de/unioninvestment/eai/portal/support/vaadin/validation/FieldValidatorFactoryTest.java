@@ -29,11 +29,12 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
-import de.unioninvestment.eai.portal.support.vaadin.test.commons.SupportVaadinSpringPortletContextTest;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.vaadin.ui.Field;
+
+import de.unioninvestment.eai.portal.support.vaadin.test.commons.SupportVaadinSpringPortletContextTest;
 
 @SuppressWarnings("unchecked")
 public class FieldValidatorFactoryTest extends SupportVaadinSpringPortletContextTest {
@@ -47,7 +48,7 @@ public class FieldValidatorFactoryTest extends SupportVaadinSpringPortletContext
 		}
 
 		@Override
-		public void apply(Field field) {
+		public void apply(Field<?> field) {
 			//
 		}
 	}
@@ -59,7 +60,7 @@ public class FieldValidatorFactoryTest extends SupportVaadinSpringPortletContext
 		}
 
 		@Override
-		public void apply(Field field) {
+		public void apply(Field<?> field) {
 			//
 		}
 	}
@@ -71,7 +72,7 @@ public class FieldValidatorFactoryTest extends SupportVaadinSpringPortletContext
 		}
 
 		@Override
-		public void apply(Field field) {
+		public void apply(Field<?> field) {
 			//
 		}
 	}
@@ -84,7 +85,7 @@ public class FieldValidatorFactoryTest extends SupportVaadinSpringPortletContext
 		}
 
 		@Override
-		public void apply(Field field) {
+		public void apply(Field<?> field) {
 			//
 		}
 	}
@@ -97,7 +98,7 @@ public class FieldValidatorFactoryTest extends SupportVaadinSpringPortletContext
 		}
 
 		@Override
-		public void apply(Field field) {
+		public void apply(Field<?> field) {
 			//
 		}
 	}
@@ -109,7 +110,7 @@ public class FieldValidatorFactoryTest extends SupportVaadinSpringPortletContext
 		}
 
 		@Override
-		public void apply(Field field) {
+		public void apply(Field<?> field) {
 			//
 		}
 	}
@@ -121,7 +122,7 @@ public class FieldValidatorFactoryTest extends SupportVaadinSpringPortletContext
 		}
 
 		@Override
-		public void apply(Field field) {
+		public void apply(Field<?> field) {
 			//
 		}
 	}

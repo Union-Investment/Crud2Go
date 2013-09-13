@@ -45,6 +45,8 @@ import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortlet;
  */
 public class GroovyCategorySpringApplicationPortlet extends CrudVaadinPortlet {
 
+	private static final long serialVersionUID = 1L;
+	
 	/**
 	 * Liste mit Klassen, die zusätzliche Methoden enthalten.
 	 */

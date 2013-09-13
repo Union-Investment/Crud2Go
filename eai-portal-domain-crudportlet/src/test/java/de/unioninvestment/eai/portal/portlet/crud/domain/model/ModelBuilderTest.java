@@ -22,7 +22,6 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -97,6 +96,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationException;
 
+@SuppressWarnings("unchecked")
 public class ModelBuilderTest {
 
 	@Mock
@@ -151,8 +151,6 @@ public class ModelBuilderTest {
 
 	@Captor
 	ArgumentCaptor<Boolean> deleteBooleanCaptor;
-
-	private LiferayUI applicationMock;
 
 	private Map<String, Long> resourceIds = new HashMap<String, Long>();
 
@@ -215,6 +213,7 @@ public class ModelBuilderTest {
 				fieldValidatorFactoryMock, 300, config);
 	}
 
+	
 	@Test
 	public void shouldCreateDatabaseTableModelFromConfiguration()
 			throws Exception {
@@ -361,7 +360,6 @@ public class ModelBuilderTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldCreateDatabaseQueryModelFromConfiguration()
 			throws Exception {
 
@@ -386,7 +384,6 @@ public class ModelBuilderTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldCreateDatabaseQueryModelFromConfigurationSelectWithQuery()
 			throws Exception {
 		PortletConfig config = createConfiguration("validSelectConfig.xml");
@@ -433,7 +430,6 @@ public class ModelBuilderTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldCreateDatabaseQueryModelFromConfigurationSelectWithOptionList()
 			throws Exception {
 		PortletConfig config = createConfiguration("validSelectConfig.xml");
@@ -464,7 +460,6 @@ public class ModelBuilderTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldCreateDatabaseQueryModelFromConfigurationDynamicSelect()
 			throws Exception {
 
@@ -491,7 +486,6 @@ public class ModelBuilderTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldFillTableColumnsGeneratedTypeProperty() throws Exception {
 
 		PortletConfig config = createConfiguration("validTableExportOfGeneratedColumnConfig.xml");
@@ -534,7 +528,6 @@ public class ModelBuilderTest {
 		unmarshaller.setSchema(schema);
 		InputStream stream = ModelBuilderTest.class.getClassLoader()
 				.getResourceAsStream(configRessource);
-		@SuppressWarnings("unchecked")
 		JAXBElement<PortletConfig> element = (JAXBElement<PortletConfig>) unmarshaller
 				.unmarshal(stream);
 		return element.getValue();
@@ -883,7 +876,6 @@ public class ModelBuilderTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldNotCrudQueryContainerByPermission() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
@@ -912,7 +904,6 @@ public class ModelBuilderTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldNotCrudTableContainerByPermission() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");

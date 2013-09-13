@@ -22,7 +22,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -36,7 +35,6 @@ public class DateToStringConverterTest {
 
 	private DateToStringConverter dateToStringConverter;
 	private Date date;
-	private SimpleDateFormat df;
 
 	@Before
 	public void setUp() throws Exception {
@@ -45,7 +43,6 @@ public class DateToStringConverterTest {
 		date = new GregorianCalendar(2013, 6, 4, 14, 27, 13).getTime();
 		int dateResolution = Calendar.HOUR_OF_DAY;
 		String format = "dd.MM.yyyy";
-		df = new SimpleDateFormat("dd.MM.yyyy");
 		dateToStringConverter = new DateToStringConverter(dateResolution,
 				format);
 	}

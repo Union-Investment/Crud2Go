@@ -46,7 +46,7 @@ public class GenericContainerFieldTest extends ContainerFieldTest {
 	@Mock
 	private GenericVaadinContainer vaadinContainerMock;
 
-	private GenericProperty itemProperty;
+	private GenericProperty<Object> itemProperty;
 	
 	@Before
 	public void setupGenericContainerFieldTest() {
@@ -81,7 +81,7 @@ public class GenericContainerFieldTest extends ContainerFieldTest {
 
 		Mockito.when(itemMock.getContainer()).thenReturn(vaadinContainerMock);
 		
-		itemProperty = new GenericProperty(columnMock, propertyValue);
+		itemProperty = new GenericProperty<Object>(columnMock, propertyValue);
 		itemProperty.setItem(itemMock);
 		
 		return new GenericContainerField(genericContainerRowMock, itemProperty, containerMock);

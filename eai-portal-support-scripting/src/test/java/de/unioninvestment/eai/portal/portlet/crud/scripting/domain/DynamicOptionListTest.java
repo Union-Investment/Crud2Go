@@ -114,7 +114,7 @@ public class DynamicOptionListTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldGetMapFromArraysThrowsException() throws Exception {
 		letClosureReturn(new String[] { "ERROR" });
-		Map<String, String> options = selection.getOptions(context);
+		selection.getOptions(context);
 	}
 
 	private void letClosureReturn(final Object returnValue) {

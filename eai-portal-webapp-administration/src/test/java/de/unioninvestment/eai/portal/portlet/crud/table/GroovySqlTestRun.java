@@ -46,6 +46,7 @@ public class GroovySqlTestRun {
 		sql.eachRow(select, new Closure<Object>(this) {
 			private static final long serialVersionUID = 1L;
 
+			@SuppressWarnings("unused")
 			public void doCall(GroovyResultSet row) {
 				System.out.println(row);
 			}

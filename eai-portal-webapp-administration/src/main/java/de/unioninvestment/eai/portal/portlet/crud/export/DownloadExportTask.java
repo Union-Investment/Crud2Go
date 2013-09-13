@@ -6,21 +6,18 @@ package de.unioninvestment.eai.portal.portlet.crud.export;
 import java.io.InputStream;
 import java.io.Serializable;
 
+import org.codehaus.groovy.runtime.StackTraceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaadin.addon.tableexport.TableExport;
 import com.vaadin.server.Page;
-import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download.Status;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTable;
 
 /**
  * Export-Task that is intended to be given its download-content asynchronously
@@ -101,7 +98,7 @@ public class DownloadExportTask extends AbstractExportTask implements
 
 		} catch (Exception e) {
 			finished = true;
-			LOGGER.error("Error during report generation", e);
+			LOGGER.error("Error during report generation", StackTraceUtils.deepSanitize(e));
 			informFrontendAboutException(e);
 
 		} finally {

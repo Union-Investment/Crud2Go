@@ -23,10 +23,8 @@ import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Field;
-import com.vaadin.ui.Select;
+import com.vaadin.ui.ComboBox;
 
-import de.unioninvestment.eai.portal.support.vaadin.validation.RequiredValidator;
 import de.unioninvestment.eai.portal.support.vaadin.validation.validator.AbstractValidatorTest;
 
 public class RequiredValidatorTest extends AbstractValidatorTest {
@@ -47,7 +45,7 @@ public class RequiredValidatorTest extends AbstractValidatorTest {
 
 	@Test
 	public void sholdSetNullSelectionAllowed() {
-		AbstractSelect field = new Select();
+		AbstractSelect field = new ComboBox();
 		validator.apply(field);
 		
 		assertFalse(field.isNullSelectionAllowed());

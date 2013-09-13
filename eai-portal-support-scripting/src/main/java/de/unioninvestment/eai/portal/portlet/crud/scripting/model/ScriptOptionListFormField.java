@@ -27,8 +27,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
  */
 public class ScriptOptionListFormField extends ScriptFormField {
 
-	private static final long serialVersionUID = 42L;
-
 	/**
 	 * Konstruktor.
 	 * 

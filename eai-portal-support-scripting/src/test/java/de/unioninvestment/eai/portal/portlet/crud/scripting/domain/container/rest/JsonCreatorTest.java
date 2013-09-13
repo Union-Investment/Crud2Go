@@ -60,7 +60,7 @@ public class JsonCreatorTest {
 
 	private JsonCreator newJsonCreator(ReSTContainerConfig config) {
 		JsonCreator creator = new JsonCreator(containerMock,
-				config, scriptBuilderMock);
+				scriptBuilderMock);
 		return creator;
 	}
 

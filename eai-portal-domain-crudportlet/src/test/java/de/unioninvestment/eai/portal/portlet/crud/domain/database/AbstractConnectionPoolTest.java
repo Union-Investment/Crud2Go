@@ -46,6 +46,7 @@ public class AbstractConnectionPoolTest {
 
 	private DummyConnectionPool pool;
 
+	@SuppressWarnings("serial")
 	private class DummyConnectionPool extends AbstractConnectionPool {
 
 		public DummyConnectionPool() {
@@ -77,6 +78,7 @@ public class AbstractConnectionPoolTest {
 		verify(connectionMock).setAutoCommit(false);
 	}
 
+	@SuppressWarnings("serial")
 	@Test(expected = BusinessException.class)
 	public void shouldThrowBusinessInsteadOfNamingException()
 			throws SQLException, NamingException {

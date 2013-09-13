@@ -52,6 +52,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.TableFieldFactory;
 
+@SuppressWarnings("rawtypes")
 public class BufferedTableTest {
 
 	@Mock
@@ -61,7 +62,7 @@ public class BufferedTableTest {
 	private Container containerMock;
 
 	@Mock
-	private Field fieldMock;
+	private Field<?> fieldMock;
 
 	// @Spy
 	// private StringDataType stringDataTypeMock = new StringDataType();
@@ -94,15 +95,16 @@ public class BufferedTableTest {
 		assertEquals(String.class, type);
 	}
 
+	
 	@Test
 	public void shouldRegisterNewFieldsOnlyIfBuffered() {
 
 		when(fieldMock.isBuffered()).thenReturn(false);
-		when(
+		when((Field)
 				fieldFactoryMock.createField(table.getContainerDataSource(), 1,
 						"col", table)).thenReturn(fieldMock);
 
-		Field field = (Field) table.getPropertyValue(1, "col", null);
+		Field<?> field = (Field<?>) table.getPropertyValue(1, "col", null);
 		assertEquals(fieldMock, field);
 		assertThat(table.getRegisteredFields().size(), is(0));
 
@@ -112,11 +114,11 @@ public class BufferedTableTest {
 	public void shouldRegisterNewFields() {
 
 		when(fieldMock.isBuffered()).thenReturn(true);
-		when(
+		when((Field)
 				fieldFactoryMock.createField(table.getContainerDataSource(), 1,
 						"col", table)).thenReturn(fieldMock);
 
-		Field field = (Field) table.getPropertyValue(1, "col", null);
+		Field<?> field = (Field<?>) table.getPropertyValue(1, "col", null);
 		assertEquals(fieldMock, field);
 		assertTrue(table.getRegisteredFields().contains(fieldMock));
 	}
@@ -147,10 +149,10 @@ public class BufferedTableTest {
 	@Test
 	public void shouldCommitAllValidFields() {
 		shouldRegisterNewFields();
-		Field notValidFieldMock = mock(Field.class);
+		Field<?> notValidFieldMock = mock(Field.class);
 		when(notValidFieldMock.isBuffered()).thenReturn(true);
 		when(fieldMock.isBuffered()).thenReturn(true);
-		when(
+		when((Field)
 				fieldFactoryMock.createField(table.getContainerDataSource(), 2,
 						"col2", table)).thenReturn(notValidFieldMock);
 

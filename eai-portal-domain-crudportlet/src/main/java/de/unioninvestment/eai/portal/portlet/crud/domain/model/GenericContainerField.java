@@ -33,6 +33,7 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
  * @author markus.bonsch
  * 
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class GenericContainerField extends ContainerField {
 
 	private final GenericContainerRow row;

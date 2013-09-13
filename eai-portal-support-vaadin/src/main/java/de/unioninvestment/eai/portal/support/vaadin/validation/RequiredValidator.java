@@ -30,7 +30,6 @@ import com.vaadin.ui.Field;
 @ValidatorKeyword("required")
 public class RequiredValidator implements FieldValidator {
 
-	private static final long serialVersionUID = 1L;
 	private final String validatorMsg;
 
 	/**
@@ -42,7 +41,7 @@ public class RequiredValidator implements FieldValidator {
 	}
 
 	@Override
-	public void apply(Field field) {
+	public void apply(Field<?> field) {
 		field.setRequired(true);
 		field.setRequiredError(validatorMsg);
 		if (field instanceof AbstractSelect) {
