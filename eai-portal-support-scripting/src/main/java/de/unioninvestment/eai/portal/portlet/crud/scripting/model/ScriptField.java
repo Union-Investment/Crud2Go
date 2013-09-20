@@ -75,7 +75,7 @@ public class ScriptField {
 		if (ContainerClob.class.isAssignableFrom(type)
 				|| ContainerBlob.class.isAssignableFrom(type)) {
 			throw new UnsupportedOperationException(
-					"setValue wird für Lobs nicht unterstützt.");
+					"setValue() is not supported for Lobs. Please use row.values.MYLOB.setValue(...) instead.");
 		}
 		containerField.setValue(value);
 	}
