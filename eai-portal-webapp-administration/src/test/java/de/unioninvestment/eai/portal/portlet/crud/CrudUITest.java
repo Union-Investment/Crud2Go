@@ -87,7 +87,11 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 public class CrudUITest extends SpringPortletContextTest {
 
 	@InjectMocks
-	private CrudUI app = new CrudUI();
+	private CrudUI app = new CrudUI() {
+		public void accessSynchronously(Runnable runnable) throws com.vaadin.ui.UIDetachedException {
+			runnable.run();
+		};
+	};
 
 	@Mock
 	private Settings settingsMock;

@@ -448,7 +448,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	 * 
 	 * {@inheritDoc}
 	 */
-	public void handleRenderRequest(RenderRequest request,
+	public void handleRenderRequest(final RenderRequest request,
 			RenderResponse response, UI ui) {
 		LOG.debug("Handling render request...");
 		if (portletDomain != null) {
@@ -458,13 +458,23 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			if (firstLoad) {
 				firstLoad = false;
 			} else if (request.getPortletMode() == PortletMode.VIEW) {
-				portletDomain.handleReload();
+				accessSynchronously(new Runnable() {
+					@Override
+					public void run() {
+						portletDomain.handleReload();
+					}
+				});
 			}
 		}
 		if (portletUriFragmentUtility != null) {
 			// portletUriFragmentUtility.setInitialFragment();
 		}
-		handleViewChange(request);
+		accessSynchronously(new Runnable() {
+			@Override
+			public void run() {
+				handleViewChange(request);
+			}
+		});
 	}
 
 	@Override
