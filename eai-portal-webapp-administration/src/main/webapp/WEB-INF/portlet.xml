@@ -23,11 +23,9 @@
 
 		<!-- Replaced the resource-bundle config by portlet-info, as it causes a bug that prevents hot deployment with jboss 7 -->
 		<portlet-info>
-			<title>Crud2Go</title>
-			<short-title>Crud2Go</short-title>
+			<title>CRUD-Portlet</title>
+			<short-title>CRUD-Portlet</short-title>
 		</portlet-info>
-		
-		<!-- <supported-locale>de</supported-locale> <resource-bundle>de.unioninvestment.eai.portal.portlet.crud.portlet-info</resource-bundle> -->
-		
+				
 	</portlet>
 </portlet-app>
