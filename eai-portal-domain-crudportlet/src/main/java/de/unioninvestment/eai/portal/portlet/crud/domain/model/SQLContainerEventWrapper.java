@@ -19,6 +19,8 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -89,8 +91,37 @@ public class SQLContainerEventWrapper extends SQLContainer implements
 	 */
 	@Override
 	public void fireContentsChange() {
-
 		super.fireContentsChange();
+	}
+
+	/**
+	 * Mark item as modified (for blobs and clobs)
+	 * 
+	 * @param containerRowId
+	 *            modified item
+	 */
+	public void markRowAsModified(Object itemId) {
+		try {
+			RowItem item = (RowItem) getItemUnfiltered(itemId);
+
+			Method method = SQLContainer.class.getDeclaredMethod(
+					"itemChangeNotification", RowItem.class);
+			method.setAccessible(true);
+			method.invoke(this, item);
+
+		} catch (NoSuchMethodException e) {
+			throw new TechnicalCrudPortletException(
+					"Error finding super.itemChangeNotification(RowItem) via reflection",
+					e);
+		} catch (IllegalAccessException e) {
+			throw new TechnicalCrudPortletException(
+					"Error calling super.itemChangeNotification(RowItem) via reflection",
+					e);
+		} catch (InvocationTargetException e) {
+			throw new TechnicalCrudPortletException(
+					"Error calling super.itemChangeNotification(RowItem) via reflection",
+					e);
+		}
 	}
 
 	@Override
