@@ -24,13 +24,13 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import com.vaadin.addon.sqlcontainer.RowId;
-import com.vaadin.addon.sqlcontainer.RowItem;
 import com.vaadin.addon.sqlcontainer.SQLContainer;
 import com.vaadin.addon.sqlcontainer.TemporaryRowId;
 import com.vaadin.addon.sqlcontainer.query.OrderBy;
@@ -39,7 +39,6 @@ import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQueryEventWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
 
@@ -214,36 +213,25 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 
 	@Override
 	public void commit() {
+		markRowsWithModifiedLobsAsModified();
 		super.commit();
-		try {
-			if (isAdditionalColumnModified()) {
-				try {
-					queryDelegate.beginTransaction();
-					for (ContainerRowId containerRowId : blobFields.keySet()) {
-						RowItem item = (RowItem) getVaadinContainer()
-								.getItemUnfiltered(
-										containerRowId.getInternalId());
-						queryDelegate.storeRow(item);
-					}
-					for (ContainerRowId containerRowId : clobFields.keySet()) {
-						RowItem item = (RowItem) getVaadinContainer()
-								.getItemUnfiltered(
-										containerRowId.getInternalId());
-						queryDelegate.storeRow(item);
-					}
-					queryDelegate.commit();
-					getVaadinContainer().refresh();
-				} catch (SQLException e) {
-					try {
-						queryDelegate.rollback();
-					} catch (SQLException e1) {
-						throw new ContainerException(e1);
-					}
-					throw new ContainerException(e);
+		clearAdditionalFields();
+	}
+
+	private void markRowsWithModifiedLobsAsModified() {
+		for (Entry<ContainerRowId, Map<String, ContainerBlob>> rowBlobs : blobFields.entrySet()) {
+			for (ContainerBlob blob : rowBlobs.getValue().values()) {
+				if (blob.isModified()) {
+					getVaadinContainer().markRowAsModified(rowBlobs.getKey().getInternalId());
 				}
 			}
-		} finally {
-			clearAdditionalFields();
+		}
+		for (Entry<ContainerRowId, Map<String, ContainerClob>> rowClobs : clobFields.entrySet()) {
+			for (ContainerClob clob : rowClobs.getValue().values()) {
+				if (clob.isModified()) {
+					getVaadinContainer().markRowAsModified(rowClobs.getKey().getInternalId());
+				}
+			}
 		}
 	}
 

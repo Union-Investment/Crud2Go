@@ -20,7 +20,6 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -40,7 +39,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.NamingException;
 
@@ -48,7 +49,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import com.vaadin.addon.sqlcontainer.RowId;
-import com.vaadin.addon.sqlcontainer.RowItem;
 import com.vaadin.addon.sqlcontainer.TemporaryRowId;
 import com.vaadin.addon.sqlcontainer.query.OrderBy;
 import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
@@ -56,7 +56,6 @@ import com.vaadin.addon.sqlcontainer.query.generator.StatementHelper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQueryEventWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportCallback;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
@@ -181,7 +180,6 @@ public class DatabaseQueryContainerTest
 	public void shouldCommitContainerWithModifiedClob() throws SQLException {
 		container.setVaadinContainer(vaadinContainerMock);
 		String value = "testValue";
-		RowItem rowItem = createRow(rowIdMock);
 		when(queryDelegateMock.getCLob(any(RowId.class), anyString()))
 				.thenReturn(value);
 		when(containerRowIdMock.getInternalId()).thenReturn(rowIdMock);
@@ -190,45 +188,11 @@ public class DatabaseQueryContainerTest
 		ContainerClob containerClob = container.getCLob(containerRowIdMock,
 				"TestCol");
 		containerClob.setValue("NewValue");
-
-		when(vaadinContainerMock.getItemUnfiltered(any(RowId.class)))
-				.thenReturn(rowItem);
 
 		container.commit();
 
-		verify(queryDelegateMock).storeRow(rowItem);
-		verify(queryDelegateMock).commit();
-
-	}
-
-	@Test
-	public void shouldRollbackContainerCommitWithModifiedClob()
-			throws SQLException {
-		container.setVaadinContainer(vaadinContainerMock);
-		String value = "testValue";
-		RowItem rowItem = createRow(rowIdMock);
-		when(queryDelegateMock.getCLob(any(RowId.class), anyString()))
-				.thenReturn(value);
-		when(containerRowIdMock.getInternalId()).thenReturn(rowIdMock);
-		container.setQueryDelegate(queryDelegateMock);
-
-		doThrow(new SQLException()).when(queryDelegateMock).storeRow(rowItem);
-
-		ContainerClob containerClob = container.getCLob(containerRowIdMock,
-				"TestCol");
-		containerClob.setValue("NewValue");
-
-		when(vaadinContainerMock.getItemUnfiltered(any(RowId.class)))
-				.thenReturn(rowItem);
-		try {
-			container.commit();
-			assertTrue(false);
-		} catch (ContainerException e) {
-			assertTrue(true);
-		}
-		ContainerClob otherContainerClob = container.getCLob(
-				containerRowIdMock, "TestCol");
-		assertThat(containerClob, is(not(sameInstance(otherContainerClob))));
+		verify(vaadinContainerMock).markRowAsModified(rowIdMock);
+		assertThat(container.clobFields, is(Collections.<ContainerRowId, Map<String, ContainerClob>>emptyMap()));
 	}
 
 	@Test
@@ -332,7 +296,6 @@ public class DatabaseQueryContainerTest
 		container.setVaadinContainer(vaadinContainerMock);
 		byte[] value = new byte[] { 1, 2, 3 };
 		byte[] newValue = new byte[] { 1, 2, 3, 4, 5 };
-		RowItem rowItem = createRow(rowIdMock);
 		when(queryDelegateMock.getBLob(any(RowId.class), anyString()))
 				.thenReturn(value);
 		when(containerRowIdMock.getInternalId()).thenReturn(rowIdMock);
@@ -342,13 +305,10 @@ public class DatabaseQueryContainerTest
 				"TestCol");
 		containerBlob.setValue(newValue);
 
-		when(vaadinContainerMock.getItemUnfiltered(any(RowId.class)))
-				.thenReturn(rowItem);
-
 		container.commit();
 
-		verify(queryDelegateMock).storeRow(rowItem);
-		verify(queryDelegateMock).commit();
+		verify(vaadinContainerMock).markRowAsModified(rowIdMock);
+		assertThat(container.blobFields, is(Collections.<ContainerRowId, Map<String, ContainerBlob>>emptyMap()));
 	}
 
 	@Override
