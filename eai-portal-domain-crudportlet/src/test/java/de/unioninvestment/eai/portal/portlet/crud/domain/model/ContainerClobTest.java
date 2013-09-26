@@ -76,6 +76,18 @@ public class ContainerClobTest {
 	}
 
 	@Test
+	public void shouldAllowSettingClobToNull() throws IOException {
+		containerClob = new ContainerClob(queryDelegateMock,
+				containerRowIdMock, "Column");
+
+		containerClob.setValue(null);
+
+		int size = containerClob.getSize();
+		assertThat(size, is(0));
+		assertThat(containerClob.getValue(), is(nullValue()));
+}
+
+	@Test
 	public void clobWithoutDataShouldBeNull() {
 		containerClob = new ContainerClob();
 		int size = containerClob.getSize();

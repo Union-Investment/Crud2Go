@@ -61,6 +61,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerClob;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
@@ -113,6 +115,15 @@ public class ScriptTableTest {
 
 	@Captor
 	private ArgumentCaptor<TableDoubleClickEventHandler> doubleClickEventCaptor;
+
+	@Captor
+	private ArgumentCaptor<Map<String,Object>> defaultValueMapCaptor;
+
+	@Mock
+	private ContainerClob containerClobMock;
+
+	@Mock
+	private ContainerBlob containerBlobMock;
 
 	@Before
 	public void setUp() {
@@ -333,13 +344,20 @@ public class ScriptTableTest {
 	public void shouldDelegateCreateNewRow() {
 		// Gegeben einige Werte für eine neue Zeile
 		Map<String, Object> values = createValuesForNewRow();
-		when(tableMock.createNewRow(values)).thenReturn(containerRowMock);
+		when(tableMock.createNewRow((Map<String,Object>)any())).thenReturn(containerRowMock);
 
 		// wenn per createNewRow eine neue Zeile hinzugefügt wird
 		scriptTable.createNewRow(values);
 
 		// dann sollte dies an die Modell-Table delegiert werden
-		verify(tableMock).createNewRow(values);
+		verify(tableMock).createNewRow(defaultValueMapCaptor.capture());
+		
+		assertThat(defaultValueMapCaptor.getValue().size(), is(5));
+		assertThat(defaultValueMapCaptor.getValue().get("1"), is((Object)"Fitze"));
+		assertThat(defaultValueMapCaptor.getValue().get("2"), is((Object)"Fatze"));
+		assertThat(defaultValueMapCaptor.getValue().get("3"), is((Object)"Foo"));
+		assertThat(defaultValueMapCaptor.getValue().get("4"), is((Object)containerClobMock));
+		assertThat(defaultValueMapCaptor.getValue().get("5"), is((Object)containerBlobMock));
 	}
 
 	private Map<String, Object> createValuesForNewRow() {
@@ -347,6 +365,8 @@ public class ScriptTableTest {
 		values.put("1", "Fitze");
 		values.put("2", "Fatze");
 		values.put("3", "Foo");
+		values.put("4", new ScriptClob(containerClobMock));
+		values.put("5", new ScriptBlob(containerBlobMock));
 		return values;
 	}
 

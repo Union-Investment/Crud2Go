@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -89,13 +90,22 @@ public class ContainerBlobTest {
 	}
 
 	@Test
-	public void shouldBlobIsUnmodifiedAfterCommit() {
+	public void shouldAlllowSettingToNullValue() {
+		containerBlob.setValue(null);
+
+		assertThat(containerBlob.isEmpty(), is(true));
+		assertThat(containerBlob.isModified(), is(true));
+		assertThat(containerBlob.getValue(), is(nullValue()));
+	}
+
+	@Test
+	public void shouldBeUnmodifiedAfterCommit() {
 		byte[] data = new byte[] { 1, 2 };
 		containerBlob.setValue(data);
 		containerBlob.commit();
 		assertThat(containerBlob.isModified(), is(false));
 	}
-
+	
 	@Test
 	public void shouldInitializeEmptyBlob() {
 		containerBlob = new ContainerBlob();

@@ -23,8 +23,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.sql.Blob;
+import java.sql.Clob;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -79,6 +82,19 @@ public class DatabaseContainerFieldTest extends ContainerFieldTest {
 	@Rule
 	public LiferayContext liferayContext = new LiferayContext();
 
+	@Mock
+	private ContainerClob clobMock;
+	@Mock
+	private ContainerClob otherClobMock;
+
+	@Mock
+	private ContainerRowId containerRowIdMock;
+
+	@Mock
+	private ContainerBlob blobMock;
+	@Mock
+	private ContainerBlob otherBlobMock;
+
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() {
@@ -106,6 +122,8 @@ public class DatabaseContainerFieldTest extends ContainerFieldTest {
 
 		rowItem = new RowItem(sqlContainerMock, rowIdMock,
 				Arrays.asList(columnProperty));
+
+		when(rowMock.getId()).thenReturn(containerRowIdMock);
 
 		databaseContainerField = createContainerField();
 	}
@@ -301,5 +319,89 @@ public class DatabaseContainerFieldTest extends ContainerFieldTest {
 	DatabaseContainerField createContainerField() {
 		return new DatabaseContainerField(rowMock, columnProperty,
 				containerMock);
+	}
+
+	@Test
+	public void shouldSetValueForClobFromOtherClob() {
+		createClobField();
+		when(otherClobMock.getValue()).thenReturn("TestText");
+
+		databaseContainerField.setValue(otherClobMock);
+
+		verify(clobMock).setValue("TestText");
+	}
+
+	@Test
+	public void shouldSetValueForClobFromString() {
+		createClobField();
+
+		databaseContainerField.setValue("TestText");
+
+		verify(clobMock).setValue("TestText");
+	}
+
+	@Test
+	public void shouldSetNullValueForClob() {
+		createClobField();
+
+		databaseContainerField.setValue(null);
+
+		verify(clobMock).setValue(null);
+	}
+
+	private void createClobField() {
+		columnProperty = new ColumnProperty(propertyId, false, true, true,
+				false, propertyValue, Clob.class);
+
+		rowItem = new RowItem(sqlContainerMock, rowIdMock,
+				Arrays.asList(columnProperty));
+
+		databaseContainerField = createContainerField();
+
+		when(containerMock.isCLob(propertyId)).thenReturn(true);
+		when(containerMock.getCLob(containerRowIdMock, propertyId)).thenReturn(
+				clobMock);
+	}
+
+	@Test
+	public void shouldSetValueForBlobFromOtherBlob() {
+		createBlobField();
+		when(otherBlobMock.getValue()).thenReturn("TestText".getBytes());
+
+		databaseContainerField.setValue(otherBlobMock);
+
+		verify(blobMock).setValue("TestText".getBytes());
+	}
+
+	@Test
+	public void shouldSetValueForBlobFromByteArray() {
+		createBlobField();
+
+		databaseContainerField.setValue("TestText".getBytes());
+
+		verify(blobMock).setValue("TestText".getBytes());
+	}
+
+	@Test
+	public void shouldSetNullValueForBlob() {
+		createBlobField();
+
+		databaseContainerField.setValue(null);
+
+		verify(blobMock).setValue(null);
+	}
+
+	private void createBlobField() {
+		columnProperty = new ColumnProperty(propertyId, false, true, true,
+				false, propertyValue, Blob.class);
+
+		rowItem = new RowItem(sqlContainerMock, rowIdMock,
+				Arrays.asList(columnProperty));
+
+		databaseContainerField = createContainerField();
+
+		when(containerMock.isBLob(propertyId)).thenReturn(true);
+		when(containerMock.getBLob(containerRowIdMock, propertyId)).thenReturn(
+				blobMock);
 	}
 }

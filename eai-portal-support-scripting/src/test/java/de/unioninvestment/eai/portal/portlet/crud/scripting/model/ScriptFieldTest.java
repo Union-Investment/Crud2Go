@@ -20,14 +20,13 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerClob;
@@ -42,6 +41,18 @@ public class ScriptFieldTest {
 
 	@Mock
 	private ContainerField containerFieldMock;
+
+	@Mock
+	private ScriptClob scriptClobMock;
+
+	@Mock
+	private ScriptBlob scriptBlobMock;
+
+	@Mock
+	private ContainerClob containerClobMock;
+
+	@Mock
+	private ContainerBlob containerBlobMock;
 
 	@Before
 	public void setUp() {
@@ -69,25 +80,22 @@ public class ScriptFieldTest {
 		assertThat(scriptField.isModified(), is(true));
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
-	public void shouldRevokeUpdatesOfClobFields() {
-		when(containerFieldMock.getType()).thenAnswer(new Answer<Object>() {
-			@Override
-			public Object answer(InvocationOnMock invocation) throws Throwable {
-				return ContainerClob.class;
-			}
-		});
-		scriptField.setValue(null);
+	@Test
+	public void shouldAllowUpdatesOfClobFields() {
+		when(scriptClobMock.getContainerClob()).thenReturn(containerClobMock);
+		
+		scriptField.setValue(scriptClobMock);
+		
+		verify(containerFieldMock).setValue(containerClobMock);
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
-	public void shouldRevokeUpdatesOfBlobFields() {
-		when(containerFieldMock.getType()).thenAnswer(new Answer<Object>() {
-			@Override
-			public Object answer(InvocationOnMock invocation) throws Throwable {
-				return ContainerBlob.class;
-			}
-		});
-		scriptField.setValue(null);
+	@Test
+	public void shouldAllowUpdatesOfBlobFields() {
+		when(scriptBlobMock.getContainerBlob()).thenReturn(containerBlobMock);
+		
+		scriptField.setValue(scriptBlobMock);
+		
+		verify(containerFieldMock).setValue(containerBlobMock);
 	}
+
 }

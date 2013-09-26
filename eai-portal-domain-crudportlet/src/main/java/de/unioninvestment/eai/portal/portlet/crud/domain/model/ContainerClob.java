@@ -116,10 +116,10 @@ public class ContainerClob {
 	 *            der neue CLob-Wert
 	 */
 	public void setValue(String value) {
-		this.size = value.length();
+		this.size = value != null ? value.length() : 0;
 		this.data = value;
-		isInitialized = true;
-		isModified = true;
+		this.isInitialized = true;
+		this.isModified = true;
 	}
 
 	/**

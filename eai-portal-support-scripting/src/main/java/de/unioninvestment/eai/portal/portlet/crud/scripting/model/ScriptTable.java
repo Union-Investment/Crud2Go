@@ -23,6 +23,7 @@ import static java.util.Collections.unmodifiableSet;
 import groovy.lang.Closure;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +48,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.map.TransformedEntryMap;
 import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
 
 /**
@@ -480,7 +482,17 @@ public class ScriptTable extends ScriptComponent {
 	 * @return die neu angelegte Zeile
 	 */
 	public ScriptRow createNewRow(Map<String, Object> values) {
-		return new ScriptRow(table.createNewRow(values));
+		return new ScriptRow(table.createNewRow(mapValuesToModel(values)));
+	}
+
+	private Map<String, Object> mapValuesToModel(
+			Map<String, Object> values) {
+		if (values == null) {
+			return Collections.<String,Object>emptyMap();
+		} else {
+			return new TransformedEntryMap<String, Object, Object>(values,
+					ScriptField.SCRIPT_TO_MODEL_VALUE_TRANSFORMER);
+		}
 	}
 
 	/**

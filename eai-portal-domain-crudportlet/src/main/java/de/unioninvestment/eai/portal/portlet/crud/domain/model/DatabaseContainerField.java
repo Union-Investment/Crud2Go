@@ -75,13 +75,53 @@ public class DatabaseContainerField extends ContainerField {
 					.withExistingTransaction(new TransactionCallback<Object>() {
 						@Override
 						public Object doInTransaction() {
-							property.setValue(value);
+							setValueInternal(value);
 							return null;
 						}
+
 					});
 		} else {
-			property.setValue(value);
+			setValueInternal(value);
 		}
+	}
+
+	private void setValueInternal(final Object value) {
+		String columnName = property.getPropertyId();
+		if (container.isCLob(columnName)) {
+			String newValue = getClobText(value);
+			container.getCLob(row.getId(), columnName).setValue(newValue);
+		} else if (container.isBLob(columnName)) {
+			byte[] newValue = getBlobContent(value);
+			container.getBLob(row.getId(), columnName).setValue(newValue);
+		} else {
+			try {
+				property.setValue(value);
+				
+			} catch (IllegalArgumentException e) {
+				throw new IllegalArgumentException("Error setting value of '"
+						+ property.getPropertyId() + "'", e);
+			}
+		}
+	}
+
+	private byte[] getBlobContent(Object value) {
+		byte[] newValue;
+		if (value instanceof ContainerBlob) {
+			newValue = ((ContainerBlob) value).getValue();
+		} else {
+			newValue = (value == null ? null : (byte[]) value);
+		}
+		return newValue;
+	}
+
+	private String getClobText(final Object value) {
+		String newValue;
+		if (value instanceof ContainerClob) {
+			newValue = ((ContainerClob) value).getValue();
+		} else {
+			newValue = (value == null ? null : value.toString());
+		}
+		return newValue;
 	}
 
 	/**

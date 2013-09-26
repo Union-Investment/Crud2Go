@@ -19,19 +19,21 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.server.StreamResource.StreamSource;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQueryEventWrapper;
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 
 /**
- * BLob Implementierung für das Domain Model.
+ * BLob Implementierung für das Domain Model. Während geänderte Daten im
+ * Speicher gehalten werden, werden unveränderte Blobs immer aus der Datenbank
+ * geladen und nicht zwischengespeichert, um den Speicherverbrauch gering zu
+ * halten.
  * 
  * @author markus.bonsch
+ * @author carsten.mjartan
  * 
  */
 public class ContainerBlob {
@@ -75,18 +77,12 @@ public class ContainerBlob {
 	 * 
 	 */
 	public byte[] getValue() {
-		return toArray(getInputStream());
-	}
-
-	private byte[] toArray(ByteArrayInputStream bais) {
-		byte[] array = new byte[bais.available()];
-		try {
-			bais.read(array);
-		} catch (IOException e) {
-			throw new TechnicalCrudPortletException(
-					"Error while reading blob data.", e);
+		if (isInitialized) {
+			return data;
+		} else {
+			return queryDelegate.getBLob(
+					(RowId) containerRowId.getInternalId(), columnName);
 		}
-		return array;
 	}
 
 	public void setValue(byte[] data) {
@@ -104,12 +100,12 @@ public class ContainerBlob {
 		}
 	}
 
+	/**
+	 * @return den Content als InputStream oder <code>null</code>
+	 */
 	public ByteArrayInputStream getInputStream() {
-		if (!isInitialized) {
-			return new ByteArrayInputStream(queryDelegate.getBLob(
-					(RowId) containerRowId.getInternalId(), columnName));
-		}
-		return new ByteArrayInputStream(data);
+		byte[] result = getValue();
+		return result == null ? null : new ByteArrayInputStream(result);
 	}
 
 	public StreamSource getStreamSource() {
