@@ -30,6 +30,7 @@ import org.springframework.context.MessageSource;
 
 import com.vaadin.addon.tableexport.TableExport;
 import com.vaadin.server.StreamResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
@@ -79,21 +80,22 @@ public abstract class AbstractTableExportTask extends AbstractExportTask
 			LOGGER.info("Started export thread for report '{}'", filename);
 			export = createExport();
 
-			doWithExportSettingsAndProperLocking(tableModel, new ExportWithExportSettings() {
-				public void export() {
-					LOGGER.info("Building Report");
-					try {
-						export.convertTable();
-						finished = true;
-						informFrontendAboutFinish();
-						LOGGER.info("Finished Building Excel sheet");
+			doWithExportSettingsAndProperLocking(tableModel,
+					new ExportWithExportSettings() {
+						public void export() {
+							LOGGER.info("Building Report");
+							try {
+								export.convertTable();
+								finished = true;
+								informFrontendAboutFinish();
+								LOGGER.info("Finished Building Excel sheet");
 
-					} catch (ExportInterruptionException e) {
-						LOGGER.info("Report generation was cancelled/interrupted");
-						cancelled = true;
-					}
-				}
-			});
+							} catch (ExportInterruptionException e) {
+								LOGGER.info("Report generation was cancelled/interrupted");
+								cancelled = true;
+							}
+						}
+					});
 			LOGGER.info("Finished export thread for report '{}'", filename);
 
 		} catch (Exception e) {
@@ -155,16 +157,24 @@ public abstract class AbstractTableExportTask extends AbstractExportTask
 		}
 	}
 
+	/**
+	 * Wait for background task to finish releasing the UI lock for that time
+	 */
 	private void waitForFinishing() {
-		while (true) {
-			if (finished) {
-				return;
+		try {
+			VaadinSession.getCurrent().getLockInstance().unlock();
+			while (true) {
+				if (finished) {
+					return;
+				}
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					return;
+				}
 			}
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				return;
-			}
+		} finally {
+			VaadinSession.getCurrent().getLockInstance().lock();
 		}
 	}
 
