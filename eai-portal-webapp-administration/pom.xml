@@ -40,23 +40,6 @@
 			<artifactId>eai-portal-support-vaadin</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>javax.portlet</groupId>
-			<artifactId>portlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.liferay.portal</groupId>
-			<artifactId>portal-service</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- Spring source -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -230,6 +213,16 @@
 			<artifactId>log4j</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.liferay.portal</groupId>
+			<artifactId>portal-service</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -333,6 +326,14 @@
 					<verbose>false</verbose>
 					<showWeaveInfo>false</showWeaveInfo>
 					<weaveDependencies>
+						<weaveDependency>
+							<groupId>com.vaadin</groupId>
+							<artifactId>vaadin-server</artifactId>
+						</weaveDependency>
+						<weaveDependency>
+							<groupId>de.uit.eai.portal</groupId>
+							<artifactId>eai-portal-domain-crudportlet</artifactId>
+						</weaveDependency>
 						<weaveDependency>
 							<groupId>com.vaadin</groupId>
 							<artifactId>vaadin-server</artifactId>

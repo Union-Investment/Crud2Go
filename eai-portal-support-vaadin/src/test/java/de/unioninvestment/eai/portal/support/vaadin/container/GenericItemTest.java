@@ -46,10 +46,10 @@ public class GenericItemTest {
 	private GenericItem item;
 
 	@Mock
-	private GenericProperty<Object> propertyMock;
+	private GenericProperty propertyMock;
 
 	@Mock
-	private GenericProperty<Object> propertyMock2;
+	private GenericProperty propertyMock2;
 
 	@Before
 	public void setUp() {

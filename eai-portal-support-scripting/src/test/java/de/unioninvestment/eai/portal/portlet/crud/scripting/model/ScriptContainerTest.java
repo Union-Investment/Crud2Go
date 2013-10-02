@@ -38,10 +38,6 @@ public class ScriptContainerTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-	}
-
-	@Before
-	public void setup() {
 		scriptContainer = new ScriptContainer(dataContainerMock);
 	}
 

@@ -20,23 +20,16 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.domain;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import groovy.lang.Closure;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.dialogs.ConfirmDialog.Listener;
 
@@ -46,8 +39,6 @@ import com.vaadin.ui.Window;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ConfirmationDialogProvider.Result;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ ConfirmDialog.class })
 public class ConfirmationDialogProviderTest {
 
 	@Mock
@@ -55,11 +46,9 @@ public class ConfirmationDialogProviderTest {
 
 	@Mock
 	private Window window;
-
-	private ConfirmDialog dialog;
-
+	
 	@Captor
-	private ArgumentCaptor<Listener> listener;
+	private ArgumentCaptor<ConfirmDialog> dialogCaptor;
 
 	@Captor
 	private ArgumentCaptor<Result> result;
@@ -70,27 +59,25 @@ public class ConfirmationDialogProviderTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		PowerMockito.mockStatic(ConfirmDialog.class);
-		dialog = PowerMockito.mock(ConfirmDialog.class);
 	}
 
 	@Test
 	public void shouldCreateDialog() {
-		ConfirmationDialogProvider provider = new ConfirmationDialogProvider(
-				null);
-		provider.doCall("Title", "Question", "Accept", "Decline", actionClosure);
-
-		PowerMockito.verifyStatic();
-		ConfirmDialog.show(eq(UI.getCurrent()), eq("Title"), eq("Question"),
-				eq("Accept"), eq("Decline"), isA(Listener.class));
+		createDialog();
+		
+		assertThat(dialogCaptor.getValue().getCaption(), is("Title"));
+		assertThat(dialogCaptor.getValue().getOkButton().getCaption(), is("Accept"));
+		assertThat(dialogCaptor.getValue().getCancelButton().getCaption(), is("Decline"));
 	}
 
-	@Test()
+	@SuppressWarnings("serial")
+	@Test
 	public void shouldCallClosure() {
 		createDialog();
-
-		when(dialog.isConfirmed()).thenReturn(true);
-		listener.getValue().onClose(dialog);
+		Listener listener = dialogCaptor.getValue().getListener();
+		listener.onClose(new ConfirmDialog() {{
+			setConfirmed(true);
+		}});
 
 		verify(actionClosure).call(result.capture());
 		assertThat(result.getValue().isConfirmed(), is(true));
@@ -101,8 +88,6 @@ public class ConfirmationDialogProviderTest {
 				null);
 		provider.doCall("Title", "Question", "Accept", "Decline", actionClosure);
 
-		PowerMockito.verifyStatic();
-		ConfirmDialog.show(eq(UI.getCurrent()), eq("Title"), eq("Question"),
-				eq("Accept"), eq("Decline"), listener.capture());
+		verify(UI.getCurrent()).addWindow(dialogCaptor.capture());
 	}
 }

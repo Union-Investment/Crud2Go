@@ -724,7 +724,7 @@ public class ModelBuilderTest {
 		FormField field = ((Form) build.getPage().getElements().get(0))
 				.getFields().get("CVARCHAR5_NN");
 
-		assertThat(field, is(MultiOptionListFormField.class));
+		assertThat(field, instanceOf(MultiOptionListFormField.class));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

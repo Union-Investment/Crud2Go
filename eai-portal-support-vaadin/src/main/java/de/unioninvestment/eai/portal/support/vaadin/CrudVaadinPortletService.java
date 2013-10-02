@@ -23,9 +23,11 @@ import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinPortlet;
 import com.vaadin.server.VaadinPortletService;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
 
 public class CrudVaadinPortletService extends VaadinPortletService {
 
+	private static final String CRUD2GO_PROCESSING_INFO = "CRUD2GO_PROCESSING_INFO";
 	private static final long serialVersionUID = 1L;
 
 	public CrudVaadinPortletService(VaadinPortlet portlet,
@@ -45,5 +47,18 @@ public class CrudVaadinPortletService extends VaadinPortletService {
 	@Override
 	public String getStaticFileLocation(VaadinRequest request) {
 		return getCurrentRequest().getContextPath();
+	}
+
+	@Override
+	public void requestStart(VaadinRequest request, VaadinResponse response) {
+		request.setAttribute(CRUD2GO_PROCESSING_INFO,
+				new RequestProcessingInfo());
+		super.requestStart(request, response);
+	}
+
+	public RequestProcessingInfo getCurrentRequestProcessingInfo() {
+		VaadinRequest currentRequest = getCurrentRequest();
+		return (RequestProcessingInfo) (currentRequest == null ? null : currentRequest.getAttribute(
+				CRUD2GO_PROCESSING_INFO));
 	}
 }

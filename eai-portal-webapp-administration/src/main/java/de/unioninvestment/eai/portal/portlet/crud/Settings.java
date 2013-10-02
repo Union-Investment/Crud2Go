@@ -69,6 +69,9 @@ public class Settings {
 	@Value("${portlet.crud.revision.portal.role}")
 	private String revisionPortalRole;
 
+	@Value("${portlet.crud.displayRequestProcessingInfo}")
+	private boolean displayRequestProcessingInfo;
+		
 	private URL propertiesLocation = Settings.class.getClassLoader()
 			.getResource("eai/eai-portal-administration.properties");
 
@@ -176,6 +179,14 @@ public class Settings {
 
 	public String getRevisionPortalRole() {
 		return revisionPortalRole;
+	}
+
+	public boolean isDisplayRequestProcessingInfo() {
+		return displayRequestProcessingInfo;
+	}
+
+	public void setDisplayRequestProcessingInfo(boolean displayRequestProcessingInfo) {
+		this.displayRequestProcessingInfo = displayRequestProcessingInfo;
 	}
 
 }

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.server.ErrorEvent;
+import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
 
 public class CrudErrorHandler extends DefaultErrorHandler {
@@ -37,12 +38,19 @@ public class CrudErrorHandler extends DefaultErrorHandler {
 	public void error(ErrorEvent event) {
 		Throwable throwable = event.getThrowable();
 		LOGGER.error("Internal error", StackTraceUtils.deepSanitize(throwable));
+		if (Page.getCurrent() != null) {
+			displayRootCauseAsErrorNotification(throwable);
+		}
+	}
+
+	private void displayRootCauseAsErrorNotification(Throwable throwable) {
 		Throwable rootCause = StackTraceUtils.extractRootCause(throwable);
 		String message = rootCause.getMessage();
 		if (message != null) {
 			Notification.show(message, Notification.Type.ERROR_MESSAGE);
 		} else {
-			Notification.show(rootCause.getClass().getSimpleName(), Notification.Type.ERROR_MESSAGE);
+			Notification.show(rootCause.getClass().getSimpleName(),
+					Notification.Type.ERROR_MESSAGE);
 		}
 	}
 }

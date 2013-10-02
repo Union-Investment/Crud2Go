@@ -51,6 +51,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.JavaScript;
@@ -78,6 +79,7 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.DatasourceInfoView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BusinessExceptionMessage;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.Popup;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.PortletUriFragmentUtility;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.RequestProcessingLabel;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
@@ -85,6 +87,7 @@ import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.support.UnconfiguredMessage;
+import de.unioninvestment.eai.portal.support.vaadin.timing.TimingPortletListener;
 import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationException;
 
 /**
@@ -114,7 +117,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 	private DatasourceInfoPresenter datasourceInfo;
 
-	private ComponentContainer viewPage = new VerticalLayout();
+	private VerticalLayout viewPage = new VerticalLayout();
 	private ComponentContainer editPage = new VerticalLayout();
 	private ComponentContainer helpPage;
 
@@ -154,6 +157,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	boolean firstLoad = true;
 
 	Config portletConfig;
+
+	private RequestProcessingLabel requestProcessingLabel;
 
 	/**
 	 * Initialisierung des PortletPresenter.
@@ -319,6 +324,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 			if (status == ConfigStatus.CONFIGURED) {
 				initializeModelAndViews(portletConfig);
+				addServerProcessingInfo();
 			} else {
 				viewPage.addComponent(new UnconfiguredMessage());
 			}
@@ -333,6 +339,19 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		}
 	}
 
+	private void addServerProcessingInfo() {
+		if (settings.isDisplayRequestProcessingInfo()) {
+			if (requestProcessingLabel == null) {
+				requestProcessingLabel = new RequestProcessingLabel();
+				VaadinPortletSession portletSession = (VaadinPortletSession) VaadinPortletSession
+						.getCurrent();
+				portletSession.addPortletListener(new TimingPortletListener(requestProcessingLabel));
+			} 
+			viewPage.addComponent(requestProcessingLabel);
+			viewPage.setComponentAlignment(requestProcessingLabel, Alignment.MIDDLE_RIGHT);
+		}
+	}
+	
 	private ConfigStatus getConfigStatus(Config portletConfig) {
 		if (portletConfig == null) {
 			return ConfigStatus.NO_CONFIG;
@@ -497,6 +516,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	@Override
 	public void handleResourceRequest(ResourceRequest request,
 			ResourceResponse response, UI ui) {
+		
 		LOG.debug("Handling resource request...");
 		handleViewChange(request);
 	}

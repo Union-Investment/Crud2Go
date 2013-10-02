@@ -61,6 +61,6 @@ public class DateToTimestampConverterTest {
 		DateToTimestampConverter converter = new DateToTimestampConverter(
 				resolution);
 		assertThat(converter.convertToModel(oldDate, Timestamp.class,
-				Locale.GERMANY), equalTo((Object) newDate));
+				Locale.GERMANY), equalTo(new Timestamp(newDate.getTime())));
 	}
 }
