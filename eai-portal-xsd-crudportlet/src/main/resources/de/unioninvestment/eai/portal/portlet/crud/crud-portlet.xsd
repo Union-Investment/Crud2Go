@@ -38,7 +38,8 @@
 					</choice>
 					<element name="dialog" type="tns:DialogConfig" minOccurs="0"
 						maxOccurs="unbounded" />
-					<element name="script" type="tns:ScriptConfig" minOccurs="0" />
+					<element name="script" type="tns:ScriptConfig" minOccurs="0"
+						maxOccurs="unbounded" />
 				</sequence>
 				<attribute name="title" type="string">
 					<annotation>
@@ -220,7 +221,23 @@
 			</documentation>
 		</annotation>
 		<simpleContent>
-			<extension base="string" />
+			<extension base="string">
+				<attribute name="property" type="string">
+					<annotation>
+						<documentation>
+							Propertyname, unter dem das Script zur Laufzeit
+							referenzierbar ist.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="src" type="string">
+					<annotation>
+						<documentation>
+							Relativer Pfad des zu inkludierenden Scripts
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
 		</simpleContent>
 	</complexType>
 

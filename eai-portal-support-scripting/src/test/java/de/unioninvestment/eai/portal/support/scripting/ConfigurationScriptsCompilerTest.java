@@ -97,7 +97,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 
 		verify(scriptCompilerMock)
 				.compileScript(
-						"log.info \"Hello World\"\nlog.debug 'Main-Script executed...'");
+						"log.info \"Hello World\"\nlog.debug 'MainPortletScript.groovy execution finished...'");
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 
 		verify(scriptCompilerMock)
 				.compileScript(
-						"def aufruf() { println \"aufruf erfolgreich\" }\nlog.debug 'Main-Script executed...'");
+						"def aufruf() { println \"aufruf erfolgreich\" }\nlog.debug 'MainPortletScript.groovy execution finished...'");
 		verify(scriptCompilerMock).compileScript("{ it -> aufruf() }");
 		// assertThat(config.getScript().getValue().getClazz(), notNullValue());
 	}
@@ -193,7 +193,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		assertThat(getDynamicSelect(portletConfig).getDynamic().getOptions()
 				.getClazz(), notNullValue());
 
-		Script script = portletConfig.getScript().getValue().getClazz()
+		Script script = portletConfig.getScript().get(0).getValue().getClazz()
 				.newInstance();
 		script.getBinding()
 				.setVariable(
@@ -285,7 +285,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 
 		Closure<?> generatorClosure = (Closure<?>) generatorScript.run();
 
-		Script mainScript = portletConfig.getScript().getValue().getClazz()
+		Script mainScript = portletConfig.getScript().get(0).getValue().getClazz()
 				.newInstance();
 		generatorClosure.setDelegate(mainScript);
 
@@ -303,7 +303,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		new ConfigurationScriptsCompiler(scriptCompiler)
 				.compileAllScripts(portletConfig);
 
-		Script mainScript = portletConfig.getScript().getValue().getClazz()
+		Script mainScript = portletConfig.getScript().get(0).getValue().getClazz()
 				.newInstance();
 
 		TableConfig tableConfig = (TableConfig) portletConfig.getPage()
@@ -349,7 +349,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		PortletConfig portletConfig = createConfiguration("validScriptConfig.xml");
 		when(
 				scriptCompilerMock
-						.compileScript("log.info \"Hello World\"\nlog.debug 'Main-Script executed...'"))
+						.compileScript("log.info \"Hello World\"\nlog.debug 'MainPortletScript.groovy execution finished...'"))
 				.thenThrow(
 						new ScriptingException(null,
 								"portlet.crud.error.compilingScript"));
@@ -371,7 +371,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		new ConfigurationScriptsCompiler(scriptCompiler)
 				.compileAllScripts(portletConfig);
 
-		Script mainScript = portletConfig.getScript().getValue().getClazz()
+		Script mainScript = portletConfig.getScript().get(0).getValue().getClazz()
 				.newInstance();
 
 		TableConfig tableConfig = (TableConfig) portletConfig.getPage()
@@ -483,7 +483,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		when(tabsMock.getActiveTab()).thenReturn(tabMock);
 		when(tabMock.getId()).thenReturn("tab1");
 
-		Script script = portletConfig.getScript().getValue().getClazz()
+		Script script = portletConfig.getScript().get(0).getValue().getClazz()
 				.newInstance();
 		script.getBinding().setVariable("portlet", portletMock);
 		script.getBinding()

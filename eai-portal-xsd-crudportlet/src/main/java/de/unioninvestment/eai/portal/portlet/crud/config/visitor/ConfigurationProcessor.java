@@ -33,6 +33,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RolesConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
@@ -79,11 +80,14 @@ public class ConfigurationProcessor {
 			traverseTabs(portletConfig.getTabs());
 		}
 		traverseDialogs(portletConfig);
-
-		if (portletConfig.getScript() != null) {
-			visitLeaf(portletConfig.getScript());
-		}
+		traverseScripts(portletConfig);
 		visitor.visitAfter(portletConfig);
+	}
+
+	private void traverseScripts(PortletConfig portletConfig) {
+		for (ScriptConfig scriptConfig : portletConfig.getScript()) {
+			visitLeaf(scriptConfig);
+		}
 	}
 
 	void traverseAuthentication(AuthenticationConfig authenticationConfig) {

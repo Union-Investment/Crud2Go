@@ -18,6 +18,11 @@
  */
 package de.unioninvestment.eai.portal.support.scripting;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import groovy.lang.Binding;
 import groovy.lang.Closure;
 import groovy.lang.Script;
 
@@ -39,6 +44,8 @@ public class ScriptBuilder {
 	private static final org.slf4j.Logger LOG = LoggerFactory
 			.getLogger(ScriptBuilder.class);
 	private Script mainScript;
+	private Binding mainScriptBinding = new Binding();
+	private Binding propertyScriptBinding = new Binding();
 
 	/**
 	 * Registriert das Haupt-Script.
@@ -63,7 +70,8 @@ public class ScriptBuilder {
 	 *             falls der Script-Builder nicht initialisiert wurde
 	 */
 	public void addBindingVariable(String name, Object value) {
-		mainScript.getBinding().setVariable(name, value);
+		mainScriptBinding.setVariable(name, value);
+		propertyScriptBinding.setVariable(name, value);
 	}
 
 	/**
@@ -71,6 +79,7 @@ public class ScriptBuilder {
 	 * 
 	 */
 	public void runMainScript() {
+		mainScript.setBinding(mainScriptBinding);
 		mainScript.run();
 	}
 
@@ -121,6 +130,15 @@ public class ScriptBuilder {
 
 	public Script getMainScript() {
 		return mainScript;
+	}
+
+	public void registerAndRunPropertyScript(String property,
+			GroovyScript script) {
+		Script scriptInstance = createNewInstance(script);
+		scriptInstance.setBinding(propertyScriptBinding);
+		scriptInstance.run();
+		
+		mainScriptBinding.setVariable(property, scriptInstance);
 	}
 
 }

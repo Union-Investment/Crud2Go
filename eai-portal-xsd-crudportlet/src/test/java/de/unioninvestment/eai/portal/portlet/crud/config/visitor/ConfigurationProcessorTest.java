@@ -115,7 +115,7 @@ public class ConfigurationProcessorTest {
 
 	@Test
 	public void shouldCallVisitorMethodsOnPortletAndScriptConfig() {
-		portletConfig.setScript(scriptConfig);
+		portletConfig.getScript().add(scriptConfig);
 		processor.traverse(portletConfig);
 		verifyVisitsInOrder(portletConfig, scriptConfig);
 	}

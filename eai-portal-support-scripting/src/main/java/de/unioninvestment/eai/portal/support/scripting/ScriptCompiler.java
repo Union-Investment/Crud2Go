@@ -55,11 +55,24 @@ public class ScriptCompiler {
 	 *            der Script-Quellcode
 	 * @return die kompilierte Klasse
 	 */
-	@SuppressWarnings("unchecked")
 	public Class<Script> compileScript(String scriptSource) {
+		return compileScript(scriptSource, "PortletScript.groovy");
+	}
+	
+	/**
+	 * Kompiliert Strings in Scripte.
+	 * 
+	 * @param scriptSource
+	 *            der Script-Quellcode
+	 * @Param name
+	 * 			  der Klassenname
+	 * @return die kompilierte Klasse
+	 */
+	@SuppressWarnings("unchecked")
+	public Class<Script> compileScript(String scriptSource, String name) {
 
 		try {
-			return loader.parseClass(scriptSource, "PortletScript.groovy");
+			return loader.parseClass(scriptSource, name);
 
 		} catch (Exception e) {
 			throw new ScriptingException(e,

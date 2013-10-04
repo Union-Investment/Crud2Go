@@ -22,7 +22,10 @@ import groovy.lang.Closure;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig.Dynamic;
@@ -45,6 +49,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
+import de.unioninvestment.eai.portal.portlet.crud.config.validation.ConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
@@ -159,7 +164,7 @@ public class ScriptModelBuilder {
 
 		PortletConfig config = ((Config) configs.get(portlet))
 				.getPortletConfig();
-		scriptBuilder.registerMainScript(config.getScript());
+		scriptBuilder.registerMainScript(findMainScript(config));
 
 		scriptPortlet = factory.getScriptPortlet(portlet);
 
@@ -211,9 +216,41 @@ public class ScriptModelBuilder {
 		scriptBuilder.addBindingVariable("audit", new ScriptAuditLogger(
 				scriptBuilder.getMainScript(), auditLogger));
 
+		for (ScriptConfig script : findPropertyScripts(config).values()) {
+			scriptBuilder.registerAndRunPropertyScript(script.getProperty(), script.getValue());
+		}
 		scriptBuilder.runMainScript();
 
 		return scriptPortlet;
+	}
+
+	private ScriptConfig findMainScript(PortletConfig config) {
+		ScriptConfig mainScript = null;
+		for (ScriptConfig script : config.getScript()) {
+			if (script.getProperty() == null) {
+				if (mainScript == null) {
+					mainScript = script;
+				} else {
+					throw new ConfigurationException("Only one main script allowed");
+				}
+			}
+		}
+		return mainScript;
+	}
+
+	private Map<String, ScriptConfig> findPropertyScripts(PortletConfig config) {
+		Map<String,ScriptConfig> propertyScripts = new HashMap<String,ScriptConfig>();
+		for (ScriptConfig script : config.getScript()) {
+			String property = script.getProperty();
+			if (property != null) {
+				if (propertyScripts.containsKey(property)) {
+					throw new ConfigurationException("Script property must be unique: " + property);
+				} else {
+					propertyScripts.put(property, script);
+				}
+			}
+		}
+		return propertyScripts;
 	}
 
 	/**
