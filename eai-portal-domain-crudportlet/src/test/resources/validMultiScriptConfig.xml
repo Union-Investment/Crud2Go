@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+		</table>
+	</page>
+	<script property="shared" src="shared.groovy"><![CDATA[
+		log.info "Hello Shared"
+		
+		def addLog(message) {
+			log.info "Shared: $message"
+		}
+	]]></script>
+	<script><![CDATA[
+		log.info "Hello Main"
+		shared.addLog("Hello from Main");
+	]]></script>
+</portlet>
