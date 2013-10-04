@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class RequestProcessingInfoTest {
+public class RequestProcessingInfoIntegrationTest {
 
 	private RequestProcessingInfo info = new RequestProcessingInfo();
 
@@ -35,7 +35,7 @@ public class RequestProcessingInfoTest {
 
 		long duration = info.getTimeSinceRequestStart();
 
-		assertThat(duration >= 27, is(true));
+		assertThat(duration >= 25, is(true));
 		assertThat(duration < 35, is(true));
 	}
 
@@ -44,7 +44,7 @@ public class RequestProcessingInfoTest {
 		measureForDB(10L);
 
 		long duration = info.getMeasuredTime("db");
-		assertThat(duration >= 7, is(true));
+		assertThat(duration >= 5, is(true));
 		assertThat(duration < 15, is(true));
 	}
 
