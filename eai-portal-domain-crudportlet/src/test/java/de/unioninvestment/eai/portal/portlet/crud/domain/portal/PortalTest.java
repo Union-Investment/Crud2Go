@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.portal;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -25,13 +26,16 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -46,6 +50,9 @@ import com.liferay.portal.service.CompanyLocalService;
 import com.liferay.portal.service.ResourceLocalService;
 import com.liferay.portal.service.RoleLocalService;
 import com.liferay.portal.service.UserLocalService;
+import com.vaadin.server.Page;
+
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class PortalTest {
 
@@ -61,6 +68,9 @@ public class PortalTest {
 
 	@Mock
 	private User userMock;
+
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext();
 
 	private String type = de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole.RESOURCE_KEY;
 
@@ -204,4 +214,27 @@ public class PortalTest {
 
 	}
 
+	@Test
+	public void shouldOpenAPortalPageByFriendlyUrl() throws URISyntaxException {
+		portal.open("/my/friendly/url", null);
+		verify(Page.getCurrent()).open("/my/friendly/url", "_self");
+	}
+
+	@Test
+	public void shouldOpenAPortalPageByFriendlyUrlAndParameters()
+			throws URISyntaxException {
+		portal.open("/my/friendly/url", singletonMap("key", "value"));
+		verify(Page.getCurrent()).open("/my/friendly/url?key=value", "_self");
+	}
+
+	@Test
+	public void shouldReturnParametersFromCrudVaadinPortletService()
+			throws URISyntaxException {
+		Map<String, String[]> params = singletonMap("name",
+				new String[] { "Test" });
+		when(
+				liferayContext.getVaadinPortletServiceMock()
+						.getRequestParameters()).thenReturn(params);
+		assertThat(portal.getParameters(), is(params));
+	}
 }

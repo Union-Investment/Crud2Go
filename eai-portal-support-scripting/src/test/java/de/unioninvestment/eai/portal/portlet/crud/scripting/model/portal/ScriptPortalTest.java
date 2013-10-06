@@ -23,7 +23,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -51,5 +53,12 @@ public class ScriptPortalTest {
 		when(portalMock.getAllRoles()).thenReturn(roles);
 
 		assertThat(scriptPortal.getAllRoles(), is(roles));
+	}
+
+	@Test
+	public void shouldDelegateGetParameters() {
+		Map<String, String[]> params = new HashMap<String,String[]>();
+		when(portalMock.getParameters()).thenReturn(params);
+		assertThat(scriptPortal.getParameters(), is(params));
 	}
 }
