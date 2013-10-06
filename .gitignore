@@ -1,6 +1,10 @@
+*.iml
+.idea
+
 .settings
 .project
 .classpath
+
 target
 
 /eai-portal-server/downloads
@@ -28,4 +32,5 @@ target
 /eai-portal-support-vaadin/eai-portal-support-vaadin.iml
 /eai-portal-webapp-administration/eai-portal-webapp-administration.iml
 /eai-portal-xsd-crudportlet/eai-portal-xsd-crudportlet.iml
-/.idea
+
+

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Tweets zum Thema Vaadin">
+	<page>
+		<table id="tweets">
+			<rest-container>
+				<query url="http://search.twitter.com/search.json?rpp=100&amp;q=@vaadin" collection="results">
+					<attribute name="id" primary-key="true"/>
+					<attribute name="created_at" type="java.util.Date" 
+						format="EEE, dd MMM yyyy HH:mm:ss ZZZZZ" locale="en"/>
+					<attribute name="from_user"/>
+					<attribute name="text"/>
+				</query>
+			</rest-container>
+			<columns>
+				<column name="id" title="ID" primary-key="true" hidden="true"/>
+				<column name="created_at" title="Datum" />
+				<column name="from_user" title="Absender" />
+				<column name="text" title="Text"/>
+			</columns>
+		</table>
+	</page>
+</portlet>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für eine Sequenz aus Upload und Download">
+	<page>
+		<component generator="generateUploadPage(builder)" />
+	</page>
+	<dialog id="DownloadDialog" backButtonCaption="Zurück">
+		<component generator="generateDownloadDialog(builder)" />
+	</dialog>
+	<script><![CDATA[
+	
+		def generateUploadPage(builder) { 
+			def uploadedFilename;
+			def uploadedMIMEType;
+			def uploadedData;
+			
+			return builder.verticalLayout(spacing: true) {
+				label(caption: 'Bitte wählen Sie eine Datei zum Hochladen aus');			
+				upload(buttonCaption: 'Hochladen', receiver: { filename, MIMEType ->
+					return handleUploadReceived(filename, MIMEType)
+				}, onsuccess: { event ->
+					handleUploadSuceeded(event)
+				}, onfailure: { event ->
+					handleUploadFailed(event)
+				});
+			}
+		}
+		
+		// This method is called the moment the upload-button is pressed. It needs to return a java.io.OutputStream to receive the data.
+		def handleUploadReceived(filename, MIMEType){
+			uploadedFilename = filename;
+			uploadedMIMEType = MIMEType;
+			uploadedData = new ByteArrayOutputStream();
+			return uploadedData;
+		}
+		
+		// The method generateDownloadDialog() is only ever called once. Thus, to be able to change filename and mimetype on the download-link when a new upload
+		// succeeded, we need to provide global access to the corresponding instance.
+		downloadDialogLink = null;
+		
+		// This method is called when the upload was successfully completed
+		def handleUploadSuceeded(event){
+			if (downloadDialogLink) {
+				downloadDialogLink.resource.filename=event.filename;
+				downloadDialogLink.resource.MIMEType=event.MIMEType;				
+			}
+			showInfo 'Hochladen von Datei '+ event.filename + ' mit MIME-Typ '+ event.MIMEType +' erfolgreich: ' + event.length + ' bytes'; 
+			openDownloadDialog();
+		}
+		
+		// This method is called when the upload failed
+		def handleUploadFailed(event){
+			showError 'Hochladen von Datei '+ event.filename + ' mit MIME-Typ '+ event.MIMEType +' gescheitert: ' + event.reason; 
+		}
+			
+		def generateDownloadDialog(builder) {
+			layout = builder.verticalLayout(spacing: true);
+			downloadDialogLink = builder.downloadLink(
+				caption: 'Herunterladen', 
+				filename: uploadedFilename, 
+				mimetype: uploadedMIMEType, 
+				source: {
+					new ByteArrayInputStream(uploadedData.toByteArray());
+				}
+			);
+			layout.addComponent(downloadDialogLink);
+			
+			return layout;
+		}
+		
+		def openDownloadDialog() { portlet.page.attachDialog 'DownloadDialog' }
+		
+		
+	]]></script>
+</portlet>
