@@ -2,6 +2,7 @@ package de.uit.eai.portal.mvn.plugin;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.plugin.logging.Log;
 
 import java.io.File;
 import java.io.FileReader;
@@ -35,7 +36,7 @@ public class SourceTransformer {
 	private static final String SRC_ATTRIBUTE = "src";
 
 	public enum RESULT {
-		NOT_PORTLET, PORTLET_NO_PROCESSING, PORTLET_PROCESSING_DONE;
+		NOT_PORTLET, PORTLET_NO_PROCESSING, PORTLET_PROCESSING_DONE
 	}
 
 	public SourceTransformer() {
@@ -57,7 +58,13 @@ public class SourceTransformer {
             break;
         case PORTLET_PROCESSING_DONE:
             FileWriter outputFileWriter = new FileWriter(outputFilePath);
-            IOUtils.write(outputWriter.toString(), outputFileWriter);
+            try{
+                IOUtils.write(outputWriter.toString(), outputFileWriter);
+            }finally {
+                outputFileWriter.close();
+            }
+
+            break;
         }
 		return result;
 	}
@@ -84,7 +91,7 @@ public class SourceTransformer {
 			eventReader = inputFactory.createXMLEventReader(inputReader);
 			eventWriter = outputFactory.createXMLEventWriter(outputWriter);
 
-			boolean skipClosingScriptElenent = false;
+			boolean skipClosingScriptElement = false;
 
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
@@ -102,7 +109,7 @@ public class SourceTransformer {
 						String value = getSrcAttribute(element);
 						if (value != null) {
 							event = null;
-							skipClosingScriptElenent = true;
+							skipClosingScriptElement = true;
 							XMLEvent newScriptTag = eventFactory
 									.createStartElement(
 											elementQName.getPrefix(),
@@ -128,8 +135,8 @@ public class SourceTransformer {
 					QName elementQName = element.getName();
 					String nameLocalPart = elementQName.getLocalPart();
 					if (SCRIPT_TAG.equalsIgnoreCase(nameLocalPart)) {
-						if (skipClosingScriptElenent) {
-							skipClosingScriptElenent = false;
+						if (skipClosingScriptElement) {
+							skipClosingScriptElement = false;
 							event = null;
 						}
 					}
@@ -141,6 +148,7 @@ public class SourceTransformer {
 			// clean up
 			eventWriter.close();
 			eventReader.close();
+            outputWriter.flush();
 			return result;
 		} catch (javax.xml.stream.XMLStreamException e) {
 			throw new IOException(e.getMessage(), e);
@@ -190,21 +198,31 @@ public class SourceTransformer {
 
 	public static String constructAbsolutePath(String basePath,
 			String includePath) throws IOException {
-		String result = null;
-		if (includePath.startsWith("/") || includePath.contains(":")) {
-			result = includePath;
-		} else {
-			int lastIndexOf = basePath.lastIndexOf(File.separator);
-			int slashLastIndex = basePath.lastIndexOf("/");
-			lastIndexOf = lastIndexOf > slashLastIndex ? lastIndexOf
-					: slashLastIndex;
-			String baseDir = "";
-			if (lastIndexOf != -1) {
-				baseDir = basePath.substring(0, lastIndexOf + 1);
-			}
-			result = baseDir + includePath;
-		}
-		return new File(result).getCanonicalPath();
+        String result;
+        if (includePath.startsWith("/") || includePath.contains(":")) {
+            result = includePath;
+        } else {
+            String baseDir = "";
+            if (new File(basePath).isDirectory()) {
+                baseDir = basePath;
+                if(!baseDir.endsWith(File.separator)){
+                    baseDir += File.separator;
+                }
+            } else {
+
+                int lastIndexOf = basePath.lastIndexOf(File.separator);
+                int slashLastIndex = basePath.lastIndexOf("/");
+                lastIndexOf = lastIndexOf > slashLastIndex ? lastIndexOf
+                        : slashLastIndex;
+
+                if (lastIndexOf != -1) {
+                    baseDir = basePath.substring(0, lastIndexOf + 1);
+                }
+            }
+
+            result = baseDir + includePath;
+        }
+        return new File(result).getCanonicalPath();
 	}
 
 	private String getSrcAttribute(StartElement element) {

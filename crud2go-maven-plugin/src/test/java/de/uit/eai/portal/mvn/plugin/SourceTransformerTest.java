@@ -89,6 +89,19 @@ public class SourceTransformerTest {
 
 	}
 
+    @Test
+    public void testConstructAbsolutePath() throws IOException {
+        String result = SourceTransformer.constructAbsolutePath("C:/Users/serhiy.yevtushenko/Documents/mvn-plugin/crud2go-maven-plugin/target/test-classes/",
+                "validUploadConfig_Include.xml");
+        Assert.assertEquals(new File("C:/Users/serhiy.yevtushenko/Documents/mvn-plugin/crud2go-maven-plugin/target/test-classes/validUploadConfig_Include.xml").getCanonicalPath(),
+                result);
+
+        result = SourceTransformer.constructAbsolutePath("C:/Users/serhiy.yevtushenko/Documents/mvn-plugin/crud2go-maven-plugin/target/test-classes/validUploadConfig_Include.xml",
+                "otherConfig.xml");
+        Assert.assertEquals(new File("C:/Users/serhiy.yevtushenko/Documents/mvn-plugin/crud2go-maven-plugin/target/test-classes/otherConfig.xml").getCanonicalPath(),
+                result);
+    }
+
 	@Test
 	public void testGetRelativePath() {
 		String relativePath = SourceTransformer.getRelativePath(new File(

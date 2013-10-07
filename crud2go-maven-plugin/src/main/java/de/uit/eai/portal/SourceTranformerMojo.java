@@ -17,7 +17,6 @@ package de.uit.eai.portal;
  */
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -26,21 +25,20 @@ import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import de.uit.eai.portal.mvn.plugin.SourceTransformer;
 
 @Mojo(name = "merge", aggregator = true)
-@Execute(goal = "merge", phase = LifecyclePhase.GENERATE_SOURCES)
+//@Execute(goal = "merge", phase = LifecyclePhase.GENERATE_SOURCES)
+//@Execute(goal = "merge")
 public class SourceTranformerMojo extends AbstractMojo {
 
-	@Parameter(defaultValue = "${project.build.sourceDirectory}")
+	@Parameter(defaultValue = "${basedir}/src/config/")
 	private File sourceDirectory;
 
-	@Parameter(defaultValue = "${project.build.directory}")
+	@Parameter(defaultValue = "${project.build.directory}/config/")
 	private File outputDirectory;
 
 	interface FileProcessor {
@@ -48,12 +46,15 @@ public class SourceTranformerMojo extends AbstractMojo {
 	}
 
 	public void execute() throws MojoExecutionException {
-		final File f = outputDirectory;
+        getLog().info("Source Directory:" + sourceDirectory);
+        getLog().info("Output Directory:" + outputDirectory);
 
-		if (!f.exists()) {
-			f.mkdirs();
+		final File outputDir = outputDirectory;
+
+		if (!outputDir.exists()) {
+			outputDir.mkdirs();
 		}
-		if (!f.isDirectory()) {
+		if (!outputDir.isDirectory()) {
 			throw new MojoExecutionException(
 					"outputDirect Parameter ist nicht ein Verzeichnis!"
 							+ outputDirectory);
@@ -70,25 +71,24 @@ public class SourceTranformerMojo extends AbstractMojo {
 		}
 
 		final List<String> errors = new ArrayList<String>();
-		traverseFiles(sourceDirectory, "*.xml", new FileProcessor() {
+		traverseFiles(sourceDirectory, "xml", new FileProcessor() {
 			public void processFile(File file) {
-				// TODO: remove
-				System.out.println(file.getAbsolutePath());
 				try {
-                    SourceTransformer.RESULT result = new SourceTransformer().processFile(
-                            file.getCanonicalPath(), SourceTransformer
-                            .constructAbsolutePath(f.getAbsolutePath(),
+                    String outputFilePath = SourceTransformer
+                            .constructAbsolutePath(outputDir.getAbsolutePath(),
                                     SourceTransformer.getRelativePath(
-                                            sourceDirectory, file)));
+                                            sourceDirectory, file));
+                    SourceTransformer.RESULT result = new SourceTransformer().processFile(
+                            file.getCanonicalPath(), outputFilePath);
                     switch(result){
                         case NOT_PORTLET:
                             getLog().info("File "+file + " was skipped, as its not a Crud2Go-portlet file");
                             break;
                         case PORTLET_NO_PROCESSING:
-                            getLog().info("File "+file + " was copyied as is, as its does not contains includes");
+                            getLog().info("File "+file + " was copied to "+outputFilePath+" as is, as its does not contains includes");
                             break;
                         case PORTLET_PROCESSING_DONE:
-                            getLog().info("File "+file + " was processed, as its contains includes");
+                            getLog().info("File "+file + " was processed, as its contains includes. Results is stored "+ outputFilePath);
                             break;
                     }
                 } catch (IOException e) {
