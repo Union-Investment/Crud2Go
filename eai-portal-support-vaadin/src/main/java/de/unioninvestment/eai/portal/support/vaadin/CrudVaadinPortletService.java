@@ -18,7 +18,11 @@
  */
 package de.unioninvestment.eai.portal.support.vaadin;
 
+import java.util.List;
+import java.util.Map;
+
 import com.vaadin.server.DeploymentConfiguration;
+import com.vaadin.server.RequestHandler;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinPortlet;
 import com.vaadin.server.VaadinPortletService;
@@ -29,6 +33,8 @@ public class CrudVaadinPortletService extends VaadinPortletService {
 
 	private static final String CRUD2GO_PROCESSING_INFO = "CRUD2GO_PROCESSING_INFO";
 	private static final long serialVersionUID = 1L;
+	
+	private ParameterRetrievalRequestHandler parameterRetrievalRequestHandler;
 
 	public CrudVaadinPortletService(VaadinPortlet portlet,
 			DeploymentConfiguration deploymentConfiguration)
@@ -36,6 +42,15 @@ public class CrudVaadinPortletService extends VaadinPortletService {
 		super(portlet, deploymentConfiguration);
 	}
 
+	@Override
+	protected List<RequestHandler> createRequestHandlers()
+			throws ServiceException {
+		List<RequestHandler> handlers = super.createRequestHandlers();
+		parameterRetrievalRequestHandler = new ParameterRetrievalRequestHandler();
+		handlers.add(parameterRetrievalRequestHandler);
+		return handlers;
+	}
+	
 	/**
 	 * Self-Contained WAR.
 	 * 
@@ -60,5 +75,13 @@ public class CrudVaadinPortletService extends VaadinPortletService {
 		VaadinRequest currentRequest = getCurrentRequest();
 		return (RequestProcessingInfo) (currentRequest == null ? null : currentRequest.getAttribute(
 				CRUD2GO_PROCESSING_INFO));
+	}
+	
+	public Map<String,String[]> getRequestParameters() {
+		return parameterRetrievalRequestHandler.getParameters();
+	}
+	
+	public static CrudVaadinPortletService getCurrent() {
+		return (CrudVaadinPortletService) VaadinPortletService.getCurrent();
 	}
 }

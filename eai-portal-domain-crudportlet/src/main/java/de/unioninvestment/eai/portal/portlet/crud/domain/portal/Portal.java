@@ -18,11 +18,15 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.portal;
 
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,9 +43,11 @@ import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
+import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortletService;
 
 /**
  * 
@@ -59,7 +65,7 @@ public class Portal {
 	private String portalInstanceId = "liferay.com";
 
 	private Long companyId;
-
+	
 	/**
 	 * Ermittelt die CompanyId.
 	 * 
@@ -209,4 +215,20 @@ public class Portal {
 		}
 		return result;
 	}
+
+	public void open(String friendlyUrl, Map<String,String> parameters) throws URISyntaxException {
+		URIBuilder uriBuilder = new URIBuilder(friendlyUrl);
+		if (parameters != null) {
+			for (Entry<String, String> entry : parameters.entrySet()) {
+				uriBuilder.addParameter(entry.getKey(), entry.getValue());
+			}
+		}
+		String url = uriBuilder.build().toASCIIString();
+		UI.getCurrent().getPage().open(url, "_self");
+	}
+
+	public Map<String, String[]> getParameters() {
+		return CrudVaadinPortletService.getCurrent().getRequestParameters();
+	}
+
 }

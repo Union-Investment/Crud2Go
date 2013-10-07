@@ -43,6 +43,7 @@ import com.vaadin.server.VaadinPortletResponse;
 import com.vaadin.server.VaadinPortletSession;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.ConnectorTracker;
 import com.vaadin.ui.JavaScript;
@@ -50,6 +51,7 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 import com.vaadin.util.CurrentInstance;
 
+import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortletService;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 
 @SuppressWarnings("deprecation")
@@ -78,6 +80,8 @@ public class LiferayContext extends TestWatchman {
 	private PortletPreferences portletPreferencesMock;
 	@Mock
 	private VaadinPortletSession vaadinPortletSessionMock;
+	@Mock
+	private CrudVaadinPortletService vaadinPortletServiceMock;
 	@Mock
 	private ConnectorTracker connectorTrackerMock;
 	@Mock
@@ -125,6 +129,7 @@ public class LiferayContext extends TestWatchman {
 				new DefaultConverterFactory());
 
 		CurrentInstance.set(VaadinSession.class, vaadinPortletSessionMock);
+		CurrentInstance.set(VaadinService.class, vaadinPortletServiceMock);
 	}
 
 	@Override
@@ -180,5 +185,9 @@ public class LiferayContext extends TestWatchman {
 
 	public VaadinPortletSession getVaadinSessionMock() {
 		return vaadinPortletSessionMock;
+	}
+
+	public CrudVaadinPortletService getVaadinPortletServiceMock() {
+		return vaadinPortletServiceMock;
 	}
 }
