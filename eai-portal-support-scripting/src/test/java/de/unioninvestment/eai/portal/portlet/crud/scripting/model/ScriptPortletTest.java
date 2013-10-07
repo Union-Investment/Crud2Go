@@ -118,4 +118,5 @@ public class ScriptPortletTest {
 
 		elements.put("not", "allowed");
 	}
+	
 }

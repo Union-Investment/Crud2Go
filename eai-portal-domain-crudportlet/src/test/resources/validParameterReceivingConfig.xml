@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel" onReload="logParameters()">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+			<action title="log" onExecution="logParameters()"></action>
+		</table>
+	</page>
+	<script><![CDATA[
+		log.info "Starting with parameters: $portal.parameters"
+		
+		def logParameters() {
+			log.info "Parameters: $portal.parameters"
+		}
+	]]></script>
+</portlet>

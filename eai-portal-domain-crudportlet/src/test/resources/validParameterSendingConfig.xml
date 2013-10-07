@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+			<action title="open" onExecution="openPage()"></action>
+		</table>
+	</page>
+	<script><![CDATA[
+		def openPage() {
+			portal.open('/web/guest/receiver', name:'Carsten')
+		}
+	]]></script>
+</portlet>
