@@ -18,7 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
+import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
 
 import javax.portlet.MimeResponse;
 import javax.portlet.PortletMode;

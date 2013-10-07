@@ -69,11 +69,6 @@ public class PortletUtilsTest {
 		messageSourceMock = mock(MessageSource.class);
 	}
 
-	@After
-	public void resetAppCtx() {
-		PortletUtils.setSpringApplicationContextMock(null);
-	}
-
 	@Test
 	public void testSwitchPortletMode() throws MalformedURLException {
 		when(
@@ -95,80 +90,4 @@ public class PortletUtilsTest {
 		assertFalse(result);
 	}
 
-	@Test
-	public void shouldReturnValidMessage() throws MalformedURLException {
-		when(applicationContextMock.getBean(MessageSource.class)).thenReturn(
-				messageSourceMock);
-		when(
-				messageSourceMock.getMessage("portlet.crud.window.name", null,
-						null)).thenReturn("message");
-		PortletUtils.setSpringApplicationContextMock(applicationContextMock);
-
-		String msg = PortletUtils.getMessage("portlet.crud.window.name");
-
-		assertEquals("message", msg);
-	}
-
-	@Test
-	public void shouldReturnValidParameterizedMessage()
-			throws MalformedURLException {
-		when(applicationContextMock.getBean(MessageSource.class)).thenReturn(
-				messageSourceMock);
-		when(messageSourceMock.getMessage("code", new Object[] { 1, 2 }, null))
-				.thenReturn("1 < 2");
-		PortletUtils.setSpringApplicationContextMock(applicationContextMock);
-
-		String msg = PortletUtils.getMessage("code", 1, 2);
-
-		assertEquals("1 < 2", msg);
-	}
-
-	@Test
-	public void shouldReturnCodeAndParametersOnMissingApplicationContext() {
-		liferayContext.noCurrentRequest();
-		assertThat(PortletUtils.getMessage("bla", 1), is("bla[1]"));
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testGetSpringApplicationContextNoCurrentRequest() {
-		liferayContext.noCurrentRequest();
-		PortletUtils.getSpringApplicationContext();
-	}
-
-	@Test
-	public void testGetSpringApplicationContextMock() {
-		ApplicationContext context = new StaticApplicationContext();
-		PortletUtils.setSpringApplicationContextMock(context);
-
-		ApplicationContext result = PortletUtils.getSpringApplicationContext();
-		assertEquals(context, result);
-	}
-
-	@Test
-	public void testGetSpringApplicationContext() {
-		ApplicationContext context = new StaticApplicationContext();
-		when(
-				liferayContext
-						.getPortletContextMock()
-						.getAttribute(
-								WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
-				.thenReturn(context);
-		ApplicationContext result = PortletUtils.getSpringApplicationContext();
-		assertSame(context, result);
-	}
-
-	@Test
-	public void testGetBean() {
-		StaticApplicationContext context = new StaticApplicationContext();
-		context.registerSingleton("test", PortletUtilsTest.class);
-		when(
-				liferayContext
-						.getPortletContextMock()
-						.getAttribute(
-								WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
-				.thenReturn(context);
-
-		PortletUtilsTest bean = PortletUtils.getBean(PortletUtilsTest.class);
-		assertNotNull(bean);
-	}
 }

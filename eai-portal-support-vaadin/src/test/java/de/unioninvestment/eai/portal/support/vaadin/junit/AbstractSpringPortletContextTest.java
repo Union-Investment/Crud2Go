@@ -16,24 +16,27 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package de.unioninvestment.eai.portal.portlet.crud.domain.test.commons;
+package de.unioninvestment.eai.portal.support.vaadin.junit;
+
+import java.util.Locale;
 
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
+import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadContextProvider;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
-public abstract class DomainSpringPortletContextTest extends
+public abstract class AbstractSpringPortletContextTest extends
 		AbstractJUnit4SpringContextTests {
 
 	@Before
 	public void configurePortletUtils() {
-		PortletUtils.setSpringApplicationContextMock(applicationContext);
+		Context.setProvider(new BackgroundThreadContextProvider(applicationContext, Locale.GERMANY));
 	}
 
 	@After
 	public void resetAppCtx() {
-		PortletUtils.setSpringApplicationContextMock(null);
+		Context.setProvider(null);
 	}
 }

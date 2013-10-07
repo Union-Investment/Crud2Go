@@ -29,8 +29,9 @@ import org.mockito.MockitoAnnotations;
 import com.vaadin.addon.tableexport.CsvExport;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
 
-public class CsvExportTaskTest {
+public class CsvExportTaskTest extends SpringPortletContextTest {
 
 	private com.vaadin.ui.Table vaadinTable = new com.vaadin.ui.Table();
 

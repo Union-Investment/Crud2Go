@@ -37,12 +37,12 @@ import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.DomainSpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
-public abstract class ModelSupport extends DomainSpringPortletContextTest {
+public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 
 	private static final String TEST_PORTLET_ID = "PortletId";
 	private static final long TEST_COMMUNITY_ID = 17808L;

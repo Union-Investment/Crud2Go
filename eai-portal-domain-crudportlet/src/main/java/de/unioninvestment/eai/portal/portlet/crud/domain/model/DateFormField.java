@@ -21,9 +21,8 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.vaadin.ui.UI;
-
 import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
 import de.unioninvestment.eai.portal.support.vaadin.support.DateToStringConverter;
 
@@ -90,7 +89,7 @@ public class DateFormField extends FormField {
 
 	public Date getBeginDate() {
 		return (Date) getConverter().convertToPresentation(getValue(),
-				Date.class, UI.getCurrent().getLocale());
+				Date.class, Context.getLocale());
 	}
 
 	/**

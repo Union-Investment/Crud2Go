@@ -36,15 +36,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.portlet.MockPortalContext;
 import org.springframework.mock.web.portlet.MockPortletURL;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 
-import de.unioninvestment.eai.portal.support.vaadin.test.commons.SupportVaadinSpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 
 @Ignore
+@ContextConfiguration({"/eai-portal-web-test-applicationcontext.xml"})
 public class UnconfiguredMessageTest extends
-		SupportVaadinSpringPortletContextTest {
+		AbstractSpringPortletContextTest {
 
 	@Mock
 	private PortletRequest requestMock;

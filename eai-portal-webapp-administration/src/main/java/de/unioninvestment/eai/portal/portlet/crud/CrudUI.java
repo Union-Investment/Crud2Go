@@ -18,8 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -85,6 +83,7 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFac
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.support.UnconfiguredMessage;
 import de.unioninvestment.eai.portal.support.vaadin.timing.TimingPortletListener;
@@ -178,7 +177,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 		setContent(viewPage);
 
-		tryToSetPortletTitle(getMessage("portlet.crud.window.name"));
+		tryToSetPortletTitle(Context.getMessage("portlet.crud.window.name"));
 
 		recreateEditPage();
 		refreshViews();
@@ -187,8 +186,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	}
 
 	private void tryToSetPortletTitle(String title) {
-		String realTitle = title != null ? title
-				: getMessage("portlet.crud.window.name");
+		String realTitle = title != null ? title : Context
+				.getMessage("portlet.crud.window.name");
 		String escapedTitle = StringEscapeUtils.escapeJavaScript(realTitle);
 
 		PortletResponse portletResponse = VaadinPortletService
@@ -250,10 +249,10 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 		VerticalLayout help = new VerticalLayout();
 		help.setSpacing(true);
-		help.addComponent(new Link(
-				getMessage("portlet.crud.page.help.message"),
+		help.addComponent(new Link(Context
+				.getMessage("portlet.crud.page.help.message"),
 				new ExternalResource(settings.getHelpUrl())));
-		help.addComponent(new Label(getMessage(
+		help.addComponent(new Label(Context.getMessage(
 				"portlet.crud.page.help.buildNumberLabel",
 				settings.getBuildNumber())));
 		help.addComponent(this.datasourceInfo.getView());
@@ -345,10 +344,12 @@ public class CrudUI extends LiferayUI implements PortletListener,
 				requestProcessingLabel = new RequestProcessingLabel();
 				VaadinPortletSession portletSession = (VaadinPortletSession) VaadinPortletSession
 						.getCurrent();
-				portletSession.addPortletListener(new TimingPortletListener(requestProcessingLabel));
+				portletSession.addPortletListener(new TimingPortletListener(
+						requestProcessingLabel));
 			} 
 			viewPage.addComponent(requestProcessingLabel);
-			viewPage.setComponentAlignment(requestProcessingLabel, Alignment.MIDDLE_RIGHT);
+			viewPage.setComponentAlignment(requestProcessingLabel,
+					Alignment.MIDDLE_RIGHT);
 		}
 	}
 	

@@ -38,13 +38,12 @@ import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.CheckBoxSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.DatePickerSupport;
-import de.unioninvestment.eai.portal.portlet.crud.domain.container.TokenFieldSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.SelectSupport;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.TokenFieldSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
@@ -53,6 +52,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.TableColumnSelectionContext;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 
 /**
@@ -231,7 +231,7 @@ public class DefaultCrudFieldFactory implements TableFieldFactory,
 					.getColumns().get(propertyId.toString()).getDisplayFormat();
 			PopupDateField datePicker = ((DatePickerSupport) displayer)
 					.createDatePicker(type, propertyId, null, format);
-			datePicker.setLocale(UI.getCurrent().getLocale());
+			datePicker.setLocale(Context.getLocale());
 			return datePicker;
 
 		} else {

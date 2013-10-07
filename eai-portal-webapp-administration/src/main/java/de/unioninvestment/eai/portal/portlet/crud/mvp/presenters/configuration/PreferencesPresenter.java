@@ -18,8 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -29,6 +27,7 @@ import com.vaadin.server.VaadinPortletService;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.DefaultPreferencesView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration.PreferencesView;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.AbstractPresenter;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
@@ -63,12 +62,12 @@ public class PreferencesPresenter extends AbstractPresenter<PreferencesView>
 			eventBus.fireEvent(new ConfigurationUpdatedEvent(true));
 
 			getView().showNotification(
-					getMessage("portlet.crud.page.edit.storedSettings"));
+					Context.getMessage("portlet.crud.page.edit.storedSettings"));
 
 		} catch (Exception e) {
 			LOGGER.error("Error storing preferences", e);
 			getView().showError(
-					getMessage("portlet.crud.error.storingPreferences"));
+					Context.getMessage("portlet.crud.error.storingPreferences"));
 		}
 	}
 }

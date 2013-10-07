@@ -33,6 +33,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -49,6 +50,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrud
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
 
 public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 
@@ -78,6 +80,9 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	@Mock
 	private VaadinSession vaadinSessionMock;
 	
+	@Rule
+	public ContextMock contextMock = new ContextMock();
+
 	private final class TestExportTask extends AbstractTableExportTask {
 
 		public TestExportTask(UI application, com.vaadin.ui.Table vaadinTable,
@@ -99,6 +104,7 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+
 		task = new TestExportTask(uiMock, vaadinTableMock,
 				tableModelMock, true);
 		task.setMessageSource(messageSourceMock);

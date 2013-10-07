@@ -63,7 +63,7 @@ public class DownloadExportTask extends AbstractExportTask implements
 	}
 
 	@Override
-	public void run() {
+	public void runWithContext() {
 		LOGGER.info("Started export thread for report '{}'",
 				download.getFilename());
 		started = true;

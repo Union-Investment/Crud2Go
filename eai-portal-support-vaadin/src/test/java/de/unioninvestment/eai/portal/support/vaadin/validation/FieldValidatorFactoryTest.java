@@ -31,13 +31,15 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.vaadin.ui.Field;
 
-import de.unioninvestment.eai.portal.support.vaadin.test.commons.SupportVaadinSpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 
 @SuppressWarnings("unchecked")
-public class FieldValidatorFactoryTest extends SupportVaadinSpringPortletContextTest {
+@ContextConfiguration({"/eai-portal-web-test-applicationcontext.xml"})
+public class FieldValidatorFactoryTest extends AbstractSpringPortletContextTest {
 
 	private FieldValidatorFactory factory;
 

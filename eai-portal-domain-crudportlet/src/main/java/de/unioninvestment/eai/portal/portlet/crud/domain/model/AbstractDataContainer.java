@@ -48,7 +48,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Or;
-import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
@@ -78,6 +77,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
@@ -245,8 +245,8 @@ public abstract class AbstractDataContainer implements DataContainer,
 		Class<?> type = getType(name);
 		Locale locale;
 
-		if (UI.getCurrent().getLocale() != null) {
-			locale = UI.getCurrent().getLocale();
+		if (Context.getLocale() != null) {
+			locale = Context.getLocale();
 		} else {
 			locale = Locale.US;
 		}

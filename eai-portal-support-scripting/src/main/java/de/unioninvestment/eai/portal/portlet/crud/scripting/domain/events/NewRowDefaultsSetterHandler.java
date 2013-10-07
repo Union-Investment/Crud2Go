@@ -25,13 +25,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.vaadin.data.util.converter.Converter;
-import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 /**
  * 
@@ -86,7 +86,7 @@ public class NewRowDefaultsSetterHandler implements CreateEventHandler {
 				.createFormatter(Timestamp.class,
 						databaseContainer.getFormat(columnName));
 		return formatter.convertToPresentation(
-				new Timestamp(System.currentTimeMillis()), String.class, UI
-						.getCurrent().getLocale());
+				new Timestamp(System.currentTimeMillis()), String.class,
+				Context.getLocale());
 	}
 }

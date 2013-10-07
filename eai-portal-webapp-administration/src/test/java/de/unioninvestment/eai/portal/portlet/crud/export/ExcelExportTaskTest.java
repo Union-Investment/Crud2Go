@@ -29,8 +29,9 @@ import org.mockito.MockitoAnnotations;
 import com.vaadin.addon.tableexport.ExcelExport;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
 
-public class ExcelExportTaskTest {
+public class ExcelExportTaskTest extends SpringPortletContextTest {
 
 	private com.vaadin.ui.Table vaadinTable = new com.vaadin.ui.Table();
 

@@ -18,12 +18,15 @@
 */
 package de.unioninvestment.eai.portal.portlet.test.commons;
 
+import java.util.Locale;
+
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
+import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadContextProvider;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 @ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
 public abstract class SpringPortletContextTest extends
@@ -31,11 +34,11 @@ public abstract class SpringPortletContextTest extends
 
 	@Before
 	public void configurePortletUtils() {
-		PortletUtils.setSpringApplicationContextMock(applicationContext);
+		Context.setProvider(new BackgroundThreadContextProvider(applicationContext, Locale.GERMANY));
 	}
 
 	@After
 	public void resetAppCtx() {
-		PortletUtils.setSpringApplicationContextMock(null);
+		Context.setProvider(null);
 	}
 }

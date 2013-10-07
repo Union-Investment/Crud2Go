@@ -18,8 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.export;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
-
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
@@ -32,6 +30,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.LiferayTheme;
+
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 /**
  * Modaler Dialog, der beim Export einen Fortschrittsbalken anzeigt und die
@@ -78,7 +78,7 @@ public class ExportDialog extends Window implements ExportFrontend {
 
 	@SuppressWarnings("serial")
 	private void init() {
-		setCaption(getMessage("portlet.crud.dialog.export.title"));
+		setCaption(Context.getMessage("portlet.crud.dialog.export.title"));
 		setModal(true);
 		setResizable(false);
 		setWidth("400px");
@@ -108,7 +108,7 @@ public class ExportDialog extends Window implements ExportFrontend {
 			downloadLink = new Link();
 			downloadLink.setStyleName(LiferayTheme.BUTTON_LINK);
 			downloadLink
-					.setCaption(getMessage("portlet.crud.dialog.export.download"));
+					.setCaption(Context.getMessage("portlet.crud.dialog.export.download"));
 			downloadLink.setEnabled(false);
 			
 			layout.addComponents(indicator, downloadLink);

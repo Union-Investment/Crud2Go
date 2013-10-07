@@ -16,36 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.export;
 
-import org.junit.Before;
-import org.junit.Test;
+package de.unioninvestment.eai.portal.support.vaadin.junit;
+
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
+import de.unioninvestment.eai.portal.support.vaadin.context.ContextProvider;
 
-public class DownloadExportTaskTest extends SpringPortletContextTest {
-
-	private DownloadExportTask task;
+public class ContextMock extends TestWatcher {
 
 	@Mock
-	private Table tableModelMock;
-
-	@Mock
-	private Download downloadMock;
-
-	@Before
-	public void setUp() {
+	private ContextProvider providerMock;
+	
+	public ContextMock() {
 		MockitoAnnotations.initMocks(this);
-		task = new DownloadExportTask(null, tableModelMock,
-				downloadMock, true);
+		Context.setProvider(providerMock);
 	}
 
-	@Test
-	public void shouldExist() {
-		
+	@Override
+	protected void finished(Description description) {
+		Context.setProvider(null);
+	}
+
+	public ContextProvider getProvider() {
+		return providerMock;
 	}
 }

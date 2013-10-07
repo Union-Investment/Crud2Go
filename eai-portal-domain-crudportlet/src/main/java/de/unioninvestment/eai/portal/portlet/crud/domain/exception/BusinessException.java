@@ -20,7 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.exception;
 
 import java.text.MessageFormat;
 
-import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 /**
  * Fachlicher Fehler, der in der View in eine lesbare Fehlermeldung umgesetzt
@@ -72,7 +72,7 @@ public class BusinessException extends RuntimeException {
 		if (freeformMessage != null) {
 			return freeformMessage;
 		}
-		return PortletUtils.getMessage(code, args);
+		return Context.getMessage(code, args);
 	}
 
 	/**

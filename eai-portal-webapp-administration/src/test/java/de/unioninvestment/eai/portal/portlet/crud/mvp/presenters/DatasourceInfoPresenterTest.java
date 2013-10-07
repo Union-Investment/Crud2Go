@@ -19,7 +19,6 @@
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
 import static de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.DatasourceInfoPresenter.MANAGED_CONNECTION_FACTORY_CLASS_ATTRIBUTE;
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.setSpringApplicationContextMock;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -38,8 +37,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.MessageSource;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItem;
@@ -53,17 +50,13 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrud
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfo;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.DatasourceInfoView;
+import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class DatasourceInfoPresenterTest {
 
 	@Mock
 	private Settings settingsMock;
-
-	@Mock
-	private ApplicationContext ctxMock;
-	@Mock
-	private MessageSource messageSourceMock;
 
 	private DatasourceInfos model;
 	private DatasourceInfoPresenter presenter;
@@ -72,12 +65,14 @@ public class DatasourceInfoPresenterTest {
 	public LiferayContext liferayContext = new LiferayContext("portletId",
 			12345L);
 
+	@Rule
+	public ContextMock contextMock = new ContextMock();
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		this.model = new DatasourceInfos();
 
-		prepareMessageMocking();
 		DatasourceInfoView view = new DatasourceInfoView(
 				this.model.getContainer());
 		this.presenter = new DatasourceInfoPresenter(view, this.model);
@@ -100,12 +95,6 @@ public class DatasourceInfoPresenterTest {
 		presenter.setSettings(settingsMock);
 		when(settingsMock.getDatasourceInfoPattern(12345L)).thenReturn(
 				"dev/{0}");
-	}
-
-	private void prepareMessageMocking() {
-		setSpringApplicationContextMock(ctxMock);
-		when(ctxMock.getBean(MessageSource.class))
-				.thenReturn(messageSourceMock);
 	}
 
 	@Test
