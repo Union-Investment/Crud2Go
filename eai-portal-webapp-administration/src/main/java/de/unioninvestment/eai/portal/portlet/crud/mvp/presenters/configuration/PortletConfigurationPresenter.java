@@ -18,8 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -69,6 +67,7 @@ import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaD
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.crud.validation.ConfigurationUploadValidator;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.AbstractPresenter;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
@@ -205,7 +204,7 @@ public class PortletConfigurationPresenter extends
 
 			} else {
 				getView().showError(
-						getMessage("portlet.crud.page.upload.invalid"));
+						Context.getMessage("portlet.crud.page.upload.invalid"));
 			}
 			getView().getUpload().setVisible(true);
 		}
@@ -257,12 +256,14 @@ public class PortletConfigurationPresenter extends
 							configurable));
 
 				} else {
-					getView().showError(
-							getMessage("portlet.crud.page.upload.invalid"));
+					getView()
+							.showError(
+									Context.getMessage("portlet.crud.page.upload.invalid"));
 				}
 			} catch (Exception e) {
 				getView().showError(
-						getMessage("portlet.crud.page.upload.vcs.error", e));
+						Context.getMessage(
+								"portlet.crud.page.upload.vcs.error", e));
 			}
 		}
 	}
@@ -281,8 +282,8 @@ public class PortletConfigurationPresenter extends
 		 */
 		public PasswordAuthentication getPasswordAuthentication() {
 			return (new PasswordAuthentication(
-					getMessage("portlet.crud.page.upload.vcs.user"),
-					getMessage("portlet.crud.page.upload.vcs.password")
+					Context.getMessage("portlet.crud.page.upload.vcs.user"),
+					Context.getMessage("portlet.crud.page.upload.vcs.password")
 							.toCharArray()));
 		}
 	}
@@ -364,7 +365,7 @@ public class PortletConfigurationPresenter extends
 			List<PortletRoleTO> roles = findPortletRoles(portletConfig);
 			if (roles.size() > 0) {
 				rolesView = new DefaultPortletRolesView(
-						getMessage("portlet.crud.page.edit.securityHeader"));
+						Context.getMessage("portlet.crud.page.edit.securityHeader"));
 				getView().displayTab(rolesView);
 				rolesView.display(roles);
 			}
@@ -397,7 +398,8 @@ public class PortletConfigurationPresenter extends
 		if (portletConfig != null) {
 			List<PreferenceTO> preferences = findPortletPreferences(portletConfig);
 			if (preferences.size() > 0) {
-				prefsView = createPreferencesView(getMessage("portlet.crud.page.edit.preferencesHeader"));
+				prefsView = createPreferencesView(Context
+						.getMessage("portlet.crud.page.edit.preferencesHeader"));
 				getView().displayTab(prefsView);
 				prefsView.display(preferences);
 			}
@@ -412,7 +414,8 @@ public class PortletConfigurationPresenter extends
 		if (portletConfig != null) {
 			List<PreferenceTO> preferences = findAuthenticationPreferences(portletConfig);
 			if (preferences.size() > 0) {
-				authView = createPreferencesView(getMessage("portlet.crud.page.edit.authenticationHeader"));
+				authView = createPreferencesView(Context
+						.getMessage("portlet.crud.page.edit.authenticationHeader"));
 				getView().displayTab(authView);
 				authView.display(preferences);
 			}

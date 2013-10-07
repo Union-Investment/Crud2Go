@@ -18,10 +18,12 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,7 +35,6 @@ import com.vaadin.ui.Notification.Type;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
-import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class DefaultPortletConfigurationViewTest extends
@@ -66,21 +67,18 @@ public class DefaultPortletConfigurationViewTest extends
 
 	@Test
 	public void shouldShowStatusTextWithArgs() {
-		Date date = new Date();
+		Date date = new GregorianCalendar(2013,5,17,8,30,0).getTime();
 		String user = "TestUser";
 		view.setStatus("portlet.crud.page.status.config.available", user, date);
-		assertEquals(PortletUtils.getMessage(
-				"portlet.crud.page.status.config.available", user, date), view
-				.getStatusLabel().getValue());
+		assertThat(
+				view.getStatusLabel().getValue(),
+				is("<p>Die aktuelle Portlet-Konfiguration wurde am 17.06.13 08:30 von Benutzer: TestUser eingespielt.<br/>Version: {2}</p><p>Wollen sie diese überschreiben?</p>"));
 	}
 
 	@Test
 	public void shouldShowStatusTextWithoutArgs() {
 		view.setStatus("portlet.crud.page.status.config.notAvailable");
-		assertEquals(
-				PortletUtils
-						.getMessage("portlet.crud.page.status.config.notAvailable"),
-				view.getStatusLabel().getValue());
+		assertThat(view.getStatusLabel().getValue(), is("Es existiert noch keine Konfiguration für dieses Portlet.</br>Hier können Sie eine gültige Konfiguration hochladen."));
 	}
 
 	@Test

@@ -55,14 +55,12 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
-import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.DomainSpringPortletContextTest;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTable;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
 @ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
-public class DefaultTableViewTest extends DomainSpringPortletContextTest {
+public class DefaultTableViewTest extends AbstractSpringPortletContextTest {
 
 	private DefaultTableView view;
 

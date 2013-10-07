@@ -16,36 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.portlet.crud.export;
+package de.unioninvestment.eai.portal.support.vaadin.context;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+/**
+ * Wrapper für Runnable, der einen Kontext setzt. Dies ist für asynchrone Verarbeitung notwendig.
+ *
+ * @author carsten.mjartan
+ */
+public abstract class ContextualRunnable implements Runnable {
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+	private ContextProvider provider;
 
-public class DownloadExportTaskTest extends SpringPortletContextTest {
-
-	private DownloadExportTask task;
-
-	@Mock
-	private Table tableModelMock;
-
-	@Mock
-	private Download downloadMock;
-
-	@Before
-	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-		task = new DownloadExportTask(null, tableModelMock,
-				downloadMock, true);
+	public ContextualRunnable(ContextProvider provider) {
+		this.provider = provider;
 	}
 
-	@Test
-	public void shouldExist() {
-		
+	@Override
+	public final void run() {
+		ContextProvider oldProvider = Context.getProvider();
+		Context.setProvider(provider);
+		try {
+			runWithContext();
+		} finally {
+			Context.setProvider(oldProvider);
+		}
 	}
+
+	abstract protected void runWithContext();
 }

@@ -19,12 +19,12 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import com.vaadin.data.util.converter.Converter;
-import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.TransactionCallback;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericProperty;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 
 /**
@@ -137,8 +137,8 @@ public class GenericContainerField extends ContainerField {
 
 			if (formatter != null) {
 				Object converted = formatter
-						.convertToModel(value, (Class) property.getType(), UI
-								.getCurrent().getLocale());
+						.convertToModel(value, (Class) property.getType(), 
+								Context.getLocale());
 				property.setValue(converted);
 
 			} else {

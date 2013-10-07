@@ -18,7 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views.configuration;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
+import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;

@@ -30,6 +30,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessExcep
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadContextProvider;
+import de.unioninvestment.eai.portal.support.vaadin.context.ContextualRunnable;
 
 /**
  * Common superclas for both Download Actions and Export Actions using the
@@ -38,7 +40,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
  * @author cmj
  */
 @Configurable
-public abstract class AbstractExportTask implements ExportTask {
+public abstract class AbstractExportTask extends ContextualRunnable implements ExportTask {
 
 	protected final UI ui;
 	protected final boolean automaticDownload;
@@ -56,6 +58,7 @@ public abstract class AbstractExportTask implements ExportTask {
 	 * @param automaticDownload
 	 */
 	public AbstractExportTask(UI ui, boolean automaticDownload) {
+		super(new BackgroundThreadContextProvider());
 		this.ui = ui;
 		this.automaticDownload = automaticDownload;
 	}

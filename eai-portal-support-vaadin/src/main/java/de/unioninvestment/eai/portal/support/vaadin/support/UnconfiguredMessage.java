@@ -18,8 +18,6 @@
  */
 package de.unioninvestment.eai.portal.support.vaadin.support;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
-
 import javax.portlet.MimeResponse;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletModeException;
@@ -31,6 +29,8 @@ import com.vaadin.server.VaadinPortletService;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
+
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 /**
  * Darstellung einer Meldung, dass das Portlet noch zu konfigurieren ist. Es
@@ -46,7 +46,7 @@ public class UnconfiguredMessage extends CustomComponent {
 	 * Konstruktor.
 	 */
 	public UnconfiguredMessage() {
-		String message = getMessage("portlet.crud.info.unconfigured");
+		String message = Context.getMessage("portlet.crud.info.unconfigured");
 		try {
 			PortletResponse portletResponse = VaadinPortletService
 					.getCurrentResponse().getPortletResponse();

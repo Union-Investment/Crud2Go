@@ -28,12 +28,14 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ContextConfiguration;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
-import de.unioninvestment.eai.portal.support.scripting.test.commons.ScriptingSpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 
-public class ScriptBuilderTest extends ScriptingSpringPortletContextTest {
+@ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
+public class ScriptBuilderTest extends AbstractSpringPortletContextTest {
 	private List<String> list;
 
 	@Before

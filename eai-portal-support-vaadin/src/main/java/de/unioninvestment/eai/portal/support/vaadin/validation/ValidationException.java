@@ -20,7 +20,7 @@ package de.unioninvestment.eai.portal.support.vaadin.validation;
 
 import java.text.MessageFormat;
 
-import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 /**
  * Validierungs-Fehler.
@@ -57,7 +57,7 @@ public class ValidationException extends RuntimeException {
 	
 	@Override
 	public String getMessage() {
-		return PortletUtils.getMessage(code, args);
+		return Context.getMessage(code, args);
 	}
 
 	public String getCode() {

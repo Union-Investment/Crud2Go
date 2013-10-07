@@ -85,6 +85,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.support.NumberFormatter;
 
 /**
@@ -293,7 +294,7 @@ public class SearchFormAction implements ActionHandler {
 				} else if (Number.class.isAssignableFrom(columnType)) {
 					NumberFormatter numberFormatter = new NumberFormatter(
 							(NumberFormat) container.getFormat(columnName));
-					Locale locale = UI.getCurrent().getLocale();
+					Locale locale = Context.getLocale();
 					@SuppressWarnings("unchecked")
 					Number numberValue = numberFormatter.convertToModel(
 							fieldValue, (Class<? extends Number>) columnType,

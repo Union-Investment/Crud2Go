@@ -18,8 +18,6 @@
 */
 package de.unioninvestment.eai.portal.support.vaadin.validation;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -30,6 +28,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 
 /**
@@ -93,7 +93,7 @@ public class FieldValidatorFactory {
 		}
 		String msg = validationMessage;
 		if (msg == null) {
-			msg = getMessage("portlet.crud.error.validation.defaultMessage");
+			msg = Context.getMessage("portlet.crud.error.validation.defaultMessage");
 		}
 
 		String[] ruleList = commaDelimitedListToStringArray(

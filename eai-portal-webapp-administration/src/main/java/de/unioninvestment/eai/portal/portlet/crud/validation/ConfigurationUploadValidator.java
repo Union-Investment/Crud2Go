@@ -18,7 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.validation;
 
-import static de.unioninvestment.eai.portal.support.vaadin.PortletUtils.getMessage;
+import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

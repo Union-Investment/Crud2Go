@@ -73,7 +73,7 @@ public abstract class AbstractTableExportTask extends AbstractExportTask
 	}
 
 	@Override
-	public void run() {
+	public void runWithContext() {
 		try {
 
 			filename = createFilename();

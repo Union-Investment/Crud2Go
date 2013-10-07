@@ -24,10 +24,10 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.DomainSpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 
 @ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
-public class BusinessExceptionTest extends DomainSpringPortletContextTest {
+public class BusinessExceptionTest extends AbstractSpringPortletContextTest {
 
 	@Test
 	public void shouldTranslateCodeAndArgs() {

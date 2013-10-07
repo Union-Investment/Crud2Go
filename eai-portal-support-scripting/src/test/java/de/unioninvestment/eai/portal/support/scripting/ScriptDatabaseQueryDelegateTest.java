@@ -46,6 +46,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.filter.Between;
@@ -67,10 +68,11 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptDatabase
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptDatabaseQueryDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.StatementWrapper;
-import de.unioninvestment.eai.portal.support.scripting.test.commons.ScriptingSpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 
+@ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
 public class ScriptDatabaseQueryDelegateTest extends
-		ScriptingSpringPortletContextTest {
+		AbstractSpringPortletContextTest {
 
 	private ScriptDatabaseQueryDelegate scriptDatabaseQueryDelegate;
 	private static final String QUERY = "Select * from TestUser";

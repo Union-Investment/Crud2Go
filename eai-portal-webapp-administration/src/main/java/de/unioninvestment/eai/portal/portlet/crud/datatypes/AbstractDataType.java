@@ -31,8 +31,8 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
 
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
 import de.unioninvestment.eai.portal.support.vaadin.support.ChainedConverter;
 import de.unioninvestment.eai.portal.support.vaadin.support.CheckboxPropertyConverter;
@@ -127,7 +127,7 @@ public abstract class AbstractDataType implements DisplaySupport {
 			return property.getValue().toString();
 		} else {
 			return nf.convertToPresentation(property.getValue(), String.class,
-					UI.getCurrent().getLocale());
+					Context.getLocale());
 		}
 	}
 
