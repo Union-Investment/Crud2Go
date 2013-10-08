@@ -1,21 +1,5 @@
 package de.uit.eai.portal;
 
-/*
- * Copyright 2001-2005 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -25,20 +9,21 @@ import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import de.uit.eai.portal.mvn.plugin.SourceTransformer;
 
 @Mojo(name = "merge", aggregator = true)
-//@Execute(goal = "merge", phase = LifecyclePhase.GENERATE_SOURCES)
-//@Execute(goal = "merge")
+@Execute(goal = "merge", phase = LifecyclePhase.GENERATE_SOURCES)
 public class SourceTranformerMojo extends AbstractMojo {
 
 	@Parameter(defaultValue = "${basedir}/src/config/")
 	private File sourceDirectory;
 
-	@Parameter(defaultValue = "${project.build.directory}/config/")
+	@Parameter(defaultValue = "${project.build.directory}/combined/")
 	private File outputDirectory;
 
 	interface FileProcessor {
@@ -93,7 +78,7 @@ public class SourceTranformerMojo extends AbstractMojo {
                     }
                 } catch (IOException e) {
 					errors.add(MessageFormat.format(
-							"Error while procecessing file {0}: {1}",
+							"Fehler waehrend Bearbeitung der Datei {0}: {1}",
 							file.getAbsolutePath(), e.getMessage()));
 				}
 			}
@@ -103,7 +88,7 @@ public class SourceTranformerMojo extends AbstractMojo {
 				getLog().error(error);
 			}
 			throw new MojoExecutionException(
-					"There were failures during transofmation of portlet files");
+					"Es gibt Fehler waehrend der Transformation von Portlet-Datein");
 		}
 
 	}
@@ -112,15 +97,15 @@ public class SourceTranformerMojo extends AbstractMojo {
 			FileProcessor fileProcessor) {
 		File listFile[] = dir.listFiles();
 		if (listFile != null) {
-			for (int i = 0; i < listFile.length; i++) {
-				if (listFile[i].isDirectory()) {
-					traverseFiles(listFile[i], pattern, fileProcessor);
-				} else {
-					if (listFile[i].getName().endsWith(pattern)) {
-						fileProcessor.processFile(listFile[i]);
-					}
-				}
-			}
+            for (File aListFile : listFile) {
+                if (aListFile.isDirectory()) {
+                    traverseFiles(aListFile, pattern, fileProcessor);
+                } else {
+                    if (aListFile.getName().endsWith(pattern)) {
+                        fileProcessor.processFile(aListFile);
+                    }
+                }
+            }
 		}
 	}
 }

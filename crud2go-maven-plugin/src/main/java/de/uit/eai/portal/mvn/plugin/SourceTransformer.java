@@ -161,32 +161,6 @@ public class SourceTransformer {
 			throw new IOException("Path does not exists");
 		}
         return IOUtils.toString(new FileReader(file));
-//		File file = new File(path);
-//		if (!file.exists()) {
-//			throw new IOException("Path does not exists");
-//		}
-//		String line = null;
-//		StringBuilder result = new StringBuilder();
-//		LineNumberReader reader = null;
-//		try {
-//			reader = new LineNumberReader(new FileReader(file));
-//			String separator = System.getProperty("line.separator");
-//			while ((line = reader.readLine()) != null) {
-//				result.append(line);
-//				result.append(separator);
-//			}
-//
-//			return result.toString();
-//		} finally {
-//			if (reader != null) {
-//				try {
-//					reader.close();
-//				} catch (IOException e) {
-//					// TODO: Log
-//					e.printStackTrace();
-//				}
-//			}
-//		}
 	}
 
 	private String getSourceContent(String basePath, String includePath)
