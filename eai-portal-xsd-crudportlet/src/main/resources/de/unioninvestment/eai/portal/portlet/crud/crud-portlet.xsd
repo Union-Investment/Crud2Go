@@ -352,6 +352,7 @@
 								<jaxb:property name="elements" />
 							</appinfo>
 						</annotation>
+						<element name="textarea" type="tns:TextAreaConfig" />
 						<element name="form" type="tns:FormConfig" />
 						<element name="table" type="tns:TableConfig" />
 						<element name="tabs" type="tns:TabsConfig" />
@@ -660,6 +661,73 @@
 					</annotation>
 				</attribute>
 			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="TextAreaConfig">
+		<annotation>
+			<documentation>
+				Anzeige von HTML
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComponentConfig">
+				<sequence>
+					<element name="content" type="tns:XHTMLContentConfig"
+						minOccurs="0" />
+				</sequence>
+				<attribute name="editable" type="boolean" default="false">
+					<annotation>
+						<documentation>
+							Wenn editierbar, kann der Text per Doppelklick
+							editiert werden.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="preference-key" type="string">
+					<annotation>
+						<documentation>
+							Der Portlet-Preferenzschlüssel, unter dem der
+							Content gespeichert ist.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="expandRatio" type="int" default="0">
+					<annotation>
+						<documentation>
+							The expand ratio determines the amount of available
+							space this component
+							takes within a panel/page/region etc. For
+							example, if two components
+							define expand ratios 2 and 1,
+							respectively, then the available
+							space will
+							be distributed 2/3 and
+							1/3 among the components. If expand ratio is
+							0 (default)
+							or less
+							then the component will not expand. If only one component
+							defines
+							an
+							expand ratio, than it will take up all available space
+							regardless of
+							the
+							defined value.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="XHTMLContentConfig">
+		<complexContent mixed="true">
+			<restriction base="anyType">
+				<sequence>
+					<any processContents="lax" namespace="http://www.w3.org/1999/xhtml"
+						minOccurs="0" maxOccurs="unbounded" />
+				</sequence>
+			</restriction>
 		</complexContent>
 	</complexType>
 

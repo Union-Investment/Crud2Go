@@ -24,8 +24,8 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import com.google.gwt.thirdparty.guava.common.base.Joiner;
-import com.google.gwt.thirdparty.guava.common.base.Splitter;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.vaadin.data.util.converter.Converter;
 
 @SuppressWarnings("rawtypes")

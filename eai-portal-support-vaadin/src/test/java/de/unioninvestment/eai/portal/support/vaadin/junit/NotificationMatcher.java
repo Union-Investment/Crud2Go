@@ -20,7 +20,7 @@ package de.unioninvestment.eai.portal.support.vaadin.junit;
 
 import org.mockito.ArgumentMatcher;
 
-import com.google.gwt.thirdparty.guava.common.base.Objects;
+import com.google.common.base.Objects;
 import com.vaadin.ui.Notification;
 
 public class NotificationMatcher extends ArgumentMatcher<Notification> {

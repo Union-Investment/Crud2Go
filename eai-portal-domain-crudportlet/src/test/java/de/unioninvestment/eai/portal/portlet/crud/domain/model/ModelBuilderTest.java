@@ -51,14 +51,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -81,6 +77,7 @@ import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
@@ -92,12 +89,15 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Re
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationException;
 
 @SuppressWarnings("unchecked")
 public class ModelBuilderTest {
+
+	private static JAXBContext jaxbContext;
 
 	@Mock
 	private DatabaseTableContainer tableContainerMock;
@@ -168,6 +168,11 @@ public class ModelBuilderTest {
 	@Mock
 	private LiferayUI uiMock;
 
+	@Rule
+	public LiferayContext liferayContext = new LiferayContext();
+
+	private static PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
+
 	@Before
 	public void setUp() throws Exception {
 
@@ -213,7 +218,6 @@ public class ModelBuilderTest {
 				fieldValidatorFactoryMock, 300, config);
 	}
 
-	
 	@Test
 	public void shouldCreateDatabaseTableModelFromConfiguration()
 			throws Exception {
@@ -303,6 +307,18 @@ public class ModelBuilderTest {
 		assertThat(
 				((Table) build.getPage().getElements().get(1)).getContainer(),
 				instanceOf(DatabaseTableContainer.class));
+	}
+
+	@Test
+	public void shouldCreateTextAreaModelFromConfiguration() throws Exception {
+
+		PortletConfig config = createConfiguration("validTextAreaConfig.xml");
+		ModelBuilder builder = createTestBuilder(new Config(config, null));
+
+		Portlet build = builder.build();
+
+		assertThat(build.getPage().getElements().get(0),
+				instanceOf(TextArea.class));
 	}
 
 	@Test
@@ -482,7 +498,8 @@ public class ModelBuilderTest {
 		assertThat(table.getContainer(),
 				instanceOf(DatabaseQueryContainer.class));
 
-		assertThat(table.getColumns().get("CNUMBER5_2"), instanceOf(SelectionTableColumn.class));
+		assertThat(table.getColumns().get("CNUMBER5_2"),
+				instanceOf(SelectionTableColumn.class));
 	}
 
 	@Test
@@ -515,22 +532,9 @@ public class ModelBuilderTest {
 	public static PortletConfig createConfiguration(String configRessource)
 			throws Exception {
 
-		JAXBContext context = JAXBContext
-				.newInstance("de.unioninvestment.eai.portal.portlet.crud.config");
-		Unmarshaller unmarshaller = context.createUnmarshaller();
-		InputStream is = ModelBuilderTest.class
-				.getClassLoader()
-				.getResourceAsStream(
-						"de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
-		SchemaFactory factory = SchemaFactory
-				.newInstance("http://www.w3.org/2001/XMLSchema");
-		Schema schema = factory.newSchema(new StreamSource(is));
-		unmarshaller.setSchema(schema);
 		InputStream stream = ModelBuilderTest.class.getClassLoader()
 				.getResourceAsStream(configRessource);
-		JAXBElement<PortletConfig> element = (JAXBElement<PortletConfig>) unmarshaller
-				.unmarshal(stream);
-		return element.getValue();
+		return unmarshaller.unmarshal(stream);
 	}
 
 	@Test

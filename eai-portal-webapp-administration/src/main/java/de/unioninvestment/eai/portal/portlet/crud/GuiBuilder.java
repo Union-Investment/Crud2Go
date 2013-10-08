@@ -36,6 +36,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.RowEditingFormDia
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TextArea;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.ComponentPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.CustomComponentPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.DialogPresenter;
@@ -199,6 +200,8 @@ public class GuiBuilder implements Serializable {
 			Map<String, DialogPresenter> dialogPresenterMap) {
 		if (element instanceof Form) {
 			return buildFormPresenter((Form) element);
+		} else if (element instanceof TextArea) {
+			return buildTextAreaPresenter((TextArea) element);
 		} else if (element instanceof Table) {
 			return buildTablePresenter((Table) element);
 		} else if (element instanceof CustomComponent) {
@@ -209,6 +212,10 @@ public class GuiBuilder implements Serializable {
 			return buildRegionPresenter((Region) element, dialogPresenterMap);
 		}
 		return null;
+	}
+
+	private ComponentPresenter buildTextAreaPresenter(TextArea element) {
+		return factory.textAreaPresenter(element);
 	}
 
 	private CustomComponentPresenter buildCustomComponentPresenter(

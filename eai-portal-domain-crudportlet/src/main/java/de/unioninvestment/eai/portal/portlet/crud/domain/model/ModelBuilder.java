@@ -58,6 +58,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.TextAreaConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TriggerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TriggersConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
@@ -186,8 +187,7 @@ public class ModelBuilder {
 
 	private void buildRoles() {
 		if (config.getPortletConfig().getRoles() != null) {
-			LiferayUI application = LiferayUI
-					.getCurrent();
+			LiferayUI application = LiferayUI.getCurrent();
 			String portletId = application.getPortletId();
 			long communityId = application.getCommunityId();
 			for (RoleConfig roleConfig : config.getPortletConfig().getRoles()
@@ -241,6 +241,8 @@ public class ModelBuilder {
 				return buildForm((FormConfig) componentConfig);
 			} else if (componentConfig instanceof TableConfig) {
 				return buildTable((TableConfig) componentConfig);
+			} else if (componentConfig instanceof TextAreaConfig) {
+				return buildTextArea((TextAreaConfig) componentConfig);
 			} else if (componentConfig instanceof TabsConfig) {
 				return buildTabs((TabsConfig) componentConfig);
 			} else if (componentConfig instanceof ScriptComponentConfig) {
@@ -254,6 +256,20 @@ public class ModelBuilder {
 			}
 		}
 		return null;
+	}
+
+	private Component buildTextArea(TextAreaConfig componentConfig) {
+		if (currentUser.hasPermission(componentConfig,
+				TextArea.Permission.BUILD, true)) {
+
+			boolean editable = currentUser.hasPermission(componentConfig,
+					TextArea.Permission.EDIT, componentConfig.isEditable());
+			TextArea textarea = new TextArea(componentConfig, editable);
+			mappings.put(textarea, componentConfig);
+			return textarea;
+		} else {
+			return null;
+		}
 	}
 
 	private Component buildCustomComponent(ScriptComponentConfig componentConfig) {
@@ -614,10 +630,11 @@ public class ModelBuilder {
 				selectionBuilder //
 						.displayType(c.getSelect().getDisplay()) //
 						.separator(c.getSelect().getSeparator()) //
-						.multiselect(c.getSelect().getDisplay() == SelectDisplayType.TOKENS) //
+						.multiselect(
+								c.getSelect().getDisplay() == SelectDisplayType.TOKENS) //
 						.optionList(optionList);
 				builder = selectionBuilder;
-			} else  if (c.getCheckbox() != null) {
+			} else if (c.getCheckbox() != null) {
 				CheckBoxTableColumn.Builder checkboxBuilder = new CheckBoxTableColumn.Builder();
 				checkboxBuilder //
 						.checkedValue(c.getCheckbox().getCheckedValue()) //

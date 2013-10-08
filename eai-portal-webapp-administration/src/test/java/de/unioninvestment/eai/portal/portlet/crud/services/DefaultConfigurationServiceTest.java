@@ -96,6 +96,8 @@ public class DefaultConfigurationServiceTest {
 	@Mock
 	private Settings settingsMock;
 
+	private static PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
+
 	@Before
 	public void setUp() throws JAXBException, SAXException {
 		MockitoAnnotations.initMocks(this);
@@ -168,8 +170,7 @@ public class DefaultConfigurationServiceTest {
 			throws JAXBException, SAXException {
 		InputStream configStream = getClass().getClassLoader()
 				.getResourceAsStream("validConfig.xml");
-		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
-				.unmarshal(configStream);
+		PortletConfig portletConfig = unmarshaller.unmarshal(configStream);
 		Config config = new Config(portletConfig, null);
 
 		boolean configured = service.isConfigured(config, preferencesMock);
@@ -239,8 +240,7 @@ public class DefaultConfigurationServiceTest {
 			throws JAXBException, SAXException {
 		InputStream configStream = getClass().getClassLoader()
 				.getResourceAsStream("validReSTSecurityConfig.xml");
-		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
-				.unmarshal(configStream);
+		PortletConfig portletConfig = unmarshaller.unmarshal(configStream);
 		Config config = new Config(portletConfig, null);
 		when(preferencesMock.getValue("testserver.password", null)).thenReturn(
 				"pwd");
@@ -255,8 +255,7 @@ public class DefaultConfigurationServiceTest {
 			throws JAXBException, SAXException {
 		InputStream configStream = getClass().getClassLoader()
 				.getResourceAsStream("validReSTSecurityConfig.xml");
-		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
-				.unmarshal(configStream);
+		PortletConfig portletConfig = unmarshaller.unmarshal(configStream);
 		Config config = new Config(portletConfig, null);
 		when(preferencesMock.getValue("testserver.username", null)).thenReturn(
 				"user");
@@ -271,8 +270,8 @@ public class DefaultConfigurationServiceTest {
 			throws JAXBException, SAXException {
 		InputStream configStream = getClass().getClassLoader()
 				.getResourceAsStream("validReSTSecurityConfig.xml");
-		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
-				.unmarshal(configStream);
+
+		PortletConfig portletConfig = unmarshaller.unmarshal(configStream);
 		Config config = new Config(portletConfig, null);
 		when(preferencesMock.getValue("testserver.username", null)).thenReturn(
 				"user");

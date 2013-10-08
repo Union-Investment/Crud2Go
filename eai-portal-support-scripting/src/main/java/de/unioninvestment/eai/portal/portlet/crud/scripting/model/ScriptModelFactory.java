@@ -46,6 +46,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TextArea;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
@@ -294,5 +295,9 @@ public class ScriptModelFactory {
 
 	public ScriptReSTContainer getScriptReSTContainer(ReSTContainer container) {
 		return new ScriptReSTContainer(container);
+	}
+
+	public ScriptComponent getScriptTextArea(TextArea component) {
+		return new ScriptTextArea();
 	}
 }

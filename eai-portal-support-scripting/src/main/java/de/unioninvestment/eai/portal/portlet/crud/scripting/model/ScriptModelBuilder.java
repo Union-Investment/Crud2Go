@@ -74,6 +74,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TextArea;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
@@ -304,6 +305,8 @@ public class ScriptModelBuilder {
 			return buildScriptCustomComponent((CustomComponent) component);
 		} else if (component instanceof Region) {
 			return buildScriptRegion((Region) component);
+		} else if (component instanceof TextArea) {
+			return buildScriptTextArea((TextArea) component);
 		} else {
 			throw new UnsupportedOperationException("Component of type '"
 					+ component.getClass().getName() + "' not supported");
@@ -327,6 +330,10 @@ public class ScriptModelBuilder {
 		}
 
 		return scriptCustomComponent;
+	}
+
+	private ScriptComponent buildScriptTextArea(TextArea component) {
+		return factory.getScriptTextArea(component);
 	}
 
 	private ScriptForm buildScriptForm(Form form) {
