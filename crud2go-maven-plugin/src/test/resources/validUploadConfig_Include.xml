@@ -7,7 +7,7 @@
 	<dialog id="DownloadDialog" backButtonCaption="Zurück">
 		<component generator="generateDownloadDialog(builder)" />
 	</dialog>
-	<script src="script.groovy" />
+	<script src="script.groovy" property="shared" />
 	<script><![CDATA[
 	
 		def generateUploadPage(builder) { 

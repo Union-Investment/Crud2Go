@@ -3,14 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.uit.eai.portal</groupId>
 	<artifactId>crud2go-maven-plugin</artifactId>
-    <description>Plugin fuer Vorbearbeitung von crud2Go Portlets 0.1</description>
+    <description>Plugin fuer Vorbearbeitung von crud2Go Portlets</description>
 	<packaging>maven-plugin</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<name>crud2go-maven-plugin Maven Mojo</name>
 	<url>http://maven.apache.org</url>
+	
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -41,6 +43,7 @@
 			<version>2.4</version>
 		</dependency>
     </dependencies>
+    
 	<build>
 		<plugins>
 			<plugin>
@@ -72,4 +75,16 @@
             </plugin>
 		</plugins>
 	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>Sofia_Release</id>
+			<url>http://nexus.d3.uid.de/content/repositories/Sofia_Release</url>
+		</repository>
+		<snapshotRepository>
+			<id>Sofia_Snapshots</id>
+			<url>http://nexus.d3.uid.de/content/repositories/Sofia_Snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>

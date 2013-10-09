@@ -1,16 +1,16 @@
 package de.uit.eai.portal.mvn.plugin;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.logging.Log;
-
+import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.LineNumberReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Iterator;
@@ -27,6 +27,11 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
+
 public class SourceTransformer {
 
 	private static final String CRUD2GO_PORTLET_NAMESPACE = "http://www.unioninvestment.de/eai/portal/crud-portlet";
@@ -34,9 +39,11 @@ public class SourceTransformer {
 	private static final String SCRIPT_TAG = "script";
 
 	private static final String SRC_ATTRIBUTE = "src";
+	private long newestInputDate;
+	private long outputDate;
 
 	public enum RESULT {
-		NOT_PORTLET, PORTLET_NO_PROCESSING, PORTLET_PROCESSING_DONE
+		NOT_PORTLET, PORTLET_NO_PROCESSING, PORTLET_PROCESSING_DONE, UP_TO_DATE
 	}
 
 	public SourceTransformer() {
@@ -44,29 +51,68 @@ public class SourceTransformer {
 
 	public RESULT processFile(String inputFilePath, String outputFilePath)
 			throws IOException {
-		FileReader inputReader = new FileReader(inputFilePath);
+
+		InputStreamReader inputReader = createReaderFromFile(inputFilePath);
+
 		StringWriter outputWriter = new StringWriter();
-		
-		RESULT result = transformXMLContent(inputFilePath, inputReader, outputWriter);
-		switch(result){
+
+		newestInputDate = new File(inputFilePath).lastModified();
+		outputDate = new File(outputFilePath).lastModified();
+
+		RESULT result = transformXMLContent(inputFilePath, inputReader,
+				outputWriter);
+		switch (result) {
 		case NOT_PORTLET:
-			//FALLTHROUGH: do nothing
+		case UP_TO_DATE:
+			// do nothing
 			break;
 		case PORTLET_NO_PROCESSING:
-            //No Skript tag should be expanded
-			FileUtils.copyFile(new File(inputFilePath), new File(outputFilePath));
-            break;
-        case PORTLET_PROCESSING_DONE:
-            FileWriter outputFileWriter = new FileWriter(outputFilePath);
-            try{
-                IOUtils.write(outputWriter.toString(), outputFileWriter);
-            }finally {
-                outputFileWriter.close();
-            }
+			// No Skript tag should be expanded
+			if (outputDate < newestInputDate) {
+				FileUtils.copyFile(new File(inputFilePath), new File(
+						outputFilePath));
+			} else {
+				return RESULT.UP_TO_DATE;
+			}
+			break;
+		case PORTLET_PROCESSING_DONE:
+			if (outputDate < newestInputDate) {
+				FileWriter outputFileWriter = new FileWriter(outputFilePath);
+				try {
+					IOUtils.write(outputWriter.toString(), outputFileWriter);
+				} finally {
+					outputFileWriter.close();
+				}
+			} else {
+				return RESULT.UP_TO_DATE;
+			}
 
-            break;
-        }
+			break;
+		}
 		return result;
+	}
+
+	/**
+	 * Respect BOM if existing.
+	 * 
+	 * @param inputFilePath
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws UnsupportedEncodingException
+	 */
+	InputStreamReader createReaderFromFile(String inputFilePath)
+			throws FileNotFoundException, IOException,
+			UnsupportedEncodingException {
+		String defaultEncoding = "UTF-8";
+		InputStream inputStream = new FileInputStream(inputFilePath);
+		BOMInputStream bOMInputStream = new BOMInputStream(inputStream);
+		ByteOrderMark bom = bOMInputStream.getBOM();
+		String charsetName = bom == null ? defaultEncoding : bom
+				.getCharsetName();
+		InputStreamReader inputReader = new InputStreamReader(
+				new BufferedInputStream(bOMInputStream), charsetName);
+		return inputReader;
 	}
 
 	public RESULT transformXMLContent(String basePath, Reader inputReader,
@@ -91,7 +137,8 @@ public class SourceTransformer {
 			eventReader = inputFactory.createXMLEventReader(inputReader);
 			eventWriter = outputFactory.createXMLEventWriter(outputWriter);
 
-			boolean skipClosingScriptElement = false;
+			boolean insertScriptContent = false;
+			String scriptContent = null;
 
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
@@ -99,34 +146,17 @@ public class SourceTransformer {
 					StartElement element = event.asStartElement();
 					QName elementQName = element.getName();
 					String nameLocalPart = elementQName.getLocalPart();
-					if (PORTLET_TAG.equalsIgnoreCase(nameLocalPart)
+					if (PORTLET_TAG.equals(nameLocalPart)
 							&& CRUD2GO_PORTLET_NAMESPACE.equals(elementQName
 									.getNamespaceURI())) {
 						result = RESULT.PORTLET_NO_PROCESSING;
 					}
 					if (result != RESULT.NOT_PORTLET
-							&& SCRIPT_TAG.equalsIgnoreCase(nameLocalPart)) {
+							&& SCRIPT_TAG.equals(nameLocalPart)) {
 						String value = getSrcAttribute(element);
 						if (value != null) {
-							event = null;
-							skipClosingScriptElement = true;
-							XMLEvent newScriptTag = eventFactory
-									.createStartElement(
-											elementQName.getPrefix(),
-											elementQName.getNamespaceURI(),
-											elementQName.getLocalPart());
-							eventWriter.add(newScriptTag);
-							XMLEvent cdata = eventFactory
-									.createCData(MessageFormat.format(
-											"\r\n{0}\r\n",
-											getSourceContent(basePath, value)));
-
-							eventWriter.add(cdata);
-							XMLEvent newEndScriptTag = eventFactory
-									.createEndElement(elementQName.getPrefix(),
-											elementQName.getNamespaceURI(),
-											elementQName.getLocalPart());
-							eventWriter.add(newEndScriptTag);
+							insertScriptContent = true;
+							scriptContent = getSourceContent(basePath, value);
 							result = RESULT.PORTLET_PROCESSING_DONE;
 						}
 					}
@@ -134,10 +164,15 @@ public class SourceTransformer {
 					EndElement element = event.asEndElement();
 					QName elementQName = element.getName();
 					String nameLocalPart = elementQName.getLocalPart();
-					if (SCRIPT_TAG.equalsIgnoreCase(nameLocalPart)) {
-						if (skipClosingScriptElement) {
-							skipClosingScriptElement = false;
-							event = null;
+					if (SCRIPT_TAG.equals(nameLocalPart)) {
+						if (insertScriptContent) {
+							insertScriptContent = false;
+
+							XMLEvent cdata = eventFactory
+									.createCData(MessageFormat.format(
+											"{0}\r\n", scriptContent));
+
+							eventWriter.add(cdata);
 						}
 					}
 				}
@@ -148,19 +183,23 @@ public class SourceTransformer {
 			// clean up
 			eventWriter.close();
 			eventReader.close();
-            outputWriter.flush();
+			outputWriter.flush();
 			return result;
 		} catch (javax.xml.stream.XMLStreamException e) {
 			throw new IOException(e.getMessage(), e);
 		}
 	}
 
-	static String readFileToString(String path) throws IOException {
-        File file = new File(path);
-        if (!file.exists()) {
+	String readFileToString(String path) throws IOException {
+		File file = new File(path);
+		if (!file.exists()) {
 			throw new IOException("Path does not exists");
 		}
-        return IOUtils.toString(new FileReader(file));
+		newestInputDate = Math.max(newestInputDate, file.lastModified());
+
+		InputStream inputStream = new FileInputStream(path);
+		BOMInputStream bOMInputStream = new BOMInputStream(inputStream);
+		return IOUtils.toString(bOMInputStream);
 	}
 
 	private String getSourceContent(String basePath, String includePath)
@@ -172,31 +211,31 @@ public class SourceTransformer {
 
 	public static String constructAbsolutePath(String basePath,
 			String includePath) throws IOException {
-        String result;
-        if (includePath.startsWith("/") || includePath.contains(":")) {
-            result = includePath;
-        } else {
-            String baseDir = "";
-            if (new File(basePath).isDirectory()) {
-                baseDir = basePath;
-                if(!baseDir.endsWith(File.separator)){
-                    baseDir += File.separator;
-                }
-            } else {
+		String result;
+		if (includePath.startsWith("/") || includePath.contains(":")) {
+			result = includePath;
+		} else {
+			String baseDir = "";
+			if (new File(basePath).isDirectory()) {
+				baseDir = basePath;
+				if (!baseDir.endsWith(File.separator)) {
+					baseDir += File.separator;
+				}
+			} else {
 
-                int lastIndexOf = basePath.lastIndexOf(File.separator);
-                int slashLastIndex = basePath.lastIndexOf("/");
-                lastIndexOf = lastIndexOf > slashLastIndex ? lastIndexOf
-                        : slashLastIndex;
+				int lastIndexOf = basePath.lastIndexOf(File.separator);
+				int slashLastIndex = basePath.lastIndexOf("/");
+				lastIndexOf = lastIndexOf > slashLastIndex ? lastIndexOf
+						: slashLastIndex;
 
-                if (lastIndexOf != -1) {
-                    baseDir = basePath.substring(0, lastIndexOf + 1);
-                }
-            }
+				if (lastIndexOf != -1) {
+					baseDir = basePath.substring(0, lastIndexOf + 1);
+				}
+			}
 
-            result = baseDir + includePath;
-        }
-        return new File(result).getCanonicalPath();
+			result = baseDir + includePath;
+		}
+		return new File(result).getCanonicalPath();
 	}
 
 	private String getSrcAttribute(StartElement element) {

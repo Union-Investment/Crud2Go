@@ -1,0 +1,629 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet" title="OTC-Derivateliste"
+	refresh-on-page-reload="true">
+	<page>
+		<region title="Suche (aus-/einklappen)" collapsible="true" collapsed="false">
+			<form id="form_CM_OTC_LISTE" columns="8">
+				<field name="LIST_ID" title="Liste / Zeitpunkt">
+					<select id="list_id">
+						<query datasource="flc" initialize="async"><![CDATA[
+							select distinct ID as key, ID || ' / ' || to_char(TIMESTAMP,'dd.mm.yyyy hh24:mi:ss') as title from CM_OTC_LISTEN order by key desc]]>
+						</query>
+					</select>
+				</field>
+				<field name="CUSTOM" title="Custom" />
+				<field name="FONDSNUMMER" title="Fonds ID" />
+				<field name="COLLATERALMANAGER" title="Collateral Manager">
+					<select id="collmgr">
+						<query datasource="flc" initialize="async"><![CDATA[
+							select distinct COLLATERALMANAGER as key, COLLATERALMANAGER as title from CDC_MANDANT_FONDS_RELATION order by title]]>
+						</query>
+					</select>
+				</field>
+				<field name="ASSETMANAGER" title="Asset Manager">
+					<select id="assetmgr">
+						<query datasource="flc" initialize="async"><![CDATA[
+							select distinct ASSETMANAGER as key, ASSETMANAGER as title from CDC_MANDANT_FONDS_RELATION order by title]]>
+						</query>
+					</select>
+				</field>
+				<field name="TIMESTAMP" title="Datum">
+					<date format="dd.MM.yyyy" />
+				</field>
+				<field name="KONTRAHENTEN_ID" title="Kontrahenten ID" />
+				<field name="WAEHRUNG" title="Währung" />
+				<field name="NOMINAL" title="Nominal (>=)" />
+				<field name="CMW" title="CMW Wert (>=)" />
+				<field name="DESCRIPTION" title="Beschreibung" />
+				<field name="QS_CHANGED_BY" title="Änderung durch">
+					<select id="query_main_qschangedby">
+						<query datasource="flc" initialize="async"><![CDATA[
+							select distinct QS_CHANGED_BY AS KEY, QS_CHANGED_BY AS TITLE FROM "CM_OTC_LISTE" ORDER BY QS_CHANGED_BY]]></query>
+					</select>
+				</field>
+				<field name="QS_RELEASED_BY" title="Freigabe durch">
+					<select id="query_main_qsreleasedby">
+						<query datasource="flc" initialize="async"><![CDATA[
+							select distinct QS_RELEASED_BY AS KEY, QS_RELEASED_BY AS TITLE FROM "CM_OTC_LISTE" ORDER BY QS_RELEASED_BY]]></query>
+					</select>
+				</field>
+				<action title="Suche" id="search_CM_OTC_LISTE">
+					<triggers>
+						<trigger action="search_CM_OTC_LISTE_HIST" />
+						<trigger action="search_CM_OTC_LISTE_QS" />
+					</triggers>
+					<search>
+						<tables>
+							<table id="table_CM_OTC_LISTE" />
+						</tables>
+						<apply-filters>
+							<contains column="CUSTOM" field="CUSTOM" />
+							<contains column="FONDSNUMMER" field="FONDSNUMMER" />
+							<contains column="KONTRAHENTEN_ID" field="KONTRAHENTEN_ID" />
+							<contains column="WAEHRUNG" field="WAEHRUNG" />
+							<contains column="DESCRIPTION" field="DESCRIPTION" />
+							<equals column="TIMESTAMP" field="TIMESTAMP" />
+							<greater-or-equal column="NOMINAL" field="NOMINAL" />
+							<greater-or-equal column="CMW" field="CMW" />
+							<equals column="LIST_ID" field="LIST_ID" />
+							<equals column="COLLATERALMANAGER" field="COLLATERALMANAGER" />
+							<equals column="ASSETMANAGER" field="ASSETMANAGER" />
+							<equals column="QS_CHANGED_BY" field="QS_CHANGED_BY" />
+							<equals column="QS_RELEASED_BY" field="QS_RELEASED_BY" />
+						</apply-filters>
+					</search>
+				</action>
+				<action title="Suche zurücksetzen" id="reset_CM_OTC_LISTE">
+					<reset />
+				</action>
+			</form>
+		</region>
+		<tabs>
+			<tab id="tab_main" title="Tabelle">
+				<table id="table_CM_OTC_LISTE" sortable="true" export="xls" onDoubleClick="showComparisionPopup(row)"
+					rowStyle="mainRowStyle(row)">
+					<database-query datasource="flc" onCommit="refreshQS()">
+						<query><![CDATA[
+							SELECT s.*, mfr.COLLATERALMANAGER, mfr.ASSETMANAGER, l.TIMESTAMP FROM CM_OTC_LISTE s 
+							INNER JOIN CM_OTC_LISTEN l ON s.LIST_ID=l.ID  
+							LEFT OUTER JOIN CDC_MANDANT_FONDS_RELATION mfr on mfr.FONDSNUMMER = s.FONDSNUMMER ]]>
+						</query>
+						<!-- <insert type="script"><![CDATA[ -->
+						<!-- merge('INSERT',row,connection)]]></insert> -->
+						<update type="script"><![CDATA[
+							merge('UPDATE',row,connection)]]></update>
+						<!-- <delete type="script"><![CDATA[ -->
+						<!-- merge('DELETE',row,connection)]]></delete> -->
+					</database-query>
+					<columns>
+						<column name="ID" title="ID" primary-key="true" hidden="true" />
+						<column name="LIST_ID" title="Liste" />
+						<column name="TIMESTAMP" title="Zeitpunkt" />
+						<column name="CUSTOM" title="Custom" />
+						<column name="FONDSNUMMER" title="Fund ID" />
+						<column name="KONTRAHENTEN_ID" title="Counterparty ID" />
+						<column name="WAEHRUNG" title="Currency" />
+						<column name="NOMINAL" title="Notional" editable="true" />
+						<column name="CMW" title="CMW Value" editable="true" />
+						<column name="DESCRIPTION" title="Description" editable="true" />
+						<column name="COLLATERALMANAGER" title="Coll.Manager" />
+						<column name="ASSETMANAGER" title="Asset Manager" />
+						<column name="QS_CHANGED_BY" title="Änderung durch" />
+						<column name="QS_RELEASED_BY" title="Freigabe durch" />
+					</columns>
+					<action title="Aktualisieren" onExecution="refreshMain()" />
+				</table>
+			</tab>
+			<tab id="tab_qs" title="Freigabe">
+				<region title="QS-Suche (aus-/einklappen)" collapsible="true" collapsed="true">
+					<form id="form_CM_OTC_LISTE_QS" columns="4">
+						<field name="QS_CMD" title="Typ">
+							<select>
+								<option key="INSERT">INSERT</option>
+								<option key="UPDATE">UPDATE</option>
+								<option key="DELETE">DELETE</option>
+							</select>
+						</field>
+						<field name="QS_USER" title="Änderung durch">
+							<select id="query_qsuser">
+								<query datasource="flc" initialize="async"><![CDATA[
+									select distinct QS_USER AS KEY, QS_USER AS TITLE FROM "CM_OTC_LISTE_QS" ORDER BY QS_USER]]></query>
+							</select>
+						</field>
+						<field name="QS_TS" title="Änderung am" input-prompt="DD.MM.YYYY">
+							<date format="dd.MM.yyyy" />
+						</field>
+						<action title="QS-Suche" id="search_CM_OTC_LISTE_QS">
+							<search>
+								<tables>
+									<table id="table_CM_OTC_LISTE_QS" />
+								</tables>
+								<apply-filters>
+									<equals column="QS_CMD" field="QS_CMD" />
+									<equals column="QS_USER" field="QS_USER" />
+									<equals column="QS_TS" field="QS_TS" />
+									<include-filter action="search_CM_OTC_LISTE" />
+								</apply-filters>
+							</search>
+						</action>
+						<action title="QS-Suche zurücksetzen" id="reset_CM_OTC_LISTE_QS">
+							<reset />
+						</action>
+						<action title="Heute" onExecution="updateQsTs(new Date())" />
+						<action title="Gestern" onExecution="updateQsTs(new Date()-1)" />
+					</form>
+				</region>
+				<table id="table_CM_OTC_LISTE_QS" sortable="true" export="xls" cache-rate="3.1" onDoubleClick="showComparisionPopup(row)"
+					editable="false">
+					<database-query datasource="flc" pagelength="300">
+						<query><![CDATA[
+							SELECT s.*, mfr.COLLATERALMANAGER, mfr.ASSETMANAGER, l.TIMESTAMP FROM CM_OTC_LISTE_QS s 
+							LEFT OUTER JOIN CM_OTC_LISTEN l ON s.LIST_ID=l.ID 
+							LEFT OUTER JOIN CDC_MANDANT_FONDS_RELATION mfr on mfr.FONDSNUMMER = s.FONDSNUMMER ]]>
+						</query>
+					</database-query>
+					<columns>
+						<column name="QS_ID" primary-key="true" hidden="true" />
+						<column name="QS_CMD" title="Typ" style="'auszeichnung_ocker'" />
+						<column name="QS_USER" title="Änderung durch" style="'auszeichnung_ocker'" />
+						<column name="QS_TS" title="Änderung am" style="'auszeichnung_ocker'" />
+						<column name="ID" title="ID" hidden="true" />
+						<column name="LIST_ID" title="Liste" />
+						<column name="TIMESTAMP" title="Zeitpunkt" />
+						<column name="CUSTOM" title="Custom" />
+						<column name="FONDSNUMMER" title="Fund ID" />
+						<column name="KONTRAHENTEN_ID" title="Counterparty ID" />
+						<column name="WAEHRUNG" title="Currency" />
+						<column name="NOMINAL" title="Notional" />
+						<column name="CMW" title="CMW Value" />
+						<column name="DESCRIPTION" title="Description" />
+						<column name="COLLATERALMANAGER" title="Coll.Manager" />
+						<column name="ASSETMANAGER" title="Asset Manager" />
+					</columns>
+					<action title="Aktualisieren" onExecution="refreshQS()" />
+					<action title="Freigeben" onExecution="release(it.table.selection)" />
+					<action title="Verwerfen" onExecution="reject(it.table.selection)" />
+				</table>
+			</tab>
+			<tab id="tab_hist" title="Historie">
+				<region title="Hist-Suche (aus-/einklappen)" collapsible="true" collapsed="true">
+					<form id="form_CM_OTC_LISTE_HIST" columns="4">
+						<field name="HIST_CMD" title="Veraltet durch">
+							<select>
+								<option key="UPDATE">UPDATE</option>
+								<option key="DELETE">DELETE</option>
+							</select>
+						</field>
+						<field name="HIST_TS" title="Veraltet am" input-prompt="DD.MM.YYYY">
+							<date format="dd.MM.yyyy" />
+						</field>
+						<action title="Hist-Suche" id="search_CM_OTC_LISTE_HIST">
+							<search>
+								<tables>
+									<table id="table_CM_OTC_LISTE_HIST" />
+								</tables>
+								<apply-filters>
+									<equals column="HIST_CMD" field="HIST_CMD" />
+									<equals column="HIST_TS" field="HIST_TS" />
+									<include-filter action="search_CM_OTC_LISTE" />
+								</apply-filters>
+							</search>
+						</action>
+						<action title="Hist-Suche zurücksetzen" id="reset_CM_OTC_LISTE_HIST">
+							<reset />
+						</action>
+					</form>
+				</region>
+				<table id="table_CM_OTC_LISTE_HIST" sortable="true" export="xls" editable="false">
+					<database-query datasource="flc">
+						<default-order>
+							<order column="HIST_ID" direction="desc" />
+						</default-order>
+						<query><![CDATA[
+							SELECT s.*, mfr.COLLATERALMANAGER, mfr.ASSETMANAGER, l.TIMESTAMP FROM CM_OTC_LISTE_HIST s 
+							LEFT OUTER JOIN CM_OTC_LISTEN l ON s.LIST_ID=l.ID  
+							LEFT OUTER JOIN CDC_MANDANT_FONDS_RELATION mfr on mfr.FONDSNUMMER = s.FONDSNUMMER ]]>
+						</query>
+					</database-query>
+					<columns>
+						<column name="HIST_ID" primary-key="true" hidden="true" />
+						<column name="HIST_CMD" title="Veraltet durch" style="'ergaenzung_gruen'" />
+						<column name="HIST_TS" title="Veraltet am" style="'ergaenzung_gruen'" />
+						<column name="QS_CHANGED_BY" title="Änderung durch" style="'auszeichnung_ocker'" />
+						<column name="QS_RELEASED_BY" title="Freigabe durch" style="'auszeichnung_ocker'" />
+						<column name="ID" title="ID" hidden="true" />
+						<column name="LIST_ID" title="Liste" />
+						<column name="TIMESTAMP" title="Zeitpunkt" />
+						<column name="CUSTOM" title="Custom" />
+						<column name="FONDSNUMMER" title="Fund ID" />
+						<column name="KONTRAHENTEN_ID" title="Counterparty ID" />
+						<column name="WAEHRUNG" title="Currency" />
+						<column name="NOMINAL" title="Notional" />
+						<column name="CMW" title="CMW Value" />
+						<column name="DESCRIPTION" title="Description" />
+						<column name="COLLATERALMANAGER" title="Coll.Manager" />
+						<column name="ASSETMANAGER" title="Asset Manager" />
+					</columns>
+					<action title="Aktualisieren" onExecution="it.table.refresh()" />
+				</table>
+			</tab>
+		</tabs>
+	</page>
+	<script><![CDATA[
+		
+		import java.sql.Clob
+		
+		SQL = sql("flc")
+		
+		def updateQsTs(Date day) {
+			def dayString = new java.text.SimpleDateFormat('dd.MM.yyyy').format(day)
+			portlet.elements["form_CM_OTC_LISTE_QS"].fields.QS_TS.value = dayString
+		}
+		
+		def refreshMain() {
+			portlet.elements['query_main_qschangedby'].refresh()
+			portlet.elements['query_main_qsreleasedby'].refresh()
+			portlet.elements["table_CM_OTC_LISTE"].refresh()
+		}
+		
+		def refreshQS() {
+			portlet.elements['query_qsuser'].refresh()
+			portlet.elements["table_CM_OTC_LISTE_QS"].refresh()
+		}		
+		
+		def refreshAll() {
+			refreshMain()
+			refreshQS()
+			portlet.elements["table_CM_OTC_LISTE_HIST"].refresh()
+		}
+		
+		def updateAndAudit(sql, GString stmt) {
+			def cnt = sql.executeUpdate(stmt)
+			audit stmt.toSqlString()
+			return cnt
+		}
+		
+		def mainRowStyle(row) {
+			row.values.QS_ID ? "auszeichnung_ocker" : null
+		}
+		
+		def merge(command, row, connection) {
+			def qsId = row.values.QS_ID ? updateExistingQsEntry(command, row, connection) : insertNewQsEntry(command, row, connection)
+			if (command != 'INSERT') {
+				def updated = updateAndAudit(connection, createMergeUpdateStatement(row, qsId))
+				return updated
+			}
+			return 1
+		}
+		
+		def updateExistingQsEntry(command, row, connection) {
+			updateAndAudit(connection, createMergeStatement(command,row) )
+			return row.values.QS_ID
+		}
+		
+		def insertNewQsEntry(command, row, connection) {
+			updateAndAudit(connection, createMergeStatement(command,row) )
+			return connection.firstRow(createQsSequenceStatement()).QS_ID
+		}
+		
+		def release(selection) {
+			def rowIds = selection.ids
+			if (rowIds.size()) { 
+				def cnt = 0
+				SQL.withTransaction {
+					def ids = rowIds.collect { it.QS_ID }.join(',') 
+					
+					def deletedRows = updateAndAudit(SQL, createReleaseDeleteStatement(ids))
+					def updatedRows = updateAndAudit(SQL, createReleaseUpdateStatement(ids))
+					def insertedRows = updateAndAudit(SQL, createReleaseInsertStatement(ids))
+		
+					cnt = deletedRows + updatedRows + insertedRows
+					
+					def qsRows = SQL.executeUpdate(createReleaseDeleteQsStatement(ids))
+					assert qsRows == cnt
+					
+				}
+				refreshAll()
+		
+				showInfo "$cnt von ${rowIds.size()} gewählten Datensätzen freigegeben"
+			} else {
+				showInfo "Bitte wählen sie die freizugebenden Datensätze aus"
+			}
+		}
+		
+		def reject(selection) {
+			def rowIds = selection.ids
+			if (rowIds.size()) { 
+				def cnt = 0
+				SQL.withTransaction {
+					def ids = rowIds.collect { it.QS_ID }.join(',') 
+		
+					SQL.executeUpdate(createRejectMainStatement(ids))
+					cnt = SQL.executeUpdate(createRejectDeleteQsStatement(ids))
+				}
+				refreshAll()
+		
+				showInfo "$cnt von ${rowIds.size()} gewählten Änderungen verworfen"
+			} else {
+				showInfo "Bitte wählen sie mindestens einen Datensatz aus"
+			}
+		}
+		
+		def createMergeStatement(command,row) {
+			"""MERGE INTO "CM_OTC_LISTE_QS" qs
+		    	USING (
+			    	SELECT 
+						$row.values.ID as "ID",
+						$row.values.CMW as "CMW",
+						$row.values.CUSTOM as "CUSTOM",
+						$row.values.DESCRIPTION as "DESCRIPTION",
+						$row.values.FONDSNUMMER as "FONDSNUMMER",
+						$row.values.KONTRAHENTEN_ID as "KONTRAHENTEN_ID",
+						$row.values.NOMINAL as "NOMINAL",
+						$row.values.UWID as "UWID",
+						$row.values.WAEHRUNG as "WAEHRUNG",
+						$row.values.LIST_ID as "LIST_ID",
+						$row.values.FONDSDEPOTBANKIDENTIFIER as "FONDSDEPOTBANKIDENTIFIER",
+						$row.values.BASECURRENCYCD as "BASECURRENCYCD",
+						$row.values.BASEFXRATE as "BASEFXRATE",
+						$currentUser.name as QS_USER,
+						SYSDATE AS QS_TS,
+						$row.values.QS_ID AS "QS_ID",
+						$command AS QS_CMD
+					FROM DUAL
+			    	) src
+			    ON (src.QS_CMD <> 'INSERT' AND qs."QS_ID" = src."QS_ID")
+			    WHEN MATCHED THEN
+					UPDATE SET
+						QS_USER = src.QS_USER,
+						QS_CMD = src.QS_CMD,
+						QS_TS = src.QS_TS,
+						"ID" = src."ID",
+						"CMW" = src."CMW",
+						"CUSTOM" = src."CUSTOM",
+						"DESCRIPTION" = src."DESCRIPTION",
+						"FONDSNUMMER" = src."FONDSNUMMER",
+						"KONTRAHENTEN_ID" = src."KONTRAHENTEN_ID",
+						"NOMINAL" = src."NOMINAL",
+						"UWID" = src."UWID",
+						"WAEHRUNG" = src."WAEHRUNG",
+						"LIST_ID" = src."LIST_ID",
+						"FONDSDEPOTBANKIDENTIFIER" = src."FONDSDEPOTBANKIDENTIFIER",
+						"BASECURRENCYCD" = src."BASECURRENCYCD",
+						"BASEFXRATE" = src."BASEFXRATE"
+			    WHEN NOT MATCHED THEN
+					INSERT (
+						QS_ID,
+						QS_USER,
+						QS_CMD,
+						QS_TS,
+						"ID",
+						"CMW",
+						"CUSTOM",
+						"DESCRIPTION",
+						"FONDSNUMMER",
+						"KONTRAHENTEN_ID",
+						"NOMINAL",
+						"UWID",
+						"WAEHRUNG",
+						"LIST_ID",
+						"FONDSDEPOTBANKIDENTIFIER",
+						"BASECURRENCYCD",
+						"BASEFXRATE"
+					) VALUES (
+						"CM_OTC_LISTE_QS_SEQ".NEXTVAL,
+						src.QS_USER,
+						src.QS_CMD,
+						SYSDATE,
+						"CDC_OTC_SEQ".NEXTVAL,
+						src."CMW",
+						src."CUSTOM",
+						src."DESCRIPTION",
+						src."FONDSNUMMER",
+						src."KONTRAHENTEN_ID",
+						src."NOMINAL",
+						src."UWID",
+						src."WAEHRUNG",
+						src."LIST_ID",
+						src."FONDSDEPOTBANKIDENTIFIER",
+						src."BASECURRENCYCD",
+						src."BASEFXRATE"
+					)
+			"""
+			// FIXME: if INSERTS into the main table uses sequences, they also have to be used for inserted values: 
+			// """ + (command=='INSERT' ? 'MYTABLE_SEQ.NEXTVAL' : 'src.ID') + """,
+		}
+		
+		String createQsSequenceStatement() {
+			"select \"CM_OTC_LISTE_QS_SEQ\".CurrVal AS QS_ID from Dual"
+		}
+		
+		GString createMergeUpdateStatement(row, qsId) {
+			"""UPDATE "CM_OTC_LISTE" SET
+					QS_USER = $currentUser.name,
+					QS_ID = $qsId 
+				WHERE "ID" = $row.id.ID 
+			"""
+		}
+		
+		def createReleaseDeleteStatement(ids) {
+			"""DELETE FROM "CM_OTC_LISTE" 
+				WHERE ("QS_ID") IN (
+					SELECT 
+						"QS_ID" 
+					FROM "CM_OTC_LISTE_QS" qs 
+					WHERE qs."QS_CMD" = 'DELETE'
+					AND qs."QS_USER" <> $currentUser.name
+					AND qs."QS_ID" in ("""+ids+""")
+				)"""
+		}
+		
+		GString createReleaseUpdateStatement(ids) {
+			"""UPDATE (
+					SELECT 
+						main."ID" AS "MAIN_ID",
+						main."CMW" AS "MAIN_CMW",
+						main."CUSTOM" AS "MAIN_CUSTOM",
+						main."DESCRIPTION" AS "MAIN_DESCRIPTION",
+						main."FONDSNUMMER" AS "MAIN_FONDSNUMMER",
+						main."KONTRAHENTEN_ID" AS "MAIN_KONTRAHENTEN_ID",
+						main."NOMINAL" AS "MAIN_NOMINAL",
+						main."UWID" AS "MAIN_UWID",
+						main."WAEHRUNG" AS "MAIN_WAEHRUNG",
+						main."LIST_ID" AS "MAIN_LIST_ID",
+						main."FONDSDEPOTBANKIDENTIFIER" AS "MAIN_FONDSDEPOTBANKIDENTIFIER",
+						main."BASECURRENCYCD" AS "MAIN_BASECURRENCYCD",
+						main."BASEFXRATE" AS "MAIN_BASEFXRATE",
+						main."QS_USER" AS "MAIN_QS_USER",
+						main."QS_CHANGED_BY" AS "MAIN_QS_CHANGED_BY",
+						main."QS_RELEASED_BY" AS "MAIN_QS_RELEASED_BY",
+						main."QS_ID" as "MAIN_QS_ID",
+						qs."CMW" AS "QS_CMW",
+						qs."CUSTOM" AS "QS_CUSTOM",
+						qs."DESCRIPTION" AS "QS_DESCRIPTION",
+						qs."FONDSNUMMER" AS "QS_FONDSNUMMER",
+						qs."KONTRAHENTEN_ID" AS "QS_KONTRAHENTEN_ID",
+						qs."NOMINAL" AS "QS_NOMINAL",
+						qs."UWID" AS "QS_UWID",
+						qs."WAEHRUNG" AS "QS_WAEHRUNG",
+						qs."LIST_ID" AS "QS_LIST_ID",
+						qs."FONDSDEPOTBANKIDENTIFIER" AS "QS_FONDSDEPOTBANKIDENTIFIER",
+						qs."BASECURRENCYCD" AS "QS_BASECURRENCYCD",
+						qs."BASEFXRATE" AS "QS_BASEFXRATE",
+						qs."QS_USER" as "QS_QS_USER",
+						$currentUser.name AS CURRENTUSER_NAME
+					FROM "CM_OTC_LISTE" main, "CM_OTC_LISTE_QS" qs
+					WHERE main."QS_ID" = qs."QS_ID"
+					AND qs."QS_CMD" = 'UPDATE'
+					AND qs."QS_USER" <> $currentUser.name
+					AND qs."QS_ID" in ("""+ids+""")
+				) SET
+					"MAIN_CMW" = "QS_CMW",
+					"MAIN_CUSTOM" = "QS_CUSTOM",
+					"MAIN_DESCRIPTION" = "QS_DESCRIPTION",
+					"MAIN_FONDSNUMMER" = "QS_FONDSNUMMER",
+					"MAIN_KONTRAHENTEN_ID" = "QS_KONTRAHENTEN_ID",
+					"MAIN_NOMINAL" = "QS_NOMINAL",
+					"MAIN_UWID" = "QS_UWID",
+					"MAIN_WAEHRUNG" = "QS_WAEHRUNG",
+					"MAIN_LIST_ID" = "QS_LIST_ID",
+					"MAIN_FONDSDEPOTBANKIDENTIFIER" = "QS_FONDSDEPOTBANKIDENTIFIER",
+					"MAIN_BASECURRENCYCD" = "QS_BASECURRENCYCD",
+					"MAIN_BASEFXRATE" = "QS_BASEFXRATE",
+					"MAIN_QS_USER" = NULL,
+					"MAIN_QS_CHANGED_BY" = "QS_QS_USER",
+					"MAIN_QS_RELEASED_BY" = CURRENTUSER_NAME,
+					"MAIN_QS_ID" = NULL
+				"""
+		}
+		
+		/*
+		 * TODO Sequence-ID
+		 */
+		GString createReleaseInsertStatement(ids) {
+			"""INSERT INTO "CM_OTC_LISTE" (
+					"ID",
+					"CMW",
+					"CUSTOM",
+					"DESCRIPTION",
+					"FONDSNUMMER",
+					"KONTRAHENTEN_ID",
+					"NOMINAL",
+					"UWID",
+					"WAEHRUNG",
+					"LIST_ID",
+					"FONDSDEPOTBANKIDENTIFIER",
+					"BASECURRENCYCD",
+					"BASEFXRATE",
+					QS_CHANGED_BY,
+					QS_RELEASED_BY) 
+				SELECT
+					qs."ID",
+					qs."CMW",
+					qs."CUSTOM",
+					qs."DESCRIPTION",
+					qs."FONDSNUMMER",
+					qs."KONTRAHENTEN_ID",
+					qs."NOMINAL",
+					qs."UWID",
+					qs."WAEHRUNG",
+					qs."LIST_ID",
+					qs."FONDSDEPOTBANKIDENTIFIER",
+					qs."BASECURRENCYCD",
+					qs."BASEFXRATE",
+					QS_USER,
+					$currentUser.name
+				FROM "CM_OTC_LISTE_QS" qs
+				WHERE qs."QS_CMD" = 'INSERT'
+				AND qs."QS_USER" <> $currentUser.name
+				AND qs."QS_ID" in ("""+ids+""")
+				"""
+		} 
+		
+		GString createReleaseDeleteQsStatement(ids) {
+			"""DELETE FROM "CM_OTC_LISTE_QS"
+				WHERE "QS_USER" <> $currentUser.name
+				AND "QS_ID" in ("""+ids+""")
+			"""
+		}
+		
+		String createRejectMainStatement(ids) {
+			"""UPDATE "CM_OTC_LISTE" SET
+					QS_ID = -1, 
+					QS_USER = NULL 
+				WHERE ("QS_ID") IN (
+					SELECT 
+						"QS_ID" 
+					FROM "CM_OTC_LISTE_QS" qs 
+					WHERE qs."QS_ID" in ("""+ids+""")
+				)"""
+		}
+		
+		String createRejectDeleteQsStatement(ids) {
+			"DELETE FROM \"CM_OTC_LISTE_QS\" WHERE \"QS_ID\" in (" + ids + ")"
+		}
+		
+				
+		/*
+		 * Shows column differences of updated rows, both with MAIN and QS tables.  
+		 */
+		def showComparisionPopup(row) {
+			if (row.values.QS_ID != null && (row.values.QS_CMD == null || row.values.QS_CMD == 'UPDATE')) {
+				def cols = ['ID','CMW','CUSTOM','DESCRIPTION','FONDSNUMMER','KONTRAHENTEN_ID','NOMINAL','UWID','WAEHRUNG','LIST_ID','FONDSDEPOTBANKIDENTIFIER','BASECURRENCYCD','BASEFXRATE']
+				def sqlCols = cols.collect { "\"$it\"" }.join(',')
+				SQL.withTransaction {
+					def oldValues = SQL.firstRow("select "+sqlCols+" FROM \"CM_OTC_LISTE\" WHERE \"QS_ID\"=$row.values.QS_ID")
+					def newValues = SQL.firstRow("select "+sqlCols+" FROM \"CM_OTC_LISTE_QS\" WHERE \"QS_ID\"=$row.values.QS_ID")
+					assert oldValues != null && newValues != null
+		
+					convertClobsToText(oldValues)					
+					convertClobsToText(newValues)					
+				
+					def padding = '2px 4px'
+					showPopup "Änderungen", {
+						table(width:'100%') {
+							tr {
+								th(style:"background-color:#fab94d;padding:$padding", 'Spalte')
+								th(style:"background-color:#fab94d;padding:$padding", 'Alter Wert')
+								th(style:"background-color:#fab94d;padding:$padding", 'Neuer Wert')
+							}
+							cols.each { col ->
+								if (newValues[col] != oldValues[col]) {
+									tr {
+										td(style:"background-color:#fab94d;padding:$padding", col)
+										td(style:"background-color:#fbd69b;padding:$padding", oldValues[col])
+										td(style:"background-color:#fbd69b;padding:$padding", newValues[col])
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		def convertClobsToText(valueMap) {
+			def clobCols = valueMap.entrySet().findAll { it.value instanceof Clob }.collect { it.key }
+			clobCols.each { col -> valueMap[col] = valueMap[col].characterStream?.text }
+		}]]></script>
+</portlet>

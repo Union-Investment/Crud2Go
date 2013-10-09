@@ -1,16 +1,17 @@
 package de.uit.eai.portal.mvn.plugin;
 
-import de.uit.eai.portal.mvn.plugin.SourceTransformer.RESULT;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringWriter;
+import de.uit.eai.portal.mvn.plugin.SourceTransformer.RESULT;
 
 public class SourceTransformerTest {
 
@@ -29,13 +30,13 @@ public class SourceTransformerTest {
 
 		StringWriter outputWriter = new StringWriter();
 		RESULT result = sourceTransformer.transformXMLContent(inputPath,
-				new FileReader(inputPath), outputWriter);
+				sourceTransformer.createReaderFromFile(inputPath), outputWriter);
 
 
 		Diff diff = new Diff(
-				SourceTransformer
-						.readFileToString(resolvePath(expectedOutputFile)),
-				outputWriter.toString());
+				sourceTransformer
+						.createReaderFromFile(resolvePath(expectedOutputFile)),
+				new StringReader(outputWriter.toString()));
 		DetailedDiff detailedDiff = new DetailedDiff(diff);
 		boolean identical = diff.identical();
 		if (!identical) {
@@ -62,6 +63,13 @@ public class SourceTransformerTest {
 				RESULT.PORTLET_NO_PROCESSING);
 	}
 
+	@Test
+	public void shouldProcessFileWithBOM()
+			throws Exception {
+		checkTransformation("crud2go_otc-liste.xml", "crud2go_otc-liste.xml",
+				RESULT.PORTLET_NO_PROCESSING);
+	}
+	
 	@Test
 	public void sourceTransformer_FileWithScriptTag_WithInclude()
 			throws Exception {
