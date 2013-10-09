@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.support.scripting;
 
 import groovy.lang.Script;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.gwt.thirdparty.guava.common.base.Strings;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ComponentConfig;
@@ -51,7 +50,6 @@ import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig.Dynamic;
-import de.unioninvestment.eai.portal.portlet.crud.config.validation.ConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.config.StatementConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
@@ -232,7 +230,7 @@ public class ConfigurationScriptsCompiler {
 			compileClosure(action.getOnExecution(), location + "/action[" + i++
 					+ "]/onExecution");
 			if (action.getDownload() != null) {
-				// "export" for backwards compatibility (deprecated) 
+				// "export" for backwards compatibility (deprecated)
 				compileClosure(action.getDownload().getGenerator(),
 						"it,factory,export", location + "/action[" + i
 								+ "]/download/generator");
@@ -449,12 +447,21 @@ public class ConfigurationScriptsCompiler {
 	private boolean compileScripts(List<ScriptConfig> scripts, String location) {
 		boolean hasMainScript = false;
 		for (ScriptConfig config : scripts) {
-			String name = config.getProperty();
-			if (name == null) {
-				name = "main";
+			if (config.getProperty() == null) {
 				hasMainScript = true;
 			}
-			String scriptName = StringUtils.capitalize(name) + "PortletScript.groovy";
+
+			String scriptName;
+			if (config.getSrc() != null) {
+				scriptName = new File(config.getSrc()).getName();
+			} else {
+				String name = config.getProperty();
+				if (name == null) {
+					name = "main";
+				}
+				scriptName = StringUtils.capitalize(name)
+						+ "PortletScript.groovy";
+			}
 			compileScript(scriptName, config.getValue(), location);
 		}
 		return hasMainScript;
@@ -507,12 +514,15 @@ public class ConfigurationScriptsCompiler {
 				+ sqlString.replace("\"\"\"", "\\\"\\\"\\\"") + "\"\"\"";
 	}
 
-	private boolean compileScript(String name, GroovyScript groovyScript, String location) {
+	private boolean compileScript(String name, GroovyScript groovyScript,
+			String location) {
 		if (groovyScript != null && groovyScript.getSource() != null) {
 			String source = groovyScript.getSource();
 			try {
-				Class<Script> script = compiler.compileScript(source
-						+ "\nlog.debug '" + name + " execution finished...'");
+				String sourceWithLogAtEnd = source + //
+						"\nlog.debug '" + name + " execution finished...'";
+				Class<Script> script = compiler.compileScript(
+						sourceWithLogAtEnd, name);
 				groovyScript.setClazz(script);
 				return true;
 
