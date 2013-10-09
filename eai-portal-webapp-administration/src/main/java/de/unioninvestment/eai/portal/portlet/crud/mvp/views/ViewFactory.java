@@ -155,6 +155,19 @@ public class ViewFactory implements Serializable {
 	}
 
 	/**
+	 * @param width
+	 *            The desired width of component (@since 1.45). Defaults to
+	 *            "100%" when not specified.
+	 * @param height
+	 *            The desired width of component (@since 1.45). Defaults to
+	 *            undefined when not specified.
+	 * @return das Widget für TextArea
+	 */
+	public TextAreaView textAreaView(String width, String height) {
+		return new DefaultTextAreaView(width, height);
+	}
+	
+	/**
 	 * @param withMargin
 	 *            ob der Margin gesetzt werden soll. (@since 1.45).
 	 * @param useHorizontalLayout

@@ -30,7 +30,6 @@ import javax.xml.bind.JAXBException;
 
 import org.junit.Before;
 import org.junit.Rule;
-import org.xml.sax.SAXException;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
@@ -47,7 +46,7 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 	private static final String TEST_PORTLET_ID = "PortletId";
 	private static final long TEST_COMMUNITY_ID = 17808L;
 
-	private PortletConfigurationUnmarshaller unmarshaller;
+	private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
 
 	protected EventBus eventBus;
 	protected ConnectionPoolFactory connectionPoolFactory;
@@ -63,16 +62,6 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 	public LiferayContext liferayContext = new LiferayContext(TEST_PORTLET_ID,
 			TEST_COMMUNITY_ID);
 
-	public ModelSupport() {
-		try {
-			unmarshaller = new PortletConfigurationUnmarshaller();
-
-		} catch (JAXBException e) {
-			throw new RuntimeException(e);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	@Before
 	public void initializeDependencies() {

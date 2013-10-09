@@ -46,6 +46,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.TextAreaConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationVisitor;
 
 /**
@@ -69,6 +70,7 @@ public class RevisionRoleVisitor implements ConfigurationVisitor {
 		VALID_ACTIONS.put(TabsConfig.class, DO_NOTHING);
 		VALID_ACTIONS.put(TabConfig.class, DO_NOTHING);
 		VALID_ACTIONS.put(FormConfig.class, DO_NOTHING);
+		VALID_ACTIONS.put(TextAreaConfig.class, DO_NOTHING);
 		VALID_ACTIONS.put(TableConfig.class, "build");
 		VALID_ACTIONS.put(PortletConfig.class, NO_ACTIONS);
 		VALID_ACTIONS.put(DatabaseQueryConfig.class, NO_ACTIONS);

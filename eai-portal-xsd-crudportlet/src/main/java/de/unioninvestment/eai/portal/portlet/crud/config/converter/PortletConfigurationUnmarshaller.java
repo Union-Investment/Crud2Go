@@ -51,25 +51,31 @@ public class PortletConfigurationUnmarshaller {
 	 * @throws SAXException
 	 *             bei Fehlern bei der Analyse des Konfigurations-Schemas
 	 */
-	public PortletConfigurationUnmarshaller() throws JAXBException,
-			SAXException {
+	public PortletConfigurationUnmarshaller() {
 		if (context == null) {
 			initialize();
 		}
 	}
 
-	private synchronized void initialize() throws JAXBException, SAXException {
-		ClassLoader classLoader = getClass().getClassLoader();
+	private synchronized void initialize() {
+		try {
+			ClassLoader classLoader = getClass().getClassLoader();
 
-		this.context = JAXBContext.newInstance(
-				"de.unioninvestment.eai.portal.portlet.crud.config",
-				classLoader);
+			this.context = JAXBContext.newInstance(
+					"de.unioninvestment.eai.portal.portlet.crud.config",
+					classLoader);
 
-		SchemaFactory factory = SchemaFactory
-				.newInstance("http://www.w3.org/2001/XMLSchema");
-		InputStream is = classLoader
-				.getResourceAsStream("de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
-		schema = factory.newSchema(new StreamSource(is));
+			SchemaFactory factory = SchemaFactory
+					.newInstance("http://www.w3.org/2001/XMLSchema");
+			InputStream is = classLoader
+					.getResourceAsStream("de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
+			schema = factory.newSchema(new StreamSource(is));
+
+		} catch (JAXBException e) {
+			throw new RuntimeException("Error initializing JAXB", e);
+		} catch (SAXException e) {
+			throw new RuntimeException("Error initializing JAXB", e);
+		}
 	}
 
 	/**

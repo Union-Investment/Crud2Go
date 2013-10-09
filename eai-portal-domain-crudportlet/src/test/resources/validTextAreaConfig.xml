@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Tabellen-Beispiel">
+	<preferences>
+		<preference key="test2" title="Test 2"/>
+	</preferences>
+	<page>
+		<textarea>
+			<content>
+				Textarea 51
+			</content>
+		</textarea>
+		<textarea editable="true" preference-key="test">
+			<content>
+				Textarea 52
+			</content>
+		</textarea>
+		<textarea editable="true" preference-key="test2">
+		</textarea>
+	</page>
+</portlet>

@@ -38,6 +38,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Region;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TextArea;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration.PortletConfigurationPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.RowEditingFormView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ViewFactory;
@@ -121,6 +122,19 @@ public class PresenterFactory {
 				panel.getWidth(), panel.getHeight()), panel);
 	}
 
+	/**
+	 * Liefert einen {@link TextAreaPresenter} zurück.
+	 * 
+	 * @param textarea
+	 *            TextArea-Modell
+	 * 
+	 * @return TextAreaPresenter
+	 */
+	public TextAreaPresenter textAreaPresenter(TextArea textarea) {
+		return new TextAreaPresenter(viewFactory.textAreaView(textarea.getWidth(),
+				textarea.getHeight()), textarea);
+	}
+	
 	/**
 	 * Liefert eine {@link DialogPresenter} zurück.
 	 * 
