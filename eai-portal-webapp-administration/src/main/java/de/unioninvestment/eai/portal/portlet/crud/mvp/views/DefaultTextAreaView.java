@@ -47,6 +47,7 @@ public class DefaultTextAreaView extends CustomComponent implements
 	 *            undefined when not specified.
 	 */
 	public DefaultTextAreaView(String width, String height) {
+		addStyleName("c-textarea");
 		setWidth(width != null ? width : "100%");
 		if (height != null) {
 			setHeight(height);

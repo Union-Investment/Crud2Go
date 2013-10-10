@@ -12,6 +12,8 @@ Tooltip in Tabellen-Header wird angezeigt
 	dann erscheint der Tooltip 'Zahl (optional)'
 
 Tooltip in Editierformular wird angezeigt
+	# ACHTUNG: Selenium MouseOver funktioniert scheinbar nicht mit Chrome
+	
 	Es existieren Testdaten in TEST_CRUD2
 	und außerdem ein Portlet mit der XML-Konfiguration 'COLUMN_TOOLTIPS.xml'
 	und außerdem wird die 1. Zeile der Tabelle im Formularmodus angezeigt

@@ -10,9 +10,9 @@ Benutzerdefinierter Dynamischer Button
 	Es existieren Testdaten in TEST_CRUD2
 	und außerdem ein Portlet mit der XML-Konfiguration 'CUSTOM_COMPONENTS.xml'
 
-	und dann den Button 'Klick mich!' klickt
+	und dann den Button 'Klick mich' klickt
 	
-	dann ist der Button 'Klick mich!' nicht vorhanden
+	dann ist der Button 'Klick mich' nicht vorhanden
 	und außerdem ist der Button 'geklickt!' vorhanden
 
 

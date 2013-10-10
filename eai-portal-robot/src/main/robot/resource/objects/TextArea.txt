@@ -1,0 +1,53 @@
+*** Settings ***
+Resource        ${RESOURCES}/adapter/SeleniumLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LiferayLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/DatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/CrudDatabaseLibrary_Adapter.txt
+Resource        ${RESOURCES}/adapter/LogfileLibrary_Adapter.txt
+Resource        ${RESOURCES}/objects/common-keywords.txt
+
+*** Keywords ***
+
+####################################################
+###  Es existiert/existieren / Und weiterhin ... ###
+####################################################
+
+
+############################
+###  Wenn / Und dann ... ###
+############################
+
+eine editierbare Textarea per Doppelklick angeklickt wird
+	Call Selenium API  doubleClick  xpath=(//div[contains(@class," c-textarea")])[2]//p[text()="Textarea 52"]
+
+im Richtext-Editor ein neuer Text 'Textarea 55' eingegeben wird
+	# Aktuell (Selenium 1) nicht möglich
+	Noop
+
+der Richtext-Inhalt gespeichert wird
+	Click Vaadin Button  Speichern
+
+##########################
+###  Dann / Und es ... ###
+##########################
+
+wird in der 1. TextArea der Inhalt des Content-Tags angezeigt
+	wird in der 1. TextArea der Inhalt 'Textarea 51' angezeigt
+
+wird in der ${n}. TextArea der Inhalt '${text}' angezeigt
+	Wait until page contains element  xpath=(//div[contains(@class," c-textarea")])[${n}]//div[contains(@class,"v-label") and contains(., "${text}")]
+
+öffnet sich ein Richtext-Editor mit dem Text '${text}'
+	Wait until page contains element  xpath=(//div[contains(@class," c-textarea")])[2]//div[contains(@class,"v-richtextarea")]
+	Wait for Condition  window.document.querySelector('iframe.gwt-RichTextArea').contentWindow.document.body.innerHTML.indexOf('${text}') >= 0
+	
+
+##########################
+###  Utility Keywords  ###
+##########################
+
+##########################
+###  Setup / Teardown  ###
+##########################
+	 
+	

@@ -5,6 +5,6 @@
 <listEntry value="org.eclipse.ui.externaltools.launchGroup"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${system_path:mvn.bat}"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="install -P chrome,local  -DROBOT_SUITE=all -DROBOT_TEST=all -DROBOT_INCLUDE=all -o"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="install -P chrome,local  -DROBOT_SUITE=all -DROBOT_TEST=all -DROBOT_INCLUDE=${string_prompt:Tag name} -Dmaven.test.skip=true -o"/>
 <stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${workspace_loc:/eai-portal-robot}"/>
 </launchConfiguration>
