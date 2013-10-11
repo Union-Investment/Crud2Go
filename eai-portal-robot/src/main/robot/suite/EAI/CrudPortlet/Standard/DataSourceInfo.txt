@@ -1,5 +1,4 @@
 *** Settings ***
-Documentation   
 Test Teardown	Auf Hauptseite zurückwechseln	
 Force Tags      autor-cmj  datasourceinfo  UI-350
 
