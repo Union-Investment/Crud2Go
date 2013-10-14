@@ -99,7 +99,9 @@ public class DefaultTextAreaView extends CustomComponent implements
 		});
 		
 		CssLayout buttons = new CssLayout(saveButton, cancelButton);
+		buttons.setStyleName("actions");
 		VerticalLayout layout = new VerticalLayout(richTextArea, buttons);
+		layout.setSpacing(true);
 		if (getHeight() >= 0f) {
 			richTextArea.setHeight("100%");
 			layout.setExpandRatio(richTextArea, 1f);

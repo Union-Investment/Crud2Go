@@ -39,9 +39,11 @@ public class ConfigurationMetaDataTest {
 	public void sholdStoreAttributes() {
 		String user = "user";
 		Date created = new Date();
-		ConfigurationMetaData configurationMetaData = new ConfigurationMetaData(user, created, null);
+		Date updated = new Date();
+		ConfigurationMetaData configurationMetaData = new ConfigurationMetaData(user, created, updated, null);
 		
 		assertEquals(user, configurationMetaData.getUser());
 		assertEquals(created, configurationMetaData.getCreated());
+		assertEquals(updated, configurationMetaData.getUpdated());
 	}
 }

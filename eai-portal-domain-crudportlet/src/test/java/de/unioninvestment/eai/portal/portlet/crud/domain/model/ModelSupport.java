@@ -87,7 +87,7 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 				prefetchExecutor, resetFormAction, fieldValidatorFactory,
 				defaultSelectWidth);
 		return factory.getBuilder(eventBus, new Config(configuration,
-				resourceIds));
+				resourceIds, null, null));
 	}
 
 	protected PortletConfig createConfiguration(String configRessource)

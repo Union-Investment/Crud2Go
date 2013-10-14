@@ -209,7 +209,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 		Config config = new Config(portletConfig, singletonMap(
 				PortletRole.createRoleResourceId(testWinId, 18004L,
-						"portletRole"), 1L));
+						"portletRole"), 1L), "test.xml", null);
 		portletConfigurationPresenter.refresh(config);
 
 		verify(viewMock).displayTab(isA(PortletRolesView.class));
@@ -221,7 +221,7 @@ public class PortletConfigurationPresenterTest extends SpringPortletContextTest 
 
 		PortletConfig portletConfig = createConfigWithPreferences();
 
-		Config config = new Config(portletConfig, singletonMap("a", 1L));
+		Config config = new Config(portletConfig, singletonMap("a", 1L), "test.xml", null);
 		portletConfigurationPresenter.refresh(config);
 
 		verify(viewMock).displayTab(isA(PreferencesView.class));

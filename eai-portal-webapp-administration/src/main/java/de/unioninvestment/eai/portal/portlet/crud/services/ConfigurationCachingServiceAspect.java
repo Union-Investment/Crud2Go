@@ -25,11 +25,15 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
+import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
+import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
 
 /**
  * Caching Aspekt für CRUD-PortletPresenter-Konfiguration. Beim Schreiben einer
@@ -45,11 +49,17 @@ import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 @Configurable
 public class ConfigurationCachingServiceAspect {
 
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(ConfigurationCachingServiceAspect.class);
+	
 	@Autowired
 	private Ehcache cache;
 
 	@Autowired
 	private Settings settings;
+
+	@Autowired
+	private ConfigurationDao dao;
 
 	/**
 	 * Leerer Konstruktor.
@@ -75,17 +85,35 @@ public class ConfigurationCachingServiceAspect {
 		if (isCacheEnabled() && (cache != null)) {
 			String cacheKey = createKey(portletId, communityId);
 			Element cacheElement = cache.get(cacheKey);
-			if (cacheElement != null) {
-				return cacheElement.getObjectValue();
+			if (returnCachedElement(portletId, communityId, cacheElement)) {
+				Config config = (Config) cacheElement.getObjectValue();
+				LOGGER.info("Cache hit for config {}", config.getFileName());
+				return config;
 			} else {
 				Config config = (Config) pjp.proceed();
 				cache.put(new Element(cacheKey, config));
+				if (config != null) {
+					LOGGER.info("Cache miss for config {}", config.getFileName());
+				}
 				return config;
 			}
 		} else {
 			return pjp.proceed();
 		}
 
+	}
+
+	private boolean returnCachedElement(String portletId,
+			long communityId, Element cacheElement) {
+		if (cacheElement == null || cacheElement.getObjectValue() == null) {
+			return false;
+		} else if (!settings.isCacheCheckForUpdates()) {
+			return true;
+		} else {
+			Config cachedConfig = (Config) cacheElement.getObjectValue();
+			ConfigurationMetaData metaData = dao.readConfigMetaData(portletId, communityId);
+			return metaData != null && !cachedConfig.getLastUpdated().before(metaData.getUpdated());
+		}
 	}
 
 	/**
@@ -104,10 +132,10 @@ public class ConfigurationCachingServiceAspect {
 	public void removeFromCache(String filename, byte[] configXml,
 			String portletId, long communityId, String username) {
 		if (isCacheEnabled() && cache != null) {
-			cache.remove(createKey
-					(portletId, communityId));
+			cache.remove(createKey(portletId, communityId));
 		}
 	}
+	
 
 	private String createKey(String portletId, long communityId) {
 		return portletId + "." + communityId;

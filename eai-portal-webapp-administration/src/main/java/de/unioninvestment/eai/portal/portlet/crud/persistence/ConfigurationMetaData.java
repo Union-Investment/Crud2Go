@@ -29,6 +29,7 @@ public class ConfigurationMetaData {
 
 	private String user;
 	private Date created;
+	private Date updated;
 	private String fileName;
 
 	/**
@@ -37,9 +38,10 @@ public class ConfigurationMetaData {
 	 * @param created
 	 *            das Upload-Datum
 	 */
-	public ConfigurationMetaData(String user, Date created, String fileName) {
+	public ConfigurationMetaData(String user, Date created, Date updated, String fileName) {
 		this.user = user;
 		this.created = created;
+		this.updated = updated;
 		this.fileName = fileName;
 	}
 
@@ -59,5 +61,9 @@ public class ConfigurationMetaData {
 
 	public String getFileName() {
 		return fileName;
+	}
+
+	public Date getUpdated() {
+		return updated;
 	}
 }
