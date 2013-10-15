@@ -165,9 +165,11 @@ public class ExcelExportTask extends AbstractTableExportTask implements
 		excelExport.setMimeType(EXCEL_XSLX_MIMETYPE);
 		excelExport.setRowHeaders(true);
 		excelExport.excludeCollapsedColumns();
-		excelExport.setDoubleDataFormat("#.##0");
-		excelExport.setDateDataFormat("DD.MM.YYYY");
+		
+		applyExcelFormatForColumns(excelExport);
+
 		return excelExport;
 	}
+
 
 }

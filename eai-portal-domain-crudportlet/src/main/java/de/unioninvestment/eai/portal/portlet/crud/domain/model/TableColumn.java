@@ -54,6 +54,7 @@ public class TableColumn implements Serializable {
 	private Integer width;
 	private String inputPrompt;
 	protected String displayFormat;
+	private String excelFormat;
 	private FileMetadata fileMetadata;
 
 	private List<FieldValidator> validators;
@@ -93,6 +94,7 @@ public class TableColumn implements Serializable {
 		this.width = builder.width;
 		this.inputPrompt = builder.inputPrompt;
 		this.displayFormat = builder.displayFormat;
+		this.excelFormat = builder.excelFormat;
 		this.fileMetadata = builder.fileMetadata;
 		this.validators = builder.validators;
 		this.columnStyleRenderer = builder.columnStyleRenderer;
@@ -298,6 +300,7 @@ public class TableColumn implements Serializable {
 		protected Integer width;
 		protected String inputPrompt;
 		protected String displayFormat;
+		protected String excelFormat;
 		protected FileMetadata fileMetadata;
 		protected List<FieldValidator> validators;
 		protected ColumnStyleRenderer columnStyleRenderer;
@@ -408,6 +411,15 @@ public class TableColumn implements Serializable {
 		}
 
 		/**
+		 * @param excelFormat
+		 * @return den builder
+		 */
+		public T excelFormat(String excelFormat) {
+			this.excelFormat = excelFormat;
+			return self();
+		}
+
+		/**
 		 * @param fileMetadata
 		 * @return den builder
 		 */
@@ -487,6 +499,13 @@ public class TableColumn implements Serializable {
 	public void setGeneratedValueGenerator(
 			GeneratedValueGenerator generatedValueGenerator) {
 		this.generatedValueGenerator = generatedValueGenerator;
+	}
+
+	/**
+	 * @return das Excel-Format, falls angegeben
+	 */
+	public String getExcelFormat() {
+		return excelFormat;
 	}
 
 }

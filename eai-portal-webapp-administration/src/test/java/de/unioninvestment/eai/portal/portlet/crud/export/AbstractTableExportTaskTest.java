@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.export;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -25,10 +26,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Date;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
@@ -41,6 +45,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.context.MessageSource;
 
+import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.addon.tableexport.TableExport;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
@@ -48,7 +53,8 @@ import com.vaadin.ui.UI;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
 
@@ -61,10 +67,13 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	private com.vaadin.ui.Table vaadinTableMock;
 
 	@Mock
-	private Table tableModelMock;
+	private de.unioninvestment.eai.portal.portlet.crud.domain.model.Table tableModelMock;
 
 	@Mock
 	public TableExport tableExportMock;
+
+	@Mock
+	public ExcelExport excelExportMock;
 
 	private TestExportTask task;
 
@@ -83,10 +92,21 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	@Rule
 	public ContextMock contextMock = new ContextMock();
 
+	@Mock
+	private TableColumns tableColumnsMock;
+
+	@Mock
+	private TableColumn column1Mock;
+	@Mock
+	private TableColumn column2Mock;
+
+	@Mock
+	private TableColumn column3Mock;
+
 	private final class TestExportTask extends AbstractTableExportTask {
 
 		public TestExportTask(UI application, com.vaadin.ui.Table vaadinTable,
-				Table tableModel, boolean automaticDownload) {
+				de.unioninvestment.eai.portal.portlet.crud.domain.model.Table tableModel, boolean automaticDownload) {
 			super(application, vaadinTable, tableModel, automaticDownload);
 		}
 
@@ -242,4 +262,66 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 		task.sendToClient("_blank");
 	}
 
+	@Test
+	public void shouldApplyDefaultDateFormat() {
+		task.applyExcelFormatForColumns(excelExportMock);
+		verify(excelExportMock).setDateDataFormat("[$-0407]dd.MM.yyyy;@");
+	}
+	
+	@Test
+	public void shouldApplyDefaultNumberFormat() {
+		task.applyExcelFormatForColumns(excelExportMock);
+		verify(excelExportMock).setDoubleDataFormat("#.##0");
+	}
+	
+	@Test
+	public void shouldApplyExplicitColumnExcelFormat() {
+		prepareThreeColumns();
+		when(column1Mock.getExcelFormat()).thenReturn("myExcelFormat");
+		
+		task.applyExcelFormatForColumns(excelExportMock);
+
+		verify(excelExportMock).setExcelFormatOfProperty("column1", "myExcelFormat");
+	}
+
+	@Test
+	public void shouldApplyDateFormatCalculatedFromDisplayFormat() {
+		prepareThreeColumns();
+		when(column1Mock.getDisplayFormat()).thenReturn("dd.MM.yyyy HH:mm");
+		
+		task.applyExcelFormatForColumns(excelExportMock);
+		
+		verify(excelExportMock).setExcelFormatOfProperty("column1", "[$-0407]dd.MM.yyyy HH:mm;@");
+	}
+	
+	@Test
+	public void shouldNotApplyAnyColumnFormatsByDefault() {
+		prepareThreeColumns();
+		
+		task.applyExcelFormatForColumns(excelExportMock);
+		
+		verify(excelExportMock, never()).setExcelFormatOfProperty(isA(String.class), isA(String.class));
+	}
+
+	@Test
+	public void shouldIgnoreGeneratedColumnsWithoutExcelFormat() {
+		prepareThreeColumns();
+		doReturn(null).when(vaadinTableMock).getType("column1");
+		
+		task.applyExcelFormatForColumns(excelExportMock);
+		
+		verify(excelExportMock, never()).setExcelFormatOfProperty(isA(String.class), isA(String.class));
+	}
+	
+	private void prepareThreeColumns() {
+		when(tableModelMock.getColumns()).thenReturn(tableColumnsMock);
+		when(tableColumnsMock.iterator()).thenReturn(asList(column1Mock, column2Mock, column3Mock).iterator());
+		when(column1Mock.getName()).thenReturn("column1");
+		when(column2Mock.getName()).thenReturn("column2");
+		when(column3Mock.getName()).thenReturn("column3");
+		doReturn(Date.class).when(vaadinTableMock).getType("column1");
+		doReturn(Number.class).when(vaadinTableMock).getType("column2");
+		doReturn(String.class).when(vaadinTableMock).getType("column3");
+	}
+	
 }
