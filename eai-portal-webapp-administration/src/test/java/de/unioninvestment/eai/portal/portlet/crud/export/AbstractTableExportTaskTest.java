@@ -271,7 +271,7 @@ public class AbstractTableExportTaskTest extends SpringPortletContextTest {
 	@Test
 	public void shouldApplyDefaultNumberFormat() {
 		task.applyExcelFormatForColumns(excelExportMock);
-		verify(excelExportMock).setDoubleDataFormat("#.##0");
+		verify(excelExportMock).setDoubleDataFormat("General");
 	}
 	
 	@Test

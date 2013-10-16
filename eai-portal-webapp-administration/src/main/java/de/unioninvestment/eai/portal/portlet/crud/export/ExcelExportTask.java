@@ -139,8 +139,6 @@ public class ExcelExportTask extends AbstractTableExportTask implements
 			
 			// modified styling to prevent black on black cell coloring on edit/doubleclick
 			style.setFillBackgroundColor(HSSFColor.WHITE.index);
-			style.setFillForegroundColor(HSSFColor.WHITE.index);
-			style.setFillPattern(CellStyle.NO_FILL);
 			
 			return style;
 		}
