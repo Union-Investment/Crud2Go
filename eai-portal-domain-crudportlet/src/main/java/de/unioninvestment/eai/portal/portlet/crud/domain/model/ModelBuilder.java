@@ -661,6 +661,7 @@ public class ModelBuilder {
 					.inputPrompt(c.getInputPrompt()) //
 					.validators(validators) //
 					.displayFormat(c.getDisplayFormat()) //
+					.excelFormat(c.getExcelFormat()) //
 					.fileMetadata(fileMetadata) //
 					.generatedType(generatedType) //
 					.build();
