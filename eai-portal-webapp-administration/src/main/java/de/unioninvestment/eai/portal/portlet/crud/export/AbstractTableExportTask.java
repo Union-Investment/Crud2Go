@@ -238,7 +238,7 @@ public abstract class AbstractTableExportTask extends AbstractExportTask
 
 	protected void applyExcelFormatForColumns(ExcelExport excelExport) {
 
-		excelExport.setDoubleDataFormat("#.##0");
+		excelExport.setDoubleDataFormat("General");
 		excelExport.setDateDataFormat(DateFormatConverter.convert(
 				Context.getLocale(), "dd.MM.yyyy"));
 
