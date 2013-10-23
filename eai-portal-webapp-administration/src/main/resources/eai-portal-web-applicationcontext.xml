@@ -103,6 +103,6 @@
 
 	<bean id="prefetchExecutor" class="java.util.concurrent.Executors"
 		factory-method="newFixedThreadPool">
-		<constructor-arg value="${portlet.crud.export.executor.poolsize}" />
+		<constructor-arg value="${portlet.crud.prefetch.executor.poolsize}" />
 	</bean>
 </beans>

@@ -20,6 +20,8 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
@@ -30,6 +32,7 @@ import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
 import com.vaadin.data.util.sqlcontainer.connection.JDBCConnectionPool;
 import com.vaadin.data.util.sqlcontainer.query.FreeformQuery;
+import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
@@ -63,6 +66,8 @@ public class FreeformQueryEventWrapper extends CrudFreeformQuery implements
 
 	private final ConnectionPool connectionPool;
 
+	private boolean orderByPrimaryKeys;
+
 	/**
 	 * @param container
 	 *            der DatabaseContainer der den Events mitgegeben wird
@@ -78,19 +83,21 @@ public class FreeformQueryEventWrapper extends CrudFreeformQuery implements
 	 *            der Router für DELETE Events
 	 * @param primaryKeyColumns
 	 *            die konfigurierten Primärschlüsselspalten
+	 * @param orderByPrimaryKeys
 	 */
 	public FreeformQueryEventWrapper(DataContainer container,
 			String queryString, ConnectionPool connectionPool,
 			EventRouter<InsertEventHandler, InsertEvent> onInsertEventRouter,
 			EventRouter<UpdateEventHandler, UpdateEvent> onUpdateEventRouter,
 			EventRouter<DeleteEventHandler, DeleteEvent> onDeleteEventRouter,
-			String... primaryKeyColumns) {
+			boolean orderByPrimaryKeys, String... primaryKeyColumns) {
 		super(queryString, connectionPool, primaryKeyColumns);
 		this.container = container;
 		this.connectionPool = connectionPool;
 		this.onInsertEventRouter = onInsertEventRouter;
 		this.onUpdateEventRouter = onUpdateEventRouter;
 		this.onDeleteEventRouter = onDeleteEventRouter;
+		this.orderByPrimaryKeys = orderByPrimaryKeys;
 	}
 
 	@Override
@@ -199,4 +206,33 @@ public class FreeformQueryEventWrapper extends CrudFreeformQuery implements
 		return clobString;
 	}
 
+	@Override
+	public void setOrderBy(List<OrderBy> orderBys)
+			throws UnsupportedOperationException {
+		if (orderByPrimaryKeys) {
+			List<OrderBy> newOrderBys = createOrderBysIncludingPrimaryKeys(orderBys, getPrimaryKeyColumns());
+			super.setOrderBy(newOrderBys);
+		} else {
+			super.setOrderBy(orderBys);
+		}
+	}
+
+	static List<OrderBy> createOrderBysIncludingPrimaryKeys(List<OrderBy> orderBys, List<String> primaryKeyColumns) {
+		if (primaryKeyColumns == null) {
+			return orderBys;
+		}
+		
+		List<String> remainingPrimaryKeyColumns = new ArrayList<String>(primaryKeyColumns);
+		List<OrderBy> newOrderBys = new ArrayList<OrderBy>(primaryKeyColumns.size());
+		if (orderBys != null) {
+			for (OrderBy orderBy : orderBys) {
+				newOrderBys.add(orderBy);
+				remainingPrimaryKeyColumns.remove(orderBy.getColumn());
+			}
+		}
+		for (String primaryKeyColumn : remainingPrimaryKeyColumns) {
+			newOrderBys.add(new OrderBy(primaryKeyColumn, true));
+		}
+		return newOrderBys;
+	}
 }

@@ -811,7 +811,8 @@ public class ModelBuilder {
 				extractFilterPolicy(databaseQuery),
 				databaseQuery.getPagelength(),
 				databaseQuery.getExportPagelength(),
-				databaseQuery.getSizeValid());
+				databaseQuery.getSizeValid(),
+				databaseQuery.isOrderByPrimarykeys());
 	}
 
 	private DataContainer buildTableContainer(DatabaseTableConfig config,

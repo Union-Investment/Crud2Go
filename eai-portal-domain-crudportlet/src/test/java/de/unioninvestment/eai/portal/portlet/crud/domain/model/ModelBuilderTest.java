@@ -382,13 +382,7 @@ public class ModelBuilderTest {
 		PortletConfig config = createConfiguration("validReadonlyQueryConfig.xml");
 		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
-		when(
-				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
-						Mockito.anyString(), eq(false), eq(false), eq(false),
-						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
-						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
-				queryContainerMock);
+		mockGetDatabaseQueryContainerCall();
 
 		Portlet build = builder.build();
 
@@ -397,6 +391,16 @@ public class ModelBuilderTest {
 		assertThat(
 				((Table) build.getPage().getElements().get(0)).getContainer(),
 				instanceOf(DatabaseQueryContainer.class));
+	}
+
+	private void mockGetDatabaseQueryContainerCall() {
+		when(
+				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
+						Mockito.anyString(), eq(false), eq(false), eq(false),
+						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
+						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
+						anyInt(), anyInt(), anyInt(), anyBoolean())).thenReturn(
+				queryContainerMock);
 	}
 
 	@Test
@@ -410,7 +414,7 @@ public class ModelBuilderTest {
 						Mockito.anyString(), eq(true), eq(true), eq(true),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
+						anyInt(), anyInt(), anyInt(), anyBoolean())).thenReturn(
 				queryContainerMock);
 		when(
 				factoryMock.getQueryOptionList(eq(eventBus),
@@ -456,7 +460,7 @@ public class ModelBuilderTest {
 						Mockito.anyString(), eq(true), eq(true), eq(true),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
+						anyInt(), anyInt(), anyInt(), anyBoolean())).thenReturn(
 				queryContainerMock);
 
 		Portlet build = builder.build();
@@ -487,7 +491,7 @@ public class ModelBuilderTest {
 						Mockito.anyString(), eq(true), eq(true), eq(true),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
+						anyInt(), anyInt(), anyInt(), anyBoolean())).thenReturn(
 				queryContainerMock);
 
 		Portlet build = builder.build();
@@ -508,13 +512,7 @@ public class ModelBuilderTest {
 		PortletConfig config = createConfiguration("validTableExportOfGeneratedColumnConfig.xml");
 		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
-		when(
-				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
-						Mockito.anyString(), eq(false), eq(false), eq(false),
-						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
-						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
-				queryContainerMock);
+		mockGetDatabaseQueryContainerCall();
 
 		Portlet build = builder.build();
 
@@ -885,13 +883,7 @@ public class ModelBuilderTest {
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
-		when(
-				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
-						Mockito.anyString(), eq(false), eq(false), eq(false),
-						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
-						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
-				queryContainerMock);
+		mockGetDatabaseQueryContainerCall();
 
 		builder.build();
 
@@ -899,12 +891,12 @@ public class ModelBuilderTest {
 				Mockito.anyString(), eq(true), eq(true), eq(true),
 				eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 				anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-				anyInt(), anyInt(), anyInt());
+				anyInt(), anyInt(), anyInt(), anyBoolean());
 		verify(factoryMock).getDatabaseQueryContainer(eq(eventBus), eq("test"),
 				Mockito.anyString(), eq(false), eq(false), eq(false),
 				eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 				anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-				anyInt(), anyInt(), anyInt());
+				anyInt(), anyInt(), anyInt(), anyBoolean());
 	}
 
 	@Test

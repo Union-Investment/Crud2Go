@@ -109,9 +109,8 @@ public class ModelFactory {
 	 * @return Model-Builder
 	 */
 	public ModelBuilder getBuilder(EventBus eventBus, Config config) {
-		return new ModelBuilder(eventBus, this,
-				resetFormAction, fieldValidatorFactory, defaultSelectWidth,
-				config);
+		return new ModelBuilder(eventBus, this, resetFormAction,
+				fieldValidatorFactory, defaultSelectWidth, config);
 	}
 
 	public Realm getAuthenticationRealm(AuthenticationRealmConfig config) {
@@ -150,18 +149,16 @@ public class ModelFactory {
 	 * @return eine neue Instanz des {@link DatabaseTableContainer}
 	 */
 	public DatabaseTableContainer getDatabaseTableContainer(EventBus eventBus,
-			String datasource,
-			String tablename, boolean insertable, boolean updateable,
-			boolean deleteable, CurrentUser currentUser,
+			String datasource, String tablename, boolean insertable,
+			boolean updateable, boolean deleteable, CurrentUser currentUser,
 			Map<String, String> formatPattern, List<ContainerOrder> orderBys,
 			FilterPolicy filterPolicy, int pagelength, int exportPagelength,
 			int sizeValidTimeout) {
 		ConnectionPool pool = connectionPoolFactory.getPool(datasource);
 		return new DatabaseTableContainer(eventBus, datasource, tablename,
-				pool,
-				insertable, updateable, deleteable, currentUser, formatPattern,
-				orderBys, filterPolicy, pagelength, exportPagelength,
-				sizeValidTimeout);
+				pool, insertable, updateable, deleteable, currentUser,
+				formatPattern, orderBys, filterPolicy, pagelength,
+				exportPagelength, sizeValidTimeout);
 	}
 
 	/**
@@ -194,21 +191,23 @@ public class ModelFactory {
 	 *            Anzahl der Einträge pro Seite
 	 * @param exportPagelength
 	 *            Anzahl der Einträge pro Seite beim Export
+	 * @param orderByPrimaryKeys
+	 *            sortiere immer auch nach Primärschlüsseln
 	 * @return DatabaseQueryContainer
 	 */
 	public DatabaseQueryContainer getDatabaseQueryContainer(EventBus eventBus,
-			String datasource,
-			String query, boolean insertable, boolean updateable,
-			boolean deleteable, List<String> primaryKeys,
+			String datasource, String query, boolean insertable,
+			boolean updateable, boolean deleteable, List<String> primaryKeys,
 			String currentUsername, Map<String, String> displayPattern,
 			List<ContainerOrder> orderBys, FilterPolicy filterPolicy,
-			int pagelength, int exportPagelength, Integer sizeValidTimeout) {
+			int pagelength, int exportPagelength, Integer sizeValidTimeout,
+			boolean orderByPrimaryKeys) {
 		ConnectionPool pool = connectionPoolFactory.getPool(datasource);
 		return new DatabaseQueryContainer(eventBus, datasource, query,
-				insertable,
-				updateable, deleteable, primaryKeys, pool, currentUsername,
-				displayPattern, orderBys, filterPolicy, pagelength,
-				exportPagelength, sizeValidTimeout);
+				insertable, updateable, deleteable, primaryKeys, pool,
+				currentUsername, displayPattern, orderBys, filterPolicy,
+				pagelength, exportPagelength, sizeValidTimeout,
+				orderByPrimaryKeys);
 	}
 
 	/**
@@ -220,8 +219,8 @@ public class ModelFactory {
 	 *            Art des Filterhandlings
 	 * @return den Container
 	 */
-	public GenericDataContainer getGenericDataContainer(
-			EventBus eventBus, Map<String, String> formatPattern,
+	public GenericDataContainer getGenericDataContainer(EventBus eventBus,
+			Map<String, String> formatPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {
 		return new GenericDataContainer(eventBus, formatPattern, defaultOrder,
 				filterPolicy);
@@ -260,11 +259,9 @@ public class ModelFactory {
 	}
 
 	public QueryOptionList getQueryOptionList(EventBus eventBus,
-			SelectConfig config,
-			String datasource) {
+			SelectConfig config, String datasource) {
 		return new QueryOptionList(config, eventBus,
-				connectionPoolFactory.getPool(datasource),
-				prefetchExecutor);
+				connectionPoolFactory.getPool(datasource), prefetchExecutor);
 	}
 
 }

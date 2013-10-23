@@ -1950,6 +1950,18 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="order-by-primarykeys" type="boolean"
+					default="false">
+					<annotation>
+						<documentation>
+							Es wird unabhängig von der aktuellen Sortierung
+							immer auch nach den Primärschlüsselspalten sortiert.
+							Dies ist nur
+							bei Queries notwendig, die Daten nicht
+							in einer konsistenten Reihenfolge liefern.
+						</documentation>
+					</annotation>
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>

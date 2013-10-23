@@ -78,6 +78,8 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 
 	private final Integer exportPageLength;
 
+	private boolean orderByPrimaryKeys;
+
 	/**
 	 * Erzeugt bei der Initialisierung eine neue {@link SQLContainer} Instanz
 	 * auf Basis der übergebenen SQLQuery.
@@ -103,6 +105,11 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 	 *            Cachttimeout für die Anzahl aller selektierten Einträge
 	 * @param pageLength
 	 *            Anzahl der Einträge pro Seite
+	 * @param orderByPrimaryKeys
+	 *            Es wird unabhängig von der aktuellen Sortierung immer auch
+	 *            nach den Primärschlüsselspalten sortiert. Dies ist nur bei
+	 *            Queries notwendig, die Daten nicht in einer konsistenten
+	 *            Reihenfolge liefern.
 	 */
 	public DatabaseQueryContainer(EventBus eventBus, String datasource,
 			String sqlQuery, boolean insertable, boolean updateable,
@@ -110,7 +117,8 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 			ConnectionPool connectionPool, String currentUsername,
 			Map<String, String> displayPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy,
-			int pageLength, int exportPageLength, Integer sizeValidTimeout) {
+			int pageLength, int exportPageLength, Integer sizeValidTimeout,
+			boolean orderByPrimaryKeys) {
 		super(eventBus, displayPattern, defaultOrder, filterPolicy);
 
 		this.insertable = insertable;
@@ -119,6 +127,7 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 		this.pageLength = pageLength;
 		this.exportPageLength = exportPageLength;
 		this.sizeValidTimeout = sizeValidTimeout;
+		this.orderByPrimaryKeys = orderByPrimaryKeys;
 		Assert.notNull(datasource, "DataSource is required");
 		Assert.notNull(sqlQuery, "SQL-Query is required");
 
@@ -154,6 +163,7 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 			queryDelegate = new FreeformQueryEventWrapper(this, query,
 					connectionPool, getOnInsertEventRouter(),
 					getOnUpdateEventRouter(), getOnDeleteEventRouter(),
+					orderByPrimaryKeys,
 					primaryKeys.toArray(new String[primaryKeys.size()]));
 			this.getFreeformQueryEventWrapper().setDelegate(
 					databaseQueryDelegate);
@@ -219,17 +229,21 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 	}
 
 	private void markRowsWithModifiedLobsAsModified() {
-		for (Entry<ContainerRowId, Map<String, ContainerBlob>> rowBlobs : blobFields.entrySet()) {
+		for (Entry<ContainerRowId, Map<String, ContainerBlob>> rowBlobs : blobFields
+				.entrySet()) {
 			for (ContainerBlob blob : rowBlobs.getValue().values()) {
 				if (blob.isModified()) {
-					getVaadinContainer().markRowAsModified(rowBlobs.getKey().getInternalId());
+					getVaadinContainer().markRowAsModified(
+							rowBlobs.getKey().getInternalId());
 				}
 			}
 		}
-		for (Entry<ContainerRowId, Map<String, ContainerClob>> rowClobs : clobFields.entrySet()) {
+		for (Entry<ContainerRowId, Map<String, ContainerClob>> rowClobs : clobFields
+				.entrySet()) {
 			for (ContainerClob clob : rowClobs.getValue().values()) {
 				if (clob.isModified()) {
-					getVaadinContainer().markRowAsModified(rowClobs.getKey().getInternalId());
+					getVaadinContainer().markRowAsModified(
+							rowClobs.getKey().getInternalId());
 				}
 			}
 		}

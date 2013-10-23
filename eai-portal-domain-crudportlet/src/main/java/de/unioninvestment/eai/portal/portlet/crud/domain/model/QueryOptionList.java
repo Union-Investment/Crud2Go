@@ -26,6 +26,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,8 +79,7 @@ public class QueryOptionList extends VolatileOptionList {
 	 *            executes the prefetch operation, if configured
 	 */
 	public QueryOptionList(SelectConfig config, EventBus eventBus,
-			ConnectionPool connectionPool,
-			ExecutorService asyncExecutor) {
+			ConnectionPool connectionPool, ExecutorService asyncExecutor) {
 		super(eventBus);
 		this.connectionPool = connectionPool;
 		this.prefetchExecutor = asyncExecutor;
@@ -98,6 +98,7 @@ public class QueryOptionList extends VolatileOptionList {
 
 	private void startPrefetch() {
 		cancelOlderPrefetch();
+		logIfThreadPoolIsFull(prefetchExecutor);
 		future = prefetchExecutor.submit(new Callable<Map<String, String>>() {
 			@Override
 			public Map<String, String> call() throws Exception {
@@ -110,6 +111,19 @@ public class QueryOptionList extends VolatileOptionList {
 			}
 
 		});
+	}
+
+	private void logIfThreadPoolIsFull(ExecutorService prefetchExecutor) {
+		if (prefetchExecutor instanceof ThreadPoolExecutor) {
+			ThreadPoolExecutor executor = (ThreadPoolExecutor) prefetchExecutor;
+			int requestsInProgress = executor.getActiveCount()
+					+ executor.getQueue().size();
+			if (requestsInProgress >= executor.getMaximumPoolSize()) {
+				LOGGER.warn(
+						"Maximum OptionList prefetch threads reached (~{}/{}). Request will be queued.",
+						requestsInProgress, executor.getMaximumPoolSize());
+			}
+		}
 	}
 
 	private String logId() {
