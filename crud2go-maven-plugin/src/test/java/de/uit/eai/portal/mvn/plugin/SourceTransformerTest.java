@@ -24,7 +24,7 @@ public class SourceTransformerTest {
 	private static void checkTransformation(String inputName,
 			String expectedOutputFile, RESULT expectedResult)
 			throws IOException, SAXException {
-		SourceTransformer sourceTransformer = new SourceTransformer();
+		SourceTransformer sourceTransformer = new SourceTransformer("utf-8");
 
 		String inputPath = resolvePath(inputName);
 

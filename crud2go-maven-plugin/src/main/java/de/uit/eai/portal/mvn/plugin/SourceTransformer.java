@@ -39,6 +39,9 @@ public class SourceTransformer {
 	private static final String SCRIPT_TAG = "script";
 
 	private static final String SRC_ATTRIBUTE = "src";
+
+	private final String scriptEncoding;
+	
 	private long newestInputDate;
 	private long outputDate;
 
@@ -46,7 +49,8 @@ public class SourceTransformer {
 		NOT_PORTLET, PORTLET_NO_PROCESSING, PORTLET_PROCESSING_DONE, UP_TO_DATE
 	}
 
-	public SourceTransformer() {
+	public SourceTransformer(String scriptEncoding) {
+		this.scriptEncoding = scriptEncoding;
 	}
 
 	public RESULT processFile(String inputFilePath, String outputFilePath)
@@ -124,8 +128,6 @@ public class SourceTransformer {
 				Boolean.TRUE);
 
 		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-		// get the XMLInputFactory and XMLOutputFactory objects
-
 		XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
 		XMLEventReader eventReader;
@@ -136,13 +138,16 @@ public class SourceTransformer {
 
 			eventReader = inputFactory.createXMLEventReader(inputReader);
 			eventWriter = outputFactory.createXMLEventWriter(output, "utf-8");
+			eventWriter.add(eventFactory.createStartDocument("UTF-8", "1.0"));
 
 			boolean insertScriptContent = false;
 			String scriptContent = null;
 
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
-				if (event.isStartElement()) {
+				if (event.isStartDocument()) {
+					continue;
+				} else if (event.isStartElement()) {
 					StartElement element = event.asStartElement();
 					QName elementQName = element.getName();
 					String nameLocalPart = elementQName.getLocalPart();
@@ -156,7 +161,7 @@ public class SourceTransformer {
 						String value = getSrcAttribute(element);
 						if (value != null) {
 							insertScriptContent = true;
-							scriptContent = getSourceContent(basePath, value);
+							scriptContent = getScriptContent(basePath, value);
 							result = RESULT.PORTLET_PROCESSING_DONE;
 						}
 					}
@@ -190,27 +195,24 @@ public class SourceTransformer {
 		}
 	}
 
-	String readFileToString(String path) throws IOException {
-		File file = new File(path);
+	private String getScriptContent(String basePath, String includePath)
+			throws IOException {
+
+		String absolutePath = constructAbsolutePath(basePath, includePath);
+
+		File file = new File(absolutePath);
 		if (!file.exists()) {
 			throw new IOException("Path does not exists");
 		}
 		newestInputDate = Math.max(newestInputDate, file.lastModified());
 
-		InputStream inputStream = new FileInputStream(path);
-		BOMInputStream bOMInputStream = new BOMInputStream(inputStream);
-		String charset = bOMInputStream.getBOMCharsetName();
+		InputStream inputStream = new FileInputStream(file);
+		BOMInputStream bomInputStream = new BOMInputStream(inputStream);
+		String charset = bomInputStream.getBOMCharsetName();
 		if (charset == null) {
-			charset = "utf-8";
+			charset = scriptEncoding;
 		}
-		return IOUtils.toString(bOMInputStream, charset);
-	}
-
-	private String getSourceContent(String basePath, String includePath)
-			throws IOException {
-
-		String absolutePath = constructAbsolutePath(basePath, includePath);
-		return readFileToString(absolutePath);
+		return IOUtils.toString(bomInputStream, charset);
 	}
 
 	public static String constructAbsolutePath(String basePath,
