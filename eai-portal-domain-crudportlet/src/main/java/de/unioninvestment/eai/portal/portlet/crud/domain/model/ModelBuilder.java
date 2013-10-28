@@ -661,6 +661,7 @@ public class ModelBuilder {
 					.inputPrompt(c.getInputPrompt()) //
 					.validators(validators) //
 					.displayFormat(c.getDisplayFormat()) //
+					.excelFormat(c.getExcelFormat()) //
 					.fileMetadata(fileMetadata) //
 					.generatedType(generatedType) //
 					.build();
@@ -810,7 +811,8 @@ public class ModelBuilder {
 				extractFilterPolicy(databaseQuery),
 				databaseQuery.getPagelength(),
 				databaseQuery.getExportPagelength(),
-				databaseQuery.getSizeValid());
+				databaseQuery.getSizeValid(),
+				databaseQuery.isOrderByPrimarykeys());
 	}
 
 	private DataContainer buildTableContainer(DatabaseTableConfig config,

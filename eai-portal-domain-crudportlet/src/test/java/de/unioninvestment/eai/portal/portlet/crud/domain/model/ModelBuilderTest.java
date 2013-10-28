@@ -222,7 +222,7 @@ public class ModelBuilderTest {
 	public void shouldCreateDatabaseTableModelFromConfiguration()
 			throws Exception {
 		PortletConfig config = createConfiguration("validConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),
@@ -252,7 +252,7 @@ public class ModelBuilderTest {
 		roleResourceIds.put("PortletId_17808_admin5", 1L);
 		roleResourceIds.put("PortletId_17808_user5", 2L);
 		ModelBuilder builder = createTestBuilder(new Config(config,
-				roleResourceIds));
+				roleResourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),
@@ -284,7 +284,7 @@ public class ModelBuilderTest {
 	public void shouldCreateFormModelFromConfiguration() throws Exception {
 
 		PortletConfig config = createConfiguration("validFormConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),
@@ -313,7 +313,7 @@ public class ModelBuilderTest {
 	public void shouldCreateTextAreaModelFromConfiguration() throws Exception {
 
 		PortletConfig config = createConfiguration("validTextAreaConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		Portlet build = builder.build();
 
@@ -326,7 +326,7 @@ public class ModelBuilderTest {
 			throws Exception {
 
 		PortletConfig config = createConfiguration("validFormConfigWithScript.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -351,7 +351,7 @@ public class ModelBuilderTest {
 	public void shouldCreateTabsModelFromConfiguration() throws Exception {
 
 		PortletConfig config = createConfiguration("validTabsConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -380,15 +380,9 @@ public class ModelBuilderTest {
 			throws Exception {
 
 		PortletConfig config = createConfiguration("validReadonlyQueryConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
-		when(
-				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
-						Mockito.anyString(), eq(false), eq(false), eq(false),
-						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
-						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
-				queryContainerMock);
+		mockGetDatabaseQueryContainerCall();
 
 		Portlet build = builder.build();
 
@@ -399,18 +393,28 @@ public class ModelBuilderTest {
 				instanceOf(DatabaseQueryContainer.class));
 	}
 
+	private void mockGetDatabaseQueryContainerCall() {
+		when(
+				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
+						Mockito.anyString(), eq(false), eq(false), eq(false),
+						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
+						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
+						anyInt(), anyInt(), anyInt(), anyBoolean())).thenReturn(
+				queryContainerMock);
+	}
+
 	@Test
 	public void shouldCreateDatabaseQueryModelFromConfigurationSelectWithQuery()
 			throws Exception {
 		PortletConfig config = createConfiguration("validSelectConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
 						Mockito.anyString(), eq(true), eq(true), eq(true),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
+						anyInt(), anyInt(), anyInt(), anyBoolean())).thenReturn(
 				queryContainerMock);
 		when(
 				factoryMock.getQueryOptionList(eq(eventBus),
@@ -449,14 +453,14 @@ public class ModelBuilderTest {
 	public void shouldCreateDatabaseQueryModelFromConfigurationSelectWithOptionList()
 			throws Exception {
 		PortletConfig config = createConfiguration("validSelectConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
 						Mockito.anyString(), eq(true), eq(true), eq(true),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
+						anyInt(), anyInt(), anyInt(), anyBoolean())).thenReturn(
 				queryContainerMock);
 
 		Portlet build = builder.build();
@@ -480,14 +484,14 @@ public class ModelBuilderTest {
 			throws Exception {
 
 		PortletConfig config = createConfiguration("validDynamicDropDownConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
 						Mockito.anyString(), eq(true), eq(true), eq(true),
 						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
+						anyInt(), anyInt(), anyInt(), anyBoolean())).thenReturn(
 				queryContainerMock);
 
 		Portlet build = builder.build();
@@ -506,15 +510,9 @@ public class ModelBuilderTest {
 	public void shouldFillTableColumnsGeneratedTypeProperty() throws Exception {
 
 		PortletConfig config = createConfiguration("validTableExportOfGeneratedColumnConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
-		when(
-				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
-						Mockito.anyString(), eq(false), eq(false), eq(false),
-						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
-						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
-				queryContainerMock);
+		mockGetDatabaseQueryContainerCall();
 
 		Portlet build = builder.build();
 
@@ -541,7 +539,7 @@ public class ModelBuilderTest {
 	public void shouldAddTabsById() throws Exception {
 
 		PortletConfig config = createConfiguration("validNestedTabsConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -590,7 +588,7 @@ public class ModelBuilderTest {
 		// Given a valid configuration with dialogs and a ModelBuilder for this
 		// config
 		PortletConfig config = createConfiguration("validDialogConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		// when the ModelBuilder builds a portlet instance for this config
 		Portlet portlet = builder.build();
@@ -610,7 +608,7 @@ public class ModelBuilderTest {
 		// Given a valid configuration with dialogs and a ModelBuilder for this
 		// config
 		PortletConfig config = createConfiguration("validDialogConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		// when the ModelBuilder builds a portlet instance for this config
 		Portlet portlet = builder.build();
@@ -624,7 +622,7 @@ public class ModelBuilderTest {
 	public void shouldAddTriggers() throws Exception {
 
 		PortletConfig config = createConfiguration("validActionTriggersConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -653,7 +651,7 @@ public class ModelBuilderTest {
 			throws Exception {
 
 		PortletConfig config = createConfiguration("validTableActionConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -677,7 +675,7 @@ public class ModelBuilderTest {
 			throws Exception {
 
 		PortletConfig config = createConfiguration("validReSTSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getAuthenticationRealm(config.getAuthentication()
@@ -694,7 +692,7 @@ public class ModelBuilderTest {
 			throws Exception {
 
 		PortletConfig config = createConfiguration("validXLSExportConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -715,7 +713,7 @@ public class ModelBuilderTest {
 			throws Exception {
 
 		PortletConfig config = createConfiguration("validMultiselectFormConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -735,7 +733,7 @@ public class ModelBuilderTest {
 	public void shouldNotBuildDeniedTab1FromConfiguration() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -753,7 +751,7 @@ public class ModelBuilderTest {
 			throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -771,7 +769,7 @@ public class ModelBuilderTest {
 			throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -788,7 +786,7 @@ public class ModelBuilderTest {
 	public void shouldSetTableReadonlyByPermission() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -806,7 +804,7 @@ public class ModelBuilderTest {
 	public void shouldNotBuildTableByPermission() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -823,7 +821,7 @@ public class ModelBuilderTest {
 	public void shouldBuildTableByPermission() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -841,7 +839,7 @@ public class ModelBuilderTest {
 	public void shouldNotEditableColumnByPermission() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -863,7 +861,7 @@ public class ModelBuilderTest {
 	public void shouldNotVisibleColumnByPermission() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eventBus, "test",
@@ -883,15 +881,9 @@ public class ModelBuilderTest {
 	public void shouldNotCrudQueryContainerByPermission() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
-		when(
-				factoryMock.getDatabaseQueryContainer(eq(eventBus), eq("test"),
-						Mockito.anyString(), eq(false), eq(false), eq(false),
-						eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
-						anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-						anyInt(), anyInt(), anyInt())).thenReturn(
-				queryContainerMock);
+		mockGetDatabaseQueryContainerCall();
 
 		builder.build();
 
@@ -899,19 +891,19 @@ public class ModelBuilderTest {
 				Mockito.anyString(), eq(true), eq(true), eq(true),
 				eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 				anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-				anyInt(), anyInt(), anyInt());
+				anyInt(), anyInt(), anyInt(), anyBoolean());
 		verify(factoryMock).getDatabaseQueryContainer(eq(eventBus), eq("test"),
 				Mockito.anyString(), eq(false), eq(false), eq(false),
 				eq(Arrays.asList("ID")), Mockito.anyString(), anyMap(),
 				anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
-				anyInt(), anyInt(), anyInt());
+				anyInt(), anyInt(), anyInt(), anyBoolean());
 	}
 
 	@Test
 	public void shouldNotCrudTableContainerByPermission() throws Exception {
 
 		PortletConfig config = createConfiguration("validSecurityConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),
@@ -938,7 +930,7 @@ public class ModelBuilderTest {
 	@Test
 	public void shouldBuildCustomComponentInPage() throws Exception {
 		PortletConfig config = createConfiguration("validCustomComponentConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		Portlet portlet = builder.build();
 
@@ -951,7 +943,7 @@ public class ModelBuilderTest {
 	@Test
 	public void shouldBuildCustomComponentInTab() throws Exception {
 		PortletConfig config = createConfiguration("validCustomComponentConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		Portlet portlet = builder.build();
 
@@ -966,7 +958,7 @@ public class ModelBuilderTest {
 	@Test
 	public void shouldAddCustomComponentsById() throws Exception {
 		PortletConfig config = createConfiguration("validCustomComponentConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		Portlet portlet = builder.build();
 
@@ -983,7 +975,7 @@ public class ModelBuilderTest {
 	@Test
 	public void shouldAddCustomComponentToTabElementList() throws Exception {
 		PortletConfig config = createConfiguration("validCustomComponentConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		Portlet portlet = builder.build();
 
@@ -999,7 +991,7 @@ public class ModelBuilderTest {
 			throws Exception {
 		// Gegegeben eine editierbare Tabelle ohne Primary-Key-Column,
 		PortletConfig config = createConfiguration("invalidEditableWithoutPrimaryKey.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		// wenn die Konfiguration gebaut wird
 		try {
@@ -1018,7 +1010,7 @@ public class ModelBuilderTest {
 			throws Exception {
 		// Gegegeben eine exportierbare Tabelle ohne Primary-Key-Column,
 		PortletConfig config = createConfiguration("invalidExportableWithoutPrimaryKey.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		// wenn die Konfiguration gebaut wird
 		try {
@@ -1038,7 +1030,7 @@ public class ModelBuilderTest {
 		// Gegegeben eine nicht editierbare und nicht exportierbare Tabelle ohne
 		// Primary-Key-Column,
 		PortletConfig config = createConfiguration("validNonEditableNonExportableWithoutPrimaryKey.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		// wenn die Konfiguration gebaut wird
 		Portlet portlet = builder.build();
@@ -1055,7 +1047,7 @@ public class ModelBuilderTest {
 		// da sie ein Query-Backend ohne Update/Insert/Delete-Teil hat,
 		// ohne Primary-Key-Column,
 		PortletConfig config = createConfiguration("validImplicitNonEditableWithoutPrimaryKey.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds));
+		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
 
 		// wenn die Konfiguration gebaut wird
 		Portlet portlet = builder.build();
@@ -1068,7 +1060,7 @@ public class ModelBuilderTest {
 	@Test
 	public void shouldCreateRegionModelFromConfiguration() throws Exception {
 		PortletConfig config = createConfiguration("validRegionConfig.xml");
-		ModelBuilder builder = createTestBuilder(new Config(config, null));
+		ModelBuilder builder = createTestBuilder(new Config(config, null, null, null));
 
 		when(
 				factoryMock.getDatabaseTableContainer(eq(eventBus), eq("test"),

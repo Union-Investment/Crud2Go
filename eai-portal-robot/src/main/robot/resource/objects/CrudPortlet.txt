@@ -178,13 +178,12 @@ die 1.Spalte auf ${WERT} ändert
 	Input Text  css=table.v-table-table tr td:nth-child(2) input  ${WERT}
 	
 den Editier-Modus verlässt
-	Vaadin Click  css=span.v-button-caption:contains("Editieren verlassen")
-	Sleep  2s	
+	Click Vaadin Button  Editieren verlassen
+	Wait for AJAX calls to complete
 
 den Button '${TEXT}' klickt
-	Page Should Contain Element  css=span.v-button-caption:contains("${TEXT}")
-	Vaadin Click  css=span.v-button-caption:contains("${TEXT}")
-	Sleep  1s
+	Click Vaadin Button  ${TEXT}
+	Wait for AJAX calls to complete
 	
 das Feld verlässt	
 	Call Selenium Api  mouseDown  css=table.v-table-table tr:nth-child(2) td:nth-child(2)
@@ -212,7 +211,7 @@ der Benutzer die erste Zeile löscht
 	auf editieren klickt
 	Call Selenium Api  mouseDown  css=table.v-table-table tr td:nth-child(1) div
 	Call Selenium Api  mouseUp  css=table.v-table-table tr td:nth-child(1) div
-	Vaadin Click  css=span.v-button-caption:contains("Zeile Löschen")	
+	Click Vaadin Button  Zeile Löschen	
 	den Editier-Modus verlässt
 	
 ist die Tabelle ${TABELLE} leer
@@ -243,7 +242,7 @@ wird die ${zeile}. Zeile der Tabelle im Formularmodus angezeigt
 	Vaadin Double Click  css=tr:nth-child(${trNum}) td:nth-child(1)
 	
 mit der Maus im Formular auf den Titel des Feldes '${feld}' gefahren wird 
-	Call Selenium Api  mouseOver  css=tr td:contains("${feld}") div span
+	Call Selenium Api  mouseOver  xpath=//tr//td[contains(.,"${feld}")]//div//span
 	Sleep  2s
 
 	
@@ -305,30 +304,29 @@ hat die Tabelle eine Spalte '${TEXT}'
 	Wait until page contains  ${TEXT}  10s
 
 Button Editieren ist ausgeschlatet	
-	Wait Until Page Contains Element  css=div.v-disabled span.v-button-caption:contains("Editieren")
+	Wait Until Page Contains Element  css=//div[contains(@class, "v-disabled")//span[@class="v-button-caption" and text() = "Editieren"]
 	
 Button '${TEXT}' is nicht vorhanden	
 	Page Should Not Contain  ${TEXT}
 	
 ist der Button '${TEXT}' vorhanden
-	Page Should Contain Element  css=span.v-button-caption:contains("${TEXT}")
+	Page Should Contain Element  xpath=//span[@class="v-button-caption" and text() = "${TEXT}"]
 
 ist der Button '${TEXT}' nicht vorhanden
-	Page Should Not Contain Element  css=span.v-button-caption:contains("${TEXT}")
+	Page Should Not Contain Element  xpath=//span[@class="v-button-caption" and text() = "${TEXT}"]
 	
 werden keine Daten angezeigt
 	Page Should Not Contain Element  css=table.v-table-table tr:nth-child(1) td:nth-child(1)
 	
 der Button '${BUTTON}' angeklickt
-	Page Should Contain Element  css=span.v-button-caption:contains("${BUTTON}")
-	Vaadin Click  css=span.v-button-caption:contains(${BUTTON})
+	Click Vaadin Button  ${BUTTON}
 	Wait for AJAX calls to complete	
 	
 und der Title des Portlets lautet '${TEXT}'
 	Wait until page contains  ${TEXT}  10s
 	
 wird die Spalte '${TEXT}' nicht angezeigt
-	 Wait Until Keyword Succeeds  10s  1s  Page Should Not Contain Element  css=.crudTable td:contains('${TEXT}')
+	 Wait Until Keyword Succeeds  10s  1s  Page Should Not Contain Element  xpath=//div[contains(@class,"crudTable")]//td[contains(text(),"${TEXT}")]
 	
 wird der Text '${TEXT}' angezeigt
 	Wait Until Page Contains  ${TEXT}
@@ -366,12 +364,12 @@ hat in der Hauptmaske mit dem HTMLelement '${HTML}' die Spalte '${SPALTE}' der Z
 	
 hat in der Formedit-Tabelle mit dem HTMLelement '${HTML}' und der Methode Value die Spalte '${SPALTE}' der Zeile '${ZEILE}' den Wert '${WERT}'
 	Sleep  1s
-	${var} =  Get Value  xpath=//div[@class="v-formlayout"]//table//tr[${ZEILE}]//td[${SPALTE}]${HTML}
+	${var} =  Get Value  xpath=//div[contains(@class,"v-formlayout")]//table//tr[${ZEILE}]//td[${SPALTE}]${HTML}
 	Should Be True  '${var}'=='${WERT}'
 	
 hat in der Formedit-Tabelle mit dem HTMLelement '${HTML}' und der Methode Text die Spalte '${SPALTE}' der Zeile '${ZEILE}' den Wert '${WERT}'
 	Sleep  1s
-	${var} =  Get Text  xpath=//div[@class="v-formlayout"]//table//tr[${ZEILE}]//td[${SPALTE}]${HTML}
+	${var} =  Get Text  xpath=//div[contains(@class,"v-formlayout")]//table//tr[${ZEILE}]//td[${SPALTE}]${HTML}
 	Should Be True  '${var}'=='${WERT}'
 	
 hat die Spalte '${SPALTE}' die Breite '${WERT}'
@@ -382,7 +380,8 @@ hat die Tabellenzeile die Höhe ${WERT} Pixel
 	JavaScript Attribute should have value  xpath=//table[@class="v-table-table"]//tr//td[1]  offsetHeight  ${WERT}
 
 hat die Spalte '${SPALTE}' den Titel '${WERT}'
-	${var}  Get Text  xpath=//div[@class="v-table-header"]//table//tr[1]//td[${SPALTE}]
+	Page Should Contain Element  xpath=//div[@class="v-table-header"]//table//tr[1]//td[${SPALTE}]
+	${var} =  Get Text  xpath=//div[@class="v-table-header"]//table//tr[1]//td[${SPALTE}]
 	Should Be True  '${var}'=='${WERT}'
 
 eine neue Zeile einfügt und den Editieren Modus verlässt
@@ -402,10 +401,10 @@ wird der InputPromt '${TEXT}' in der Spalte '${SPALTE}' angezeigt
 		
 in der '${ZEILE}'. Zeile und '${SPALTE}'. Spalte den Wert '${WERT}' auswählt
 	Vaadin Click  css=table.v-table-table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE}) div.v-filterselect-button
-	Vaadin Click  css=td.gwt-MenuItem:contains("${WERT}")
+	Vaadin Click  xpath=//td[contains(@class,"gwt-MenuItem") and contains(.,"${WERT}")]
 
 steht in der '${ZEILE}'. Zeile und '${SPALTE}'. Spalte der Wert '${TEXT}'
-	${var} =  Get Text  css=table.v-table-table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE}) div
+	${var} =  Get Text  xpath=//table[contains(@class,"v-table-table")]//tr[${ZEILE}]//td[${SPALTE}]//div
 	Should Be True  '${var}'=='${TEXT}'	
 
 steht in der Eingabefeld der '${ZEILE}'. Zeile und '${SPALTE}'. Spalte der Wert '${TEXT}'
@@ -426,8 +425,8 @@ der Text im mehrzeiligen Eingabefeld auf '${WERT}' geändert wird
 	Input Text  css=textarea.v-textarea[rows="5"]  ${WERT}
 
 der Text im Eingabefeld '${TITEL}' auf '${WERT}' geändert wird
-	Wait Until Page Contains Element  css=tr.v-formlayout-row:contains('${TITEL}') td input.v-textfield
-	Input Text  css=tr.v-formlayout-row:contains('${TITEL}') td input.v-textfield  ${WERT}
+	Wait Until Page Contains Element  xpath=//tr[contains(@class,"v-formlayout-row") and contains(.,"${TITEL}")]//td//input[contains(@class,"v-textfield")]
+	Input Text  xpath=//tr[contains(@class,"v-formlayout-row") and contains(.,"${TITEL}")]//td//input[contains(@class,"v-textfield")]  ${WERT}
 
 enthält der Datenbankeintrag in der Tabelle ${TABLE} identifiziert durch den Wert ${ID-WERT} in Spalte ${ID-SPALTE} den Teilstring ${STRING} in Spalte ${WERT-SPALTE}
 	${data} =  Read Single Value From Table  ${TABLE}  ${WERT-SPALTE}  ${ID-SPALTE} = ${ID-WERT}
@@ -465,7 +464,7 @@ erscheint der Tooltip '${tooltip}'
 	Page Should Contain Element  css=tr:nth-child(1) td:nth-child(${spalte}) span[title="${tooltip}"]
 
 erscheint der Vaadin Tooltip '${tooltip}'
-	Element Should Be Visible  css=div.v-tooltip-text:contains("${tooltip}")
+	Element Should Be Visible  xpath=//div[@class="v-tooltip-text" and contains(text(), "${tooltip}")]
 
 wird die Liste der DataSources mit dem Eintrag 'test' angezeigt
 	Zeile 1 und Spalte 1 einer Tabelle enthält den Text 'test'

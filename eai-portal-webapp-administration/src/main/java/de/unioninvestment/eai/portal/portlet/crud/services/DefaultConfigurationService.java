@@ -122,10 +122,11 @@ public class DefaultConfigurationService implements ConfigurationService {
 			return dao.readConfigStream(portletId, communityId,
 					new StreamProcessor<Config>() {
 						@Override
-						public Config process(InputStream stream) {
+						public Config process(InputStream stream,
+								ConfigurationMetaData metaData) {
 							try {
 								return buildPortletConfig(stream, portletId,
-										communityId);
+										communityId, metaData);
 							} catch (JAXBException e) {
 								LOG.warn(
 										"XML Konfiguration für Window '"
@@ -146,7 +147,7 @@ public class DefaultConfigurationService implements ConfigurationService {
 	}
 
 	Config buildPortletConfig(InputStream stream, String portletId,
-			long communityId) throws JAXBException {
+			long communityId, ConfigurationMetaData metaData) throws JAXBException {
 		PortletConfig config = unmarshaller.unmarshal(stream);
 		applyRevisionToConfig(config);
 		compiler.compileAllScripts(config);
@@ -166,7 +167,7 @@ public class DefaultConfigurationService implements ConfigurationService {
 			}
 		}
 
-		return new Config(config, roleResourceIDs);
+		return new Config(config, roleResourceIDs, metaData.getFileName(), metaData.getUpdated());
 	}
 
 	private void applyRevisionToConfig(PortletConfig portletConfig) {

@@ -70,7 +70,7 @@ enthält die Tabelle nur eine Zeile mit dem Wert 'TEST5' in der Spalte CVARCHAR5
 	
 ist die Zeile '${ZEILE}' und Spalte '${SPALTE}' im Multiline-Modus
 	Wait for AJAX calls to complete
-	Page Should Contain Element   xpath=//table[@class="v-table-table"]//tr[${ZEILE}]//td[${SPALTE}]//textarea[@class="v-textarea"]
+	Page Should Contain Element   xpath=//table[@class="v-table-table"]//tr[${ZEILE}]//td[${SPALTE}]//textarea[contains(@class,"v-textarea")]
 	
 
 ##########################

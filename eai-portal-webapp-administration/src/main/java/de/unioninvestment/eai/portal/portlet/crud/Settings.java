@@ -54,6 +54,9 @@ public class Settings {
 	@Value("${portlet.crud.storage.configcache.enabled}")
 	private boolean cacheEnabled;
 
+	@Value("${portlet.crud.storage.configcache.checkForUpdates}")
+	private boolean cacheCheckForUpdates;
+
 	@Value("${portal.instanceId}")
 	private String portalInstanceId;
 
@@ -187,6 +190,10 @@ public class Settings {
 
 	public void setDisplayRequestProcessingInfo(boolean displayRequestProcessingInfo) {
 		this.displayRequestProcessingInfo = displayRequestProcessingInfo;
+	}
+
+	public boolean isCacheCheckForUpdates() {
+		return cacheCheckForUpdates;
 	}
 
 }

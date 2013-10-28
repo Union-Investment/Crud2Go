@@ -1,0 +1,33 @@
+*** Settings ***
+Force Tags      autor-mjartanc  textarea  UI-711
+
+*** Test Case ***
+
+XHTML-Content aus der Konfiguration wird angezeigt
+	Es existiert ein Portlet mit der XML-Konfiguration 'TEXTAREA.xml'
+	
+	dann wird in der 1. TextArea der Inhalt des Content-Tags angezeigt
+
+
+Content lässt sich per Doppelklick editieren
+	Es existiert ein Portlet mit der XML-Konfiguration 'TEXTAREA.xml'
+	
+	wenn eine editierbare Textarea per Doppelklick angeklickt wird
+	
+	dann öffnet sich ein Richtext-Editor mit dem Text 'Textarea 52'
+
+
+Geänderter Content wird nach dem Speichern angezeigt
+	[Tags]  NichtAusfuehren
+	# Dieser Test kann mit Selenium1 nicht ausgeführt werden, da der Richtexteditor ein IFRAME verwendet
+	Es existiert ein Portlet mit der XML-Konfiguration 'TEXTAREA.xml'
+	
+	wenn eine editierbare Textarea per Doppelklick angeklickt wird
+	und dann im Richtext-Editor ein neuer Text 'Textarea 55' eingegeben wird
+	und dann der Richtext-Inhalt gespeichert wird
+	
+	dann wird in der 2. TextArea der Inhalt 'Textarea 55' angezeigt
+
+
+*** Settings ***
+Resource        ${RESOURCES}/import/CrudPortlet.txt

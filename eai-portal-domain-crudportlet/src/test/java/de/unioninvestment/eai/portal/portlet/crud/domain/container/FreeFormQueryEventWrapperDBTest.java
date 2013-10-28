@@ -53,7 +53,7 @@ public class FreeFormQueryEventWrapperDBTest extends EventWrapperTest {
 		FreeformQueryEventWrapper freeformQueryEventWrapper = new FreeformQueryEventWrapper(
 				container, "SELECT * FROM TABLEQUERY_WRAPPER",
 				getConnectionPool(), onInsertEventRouter, onUpdateEventRouter,
-				onDeleteEventRouter, "ID");
+				onDeleteEventRouter, false, "ID");
 		freeformQueryEventWrapper.setDelegate(queryDelegate);
 		return freeformQueryEventWrapper;
 	}

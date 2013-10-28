@@ -18,9 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.portlet.ActionRequest;
@@ -34,14 +32,12 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-import com.liferay.portal.util.PortalUtil;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ExternalResource;
@@ -157,7 +153,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 	ConfigStatus status = ConfigStatus.START;
 	boolean initializing = true;
-	boolean firstLoad = true;
+	boolean firstLoad = false; // true only after config change via edit page
 
 	Config portletConfig;
 

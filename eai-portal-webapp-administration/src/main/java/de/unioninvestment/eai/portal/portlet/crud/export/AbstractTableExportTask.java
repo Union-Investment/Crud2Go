@@ -24,10 +24,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.poi.ss.util.DateFormatConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 
+import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.addon.tableexport.TableExport;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinSession;
@@ -35,6 +37,8 @@ import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 /**
  * Abstrakte Oberklasse für Exports, die auf dem TableExport Addon basieren.
@@ -228,6 +232,36 @@ public abstract class AbstractTableExportTask extends AbstractExportTask
 				fileOut.close();
 			} catch (final IOException e) {
 				// ignore it
+			}
+		}
+	}
+
+	protected void applyExcelFormatForColumns(ExcelExport excelExport) {
+
+		excelExport.setDoubleDataFormat("General");
+		excelExport.setDateDataFormat(DateFormatConverter.convert(
+				Context.getLocale(), "dd.MM.yyyy"));
+
+		if (tableModel.getColumns() != null) {
+			for (TableColumn column : tableModel.getColumns()) {
+				String columnName = column.getName();
+				String excelFormat = column.getExcelFormat();
+				if (excelFormat == null) {
+					Class<?> columnType = vaadinTable.getType(columnName);
+					if (columnType != null) {
+						if (Date.class.isAssignableFrom(columnType)) {
+							String dateDisplayFormat = column.getDisplayFormat();
+							if (dateDisplayFormat != null) {
+								excelFormat = DateFormatConverter.convert(
+										Context.getLocale(), dateDisplayFormat);
+							}
+						}
+					}
+				}
+				if (excelFormat != null) {
+					excelExport.setExcelFormatOfProperty(columnName,
+							excelFormat);
+				}
 			}
 		}
 	}

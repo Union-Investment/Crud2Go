@@ -277,4 +277,5 @@ public class QueryOptionListTest {
 
 		assertThat(queryOptionList.getOptions(), is(nullValue()));
 	}
+	
 }

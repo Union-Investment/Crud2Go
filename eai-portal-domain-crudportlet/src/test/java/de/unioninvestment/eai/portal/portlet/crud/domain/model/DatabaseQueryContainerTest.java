@@ -92,7 +92,7 @@ public class DatabaseQueryContainerTest
 		DatabaseQueryContainer databaseQueryContainer = new DatabaseQueryContainer(
 				eventBus, "eai", "select * from test", true, true, true,
 				Arrays.asList("test"), connectionPoolMock, "Benutzer",
-				displayPatternMock, orderBys, null, 100, 1000, 0);
+				displayPatternMock, orderBys, null, 100, 1000, 0, false);
 		databaseQueryContainer.setVaadinContainer(vaadinContainerMock);
 		databaseQueryContainer.setQueryDelegate(queryDelegateMock);
 
@@ -111,7 +111,7 @@ public class DatabaseQueryContainerTest
 		DatabaseQueryContainer container = new DatabaseQueryContainer(eventBus,
 				"eai", "select * from test", false, false, false,
 				Arrays.asList("test"), connectionPoolMock, "Benutzer",
-				displayPatternMock, orderBys, null, 100, 1000, 0);
+				displayPatternMock, orderBys, null, 100, 1000, 0, false);
 		assertFalse(container.isInsertable());
 		assertFalse(container.isDeleteable());
 		assertFalse(container.isUpdateable());
@@ -121,14 +121,14 @@ public class DatabaseQueryContainerTest
 	public void shouldAllowEmptyPrimaryKeysIfReadonly() {
 		new DatabaseQueryContainer(eventBus, "eai", "select * from test",
 				false, false, false, null, connectionPoolMock, "Benutzer",
-				displayPatternMock, orderBys, null, 100, 1000, 0);
+				displayPatternMock, orderBys, null, 100, 1000, 0, false);
 	}
 
 	@Test(expected = BusinessException.class)
 	public void shouldRequirePrimaryKeysForEditing() {
 		new DatabaseQueryContainer(eventBus, "eai", "select * from test", true,
 				false, false, null, connectionPoolMock, "Benutzer",
-				displayPatternMock, orderBys, null, 100, 1000, 0);
+				displayPatternMock, orderBys, null, 100, 1000, 0, false);
 	}
 
 	@Test
@@ -142,7 +142,7 @@ public class DatabaseQueryContainerTest
 			DatabaseQueryContainer container = new DatabaseQueryContainer(
 					eventBus, "eai", "select * from test", true, true, true,
 					Arrays.asList("test"), connectionPoolMock, "Benutzer",
-					displayPatternMock, orderBys, null, 100, 1000, 0);
+					displayPatternMock, orderBys, null, 100, 1000, 0, false);
 			container.getVaadinContainer();
 
 			fail("Exception expected");
@@ -163,7 +163,7 @@ public class DatabaseQueryContainerTest
 			DatabaseQueryContainer container = new DatabaseQueryContainer(
 					eventBus, "eai", "select * from test", true, true, true,
 					Arrays.asList("test"), connectionPoolMock, "Benutzer",
-					displayPatternMock, orderBys, null, 100, 1000, 0);
+					displayPatternMock, orderBys, null, 100, 1000, 0, false);
 			container.getVaadinContainer();
 
 		} catch (BusinessException e) {

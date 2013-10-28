@@ -74,7 +74,9 @@ public class ConfigurationDaoTest {
 				+ "CONFIG_NAME VARCHAR(255) NOT NULL,"
 				+ "CONFIG_XML BLOB NOT NULL,"
 				+ "USER_CREATED VARCHAR(255) NOT NULL,"
-				+ "DATE_CREATED TIMESTAMP NOT NULL" + ")");
+				+ "DATE_CREATED TIMESTAMP NOT NULL," //
+				+ "DATE_UPDATED TIMESTAMP NOT NULL default current timestamp" //
+				+ ")");
 		configurationDaoDerby = ctx.getBean(ConfigurationDao.class);
 	}
 
@@ -137,7 +139,7 @@ public class ConfigurationDaoTest {
 						testPortletId, COMMUNITY_ID }), any(RowMapper.class)))
 				.thenReturn(
 						Arrays.asList(new ConfigurationMetaData("testuser",
-								new Date(), null)));
+								new Date(), new Date(), null)));
 
 		ConfigurationMetaData metaData = configurationDao.readConfigMetaData(
 				testPortletId, COMMUNITY_ID);
@@ -184,7 +186,7 @@ public class ConfigurationDaoTest {
 		StreamProcessor<PortletConfig> processor = new StreamProcessor<PortletConfig>() {
 
 			@Override
-			public PortletConfig process(InputStream stream) {
+			public PortletConfig process(InputStream stream, ConfigurationMetaData metaData) {
 				return new PortletConfig();
 			}
 		};

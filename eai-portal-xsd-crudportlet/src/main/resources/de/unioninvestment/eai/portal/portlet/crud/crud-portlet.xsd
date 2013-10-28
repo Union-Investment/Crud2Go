@@ -1950,6 +1950,18 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="order-by-primarykeys" type="boolean"
+					default="false">
+					<annotation>
+						<documentation>
+							Es wird unabhängig von der aktuellen Sortierung
+							immer auch nach den Primärschlüsselspalten sortiert.
+							Dies ist nur
+							bei Queries notwendig, die Daten nicht
+							in einer konsistenten Reihenfolge liefern.
+						</documentation>
+					</annotation>
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -2457,7 +2469,16 @@
 				<attribute name="display-format" type="string">
 					<annotation>
 						<documentation>
-
+							Anzeigeformat in SimpleDateFormat- oder
+							DecimalFormat Syntax. Bei Datumstypen wird hiervon auch das
+							Excel-Exportformat abgeleitet.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="excel-format" type="string">
+					<annotation>
+						<documentation>
+							Anzeigeformat für den Export in Excel-Syntax.
 						</documentation>
 					</annotation>
 				</attribute>

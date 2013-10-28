@@ -64,7 +64,9 @@ public class DefaultConfigurationServiceTest {
 		@Override
 		public <T> T readConfigStream(String portletId, long communityId,
 				StreamProcessor<T> processor) {
-			return processor.process(configXmlStream);
+			return processor.process(configXmlStream,
+					new ConfigurationMetaData("test", new Date(), new Date(),
+							"test.xml"));
 		}
 	}
 
@@ -95,6 +97,9 @@ public class DefaultConfigurationServiceTest {
 
 	@Mock
 	private Settings settingsMock;
+
+	@Mock
+	private ConfigurationMetaData metaDataMock;
 
 	private static PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
 
@@ -150,7 +155,7 @@ public class DefaultConfigurationServiceTest {
 	@Test
 	public void shouldReturnMetaDataFromDao() {
 		ConfigurationMetaData data = new ConfigurationMetaData("user",
-				new Date(), null);
+				new Date(), null, null);
 		when(daoMock.readConfigMetaData("myWindowId", 17002L)).thenReturn(data);
 
 		assertEquals(data,
@@ -171,7 +176,7 @@ public class DefaultConfigurationServiceTest {
 		InputStream configStream = getClass().getClassLoader()
 				.getResourceAsStream("validConfig.xml");
 		PortletConfig portletConfig = unmarshaller.unmarshal(configStream);
-		Config config = new Config(portletConfig, null);
+		Config config = new Config(portletConfig, null, "test.xml", null);
 
 		boolean configured = service.isConfigured(config, preferencesMock);
 
@@ -186,7 +191,7 @@ public class DefaultConfigurationServiceTest {
 		when(settingsMock.getRevisionPortalRole()).thenReturn("revisionRole");
 
 		Config config = service.buildPortletConfig(configStream, "PortletId",
-				17808L);
+				17808L, metaDataMock);
 
 		assertThat(config.getPortletConfig().getRoles().getRole().get(0)
 				.getName(), is("revision"));
@@ -205,7 +210,7 @@ public class DefaultConfigurationServiceTest {
 		when(daoMock.readNextRoleResourceIdPrimKey()).thenReturn(1L, 2L);
 
 		Config config = service.buildPortletConfig(configStream, "PortletId",
-				17808L);
+				17808L, metaDataMock);
 
 		assertThat(config.getRoleResourceIDs().size(), is(2));
 		assertThat(config.getRoleResourceIDs().get("PortletId_17808_admin5"),
@@ -226,7 +231,7 @@ public class DefaultConfigurationServiceTest {
 				.thenReturn(4L);
 
 		Config config = service.buildPortletConfig(configStream, "PortletId",
-				17808L);
+				17808L, metaDataMock);
 
 		assertThat(config.getRoleResourceIDs().size(), is(2));
 		assertThat(config.getRoleResourceIDs().get("PortletId_17808_admin5"),
@@ -241,7 +246,7 @@ public class DefaultConfigurationServiceTest {
 		InputStream configStream = getClass().getClassLoader()
 				.getResourceAsStream("validReSTSecurityConfig.xml");
 		PortletConfig portletConfig = unmarshaller.unmarshal(configStream);
-		Config config = new Config(portletConfig, null);
+		Config config = new Config(portletConfig, null, "test.xml", null);
 		when(preferencesMock.getValue("testserver.password", null)).thenReturn(
 				"pwd");
 
@@ -256,7 +261,7 @@ public class DefaultConfigurationServiceTest {
 		InputStream configStream = getClass().getClassLoader()
 				.getResourceAsStream("validReSTSecurityConfig.xml");
 		PortletConfig portletConfig = unmarshaller.unmarshal(configStream);
-		Config config = new Config(portletConfig, null);
+		Config config = new Config(portletConfig, null, "test.xml", null);
 		when(preferencesMock.getValue("testserver.username", null)).thenReturn(
 				"user");
 
@@ -272,7 +277,7 @@ public class DefaultConfigurationServiceTest {
 				.getResourceAsStream("validReSTSecurityConfig.xml");
 
 		PortletConfig portletConfig = unmarshaller.unmarshal(configStream);
-		Config config = new Config(portletConfig, null);
+		Config config = new Config(portletConfig, null, "test.xml", null);
 		when(preferencesMock.getValue("testserver.username", null)).thenReturn(
 				"user");
 		when(preferencesMock.getValue("testserver.password", null)).thenReturn(

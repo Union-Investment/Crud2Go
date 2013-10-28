@@ -38,7 +38,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
  * 
- * Spezielle Implementierung von {@link UriFragmentUtility}, die für die
+ * Spezielle Implementierung von {@link UriFragmentChangedListener}, die für die
  * Backbuttonfunktionalität zuständig ist.
  * 
  * @author siva.selvarajah

@@ -24,6 +24,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -130,6 +132,16 @@ public class ExcelExportTask extends AbstractTableExportTask implements
 				}
 			}
 		}
+		
+		@Override
+		protected CellStyle defaultDataCellStyle(Workbook wb) {
+			CellStyle style = super.defaultDataCellStyle(wb);
+			
+			// modified styling to prevent black on black cell coloring on edit/doubleclick
+			style.setFillBackgroundColor(HSSFColor.WHITE.index);
+			
+			return style;
+		}
 	}
 
 	/**
@@ -165,9 +177,11 @@ public class ExcelExportTask extends AbstractTableExportTask implements
 		excelExport.setMimeType(EXCEL_XSLX_MIMETYPE);
 		excelExport.setRowHeaders(true);
 		excelExport.excludeCollapsedColumns();
-		excelExport.setDoubleDataFormat("#.##0");
-		excelExport.setDateDataFormat("DD.MM.YYYY");
+		
+		applyExcelFormatForColumns(excelExport);
+
 		return excelExport;
 	}
+
 
 }

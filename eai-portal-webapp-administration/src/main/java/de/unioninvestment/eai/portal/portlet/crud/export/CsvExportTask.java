@@ -168,6 +168,9 @@ public class CsvExportTask extends AbstractTableExportTask implements
 		export.excludeCollapsedColumns();
 		export.setDoubleDataFormat("#.##");
 		export.setDateDataFormat("DD.MM.YYYY");
+		
+		applyExcelFormatForColumns(export);
+
 		return export;
 	}
 }

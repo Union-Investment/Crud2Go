@@ -4,7 +4,7 @@
 
 	<groupId>de.uit.eai.portal</groupId>
 	<artifactId>eai-portal-build</artifactId>
-	<version>2.2-SNAPSHOT</version>
+	<version>2.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Osiris :: Investment :: EAI-Portal-Administration</name>
 
@@ -24,7 +24,7 @@
 		<springframework.version>3.2.3.RELEASE</springframework.version>
 		<liferay.version>6.1.1</liferay.version>
 
-		<vaadin.version>7.1.5</vaadin.version>
+		<vaadin.version>7.1.7</vaadin.version>
 
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 	</properties>
@@ -536,7 +536,7 @@
 											vaadin-maven-plugin
 										</artifactId>
 										<versionRange>
-											[7.1.5,)
+											[7.1.7,)
 										</versionRange>
 										<goals>
 											<goal>resources</goal>

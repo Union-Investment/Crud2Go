@@ -46,6 +46,18 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ConfigurationDao {
 
+	private static final class MetaDataRowMapper implements
+			RowMapper<ConfigurationMetaData> {
+		public ConfigurationMetaData mapRow(ResultSet rs, int rowNum)
+				throws SQLException {
+			return new ConfigurationMetaData( //
+					rs.getString("USER_CREATED"), //
+					rs.getTimestamp("DATE_CREATED"), //
+					rs.getTimestamp("DATE_UPDATED"), //
+					rs.getString("CONFIG_NAME"));
+		}
+	}
+
 	/**
 	 * Callback-Interface für die Verarbeitung des Config-InputStreams aus dem
 	 * Datenbank-Blob.
@@ -60,9 +72,11 @@ public class ConfigurationDao {
 		 * 
 		 * @param stream
 		 *            Der deserialize InputStream.
+		 * @param metaData
+		 *            Zusatzinfos zur Config.
 		 * @return Das Rückgabe Object des Processors.
 		 */
-		T process(InputStream stream);
+		T process(InputStream stream, ConfigurationMetaData metaData);
 	}
 
 	private LobHandler lobHandler = new DefaultLobHandler();
@@ -122,17 +136,9 @@ public class ConfigurationDao {
 			long communityId) {
 
 		List<ConfigurationMetaData> result = jdbcTemplate
-				.query("SELECT DATE_CREATED, USER_CREATED, CONFIG_NAME FROM ADM_CONFIG WHERE PORTLET_ID = ? AND COMMUNITY_ID = ? ORDER BY DATE_CREATED DESC",
+				.query("SELECT DATE_CREATED, DATE_UPDATED, USER_CREATED, CONFIG_NAME FROM ADM_CONFIG WHERE PORTLET_ID = ? AND COMMUNITY_ID = ? ORDER BY DATE_CREATED DESC",
 						new Object[] { porteltId, communityId },
-						new RowMapper<ConfigurationMetaData>() {
-							public ConfigurationMetaData mapRow(ResultSet rs,
-									int rowNum) throws SQLException {
-								return new ConfigurationMetaData(rs
-										.getString("USER_CREATED"), rs
-										.getTimestamp("DATE_CREATED"), rs
-										.getString("CONFIG_NAME"));
-							}
-						});
+						new MetaDataRowMapper());
 
 		if (result.isEmpty()) {
 			return null;
@@ -155,13 +161,15 @@ public class ConfigurationDao {
 			final StreamProcessor<T> processor) {
 		return jdbcTemplate
 				.queryForObject(
-						"SELECT * FROM ( SELECT CONFIG_XML FROM ADM_CONFIG WHERE PORTLET_ID = ? AND COMMUNITY_ID = ? ORDER BY DATE_CREATED DESC ) WHERE ROWNUM = 1",
+						"SELECT * FROM ( SELECT DATE_CREATED, DATE_UPDATED, USER_CREATED, CONFIG_NAME, CONFIG_XML FROM ADM_CONFIG WHERE PORTLET_ID = ? AND COMMUNITY_ID = ? ORDER BY DATE_CREATED DESC ) WHERE ROWNUM = 1",
 						new RowMapper<T>() {
 							public T mapRow(ResultSet rs, int i)
 									throws SQLException {
+								ConfigurationMetaData metaData = new MetaDataRowMapper()
+										.mapRow(rs, i);
 								InputStream stream = lobHandler
-										.getBlobAsBinaryStream(rs, 1);
-								return processor.process(stream);
+										.getBlobAsBinaryStream(rs, "CONFIG_XML");
+								return processor.process(stream, metaData);
 							}
 						}, portletId, communityId);
 	}
