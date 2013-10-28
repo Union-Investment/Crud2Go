@@ -1,17 +1,17 @@
 package de.uit.eai.portal.mvn.plugin;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Iterator;
 
@@ -54,13 +54,12 @@ public class SourceTransformer {
 
 		InputStreamReader inputReader = createReaderFromFile(inputFilePath);
 
-		StringWriter outputWriter = new StringWriter();
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 		newestInputDate = new File(inputFilePath).lastModified();
 		outputDate = new File(outputFilePath).lastModified();
 
-		RESULT result = transformXMLContent(inputFilePath, inputReader,
-				outputWriter);
+		RESULT result = transformXMLContent(inputFilePath, inputReader, output);
 		switch (result) {
 		case NOT_PORTLET:
 		case UP_TO_DATE:
@@ -77,11 +76,12 @@ public class SourceTransformer {
 			break;
 		case PORTLET_PROCESSING_DONE:
 			if (outputDate < newestInputDate) {
-				FileWriter outputFileWriter = new FileWriter(outputFilePath);
+				FileOutputStream fileOutputStream = new FileOutputStream(
+						outputFilePath);
 				try {
-					IOUtils.write(outputWriter.toString(), outputFileWriter);
+					IOUtils.write(output.toByteArray(), fileOutputStream);
 				} finally {
-					outputFileWriter.close();
+					IOUtils.closeQuietly(fileOutputStream);
 				}
 			} else {
 				return RESULT.UP_TO_DATE;
@@ -116,7 +116,7 @@ public class SourceTransformer {
 	}
 
 	public RESULT transformXMLContent(String basePath, Reader inputReader,
-			Writer outputWriter) throws FactoryConfigurationError, IOException {
+			OutputStream output) throws FactoryConfigurationError, IOException {
 		RESULT result = RESULT.NOT_PORTLET;
 		XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 		inputFactory.setProperty(
@@ -135,7 +135,7 @@ public class SourceTransformer {
 		try {
 
 			eventReader = inputFactory.createXMLEventReader(inputReader);
-			eventWriter = outputFactory.createXMLEventWriter(outputWriter);
+			eventWriter = outputFactory.createXMLEventWriter(output, "utf-8");
 
 			boolean insertScriptContent = false;
 			String scriptContent = null;
@@ -183,7 +183,7 @@ public class SourceTransformer {
 			// clean up
 			eventWriter.close();
 			eventReader.close();
-			outputWriter.flush();
+			output.flush();
 			return result;
 		} catch (javax.xml.stream.XMLStreamException e) {
 			throw new IOException(e.getMessage(), e);
@@ -199,7 +199,11 @@ public class SourceTransformer {
 
 		InputStream inputStream = new FileInputStream(path);
 		BOMInputStream bOMInputStream = new BOMInputStream(inputStream);
-		return IOUtils.toString(bOMInputStream);
+		String charset = bOMInputStream.getBOMCharsetName();
+		if (charset == null) {
+			charset = "utf-8";
+		}
+		return IOUtils.toString(bOMInputStream, charset);
 	}
 
 	private String getSourceContent(String basePath, String includePath)

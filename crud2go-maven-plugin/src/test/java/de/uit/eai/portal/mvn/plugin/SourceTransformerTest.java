@@ -1,9 +1,9 @@
 package de.uit.eai.portal.mvn.plugin;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -28,15 +28,15 @@ public class SourceTransformerTest {
 
 		String inputPath = resolvePath(inputName);
 
-		StringWriter outputWriter = new StringWriter();
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		RESULT result = sourceTransformer.transformXMLContent(inputPath,
-				sourceTransformer.createReaderFromFile(inputPath), outputWriter);
+				sourceTransformer.createReaderFromFile(inputPath), output);
 
 
 		Diff diff = new Diff(
 				sourceTransformer
 						.createReaderFromFile(resolvePath(expectedOutputFile)),
-				new StringReader(outputWriter.toString()));
+				new StringReader(new String(output.toByteArray(), "utf-8")));
 		DetailedDiff detailedDiff = new DetailedDiff(diff);
 		boolean identical = diff.identical();
 		if (!identical) {
