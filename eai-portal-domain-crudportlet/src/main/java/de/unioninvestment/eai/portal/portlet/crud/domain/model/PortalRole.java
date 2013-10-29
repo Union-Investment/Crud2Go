@@ -23,6 +23,8 @@ import java.security.Principal;
 
 import javax.portlet.PortletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Configurable;
 
 import com.vaadin.server.VaadinPortletService;
@@ -40,6 +42,9 @@ public class PortalRole implements Serializable, Role {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(PortalRole.class);
+	
 	private String name;
 	private final String portalRoleName;
 

@@ -42,6 +42,8 @@ public class NamedUser extends User {
 
 	@Autowired
 	private transient Portal portal;
+	
+	private Set<String> cachedRoles;
 
 	/**
 	 * Konstruktor.
@@ -74,18 +76,20 @@ public class NamedUser extends User {
 
 	@Override
 	public Set<String> getRoles() {
-		Set<String> userRoles = new HashSet<String>();
-		if (portletRoles != null) {
-			for (Role portletRole : portletRoles) {
-				if (portletRole.isMember(this)) {
-					userRoles.add(portletRole.getName());
+		if (cachedRoles == null) {
+			cachedRoles = new HashSet<String>();
+			if (portletRoles != null) {
+				for (Role portletRole : portletRoles) {
+					if (portletRole.isMember(this)) {
+						cachedRoles.add(portletRole.getName());
+					}
 				}
 			}
+
+			cachedRoles.add(Role.AUTHENTICATED);
+			cachedRoles.add(Role.ALL);
+
 		}
-
-		userRoles.add(Role.AUTHENTICATED);
-		userRoles.add(Role.ALL);
-
-		return userRoles;
+		return cachedRoles;
 	}
 }
