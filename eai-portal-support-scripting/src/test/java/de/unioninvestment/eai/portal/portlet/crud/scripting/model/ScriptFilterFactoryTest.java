@@ -22,6 +22,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -307,7 +308,7 @@ public class ScriptFilterFactoryTest {
 	}
 
 	@Test
-	public void shouldbuildSqlFilterForString() {
+	public void shouldBuildSqlFilterForString() {
 
 		fac.where("myCol1", "in ('test')");
 
@@ -321,6 +322,21 @@ public class ScriptFilterFactoryTest {
 		assertThat(filter.getValues(), is(emptyList()));
 	}
 
+	@Test
+	public void shouldbuildSqlFilterForStringWithoutColumn() {
+		
+		fac.where("A = 'test'");
+		
+		assertThat(filters.size(), is(1));
+		assertThat(filters.get(0), new IsInstanceOf(SQLFilter.class));
+		
+		SQLFilter filter = (SQLFilter) filters.get(0);
+		
+		assertThat(filter.getColumn(), is(nullValue()));
+		assertThat(filter.getWhereString(), is("A = 'test'"));
+		assertThat(filter.getValues(), is(emptyList()));
+	}
+	
 	@Test
 	public void shouldbuildDurableSqlFilterForString() {
 

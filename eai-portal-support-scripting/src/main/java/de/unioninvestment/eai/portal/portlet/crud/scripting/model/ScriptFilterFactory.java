@@ -501,6 +501,16 @@ public class ScriptFilterFactory {
 
 	/**
 	 * 
+	 * @param where
+	 *            where-Bedingung als GString
+	 */
+	public void where(GString where) {
+		filters.add(new ScriptSQLWhereFactory().createFilter(null, where,
+				false));
+	}
+	
+	/**
+	 * 
 	 * @param namedArguments
 	 *            Parameter Bsp. "durable":true
 	 * @param columnName
@@ -519,10 +529,33 @@ public class ScriptFilterFactory {
 	 * @param columnName
 	 *            Spaltenname
 	 * @param where
-	 *            where-Bedingung als GString
+	 *            where-Bedingung als String
 	 */
 	public void where(String columnName, String where) {
 		filters.add(new SQLFilter(columnName, where, emptyList()));
+	}
+
+	/**
+	 * 
+	 * @param where
+	 *            where-Bedingung als String
+	 */
+	public void where(String where) {
+		filters.add(new SQLFilter(null, where, emptyList()));
+	}
+	
+	/**
+	 * 
+	 * @param namedArguments
+	 *            Parameter Bsp. "durable":true
+	 * @param columnName
+	 *            Spaltenname
+	 * @param where
+	 *            where-Bedingung als GString
+	 */
+	public void where(Map<String, Object> namedArguments, String where) {
+		filters.add(new SQLFilter(null, where, emptyList(),
+				durable(namedArguments)));
 	}
 
 	/**

@@ -71,4 +71,21 @@ public class SQLFilterTranslatorTest {
 				is("\"TESTCOL\" IN (SELECT 1 FROM TEST WHERE 1 = ?)"));
 		verify(shMock).addParameterValue(any());
 	}
+
+	@Test
+	public void shouldGetWhereStringForFilterWithoutColumn() {
+
+		when(sqlFilter.getWhereString()).thenReturn(
+				"A = ?");
+		when(sqlFilter.getColumn()).thenReturn(null);
+		when(sqlFilter.getValues()).thenReturn(
+				Arrays.asList(new Object[] { "TESTPARAM" }));
+
+		sqlFilterTranslator = new SQLFilterTranslator();
+
+		assertThat(
+				sqlFilterTranslator.getWhereStringForFilter(sqlFilter, shMock),
+				is("(A = ?)"));
+		verify(shMock).addParameterValue(any());
+	}
 }
