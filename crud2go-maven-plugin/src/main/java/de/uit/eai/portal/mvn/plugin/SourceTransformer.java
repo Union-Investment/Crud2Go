@@ -61,7 +61,9 @@ public class SourceTransformer {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 		newestInputDate = new File(inputFilePath).lastModified();
-		outputDate = new File(outputFilePath).lastModified();
+
+		File outputFile = new File(outputFilePath);
+		outputDate = outputFile.lastModified();
 
 		RESULT result = transformXMLContent(inputFilePath, inputReader, output);
 		switch (result) {
@@ -72,14 +74,15 @@ public class SourceTransformer {
 		case PORTLET_NO_PROCESSING:
 			// No Skript tag should be expanded
 			if (outputDate < newestInputDate) {
-				FileUtils.copyFile(new File(inputFilePath), new File(
-						outputFilePath));
+				outputFile.getParentFile().mkdirs();
+				FileUtils.copyFile(new File(inputFilePath), outputFile);
 			} else {
 				return RESULT.UP_TO_DATE;
 			}
 			break;
 		case PORTLET_PROCESSING_DONE:
 			if (outputDate < newestInputDate) {
+				outputFile.getParentFile().mkdirs();
 				FileOutputStream fileOutputStream = new FileOutputStream(
 						outputFilePath);
 				try {
