@@ -60,8 +60,8 @@ import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
 import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.container.AbstractTimeoutableQueryDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.TimeoutableQueryDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEventHandler;
@@ -684,7 +684,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	@Test
 	public void shouldSetTimeoutAtQueryDelegateAndRestoreOldTimeout() {
 		this.testContainer.queryDelegate = Mockito
-				.mock(AbstractTimeoutableQueryDelegate.class);
+				.mock(TimeoutableQueryDelegate.class);
 
 		when(this.testContainer.queryDelegate.getQueryTimeout()).thenReturn(42);
 
@@ -697,7 +697,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 	@Test
 	public void shouldAllowTraversalOfEachContainerRow() {
-		container.queryDelegate = mock(AbstractTimeoutableQueryDelegate.class);
+		container.queryDelegate = mock(TimeoutableQueryDelegate.class);
 		container.setVaadinContainer(vaadinContainerMock);
 
 		when(vaadinContainerMock.firstItemId()).thenReturn(rowId1Mock);

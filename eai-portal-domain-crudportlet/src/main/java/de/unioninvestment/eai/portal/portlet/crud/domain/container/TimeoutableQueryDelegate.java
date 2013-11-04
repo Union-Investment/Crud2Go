@@ -16,27 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
-/**
- * Abstrakte Oberklasse für QueryDelegates die ein Timeout unterstützen.
- * 
- * @author Frank Hardy (Codecentric AG)
- */
-public abstract class AbstractTimeoutableQueryDelegate implements QueryDelegate {
-
-	private static final long serialVersionUID = 1L;
-
-	private int queryTimeout = 0;
+public interface TimeoutableQueryDelegate extends QueryDelegate {
 
 	/**
 	 * @return die Timeoutzeit in Sekunden.
 	 */
-	public int getQueryTimeout() {
-		return this.queryTimeout;
-	}
+	public abstract int getQueryTimeout();
 
 	/**
 	 * Set a timeout time in seconds for the count query.
@@ -45,9 +35,6 @@ public abstract class AbstractTimeoutableQueryDelegate implements QueryDelegate 
 	 *            the timeout time or <code>0</code> to set no timeout. Values
 	 *            below 0 will be ignored.
 	 */
-	public void setQueryTimeout(int seconds) {
-		if (seconds >= 0) {
-			this.queryTimeout = seconds;
-		}
-	}
+	public abstract void setQueryTimeout(int seconds);
+
 }
