@@ -14,11 +14,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>ru.xpoft.vaadin</groupId>
-			<artifactId>spring-vaadin-integration</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>de.uit.eai.portal</groupId>
 			<artifactId>eai-portal-xsd-crudportlet</artifactId>
 		</dependency>

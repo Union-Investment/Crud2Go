@@ -118,6 +118,10 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.cybercom</groupId>
+			<artifactId>spring-ui-scope</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.vaadin.addon</groupId>
 			<artifactId>jfreechartwrapper</artifactId>
 		</dependency>

@@ -53,7 +53,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.Presenter;
  */
 @Configuration
 @Lazy
-@Scope("session")
+@Scope("ui")
 public class PresenterFactory {
 
 	@Autowired
@@ -75,7 +75,7 @@ public class PresenterFactory {
 	 */
 	@Bean
 	@Lazy
-	@Scope("session")
+	@Scope("ui")
 	public GuiBuilder guiBuilder() {
 		return new GuiBuilder(this);
 	}
