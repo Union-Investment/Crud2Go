@@ -32,6 +32,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.xml.sax.SAXException;
 
+import com.cybercom.vaadin.spring.UIScope;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
@@ -63,6 +65,11 @@ public class SpringApplicationFactory {
 	@Resource(name = "dataTypes")
 	private List<Object> dataTypeHelpers;
 
+	@Bean
+	static UIScope uiScope() {
+		return new UIScope();
+	}
+
 	/**
 	 * Erzeugt eine Instanz der Klasse EventBus.
 	 * 
@@ -70,7 +77,7 @@ public class SpringApplicationFactory {
 	 */
 	@Bean
 	@Lazy
-	@Scope("session")
+	@Scope("ui")
 	public EventBus eventBus() {
 		return new EventBus();
 	}

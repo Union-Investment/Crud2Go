@@ -25,6 +25,7 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
+import javax.portlet.PortletContext;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -36,7 +37,8 @@ import javax.portlet.ResourceResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.portlet.context.PortletApplicationContextUtils;
 
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
@@ -99,7 +101,6 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationExcepti
  */
 @Theme("crud2go")
 @PreserveOnRefresh
-@Configurable(preConstruction = true, dependencyCheck = true)
 @SuppressWarnings("deprecation")
 public class CrudUI extends LiferayUI implements PortletListener,
 		ShowPopupEventHandler, InitializingUI {
@@ -165,6 +166,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	 */
 	@Override
 	public void doInit(VaadinRequest request) {
+		autowireUiDependencies(request);
+		
 		// deprecated, but currently the only way
 		VaadinPortletSession portletSession = (VaadinPortletSession) VaadinPortletSession
 				.getCurrent();
@@ -184,6 +187,30 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 		portletSession.addPortletListener(this);
 	}
+
+	private void autowireUiDependencies(VaadinRequest request) {
+		ApplicationContext context = getSpringContext(request);
+		if (context != null) {
+			context.getAutowireCapableBeanFactory().autowireBean(this);
+		}
+	}
+	
+	protected ApplicationContext getSpringContext(VaadinRequest request) {
+		PortletRequest currentRequest = VaadinPortletService
+				.getCurrentPortletRequest();
+		if (currentRequest != null) {
+			PortletContext pc = currentRequest.getPortletSession()
+					.getPortletContext();
+			org.springframework.context.ApplicationContext springContext = PortletApplicationContextUtils
+					.getRequiredWebApplicationContext(pc);
+			return springContext;
+
+		} else {
+			throw new IllegalStateException(
+					"Found no current portlet request. Did you subclass PortletApplication in your Vaadin Application?");
+		}
+	}
+
 
 	private void tryToSetPortletTitle(String title) {
 		String realTitle = title != null ? title : Context

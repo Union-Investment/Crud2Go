@@ -19,6 +19,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -38,7 +39,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.springframework.http.HttpStatus;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTChangeConfig;
@@ -326,7 +326,7 @@ public class ReSTDelegateImplTest {
 	public void shouldThrowReadableExceptionOnWrongResultCode()
 			throws ClientProtocolException, IOException {
 		ReSTDelegateImpl delegate = newDelegate(RestTestConfig.readonlyConfig());
-		assumeInvalidResponse(HttpStatus.NOT_FOUND, "NOT FOUND");
+		assumeInvalidResponse(HttpStatus.SC_NOT_FOUND, "NOT FOUND");
 
 		delegate.getRows();
 	}
@@ -583,7 +583,7 @@ public class ReSTDelegateImplTest {
 		stubSuccessfulPostResponse();
 		when(responseMock.getStatusLine()).thenReturn(
 				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
-						HttpStatus.FORBIDDEN.value(), "FORBIDDEN"));
+						HttpStatus.SC_FORBIDDEN, "FORBIDDEN"));
 
 		// when
 		delegate.update(asList(itemMock), new UpdateContext());
@@ -682,7 +682,7 @@ public class ReSTDelegateImplTest {
 				responseMock);
 		when(responseMock.getStatusLine()).thenReturn(
 				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
-						HttpStatus.OK.value(), "DELETED"));
+						HttpStatus.SC_OK, "DELETED"));
 	}
 
 	private HttpPost capturePostRequest() throws IOException,
@@ -711,13 +711,12 @@ public class ReSTDelegateImplTest {
 		assumeValidQueryResponse(JSON_STRING, "text/json", "utf-8");
 	}
 
-	private void assumeInvalidResponse(HttpStatus status, String message)
+	private void assumeInvalidResponse(int status, String message)
 			throws ClientProtocolException, IOException {
 		when(httpMock.execute(any(HttpUriRequest.class))).thenReturn(
 				responseMock);
 		when(responseMock.getStatusLine()).thenReturn(
-				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), status
-						.value(), message));
+				new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), status, message));
 	}
 
 	private void assumeValidQueryResponse(String content, String mimeType,

@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import javax.portlet.PortletMode;
 import javax.portlet.RenderRequest;
@@ -88,8 +89,17 @@ public class CrudUITest extends SpringPortletContextTest {
 
 	@InjectMocks
 	private CrudUI app = new CrudUI() {
+		@Override
 		public void accessSynchronously(Runnable runnable) throws com.vaadin.ui.UIDetachedException {
 			runnable.run();
+		};
+		@Override
+		public Future<Void> access(Runnable runnable) {
+			runnable.run();
+			return null;
+		};
+		protected org.springframework.context.ApplicationContext getSpringContext(com.vaadin.server.VaadinRequest request) {
+			return null;
 		};
 	};
 
