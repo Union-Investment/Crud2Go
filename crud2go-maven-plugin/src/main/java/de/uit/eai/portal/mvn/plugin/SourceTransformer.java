@@ -205,7 +205,7 @@ public class SourceTransformer {
 
 		File file = new File(absolutePath);
 		if (!file.exists()) {
-			throw new IOException("Path does not exists");
+			throw new IOException("Path does not exist: " + file);
 		}
 		newestInputDate = Math.max(newestInputDate, file.lastModified());
 
