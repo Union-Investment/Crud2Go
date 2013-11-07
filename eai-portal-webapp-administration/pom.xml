@@ -17,6 +17,7 @@
 		<gwt.draftCompile>false</gwt.draftCompile>
 		<gwt.style>OBFUSCATED</gwt.style>
 		<maven.build.number>${project.version}-${maven.build.timestamp}</maven.build.number>
+        <liferay.deployDir>d:/Projekte/eai-portal/data/svn_sofia/eai-portal-server/target/jboss-as-7.1.1.Final/liferay/deploy</liferay.deployDir>
 	</properties>
 
 	<dependencies>
@@ -392,6 +393,16 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>wagon-maven-plugin</artifactId>
+                <version>1.0-beta-4</version>
+                <configuration>
+                    <fromDir>${project.build.directory}</fromDir>
+                    <includes>eai-administration.war</includes>
+                    <url>file://${liferay.deployDir}</url>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 
