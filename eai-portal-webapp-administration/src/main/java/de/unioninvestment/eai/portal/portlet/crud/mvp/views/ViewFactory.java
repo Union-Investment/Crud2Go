@@ -34,7 +34,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
  * 
  */
 @Component
-@Scope("session")
+@Scope("ui")
 public class ViewFactory implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -19,6 +19,9 @@ import de.uit.eai.portal.mvn.plugin.SourceTransformer;
 @Execute(goal = "merge", phase = LifecyclePhase.GENERATE_SOURCES)
 public class SourceTranformerMojo extends AbstractMojo {
 
+	@Parameter(defaultValue="${project.build.sourceEncoding}")
+	private String scriptEncoding;
+	
 	@Parameter(defaultValue = "${basedir}/src/config/")
 	private File sourceDirectory;
 
@@ -59,7 +62,7 @@ public class SourceTranformerMojo extends AbstractMojo {
 							.constructAbsolutePath(outputDir.getAbsolutePath(),
 									SourceTransformer.getRelativePath(
 											sourceDirectory, file));
-					SourceTransformer.RESULT result = new SourceTransformer()
+					SourceTransformer.RESULT result = new SourceTransformer(scriptEncoding)
 							.processFile(file.getCanonicalPath(),
 									outputFilePath);
 					switch (result) {

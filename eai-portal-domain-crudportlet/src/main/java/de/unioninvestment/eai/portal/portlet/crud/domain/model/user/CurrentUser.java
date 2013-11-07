@@ -43,6 +43,8 @@ public class CurrentUser extends User {
 
 	private final Set<Role> portalRoles;
 
+	private NamedUser cachedUser;
+
 	/**
 	 * Konstruktor.
 	 * 
@@ -77,7 +79,11 @@ public class CurrentUser extends User {
 		if (currentRequest != null) {
 			String remoteUser = currentRequest.getRemoteUser();
 			if (remoteUser != null) {
-				return new NamedUser(remoteUser, portalRoles);
+				if (cachedUser == null
+						|| !cachedUser.getName().equals(remoteUser)) {
+					cachedUser = new NamedUser(remoteUser, portalRoles);
+				}
+				return cachedUser;
 			}
 		} else {
 			LOG.warn("No portlet request found - that's ok for unit testing. Returning anonymous user");

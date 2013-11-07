@@ -1,17 +1,17 @@
 package de.uit.eai.portal.mvn.plugin;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Iterator;
 
@@ -39,6 +39,9 @@ public class SourceTransformer {
 	private static final String SCRIPT_TAG = "script";
 
 	private static final String SRC_ATTRIBUTE = "src";
+
+	private final String scriptEncoding;
+	
 	private long newestInputDate;
 	private long outputDate;
 
@@ -46,7 +49,8 @@ public class SourceTransformer {
 		NOT_PORTLET, PORTLET_NO_PROCESSING, PORTLET_PROCESSING_DONE, UP_TO_DATE
 	}
 
-	public SourceTransformer() {
+	public SourceTransformer(String scriptEncoding) {
+		this.scriptEncoding = scriptEncoding;
 	}
 
 	public RESULT processFile(String inputFilePath, String outputFilePath)
@@ -54,13 +58,12 @@ public class SourceTransformer {
 
 		InputStreamReader inputReader = createReaderFromFile(inputFilePath);
 
-		StringWriter outputWriter = new StringWriter();
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 		newestInputDate = new File(inputFilePath).lastModified();
 		outputDate = new File(outputFilePath).lastModified();
 
-		RESULT result = transformXMLContent(inputFilePath, inputReader,
-				outputWriter);
+		RESULT result = transformXMLContent(inputFilePath, inputReader, output);
 		switch (result) {
 		case NOT_PORTLET:
 		case UP_TO_DATE:
@@ -77,11 +80,12 @@ public class SourceTransformer {
 			break;
 		case PORTLET_PROCESSING_DONE:
 			if (outputDate < newestInputDate) {
-				FileWriter outputFileWriter = new FileWriter(outputFilePath);
+				FileOutputStream fileOutputStream = new FileOutputStream(
+						outputFilePath);
 				try {
-					IOUtils.write(outputWriter.toString(), outputFileWriter);
+					IOUtils.write(output.toByteArray(), fileOutputStream);
 				} finally {
-					outputFileWriter.close();
+					IOUtils.closeQuietly(fileOutputStream);
 				}
 			} else {
 				return RESULT.UP_TO_DATE;
@@ -116,7 +120,7 @@ public class SourceTransformer {
 	}
 
 	public RESULT transformXMLContent(String basePath, Reader inputReader,
-			Writer outputWriter) throws FactoryConfigurationError, IOException {
+			OutputStream output) throws FactoryConfigurationError, IOException {
 		RESULT result = RESULT.NOT_PORTLET;
 		XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 		inputFactory.setProperty(
@@ -124,8 +128,6 @@ public class SourceTransformer {
 				Boolean.TRUE);
 
 		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-		// get the XMLInputFactory and XMLOutputFactory objects
-
 		XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
 		XMLEventReader eventReader;
@@ -135,14 +137,17 @@ public class SourceTransformer {
 		try {
 
 			eventReader = inputFactory.createXMLEventReader(inputReader);
-			eventWriter = outputFactory.createXMLEventWriter(outputWriter);
+			eventWriter = outputFactory.createXMLEventWriter(output, "utf-8");
+			eventWriter.add(eventFactory.createStartDocument("UTF-8", "1.0"));
 
 			boolean insertScriptContent = false;
 			String scriptContent = null;
 
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
-				if (event.isStartElement()) {
+				if (event.isStartDocument()) {
+					continue;
+				} else if (event.isStartElement()) {
 					StartElement element = event.asStartElement();
 					QName elementQName = element.getName();
 					String nameLocalPart = elementQName.getLocalPart();
@@ -156,7 +161,7 @@ public class SourceTransformer {
 						String value = getSrcAttribute(element);
 						if (value != null) {
 							insertScriptContent = true;
-							scriptContent = getSourceContent(basePath, value);
+							scriptContent = getScriptContent(basePath, value);
 							result = RESULT.PORTLET_PROCESSING_DONE;
 						}
 					}
@@ -183,30 +188,31 @@ public class SourceTransformer {
 			// clean up
 			eventWriter.close();
 			eventReader.close();
-			outputWriter.flush();
+			output.flush();
 			return result;
 		} catch (javax.xml.stream.XMLStreamException e) {
 			throw new IOException(e.getMessage(), e);
 		}
 	}
 
-	String readFileToString(String path) throws IOException {
-		File file = new File(path);
+	private String getScriptContent(String basePath, String includePath)
+			throws IOException {
+
+		String absolutePath = constructAbsolutePath(basePath, includePath);
+
+		File file = new File(absolutePath);
 		if (!file.exists()) {
 			throw new IOException("Path does not exists");
 		}
 		newestInputDate = Math.max(newestInputDate, file.lastModified());
 
-		InputStream inputStream = new FileInputStream(path);
-		BOMInputStream bOMInputStream = new BOMInputStream(inputStream);
-		return IOUtils.toString(bOMInputStream);
-	}
-
-	private String getSourceContent(String basePath, String includePath)
-			throws IOException {
-
-		String absolutePath = constructAbsolutePath(basePath, includePath);
-		return readFileToString(absolutePath);
+		InputStream inputStream = new FileInputStream(file);
+		BOMInputStream bomInputStream = new BOMInputStream(inputStream);
+		String charset = bomInputStream.getBOMCharsetName();
+		if (charset == null) {
+			charset = scriptEncoding;
+		}
+		return IOUtils.toString(bomInputStream, charset);
 	}
 
 	public static String constructAbsolutePath(String basePath,

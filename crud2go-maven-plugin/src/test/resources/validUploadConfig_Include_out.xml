@@ -7,7 +7,7 @@
 	<dialog id="DownloadDialog" backButtonCaption="Zurück">
 		<component generator="generateDownloadDialog(builder)" />
 	</dialog>
-	<script src="script.groovy" property="shared" ><![CDATA[System.out.println("Hello world from groovy script");
+	<script src="script.groovy" property="shared" ><![CDATA[System.out.println("Hello world from groovy script (ü)");
 ]]></script>
 	<script><![CDATA[
 	

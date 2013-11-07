@@ -7,7 +7,7 @@
 }
 
 .v-vaadin-version:after {
-	content: "7.1.5";
+	content: "7.1.7";
 }
 
 .v-generated-body {
@@ -1295,8 +1295,12 @@ body .crud2go.v-app .v-app-loading {
 	line-height: normal;
 }
 
-.v-ios6.v-webkit .crud2go .v-scrollable {
+.v-ios.v-webkit .crud2go .v-scrollable {
 	-webkit-overflow-scrolling: touch;
+}
+
+.v-ios5.v-webkit .crud2go .v-scrollable {
+	-webkit-overflow-scrolling: none;
 }
 
 .crud2go.v-overlay-container {
@@ -5962,4 +5966,8 @@ body .crud2go.v-app {
 
 .crud2go .v-caption-crudRegion {
 	font-weight: bold;
+}
+
+.crud2go td.v-table-cell-content-linethrough {
+	text-decoration-line: line-through;
 }

@@ -36,7 +36,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.container.AbstractTimeoutableQueryDelegate;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.TimeoutableQueryDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
@@ -56,7 +56,7 @@ public class DatabaseTableContainerTest
 	private EventBus eventBus;
 
 	@Mock
-	private AbstractTimeoutableQueryDelegate queryDelegateMock;
+	private TimeoutableQueryDelegate queryDelegateMock;
 
 	@Override
 	public DatabaseTableContainer createDataContainer() {

@@ -1418,10 +1418,11 @@
 				<sequence>
 					<element name="where" type="string" />
 				</sequence>
-				<attribute name="column" type="string" use="required">
+				<attribute name="column" type="string">
 					<annotation>
 						<documentation>
-							Name der Tabellenspalte
+							Name der Tabellenspalte oder leer fuer "freie"
+							Where-Bedingung
 						</documentation>
 					</annotation>
 				</attribute>
@@ -1958,7 +1959,8 @@
 							immer auch nach den Primärschlüsselspalten sortiert.
 							Dies ist nur
 							bei Queries notwendig, die Daten nicht
-							in einer konsistenten Reihenfolge liefern.
+							in einer konsistenten
+							Reihenfolge liefern.
 						</documentation>
 					</annotation>
 				</attribute>

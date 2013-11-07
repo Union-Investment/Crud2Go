@@ -1,1 +1,1 @@
-System.out.println("Hello world from groovy script");
+System.out.println("Hello world from groovy script (ü)");

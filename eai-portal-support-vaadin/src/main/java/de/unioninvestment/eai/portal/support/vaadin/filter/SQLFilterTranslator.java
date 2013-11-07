@@ -48,9 +48,13 @@ public class SQLFilterTranslator implements FilterTranslator {
 			sh.addParameterValue(param);
 		}
 
-		String columnName = QueryBuilder.quote(sqlFilter.getColumn());
-		return MessageFormat.format("{0} {1}", columnName,
-				sqlFilter.getWhereString());
+		if (sqlFilter.getColumn() != null) {
+			String columnName = QueryBuilder.quote(sqlFilter.getColumn());
+			return MessageFormat.format("{0} {1}", columnName,
+					sqlFilter.getWhereString());
+		} else {
+			return MessageFormat.format("({0})", sqlFilter.getWhereString());
+		}
 	}
 
 }

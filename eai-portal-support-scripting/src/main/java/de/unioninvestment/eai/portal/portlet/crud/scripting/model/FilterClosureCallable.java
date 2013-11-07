@@ -78,7 +78,7 @@ public class FilterClosureCallable implements GroovyCallable<List<Filter>> {
 		List<Filter> filters = new ArrayList<Filter>();
 		ScriptFilterFactory factory = new ScriptFilterFactory(filters);
 		filterClosure.setDelegate(factory);
-		filterClosure.setResolveStrategy(Closure.DELEGATE_ONLY);
+		filterClosure.setResolveStrategy(Closure.DELEGATE_FIRST);
 
 		GroovyCategorySupport.use(OverrideAny.class, filterClosure);
 

@@ -66,6 +66,12 @@ public class SQLFilterTest {
 	}
 
 	@Test
+	public void shouldReturnWhereStringWithoutColum() {
+		sqlFilter = new SQLFilter(null, "1 = ?", null);
+		assertThat(sqlFilter.getWhereString(), is("1 = ?"));
+	}
+	
+	@Test
 	public void shouldReturnParameters() {
 		sqlFilter = new SQLFilter(null, null, paramsMock);
 		assertThat(sqlFilter.getValues().size(), is(paramsMock.size()));

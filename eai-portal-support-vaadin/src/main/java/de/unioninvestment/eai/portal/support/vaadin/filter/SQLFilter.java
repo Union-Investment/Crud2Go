@@ -63,7 +63,7 @@ public class SQLFilter implements Filter {
 
 	@Override
 	public boolean appliesToProperty(Object propertyId) {
-		return this.column.equals(propertyId);
+		return column == null || column.equals(propertyId);
 	}
 
 	public String getWhereString() {
