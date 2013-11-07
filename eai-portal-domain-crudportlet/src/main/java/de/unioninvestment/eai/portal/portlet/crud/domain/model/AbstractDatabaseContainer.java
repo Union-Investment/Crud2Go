@@ -32,7 +32,7 @@ import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.container.AbstractTimeoutableQueryDelegate;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.TimeoutableQueryDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
@@ -62,7 +62,7 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 		QueryBuilder.addFilterTranslator(new NothingFilterTranslator());
 	}
 
-	protected AbstractTimeoutableQueryDelegate queryDelegate;
+	protected TimeoutableQueryDelegate queryDelegate;
 
 	protected String datasource;
 
@@ -205,7 +205,7 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 	 * @param queryDelegate
 	 *            for testing
 	 */
-	void setQueryDelegate(AbstractTimeoutableQueryDelegate queryDelegate) {
+	void setQueryDelegate(TimeoutableQueryDelegate queryDelegate) {
 		this.queryDelegate = queryDelegate;
 	}
 
