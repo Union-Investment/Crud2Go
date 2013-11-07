@@ -47,7 +47,7 @@ public class RequestProcessingLabel extends Label {
 		long duration = info.getTimeSinceRequestStart();
 		long dbDuration = info.getMeasuredTime("db");
 
-		String message = MessageFormat.format("{0}ms, {1}ms@db", duration,
+		String message = MessageFormat.format("{0}ms ({1}ms@db)", duration,
 				dbDuration);
 		setValue(message);
 	}
