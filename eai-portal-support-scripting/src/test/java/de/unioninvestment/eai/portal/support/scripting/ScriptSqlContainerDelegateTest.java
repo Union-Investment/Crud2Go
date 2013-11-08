@@ -70,7 +70,7 @@ public class ScriptSqlContainerDelegateTest extends ModelSupport {
 
 		Closure<ScriptContainerBackend> delegate = (Closure<ScriptContainerBackend>) getDelegate(
 				portletConfig).getClazz().newInstance().run();
-		scriptContainerDelegate = new ScriptContainerDelegate(delegate.call(),
+		scriptContainerDelegate = new ScriptContainerDelegate(delegate,
 				containerMock);
 	}
 

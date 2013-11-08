@@ -22,10 +22,7 @@ import groovy.lang.Closure;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +135,6 @@ public class ScriptModelBuilder {
 	 *            Portletmodel
 	 * @param modelToConfigMapping
 	 *            Map mit Config
-	 * @param currentUser
 	 */
 	public ScriptModelBuilder(ScriptModelFactory factory, EventBus eventBus,
 			ConnectionPoolFactory connectionPoolFactory,
@@ -395,7 +391,7 @@ public class ScriptModelBuilder {
 						scriptBuilder.getMainScript(), scriptFormAction);
 				actionHandler.setWhereFactory(whereFactory);
 
-				registerCustomFilters(scriptFormAction, actionHandler);
+				registerCustomFilters(actionHandler);
 			}
 
 			populateFormActionExecutionClosure(formAction, scriptFormAction);
@@ -404,8 +400,7 @@ public class ScriptModelBuilder {
 		return scriptForm;
 	}
 
-	private void registerCustomFilters(ScriptFormAction scriptFormAction,
-			SearchFormAction actionHandler) {
+	private void registerCustomFilters(SearchFormAction actionHandler) {
 		CustomFilterFactory filterFactory = new ScriptCustomFilterFactory(
 				scriptBuilder);
 		actionHandler.setCustomFilterFactory(filterFactory);
@@ -653,7 +648,7 @@ public class ScriptModelBuilder {
 			ColumnConfig columnConfig) {
 		GroovyScript generatedValueScript = columnConfig.getGeneratedValue();
 
-		Closure<Object> generatedValueClosure = (Closure<Object>) scriptBuilder
+		Closure<Object> generatedValueClosure = scriptBuilder
 				.buildClosure(generatedValueScript);
 
 		column.setGeneratedValueGenerator(new GeneratedValueGeneratorImpl(
@@ -713,7 +708,7 @@ public class ScriptModelBuilder {
 
 	private ScriptContainer buildScriptContainer(DataContainer container) {
 
-		ScriptContainer scriptContainer = null;
+		ScriptContainer scriptContainer;
 		if (container instanceof ReSTContainer) {
 			ReSTContainer restContainer = (ReSTContainer) container;
 			ReSTContainerConfig config = (ReSTContainerConfig) configs
@@ -730,10 +725,6 @@ public class ScriptModelBuilder {
 			JmxDelegate jmxDelegate = (JmxDelegate) delegate;
 			scriptContainer = factory.getScriptJmxContainer(container,
 					jmxDelegate);
-
-		} else if (container instanceof ReSTContainer) {
-			scriptContainer = factory
-					.getScriptReSTContainer((ReSTContainer) container);
 
 		} else if (container instanceof GenericDataContainer) {
 			// only ScriptContainer left
@@ -766,9 +757,8 @@ public class ScriptModelBuilder {
 				.get(container)).getDelegate();
 		Closure<Object> delegateClosure = scriptBuilder
 				.buildClosure(delegateScript);
-		Object delegate = delegateClosure.call();
 		container.setDelegate(new ScriptContainerDelegate(
-				(ScriptContainerBackend) delegate, container));
+                delegateClosure, container));
 	}
 
 	private void populateOnUpdateClosure(DataContainer container,

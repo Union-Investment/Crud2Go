@@ -43,18 +43,20 @@ import de.unioninvestment.eai.portal.support.vaadin.container.UpdateContext;
  */
 public class ScriptContainerDelegate implements GenericDelegate {
 
-	private final ScriptContainerBackend backend;
+    private final Closure delegateClosure;
 	private final DataContainer container;
 
-	public ScriptContainerDelegate(ScriptContainerBackend backend,
+    private ScriptContainerBackend backend;
+
+	public ScriptContainerDelegate(Closure delegateClosure,
 			DataContainer container) {
-		this.backend = backend;
+		this.delegateClosure = delegateClosure;
 		this.container = container;
 	}
 
 	@Override
 	public MetaData getMetaData() {
-		Closure<?> c = ((Closure<?>) backend.getMetaData());
+		Closure<?> c = ((Closure<?>) getBackend().getMetaData());
 		ContainerMetaDataBuilder b = new ContainerMetaDataBuilder();
 		b.invokeMethod("cols", c);
 		return b.createMetaData();
@@ -63,7 +65,7 @@ public class ScriptContainerDelegate implements GenericDelegate {
 	@Override
 	public List<Object[]> getRows() {
 		List<Object[]> ret = new ArrayList<Object[]>();
-		for (List<?> currentRow : backend.read()) {
+		for (List<?> currentRow : getBackend().read()) {
 			ret.add(currentRow.toArray());
 		}
 		return ret;
@@ -83,7 +85,13 @@ public class ScriptContainerDelegate implements GenericDelegate {
 					container,
 					false, true)));
 		}
-		backend.update(rows);
+        getBackend().update(rows);
 	}
 
+    public ScriptContainerBackend getBackend() {
+        if (backend == null) {
+            backend = (ScriptContainerBackend) delegateClosure.call();
+        }
+        return backend;
+    }
 }
