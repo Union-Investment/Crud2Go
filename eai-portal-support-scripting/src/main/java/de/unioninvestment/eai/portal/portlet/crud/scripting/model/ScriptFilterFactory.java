@@ -495,8 +495,12 @@ public class ScriptFilterFactory {
 	 *            where-Bedingung als GString
 	 */
 	public void where(String columnName, GString where) {
-		filters.add(new ScriptSQLWhereFactory().createFilter(columnName, where,
-				false));
+		SQLFilter filter = new ScriptSQLWhereFactory().createFilter(columnName, where,
+				false);
+		if (filter == null) {
+			throw new IllegalArgumentException("NULL value in SQL-where filter criteria '"+ where + "' is not supported");
+		}
+		filters.add(filter);
 	}
 
 	/**
@@ -505,8 +509,12 @@ public class ScriptFilterFactory {
 	 *            where-Bedingung als GString
 	 */
 	public void where(GString where) {
-		filters.add(new ScriptSQLWhereFactory().createFilter(null, where,
-				false));
+		SQLFilter filter = new ScriptSQLWhereFactory().createFilter(null, where,
+				false);
+		if (filter == null) {
+			throw new IllegalArgumentException("NULL value in SQL-where filter criteria '"+ where + "' is not supported");
+		}
+		filters.add(filter);
 	}
 	
 	/**
@@ -520,8 +528,12 @@ public class ScriptFilterFactory {
 	 */
 	public void where(Map<String, Object> namedArguments, String columnName,
 			GString where) {
-		filters.add(new ScriptSQLWhereFactory().createFilter(columnName, where,
-				durable(namedArguments)));
+		SQLFilter filter = new ScriptSQLWhereFactory().createFilter(columnName, where,
+						durable(namedArguments));
+		if (filter == null) {
+			throw new IllegalArgumentException("NULL value in SQL-where filter criteria '"+ where + "' is not supported");
+		}
+		filters.add(filter);
 	}
 
 	/**
