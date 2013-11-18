@@ -38,7 +38,6 @@
 							<backend>html5</backend>
 							<attributes>
 								<toc>true</toc>
-								<linkcss>false</linkcss>
 							</attributes>
 						</configuration>
 					</execution>
@@ -46,8 +45,31 @@
 				<configuration>
 					<headerFooter>true</headerFooter>
 					<sourceHighlighter>coderay</sourceHighlighter>
-					<embedAssets>true</embedAssets>
+					<!--  <embedAssets>true</embedAssets>  -->
+					<imagesDir>../resources/images</imagesDir>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+            			<!-- here the phase you need -->
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/generated-docs</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>

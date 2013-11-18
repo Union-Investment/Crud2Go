@@ -1,4 +1,9 @@
-= Anwenderdokumentation
+
+Anwenderdokumentation
+====================
+:author:		Carsten Mjartan
+:linkcss!:
+:imagesdir:		./images
 
 == Einleitung
 
@@ -26,7 +31,7 @@ bei der Initialisierung der Ansichtsseite zu einem entsprechenden
 Fehlerhinweis. Die Konfiguration kann jederzeit mit gültigen
 Portalrechten überschrieben werden.
 
-Datei:Konfiguration_hochladen.png
+image::Konfiguration_hochladen.png[]
 
 * Folgende Operationen sind möglich:
 ** Sortieren nach Spalten auf- oder absteigend
