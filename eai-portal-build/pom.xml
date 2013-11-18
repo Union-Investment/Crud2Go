@@ -9,6 +9,7 @@
 	<name>Osiris :: Investment :: EAI-Portal-Administration</name>
 
 	<modules>
+		<module>../crud2go-docs</module>
 		<module>../eai-portal-security</module>
 		<module>../eai-portal-webapp-administration</module>
 		<module>../eai-portal-domain-crudportlet</module>
