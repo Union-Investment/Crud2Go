@@ -94,7 +94,11 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 			throws JAXBException {
 
 		InputStream stream = ModelSupport.class.getClassLoader()
-				.getResourceAsStream(configRessource);
+                    .getResourceAsStream(configRessource);
+        return createConfiguration(stream);
+	}
+
+	protected PortletConfig createConfiguration(InputStream stream) throws JAXBException {
 		return unmarshaller.unmarshal(stream);
 	}
 
