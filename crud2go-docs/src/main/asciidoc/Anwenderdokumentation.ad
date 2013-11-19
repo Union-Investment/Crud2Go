@@ -88,7 +88,7 @@ Das `portlet`-Element ist das Root Element der Konfiguration und kann
 |title 
 |Der Portlet Titel. 
 |nein 
-|[multiblock cell omitted]
+|
 
 |refresh-on-page-reload 
 |Wenn aktiviert, werden beim Neuladen einer Seite mit einer bereits geladenen Konfiguration die Daten aller Tabellen und Dropdowns aktualisiert. 
@@ -98,12 +98,12 @@ Das `portlet`-Element ist das Root Element der Konfiguration und kann
 |onRefresh 
 |Closure, die bei einem Refresh des Portlets augerufen wird
 |nein 
-|[multiblock cell omitted]
+|
 
 |onReload 
 |Closure, die bem Reload der Portalseite aufgerufen wird, z. B. um einen Refresh selbst zu kontrollieren 
 |nein
-|[multiblock cell omitted]
+|
 |=======================================================================
 
 Über Preferences lassen sich Parameter außerhalb der XML-Konfiguration
@@ -253,11 +253,11 @@ geschachtelt werden. Ein Bereich hat folgende optionale Attribute:
 |=======================================================================
 |Attribut |Beschreibung |Pflicht |Standard
 |`id` |Definiert eine ID, die später in Script-Code als Referenz
-verwendet werden kann. |nein |[multiblock cell omitted]
+verwendet werden kann. |nein |
 
 |`title` |Definiert den Titeltext des Bereiches. Wenn dieser nicht
 definiert wird, so hat der Bereich auch keinen Titel. |nein
-|[multiblock cell omitted]
+|
 
 |`collapsible` |Definiert ob der Bereich auf- und zuklappbar ist.
 Standard ist `false`, also nicht auf- und zuklappbar. |nein |false
@@ -270,12 +270,12 @@ Standard ist `false`, also aufgeklappt. |nein |false
 |`onCollapse` |Bezieht sich auf `collapsible` und hat nur dann Relevanz,
 wenn `collapsible` mit `true` konfiguriert wurde. Definiert Code der
 aufgerufen wird, wenn ein auf- und zuklappbarer Bereich zugeklappt wird.
-|nein |[multiblock cell omitted]
+|nein |
 
 |`onExpand` |Bezieht sich auf `collapsible` und hat nur dann Relevanz,
 wenn `collapsible` mit `true` konfiguriert wurde. Definiert Code der
 aufgerufen wird, wenn ein auf- und zuklappbarer Bereich aufgeklappt
-wird. |nein |[multiblock cell omitted]
+wird. |nein |
 
 |`horizontalLayout` |Bei `true` werden alle folgenden Elemente
 horizontal nebeneinander angeordnet, statt untereinander |nein |false
@@ -360,14 +360,15 @@ Inline-Editing, Filter- und Sortieroperationen.
 [cols=",,,",options="header",]
 |=======================================================================
 |Attribut |Beschreibung |Pflicht |Standard
-|| cache-rate |Faktor, der angibt, wie viele Zeilen über die aktuelle
+
+| cache-rate |Faktor, der angibt, wie viele Zeilen über die aktuelle
 Ansicht hinaus gerendert werden sollen. |nein |2.0
 
-|| edit-form |Wenn der Wert auf `true` gesetzt ist, dann wird ein
+| edit-form |Wenn der Wert auf `true` gesetzt ist, dann wird ein
 Formular für die Editierung einer Zeile verwendet. |nein
-|[multiblock cell omitted]
+|
 
-|| editable |Gibt an ob in den Edit-Modus gewechselt werden kann |nein
+| editable |Gibt an ob in den Edit-Modus gewechselt werden kann |nein
 |true
 
 |export |Aktions Button zum Export der Tabellendaten in ein anderes
@@ -377,39 +378,39 @@ nicht der Fall sein, kein ein künstlicher PK über eine versteckte Spalte
 hinzugefügt werden.In der SQL-Abfrage kann die Pseudospalte _ROWNUM_
 dazu genutzt werden. IM Portlet ist das dann:
 `<column name="ROWNUM" title="ROWNUM" hidden="true" primary-key="true"/>`
-|nein |[multiblock cell omitted]
+|nein |
 
-|| onDoubleClick |Dieses Closure Event wird beim Doppelklick auf eine
-Zeile aufgerufen. |nein |[multiblock cell omitted]
+| onDoubleClick |Dieses Closure Event wird beim Doppelklick auf eine
+Zeile aufgerufen. |nein |
 
-|| onInitialize |Diese Closure wird einmalig nach dem Initialisieren der
-Tabelle ausgefuehrt. |nein |[multiblock cell omitted]
+| onInitialize |Diese Closure wird einmalig nach dem Initialisieren der
+Tabelle ausgefuehrt. |nein |
 
-|| onModeChange |Die hinterlegte Methode wird aufgerufen, wenn die
+| onModeChange |Die hinterlegte Methode wird aufgerufen, wenn die
 Tabelle in den Editiermodus oder in den Anzeigemodus wechselt. |nein
-|[multiblock cell omitted]
+|
 
-|| onRowChange |Dieses Closure Event wird aufgerufen, wenn sich min. ein
-Wert der Zeile geändert hat. |nein |[multiblock cell omitted]
+| onRowChange |Dieses Closure Event wird aufgerufen, wenn sich min. ein
+Wert der Zeile geändert hat. |nein |
 
-|| onSelectionChange |Die hinterlegte Methode wird aufgerufen, wenn die
-selektierten Zeilen geändert werden. |nein |[multiblock cell omitted]
+| onSelectionChange |Die hinterlegte Methode wird aufgerufen, wenn die
+selektierten Zeilen geändert werden. |nein |
 
 |page-length |Anzahl angezeigter Zeilen. 0 deaktiviert Paging |nein |15
 
 |row-editable |Closure, die dynamisch abhängig vom Inhalt der Zeile
 entscheiden kann, ob die Zeile editierbar ist oder schreibgeschuetzt.
-|nein |[multiblock cell omitted]
+|nein |
 
 |row-height |Die vorgegebene Höhe aller Zeilen in dieser Tabelle. Die
 Höhe mehrzeiliger Textfelder wird auf diese Höhe angepasst. Diese
 Attribut wirkt zusammen mit den Konfiguration multiline="true" an
-Spalten. |nein |[multiblock cell omitted]
+Spalten. |nein |
 
-|| rowStyle |Die hinterlegte Methode wird aufgerufen, wenn die Zeile
+| rowStyle |Die hinterlegte Methode wird aufgerufen, wenn die Zeile
 gerendert wird. Die Methode darf entweder `warn` oder `error`
 zurückgeben. `warn` wird gelb dargestellt. `error` wird rot dargestellt.
-|nein |[multiblock cell omitted]
+|nein |
 
 |sortable |Gibt an ob in der Tabelle sortiert werden darf |nein |true
 |=======================================================================
@@ -526,25 +527,25 @@ nothing-at-all: der `<nothing>`-Filter wird immer angewandt wenn keine
 weiteren Filter aktiv sind. |all
 
 |onCommit |Nach jedem Commit wird die hinterlegte Funktion aufgerufen.
-|[multiblock cell omitted]
+|
 
 |onCreate |Wenn eine neue Zeile auf der Oberfläche erzeugt wird, wird
-die hinterlegte Funktion aufgerufen. |[multiblock cell omitted]
+die hinterlegte Funktion aufgerufen. |
 
 |onDelete |Wenn eine Zeile gelöscht wird, wird die hinterlegte Funktion
-aufgerufen. |[multiblock cell omitted]
+aufgerufen. |
 
 |onInsert |Wenn eine neue Zeile in der DB erzeugt wird, wird die
-hinterlegte Funktion aufgerufen. |[multiblock cell omitted]
+hinterlegte Funktion aufgerufen. |
 
 |onUpdate |Wenn eine Zeile geändert wird, wird die hinterlegte Funktion
-aufgerufen. |[multiblock cell omitted]
+aufgerufen. |
 
 |sizeValid |Die Anzahl der Gasamteinträge wird teilweise mehrfach
 aufgerufen. Um die Perfomance zu verbessern wird dieser Wert
 zwischengespeichert. Mit sizeValid wird angegeben, wie viele Sekunden
 der zwischengespeicherte Wert gültig sein soll.
-|[multiblock cell omitted]
+|10
 |=======================================================================
 
 Das `&lt;database-table&gt;`-Element ist eine Tabellenrepräsentation
@@ -562,10 +563,10 @@ fest. `&lt;column&gt;`-Definitionen werden bei Kombination mit
 |=======================================================================
 |Attribut |Beschreibung |Pflicht |Standard
 |datasource |Der JNDI Name der Oracle Datenquelle. |ja
-|[multiblock cell omitted]
+|
 
 |tablename |Der Tabellenname, für die CRUD Operationen. |nein
-|[multiblock cell omitted]
+|
 
 |pagelength |Anzahl der Datensätze, die in den Arbeitsspeicher geladen
 und gecacht werden. |nein |100
@@ -596,7 +597,7 @@ den Benutzer auch nicht anboten.
 |=======================================================================
 |Attribut |Beschreibung |Pflicht |Standard
 |datasource |Der JNDI Name der Oracle Datenquelle. |ja
-|[multiblock cell omitted]
+|
 
 |pagelength |Anzahl der Datensätze, die in den Arbeitsspeicher geladen
 und gecacht werden. |nein |100
@@ -976,7 +977,7 @@ befindet oder einen echten Wert erhält.
 |=======================================================================
 |Attribut |Beschreibung |Pflicht |Standard
 |name |Der Spaltenname aus der SQL Ergebnismenge |ja
-|[multiblock cell omitted]
+|
 
 |title |Ein Titel für die Spaltenüberschrift |nein |Der Spaltenname
 
@@ -1000,35 +1001,35 @@ Zeilienhöhe kann dann durch row-height am `table`-Element beeinflusst
 werden. |nein |false
 
 |validate |Komma-separierte Liste von Validierungsregeln. |nein
-|[multiblock cell omitted]
+|
 
 |validation-message |Fehlermeldung bei fehlgeschlagener Validierung
-|nein |[multiblock cell omitted]
+|nein |
 
 |input-prompt |Anzeigetext bei leerem Eingabefeld |nein
-|[multiblock cell omitted]
+|
 
 |style |Die hinterlegte Methode wird aufgerufen, wenn die Spalte
-gerendert wird. |nein |[multiblock cell omitted]
+gerendert wird. |nein |
 
 |default |Closure für Standardwert (leerer String => kein Default) |nein
-|[multiblock cell omitted]
+|
 
 |generator |Groovy-Script, dass eine Vaadin-Komponente für die Anzeige
-in der Tabelle liefert |nein |[multiblock cell omitted]
+in der Tabelle liefert |nein |
 
 |generated-value |Groovy-Script, dass den zu exportierenden Wert einer
-generierten Spalte liefert |nein |[multiblock cell omitted]
+generierten Spalte liefert |nein |
 
 |generated-type |der Typ der generierten Spalte - wird für den Export
 benötigt, z. Zt. werden java.lang.String, java.lang.Integer,
 java.lang.Double und java.math.BigDecimal unterstützt |nein
-|[multiblock cell omitted]
+|
 
 |display-format |das für die Anzeige eingestellte Format. Es wird u.a.
 java-date-Format und
 http://openbook.galileodesign.de/javainsel5/javainsel04_006.htm#Rxx747java04006040001591F0121D0[java-number-Format]
-genutzt |nein |[multiblock cell omitted]
+genutzt |nein |
 |=======================================================================
 
 Zusätzlich zu den per `column` fest deklarierten Elementen lassen sich
@@ -2980,59 +2981,59 @@ Union CI
 Primäres Farbklima (UI Blau)
 ++++++++++++++++++++++++++++
 
-[cols=",,",options="header",]
+[cols="2,1,1",options="header",]
 |==============================================
-|Style |Farbe |Invertiert
-|primaer_05 |#E6EBF1 |[multiblock cell omitted]
-|primaer_10 |#DDE5ED |[multiblock cell omitted]
-|primaer_20 |#C5D2E2 |[multiblock cell omitted]
-|primaer_35 |#A7BCD5 |[multiblock cell omitted]
-|primaer_40 |#8DA8C5 |[multiblock cell omitted]
-|primaer_55 |#5884AE |[multiblock cell omitted]
-|primaer_75 |#226796 |[multiblock cell omitted]
+|Style {set:cellbgcolor:none} |Farbe |Abgestuft
+|primaer_05 {set:cellbgcolor:none} |#E6EBF1 {set:cellbgcolor:#E6EBF1} |#DDE5ED {set:cellbgcolor:#DDE5ED}
+|primaer_10 {set:cellbgcolor:none} |#DDE5ED {set:cellbgcolor:#DDE5ED} |#C5D2E2 {set:cellbgcolor:#C5D2E2}
+|primaer_20 {set:cellbgcolor:none} |#C5D2E2 {set:cellbgcolor:#C5D2E2} |#A7BCD5 {set:cellbgcolor:#A7BCD5} 
+|primaer_35 {set:cellbgcolor:none} |#A7BCD5 {set:cellbgcolor:#A7BCD5} |#8DA8C5 {set:cellbgcolor:#8DA8C5}
+|primaer_40 {set:cellbgcolor:none} |#8DA8C5 {set:cellbgcolor:#8DA8C5} |#5884AE {set:cellbgcolor:#5884AE}
+|primaer_55 {set:cellbgcolor:none} |#5884AE {set:cellbgcolor:#5884AE} |#226796 {set:cellbgcolor:#226796}
+|primaer_75 {set:cellbgcolor:none} |#226796 {set:cellbgcolor:#226796} |#003F74 {set:cellbgcolor:#003F74}
 |==============================================
 
 Ergänzungsfarben
 ++++++++++++++++
 
-[cols=",,",options="header",]
+[cols="2,1,1",options="header",]
 |====================================================
-|Style |Farbe |Invertiert
-|ergaenzung_gruen |#AEC6A1 |[multiblock cell omitted]
-|ergaenzung_grau |#D1D3D2 |[multiblock cell omitted]
+|Style {set:cellbgcolor:none} |Farbe |Abgestuft
+|ergaenzung_gruen {set:cellbgcolor:none} |#AEC6A1 {set:cellbgcolor:#AEC6A1} |#88AC77 {set:cellbgcolor:#88AC77}
+|ergaenzung_grau {set:cellbgcolor:none}  |#D1D3D2 {set:cellbgcolor:#D1D3D2} |#A6AAAD {set:cellbgcolor:#A6AAAD}
 |====================================================
 
 Auszeichnungsfarben
 +++++++++++++++++++
 
-[cols=",,",options="header",]
+[cols="2,1,1",options="header",]
 |======================================================
-|Style |Farbe |Invertiert
-|auszeichnung_ocker |#FBD69B |[multiblock cell omitted]
-|auszeichnung_rot |#E0A0A0 |[multiblock cell omitted]
+|Style {set:cellbgcolor:none} |Farbe |Abgestuft
+|auszeichnung_ocker {set:cellbgcolor:none} |#FBD69B {set:cellbgcolor:#FBD69B} |#FAB94D {set:cellbgcolor:#FAB94D}
+|auszeichnung_rot {set:cellbgcolor:none}   |#E0A0A0 {set:cellbgcolor:#E0A0A0} |#BF3954 {set:cellbgcolor:#BF3954}
 |======================================================
 
 Risikofarben
 ++++++++++++
 
-[cols=",,",options="header",]
+[cols="2,1,1",options="header",]
 |====================================================
-|Style |Farbe |Invertiert
-|risiko_geringe |#019BF4 |[multiblock cell omitted]
-|risiko_moderate |#00D6A1 |[multiblock cell omitted]
-|risiko_erhoehte |#FFF899 |[multiblock cell omitted]
-|risiko_hohe |#FCBC69 |[multiblock cell omitted]
-|risiko_sehr_hohe |#FF6666 |[multiblock cell omitted]
+|Style {set:cellbgcolor:none} |Farbe |Abgestuft
+|risiko_geringe {set:cellbgcolor:none}    |#019BF4 {set:cellbgcolor:#019BF4} |#017DC3 {set:cellbgcolor:#017DC3}
+|risiko_moderate {set:cellbgcolor:none}   |#00D6A1 {set:cellbgcolor:#00D6A1} |#00A57D {set:cellbgcolor:#00A57D}
+|risiko_erhoehte {set:cellbgcolor:none}   |#FFF899 {set:cellbgcolor:#FFF899} |#FFF000 {set:cellbgcolor:#FFF000}
+|risiko_hohe {set:cellbgcolor:none}       |#FCBC69 {set:cellbgcolor:#FCBC69} |#FA9B1E {set:cellbgcolor:#FA9B1E}
+|risiko_sehr_hohe {set:cellbgcolor:none}  |#FF6666 {set:cellbgcolor:#FF6666} |#FF0000 {set:cellbgcolor:#FF0000}
 |====================================================
 
 Finanzgruppe
 ++++++++++++
 
-[cols=",,",options="header",]
+[cols="2,1,1",options="header",]
 |===================================================
-|Style |Farbe |Invertiert
-|finanzgruppe_44 |#0091FF |[multiblock cell omitted]
-|finanzgruppe_08 |#FF944D |[multiblock cell omitted]
+|Style {set:cellbgcolor:none} |Farbe |Abgestuft
+|finanzgruppe_44 {set:cellbgcolor:none} |#0091FF {set:cellbgcolor:#0091FF} |#0066B3 {set:cellbgcolor:#0066B3}
+|finanzgruppe_08 {set:cellbgcolor:none} |#FF944D {set:cellbgcolor:#FF944D} |#FF6600 {set:cellbgcolor:#FF6600}
 |===================================================
 
 Hinweise und Beispiele zu der Crudportlet-Konfiguration
