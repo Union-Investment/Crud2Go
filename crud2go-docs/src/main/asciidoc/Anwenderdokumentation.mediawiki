@@ -1,0 +1,2516 @@
+__TOC__
+
+==Einleitung==
+In dem EAI-Administration-Portal-Server ist das CRUD-Portlet eine Portalanwendung, die sich, sofern es die Benutzerrechte zulassen, beliebig oft instanziieren und konfigurieren lassen. Sobald das Portlet entfernt wird erlischt die dazugehörige Konfiguration, da diese eindeutig mit der Window-ID des Portlets verknüpft werden.
+
+Beispiele zum CRUD-Portlet sind in Mecurial zu finden unter:
+{{EAI-Textbox|<HGroot>\eai-portal\eai-portal-domain-crudportlet\src\test\resources}}
+
+Die Bedienung des Portals und des Portlets ist für Endanwender im '''[[SOFIA/CRUD-Portlet/Allgemeines Benutzerhandbuch|Allgemeinen Benutzerhandbuch]]''' erläutert.
+
+==Benutzeroberfläche==
+* Die Konfiguration des Portlets erfolgt i. d. R. einmalig direkt nach dessen Erstellung über eine XML-Datei, die bei entsprechenden Rechten auf der ''Preferences'' Seite eines bestehenden Portlets hochgeladen werden kann. Eine nicht valide XML Konfiguration, führen zu einem Abbruch und einem Fehlerhinweis. Fehlerhafte Inhalte wie bspw. eine falsche Datasource oder Tabelle lassen sich zwar hochladen führen jedoch bei der Initialisierung der Ansichtsseite zu einem entsprechenden Fehlerhinweis. Die Konfiguration kann jederzeit mit gültigen Portalrechten überschrieben werden.   
+
+
+[[Datei:Konfiguration_hochladen.png]]
+
+* Folgende Operationen sind möglich:
+** Sortieren nach Spalten auf- oder absteigend
+** Ausblenden von Spalten (Symbol an der rechtesten Spaltenüberschrift)
+** Filtern der anzuzeigenden Daten (über die Eingabefelder oben rechts)
+** Wechseln in den Editiermodus, dann
+*** Bearbeiten bestehender Zeilen (ausgenommen PK-, LOB und Timestamp-Felder)
+*** Hinzufügen neuer Zeilen (siehe dazu auch [http://uit-ac-sd-t-01.uit.fiducia.de:28080/browse/CRUD-3 CRUD-3]
+*** Löschen bestehender Zeilen
+
+[[Datei:Tabelle_editieren.PNG]]
+
+* Ein COMMIT der Änderungen findet jeweils nach einem Zeilenwechsel bzw. bei Verlassen des Editiermodus statt. Änderungen der aktuellen Zeile lassen sich bis dahin über den Button "Zurücksetzen" rückgängig machen.
+
+
+
+==Konfiguration==
+Ein gültiges CRUD-Portlet Konfigurations-XML wird über ein aktuelles 
+* [http://hg.d3.uid.de/eai-portal/file/3b66df00bd1d/eai-portal-xsd-crudportlet/src/main/resources/de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd CRUD2Go-XSD] (Mercurial)
+bzw.
+* [https://github.com/Union-Investment/Crud2Go/blob/master/eai-portal-xsd-crudportlet/src/main/resources/de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd CRUD2Go-XSD] (Git)
+
+(Ablage in [[EAI/Entwicklungsprozess/Tools/Mercurial|Mercurial]] bzw. [[EAI/Entwicklungsprozess/Tools/Git|Git]] im Baum '''eai-portal-xsd-crudportlet/src/main/resources/de/unioninvestment/eai/portal/portlet/crud/''') definiert und gegen dieses validiert. Die sich aus dem XSD ableitende API (JAXB Modell) ist in Form einer [http://ci.d3.uid.de/view/EAI-Portal/job/Osiris%20-%20EAI-Portal-Administration%20-%20Development%20Branch%20JavaDocs/ws/eai-portal-support-scripting/target/site/apidocs/index.html JavaDoc] verfügbar und kann bei der Entwicklung von Portletkonfgurationen hilfreich sein.
+
+XSD-Einbindung kann über den folgenden Link gemacht werden:
+{{EAI-Textbox|[https://raw.github.com/Union-Investment/Crud2Go/master/eai-portal-xsd-crudportlet/src/main/resources/de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd https://raw.github.com/Union-Investment/Crud2Go/master/eai-portal-xsd-crudportlet/src/main/resources/de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd]}}
+
+===<portlet>===
+Das <code>portlet</code>-Element ist das Root Element der Konfiguration und kann über ein <code>titel</code> Attribute den Portlettitel definieren.
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|-
+!Attribut 
+!Beschreibung 
+!Pflicht 
+!Standard 
+|-
+| titel 
+| Der Portlet Titel.
+| nein 
+| 
+|-
+| refresh-on-page-reload
+| Wenn aktiviert, werden beim Neuladen einer Seite mit einer bereits geladenen Konfiguration die Daten aller Tabellen und Dropdowns aktualisiert.
+| nein 
+| false
+|-
+| onRefresh
+| Closure, die bei einem Refresh des Portlets augerufen wird
+| nein 
+| 
+|-
+| onReload
+| Closure, die bem Reload der Portalseite aufgerufen wird, z. B. um einen Refresh selbst zu kontrollieren
+| nein 
+| 
+|}
+
+
+=== <preferences> ===
+
+Über Preferences lassen sich Parameter außerhalb der XML-Konfiguration über den Tab "Konfiguration" in den Portleteinstellungen setzen. Diese Parameter werden in Liferay zur Portlet-Instanz gespeichert und sind über das Scripting verfügbar.
+
+Beispiel:
+
+<pre class="brush:xml">
+<portlet>
+    <preferences>
+        <preference key="baseUrl" default="http://localhost:8080/material/rest/"/>
+    </preferences>
+    <page>
+        <table id="material">
+            <rest-container baseUrl="${portlet.preferences.baseUrl}" >
+    ...
+</pre>
+
+
+===<page> / <tabs>===
+
+Mit dem <code>page</code>-Element wird das Portlet als Einzelseite konfiguriert, hingegen erlaubt <code>tabs</code> eine Gruppierung mehrere Tab-Reiter auf der obersten Ebene. Weiterhin lassen sich <code>tabs</code> auf beliebig tiefe Hierarchienbäume (Reiter in Reiter usw.) abbilden.
+
+ 
+===<dialog>===
+
+Ein Dialog ist ein Element, das den Inhalt einer Page oder eines Tab temporär mit den eigenen Inhalt ersetzen kann. Ein Dialog enthält automatisch einen Zurück-Knopf, welcher den Dialog ausblendet. 
+Konfiguriert wird ein Dialog in der Konfiguration mit dem Element <code>dialog</code> innerhalb des Element <code>portlet</code>.
+
+<pre class="brush:xml">
+    <dialog id="dialog-1" backButtonCaption="Zurück">
+    ...
+    </dialog>
+</pre>
+
+Die beiden Attribute <code>id</code> und <code>backButtonCaption</code> sind Pflichtangaben. Bei <code>id</code> handelt es sich um einen eindeutigen Kennzeichner. Mit seiner Hilfe wird ein Dialog in den Skripten referenziert. Bei <code>backButtonCaption</code> handelt es sich um Beschriftung des Zurück-Button.
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Attribut 
+!Beschreibung 
+!Pflicht 
+!Standard 
+|-
+| id || eindeutiger Kennzeichner innerhalb des Portlets || ja || muss manuell vergeben werden
+|-
+| backButtonCaption || Beschriftung des Zurück-Button || ja || muss manuell vergeben werden
+|}
+
+Im folgenden Beispiel geht ein Dialog auf, wenn in der Tabelle <code>table-1</code> ein Doppelklick getätigt wird.
+
+<pre class="brush:xml">
+<portlet>
+    <page>
+        <table id="table-1" onDoubleClick="openDialog(it,row)">
+        ...
+        </table>
+    </page>
+    <dialog id="dialog-1" backButtonCaption="Zurück">
+    ...
+    </dialog>
+    <script><![CDATA[
+        def openDialog(it, row) {
+            portlet.page.attachDialog('dialog-1');
+        }
+    ]]></script>
+</portlet>
+</pre>
+
+Wenn ein Dialog innerhalb eines Tab angezeigt werden soll, sieht die Konfiguration wie folg aus.
+
+<pre class="brush:xml">
+    <portlet>	
+        <tabs>
+            <tab id="tab-1" title="First Tab">
+                <table sortable="true" onDoubleClick="openDialog(it,row,'dialog-1')">
+                ...
+                </table>
+            </tab>
+        </tabs>
+
+        <dialog id="dialog-1" backButtonCaption="Zurück">
+        ...
+        </dialog>
+
+        <script><![CDATA[
+            def openDialog(it, row, dialogId) {
+                portlet.tabs.activeTab.attachDialog(dialogId);
+            }
+	]]></script>
+</portlet>
+</pre>
+
+Ein Dialog kann zur gleichen Zeit nur ein Mal innerhalb des selben Portlets angezeigt werden. Wenn versucht wird ein Dialog anzuzeigen, der bereits an einer anderen Stelle angezeigt wird (z.&nbsp;B. in einem anderen Tab), wird dieser Dialog automatisch an der ursprünglichen Stelle ausgeblendet, bevor es an der neuen Stelle angezeigt wird.
+
+===<tab>===
+Ein <code>tab</code> ist ein Inhaltscontainer und verhält sich analog zum <code>page</code>-Element. Er beschreibt einen einzelnen Reiter in einer Gruppe von Tab-Reitern. Ein <code>tab</code> benötigt einen eindeutigen <code>name</code> und optional einen <code>title</code> für eine alternative Darstellung im Reiterkopf.
+
+Eine Formularaktion wie beispielsweise die Suche, wirkt sich auf alle darunterliegen Datencontainer aus, solange diese keine eigene vorangestellte Formularkonfiguration besitzen.
+ 
+<pre class="brush:xml">
+   <tabs>
+      <tab name="tab1" title="Tab 1">
+        <form columns="2">
+         ....
+        </form>
+        <tabs>
+         ..
+        </tabs>
+      </tab>
+      <tab name="tab2" title="Tab 2">
+        <table>
+         ...
+        </table>
+      </tab>
+     </tabs>
+</pre>
+
+===<region>===
+Ein <code>region</code> Element definiert einen Bereich innerhalb einer Seite (<code>page</code>), eines Dialogs (<code>dialog</code>) oder eines 
+
+Reiters (<code>tab</code>). Bereiche können auch beliebig in andere Bereiche geschachtelt werden. Ein Bereich hat folgende optionale Attribute:
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Attribut 
+!Beschreibung 
+!Pflicht
+!Standard 
+|-
+|<code>id</code>
+|Definiert eine ID, die später in Script-Code als Referenz verwendet werden kann.
+|nein
+|
+|-
+|<code>title</code>
+|Definiert den Titeltext des Bereiches. Wenn dieser nicht definiert wird, so hat der Bereich auch keinen Titel.
+|nein
+|
+|-
+|<code>collapsible</code>
+|Definiert ob der Bereich auf- und zuklappbar ist. Standard ist <code>false</code>, also nicht auf- und zuklappbar. 
+|nein
+|false
+|-
+|<code>collapsed</code>
+|Bezieht sich auf <code>collapsible</code> und hat nur dann Relevanz, wenn <code>collapsible</code> mit <code>true</code> konfiguriert wurde. Hiermit wird definiert, ob der Bereich bei der Anzeige initial zugeklappt ist. Standard ist <code>false</code>, also aufgeklappt.
+|nein
+|false
+|-
+|<code>onCollapse</code>
+|Bezieht sich auf <code>collapsible</code> und hat nur dann Relevanz, wenn <code>collapsible</code> mit <code>true</code> konfiguriert wurde. Definiert Code der aufgerufen wird, wenn ein auf- und zuklappbarer Bereich zugeklappt wird.
+|nein
+|
+|-
+|<code>onExpand</code>
+|Bezieht sich auf <code>collapsible</code> und hat nur dann Relevanz, wenn <code>collapsible</code> mit <code>true</code> konfiguriert wurde. Definiert Code der aufgerufen wird, wenn ein auf- und zuklappbarer Bereich aufgeklappt wird.
+|nein 
+|
+|-
+|<code>horizontalLayout</code>
+|Bei <code>true</code> werden alle folgenden Elemente horizontal nebeneinander angeordnet, statt untereinander
+|nein
+|false
+|}
+
+
+<pre class="brush:xml">
+   ...
+   <region id="foo" title="Ein Bereich" collapsible="true" collapsed="false">
+      ...
+      <region id="bar" title="Ein Unterbereich">
+         ...
+      </region>
+   </region>
+   ...
+</pre>
+
+Wenn eine Region ein Suchformular zu einer Tabelle enthält und die Tabelle selbst außerhalb der Region definiert ist, greift die automatische Zuordnung hierfür nicht. Daher muss die Tabellen-ID explizit in <search><tables>... angegeben werden.
+
+
+=== <textarea> ===
+
+Ein <code>textarea</code> Element wird verwendet, um HTML aus der Konfiguration oder aus den Preferences anzuzeigen.
+
+Ist die Textarea editierbar, so wird per Doppelklick auf den Text ein Richtext Editor geöffnet. Die Eingabe wird beim Speichern auf ungültiges HTML geprüft und ggf. bereinigt, um Cross-Site-Scripting zu verhindern. Bestehenden Werten in der Konfiguration oder im HTML wird vertraut :-).
+
+Beispiel: Anzeige von XHTML aus der Konfiguration
+
+<pre class="brush:xml">
+<page>
+	<textarea>
+		<content>
+			<span xmlns="http://www.w3.org/1999/xhtml">
+				Hallo Welt
+			</span>
+		</content>
+	</textarea>
+</page>
+</pre>
+
+Beispiel: Anzeige von XHTML aus der Konfiguration, per Doppelklick kann der Text in einem RichText-Editor geändert werden.
+
+<pre class="brush:xml">
+<page>
+	<textarea editable="true" preference-key="my.textarea">
+		<content>
+			<span xmlns="http://www.w3.org/1999/xhtml">
+				Hallo Welt
+			</span>
+		</content>
+	</textarea>
+</page>
+</pre>
+
+Beispiel: Anzeige von XHTML aus den Preferences (z. B. per LCD konfiguriert). Solange kein Text verfügbar ist, wird ein Platzhalter-Text angezeigt, auf den Doppelgeklickt werden kann.
+
+<pre class="brush:xml">
+<page>
+	<textarea editable="true" preference-key="my.textarea"/>
+</page>
+</pre>
+
+===&lt;table&gt;===
+Das <code>table</code>-Element umfasst die Darstellung einer Tabelle aus einer angegebenen Datenquelle. Die Tabelle unterstützt unter anderem Inline-Editing, Filter- und Sortieroperationen.
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Attribut 
+!Beschreibung 
+!Pflicht
+!Standard 
+|-
+|| cache-rate || Faktor, der angibt, wie viele Zeilen über die aktuelle Ansicht hinaus gerendert werden sollen. || nein || 2.0
+|-
+|| edit-form || Wenn der Wert auf <code>true</code> gesetzt ist, dann wird ein Formular für die Editierung einer Zeile verwendet. || nein ||
+|-
+|| editable || Gibt an ob in den Edit-Modus gewechselt werden kann || nein || true
+|-
+|valign="top"| export || Aktions Button zum Export der Tabellendaten in ein anderes Format. Unterstützte Formate sind xls und csv<br> Die zu exportierende Tabelle muss einn Primary-Key besitzen. Sollte das nicht der Fall sein, kein ein künstlicher PK über eine versteckte Spalte hinzugefügt werden.In der SQL-Abfrage kann die Pseudospalte ''ROWNUM'' dazu genutzt werden. IM Portlet ist das dann:  <code><column name="ROWNUM" title="ROWNUM" hidden="true" primary-key="true"/></code> || nein ||
+|-
+|| onDoubleClick || Dieses Closure Event wird beim Doppelklick auf eine Zeile aufgerufen. || nein ||
+|-
+|| onInitialize || Diese Closure wird einmalig nach dem Initialisieren der Tabelle ausgefuehrt. || nein ||
+|-
+|| onModeChange || Die hinterlegte Methode wird aufgerufen, wenn die Tabelle in den Editiermodus oder in den Anzeigemodus wechselt. || nein ||
+|-
+|| onRowChange || Dieses Closure Event wird aufgerufen, wenn sich min. ein Wert der Zeile geändert hat. || nein ||
+|-
+|| onSelectionChange || Die hinterlegte Methode wird aufgerufen, wenn die selektierten Zeilen geändert werden. || nein ||
+|-
+| page-length || Anzahl angezeigter Zeilen. 0 deaktiviert Paging || nein || 15
+|-
+| row-editable || Closure, die dynamisch abhängig vom Inhalt der Zeile entscheiden kann, ob die Zeile editierbar ist oder schreibgeschuetzt. || nein || 
+|-
+| row-height || Die vorgegebene Höhe aller Zeilen in dieser Tabelle. Die Höhe mehrzeiliger Textfelder wird auf diese Höhe angepasst. Diese Attribut wirkt zusammen mit den Konfiguration multiline="true" an Spalten. || nein || 
+|-
+|| rowStyle || Die hinterlegte Methode wird aufgerufen, wenn die Zeile gerendert wird. Die Methode darf entweder <code>warn</code> oder <code>error</code> zurückgeben. <code>warn</code> wird gelb dargestellt. <code>error</code> wird rot dargestellt.|| nein ||
+|-
+| sortable || Gibt an ob in der Tabelle sortiert werden darf || nein || true
+|}
+
+<pre class="brush:xml">
+<table id="tableId" sortable="true" row-height="15" onModeChange="modeChange(it)" onSelectionChange="selectionChange(it,selection)"
+   rowStyle="getRowStyle(row)">
+...
+</table>
+....
+<script>
+def getRowStyle(row) {
+   if (row.values['spaltenname'] < 10) {
+      return 'error'
+
+   } else if (row.values['spaltenname'] >= 10) {
+      return 'warn';
+   }
+}
+</script>
+</pre>
+
+====Formular-Edit-Modus====
+
+Defaultmäßig werden Tabellenzeilen inline editiert. Mit dem Attribut <code>edit-form</code> in der Tabelle läßt sich dies ändern. Ist <code>edit-form</code> auf <code>true</code> gesetzt, wird ein Formular für die Editierung eingeblendet. 
+
+Die Editierung über ein Formular wird nur bei Tabellen mit einem Querybackend supportet.
+
+Beispielkonfiguration:
+<pre class="brush:xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet" title="Einfaches Beispiel">
+   <page>
+      <table id="table" row-height="30" edit-form="true">
+         <database-query datasource="test">
+            ...
+         </database-query>
+         <columns>
+            <column name="ID" title="ID" primary-key="true" />
+            <column name="CNUMBER5_2" title="Zahl" editable="true" />
+            <column name="CDATE" editable="false" />
+            <column name="CNUMBER5_2_NN" editable="true" />
+         </columns>
+      </table>
+   </page>
+</portlet>
+</pre>
+
+====Export====
+
+Wenn der Export aktiviert ist, wird auf Basis der gerade aktuellen Tabellendarstellung (sichtbare Spalten, Filterkriterien) ein Export im Excel- oder CSV-Format erstellt. Der CSV-Export ist dabei auf ca. 65500 Zeilen beschränkt.
+
+Generierte Spalten lassen sich per Default nicht exportieren. Um dies dennoch zu ermöglichen, müssen zusätzlich der Wert und der Typ der Spalte über die ''generated-value'' und ''generated-type'' Attribute an der <column>-Definition geliefert werden.
+
+{{EAI-Textbox|Ein Beispiel findet sich in validTableExportOfGeneratedColumnConfig.xml. }}
+
+Zum Export ist außerdem zu sagen, dass er die Container-API der Tabelle benutzt, der die Tabelleninhalte seitenweise ausliest und in die Export-Datei schreibt. Dadurch ist die Konsistenz der Exportdaten nicht sichergestellt.
+
+====<action>====
+
+Ein action Element beschreibt eine Aktion hinter einem Tabellen-Button. Das Attribute <code>title</code> gibt die Beschriftung an und das Attribute <code>id</code> wird benötigt, wenn die hinterlegte Aktion über ein Trigger aufgerufen werden soll. Die aufzurufende Funktion im Skript beim Betätigen des Buttons wird über das Attribut <code>onExecution</code> konfiguriert.
+
+=====<triggers>=====
+[[#triggers|siehe hier]]
+
+====Container====
+
+Die Anzeige einer Tabelle ist konzeptionell von ihrer Datenquelle entkoppelt, d. h. es können unterschiedliche Arten von Datenquellen an einer Tabelle konfiguriert werden. Folgende Backends sind z. Zt. möglich:
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Backend
+!Beschreibung 
+|-
+| database-table
+| Angabe einer Datenbanktabelle.
+|-
+| database-query
+| Angabe von SQL-Statements für SELECT (Pflicht), INSERT, UPDATE, DELETE (optional)
+|-
+| jmx-container
+| Remote JMX Queries, Zugriff auf JMX-Attribute
+|-
+| script-container
+| Per Groovy-Scripting implementierbares Backend
+|}
+
+Standard-Attribute von Containern:
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Attribut 
+!Beschreibung 
+!Standard 
+|-
+|valign="top" | filter-policy
+| Filterverhalten der Tabelle<br/> all: keine Beschränkung<br/> nothing: beim erstmaligen Laden gilt der <code><nothing></code>-Filter, <br/>nothing-at-all: der <code><nothing></code>-Filter wird immer angewandt wenn keine weiteren Filter aktiv sind.
+| all
+|-
+| onCommit 
+| Nach jedem Commit wird die hinterlegte Funktion aufgerufen. 
+|
+|-
+| onCreate 
+| Wenn eine neue Zeile auf der Oberfläche erzeugt wird, wird die hinterlegte Funktion aufgerufen. 
+|
+|-
+| onDelete 
+| Wenn eine Zeile gelöscht wird, wird die hinterlegte Funktion aufgerufen. 
+|
+|-
+| onInsert 
+| Wenn eine neue Zeile in der DB erzeugt wird, wird die hinterlegte Funktion aufgerufen. 
+|
+|-
+| onUpdate 
+| Wenn eine Zeile geändert wird, wird die hinterlegte Funktion aufgerufen. 
+|
+|-
+| sizeValid
+| Die Anzahl der Gasamteinträge wird teilweise mehrfach aufgerufen. Um die Perfomance zu verbessern wird dieser Wert zwischengespeichert. Mit sizeValid wird angegeben, wie viele Sekunden der zwischengespeicherte Wert gültig sein soll.
+|
+|}
+
+=====<database-table>=====
+Das <code>&lt;database-table&gt;</code>-Element ist eine Tabellenrepräsentation einer Datenbanktabelle einer EAI Datenquelle. Mit Hilfe dieses Elements lassen sich ganze Tabellen darstellen und bearbeiten (CRUD-Operationen). Primärschlüssel können nur gelesen und nicht bearbeitet bzw. eingefügt werden. Alle weiteren Datentype verhalten sich noch ihrem unterstützen Verhalten (s.u.)
+Im Attribute <code>datasource</code> wird der JNDI Kurzname (z.B 'eai') der entsprechenden EAI Oracle Datasource hinterlegt. Das Attribute <code>tablename</code> legt den Tabellennamen der anzuzeigenden Tabelle fest. <code>&lt;column&gt;</code>-Definitionen werden bei Kombination mit <code>&lt;database-table&gt;</code> nicht unterstützt.
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Attribut 
+!Beschreibung 
+!Pflicht 
+!Standard 
+|-
+| datasource
+| Der JNDI Name der Oracle  Datenquelle. 
+| ja 
+|
+|-
+| tablename 
+| Der Tabellenname, für die CRUD Operationen. 
+| nein 
+|
+|-
+| pagelength
+| Anzahl der Datensätze, die in den Arbeitsspeicher geladen und gecacht werden.
+| nein
+| 100
+|-
+| export-pagelength
+| Anzahl der Datensätze, die während eines Exports in den Arbeitsspeicher geladen und gecacht werden. Höhere Werte reduzieren die Export-Dauer, erhöhen jedoch den Speicherverbrauch und damit die Gefahr von OutOfMemory-Exceptions. Es ist zu beachten, das die aktuelle Implementierung effektiv die doppelte Anzahl der angegebenen Datensätze cached.
+| nein
+| 1000
+|}
+<pre class="brush:xml">
+   <database-table datasource="eai" tablename="TEST_TABLE" onCommit="commited(it)" onCreate="created(it)" onDelete="deleted(it)" onInsert="inserted(it)" onUpdate="updated(it)" />
+</pre>
+
+=====<database-query>=====
+Mit dem Element <code>&lt;database-query&gt;</code> lassen sich Datensichten auf SQL SELECT Abfragen abbilden, diese Datendarstellung ist gegenüber der Database-Table wesentlich flexibler, erfordert jedoch mehr Konfigurationsaufwand, da für die jeweiligen CRUD Operationen genauere Vorgaben notwending sind. 
+Ist ein Konfigurationselement wie Create, Update oder Delete nicht definiert, wird die entsprechende Operation für den Benutzer auch nicht anboten.
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Attribut 
+!Beschreibung 
+!Pflicht
+!Standard  
+|-
+| datasource
+| Der JNDI Name der Oracle Datenquelle. 
+| ja
+|
+|-
+| pagelength
+| Anzahl der Datensätze, die in den Arbeitsspeicher geladen und gecacht werden.
+| nein
+| 100
+|-
+| export-pagelength
+| Anzahl der Datensätze, die während eines Exports in den Arbeitsspeicher geladen und gecacht werden. Höhere Werte reduzieren die Export-Dauer, erhöhen jedoch den Speicherverbrauch und damit die Gefahr von OutOfMemory-Exceptions. Es ist zu beachten, das die aktuelle Implementierung effektiv die doppelte Anzahl der angegebenen Datensätze cached.
+| nein
+| 1000
+|}
+'''READ:''' Für eine reine Darstellung einer SELECT Abfrage muss das Kindelement <code>&lt;query&gt;</code> eine korrekte SELECT-Anweisung beinhalten, des weiteren müssen die anzuzeigenden Spalten als eigene <code>&lt;column&gt;</code>-Elemente (s.u.) aufgenommen werden.
+<pre class="brush:xml">
+    <query>
+       <![CDATA[
+	select * 
+	from (SELECT * FROM TEST_TABLE)
+	]]>
+    </query>
+</pre>
+
+
+'''CREATE:''' Für das Erstellen neuer Datensätze muss ein passendes INSERT-Statement in das Kindelement <code>&lt;insert&gt;</code> eingetragen werden. Dabei ist zu beachten, dass alle Pflichtspalten aufgenommen werden und die Ergebnisspalten der Query in den Columns-Definitionen enthalten sind. 
+Zulässig Werteninhalte (Values) sind:
+*Variablen in der Form <code>$row.values.{Spaltenbezeichner}</code> definieren die sich auf die Namen der Columns-Definitionen beziehen,
+*fixe Werte (Beispiel: <code>"Wert"</code>),
+*Datenbankvariablen (z.&nbsp;B. <code>SYSDATE</code>) sowie
+*Objekte aus dem Skriptkontext, z.&nbsp;B. <code>$currentUser.name</code>, auf welchen ein <code>toString()</code> aufgerufen wird.
+{{EAI-Achtung|Im Gegensatz zu den anderen Skriptvariablen muss  <code>$currentUser.name</code> in einfache Anführungszeichen gesetzt werden:  <code>'$currentUser.name'</code>}}
+:Zu beachten ist noch, falls man die Config ohne Anmeldung verwendet, landet 'null' in der Datenbank. Wenn in diesem Fall etwas Anderes in der Datenbank stehen soll, geht das z.B. so: <code>${currentUser.name?:'anonymous'}</code>
+
+
+Beispiel:
+<pre class="brush:xml">
+	<insert>
+           <![CDATA[
+		INSERT INTO TEST_TABLE
+		  (
+		    NAME,
+		    WERT,
+		    CREATED,
+		  )
+	 	  VALUES
+		  (
+		   $row.values.NAME,
+		   $row.values.WERT,
+		   SYSDATE,
+		  )
+	     ]]>
+        </insert>
+</pre>
+'''UPDATE:''' Das Bearbeiten von Datensätzen verhält sich analog zum Erstellen, das im Kindelement <code>&lt;update&gt;</code> enthaltene Update-Statement muss ebenfalls mit der Query und den Columns-Definitionen korrespondieren. 
+<pre class="brush:xml">
+	<update>
+            <![CDATA[
+		UPDATE TEST_TABLE SET 
+		NAME	  = $row.values.NAME,
+		WERT	  = $row.values.WERT,
+	
+	 ]]>
+       </update>
+</pre>
+'''DELETE:''' Das Entfernen von Zeilen wird über Kindelement <code>&lt;delete&gt;</code> konfiguriert. Der zu löschende Datensatz muss in der WHERE Klausel über die Primärschlüssel der Columns identifizierbar sein.
+ <pre class="brush:xml">
+     <delete>
+        <![CDATA[
+	   DELETE FROM TEST_TABLE
+	   WHERE ID = $row.values.ID
+	]]>
+     </delete>
+</pre>
+
+
+Die Tags <code><insert></code>,<code><update></code> und <code><delete></code> haben die Möglichkeit, statt eines SQL-Stataments ein Script auzuführen.
+
+Der Aufruf geschieht mit dem Attribut <code>type</code>
+
+<pre class="brush:xml">
+    <insert type="script>
+       meinscript_blah
+    </insert>
+</pre>
+
+=====<jmx-container>=====
+Beispielkonfiguration: [http://hg.d3.uid.de/eai-portal/file/default/eai-portal-domain-crudportlet/src/test/resources/validJMXContainerConfig.xml Konfiguration]
+
+Mit dem Element <code>&lt;jmx-container&gt;</code> lassen sich MBean-Attribute anzeigen und editieren.
+
+Das Attribut <code>server</code> kann in zwei Formaten angegeben werden:<br/>
+* Format 1) <server>:<port><br/>
+Beispiel: <code>10.10.10.10:1390</code><br/>
+Dieses format kann nur in Verbindung mit JBoss genutzt werden.
+
+* Format 2) <serviceUrl><br/>
+Beispiel für JBoss:  <code>service:jmx:rmi:///jndi/rmi://10.10.10.10:1390/jmxconnector</code><br/>
+Beispiel für Tomcat: <code>service:jmx:rmi:///jndi/rmi://10.10.10.10:1390/jmxrmi</code>
+
+======<attribute>======
+Mit dem <code>&lt;attribute&gt;</code>-Element werden Attribute, die aus den MBeans ausgelesen werden sollen, definiert.
+
+Verfügt der Server-Node über das Remoting-Feature (Vorhandensein des MBeans <code>crud:name=script,service=CrudRemoteScript</code>),
+werden alle Attribute mit einem Remote-Aufruf abgefragt.
+
+======<server-side-getter>======
+Mit dem <code>&lt;server-side-getter&gt;</code>-Element kann anstelle einer einfachen "Attribut-Abfrage" ein Groovy-Skript das Attribut zurückgeben.
+
+<pre class="brush:xml">
+<server-side-getter>
+   <![CDATA[
+       new GroovyMBean(mbeanServer,'org.apache.servicemix:service=JBIService').isMonitorEndpoint( mbean.EndpointName )
+   ]]>
+</server-side-getter>
+</pre>
+
+===== <rest-container> =====
+
+Der ReST-Container erlaubt Zugriff auf ReST-Ressourcen per HTTP GET/PUT/POST/DELETE Requests. Es werden JSON und XML als Transferformate unterstützt. Die in der HTTP-Response gelieferten Daten werden geparst und in ein tabellarisches Format gebracht. Bei Inserts und Updates wird entsprechende JSON bzw. XML generiert und an den Server geschickt.
+
+Eine entsprechende Konfiguration (für JSON) sieht z. B. wie folgt aus:
+
+<pre class="brush:xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet" title="Testkonfiguration - ReST+JSON">
+	<page>
+		<table id="material">
+			<rest-container baseUrl="http://localhost:9080/crud2go-rest-testserver/rest/library">
+				<query url="/books">
+					<attribute name="isbn" primary-key="true"/>
+					<attribute name="title" />
+					<attribute name="author" />
+				</query>
+				<insert url="/books"><![CDATA[
+					[
+						isbn: row.values.isbn,
+						title: row.values.title,
+						author: row.values.author
+					]
+				]]></insert>
+				<update url="/book/${row.values.isbn}"><![CDATA[
+					[
+						title: row.values.title,
+						author: row.values.author
+					]
+				]]></update>
+				<delete url="/book/${row.values.isbn}"/>
+			</rest-container>
+			<columns>
+				<column name="isbn" title="ID" primary-key="true" />
+				<column name="title" title="Titel" editable="true" validate="required" />
+				<column name="author" title="Autor" editable="true" validate="required"/>
+			</columns>
+		</table>
+	</page>
+</portlet>
+</pre>
+
+====== Queries ======
+
+Die Deklaration eines ReST-Containers enthält mindestens den Bereich <code><query/></code>. Hier wird angegeben unter welcher URL die Daten auszulesen sind. Das Standardformat ist dabei JSON. 
+
+
+Der JSON-Code wird per Groovy [http://groovy.codehaus.org/gapi/groovy/json/JsonSlurper.html JSONSlurper] in eine Java-Objektstruktur konvertiert. Ist das Ergebnis eine Liste, wird diese als Grundlage für die Tabellenzeilen verwendet. Wenn nicht, dann ist über das <code>collection</code>-Attribut ein [http://groovy.codehaus.org/GPath GPath] anzugeben, der die entsprechende Liste liefert. Bei XML wird entsprechend der [http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlSlurper XMLSlurper] zur Konvertierung verwendet.
+
+Die <code><attribute/></code>-Elemente der Query beschreiben die Containerspalten. Diese werden zur Ermittlung der Container-Metadaten verwendet und beinhalten außerdem Informationen für das Parsen der jeweiligen Spalten. 
+
+Anders als beim JMX-Container, bei dem die Listen immer MBeans mit eindeutigen Namen betreffen, müssen für ReST außerdem Spalten als Teil einer eindeutigen ID (Primärschlüssel) angegeben werden. 
+
+* <code>name</code> definiert den Spaltennamen, die später innerhalb der <code><column/></code>-Definitionen referenziert werden kann. 
+* <code>type</code> definiert den Spaltentyp. Wenn kein <code>type</code> angegeben ist, wird für jede Spalte der Datentyp <code>java.lang.String</code> als Standard angenommen. Unterstützt werden folgende Datentypen: <code>java.lang.String</code>, von <code>java.lang.Number</code> abgeleitete Typen sowie <code>java.util.Date</code>.
+* Über <code>format</code> lässt sich ein Format für die Konvertierung von Texten in Datumswerte angeben. Hier wird 'iso8601' und die [http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html SimpleDateFormat]-Pattern unterstützt. Dabei wird die Response-Locale verwendet - wenn diese nicht passt, lässt sich eine eigene Locale im Attribut <code>locale</code> angeben. Beispiel:
+<pre class="brush:xml">
+    <attribute name="created_at" type="java.util.Date" format="EEE, dd MMM yyyy HH:mm:ss ZZZZZ" locale="en"/>
+</pre>
+* <code>path</code> ist ein [http://groovy.codehaus.org/GPath GPath], der auf jedes Element der Collection angewendet wird um den Spaltenwert zu ermitteln. Wird keiner angegeben, so wird der <code>name</code> als Pfad verwendet. Bei JSON operiert man in der Regel auf Maps, während bei XML Responses auf <code>groovy.util.support.GPathResult</code> operiert.
+
+
+Zur Veranschaulichung: Die obige Konfiguration entspricht damit vereinfacht folgendem Groovy-Pseudocode:
+<pre class="brush:groovy">
+   def data = new JSONSlurper().parse(responseBody)
+   data.each { entry ->
+      rows.put (isbn, [ 
+          isbn: entry.isbn,
+          title: entry.title,
+          author: entry.author
+      ])
+   }
+</pre>
+
+Beim Parsen von XML mit Namespaces werden diese ignoriert. Es sind also keine besonderen Prefixe o. Ä. anzugeben.
+
+
+Insbesondere bei XML ist bei speziellen Attributen, die z. B. Sonderzeichen (im Java-Sinne) enthalten, eine spezielle Groovy-Syntax im <code>path</code> notwendig. Dafür ist das aktuelle Collection-Element zusätzlich als Parameter 'it' verfügbar:
+
+* XML-Attributen wird ein '@'-Zeichen vorangestellt: <code>path="it.@Id"</code>
+* XML-Bezeichner wie <code><long-title></code>: <code>path="it.'long-title'"</code>
+
+Weitere Beispiele lassen sich der Dokumentation zum [http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlSlurper Groovy XMLSlurper] entnehmen.
+
+====== URL-Handling ======
+
+Die URLs werden immer aus der Base-URL und der jeweiligen Query/Insert/Update/Delete-URL zusammengesetzt. Wird keine Query-URL angegeben, so liefert der Container eine leere Liste.
+
+Base- und Query-URL lassen sich per Scripting zur Laufzeit setzen (siehe [http://jenkins.d3.uid.de/job/crud2go-default-site/ws/eai-portal-support-scripting/target/site/apidocs/de/unioninvestment/eai/portal/portlet/crud/scripting/model/ScriptReSTContainer.html ScriptReSTContainer JavaDoc]), z. B. um auf Basis einer Formulareingabe bestimmte URL-Parameter einzutragen. Dies führt zu einem Refresh des Containers
+
+
+====== Insert/Update/Delete ======
+
+Bei Änderungsoperationen wird die URL als Groovy GString ausgewertet, so dass z. B. die ID der Zeile einen Teil der URL bilden kann. Es wird ein Request erstellt, der an die evaluierte URL gesendet wird und im Body jeweils JSON oder XML Content enthält. Die aktuelle Zeile steht über den Parameter 'row' sowohl bei der URL als auch für die Erstellung des HTTP Body zur Verfügung.
+
+Inserts führen standardmäßig zu einem POST-Request und erwarten einen HTTP-Status 201(CREATED) oder 204(NO_CONTENT), Update-Operationen bewirken einem PUT-Request und erwarten die Status-Codes 200(OK) oder 204(NO_CONTENT).
+
+Zur Formatierung von Datumswerten im ISO-8601-Format steht an der java.util.Date-Klasse die Methode getIso8601String() zur Verfügung.
+
+''' JSON '''
+
+Für JSON POST-/PUT-Requests wird im <code><insert/></code>- bzw. <code><update/></code>Tag ein Stück Groovy-Code erwartet, der zu einer Liste oder Map evaluiert. Diese wird über den [http://groovy.codehaus.org/gapi/groovy/json/JsonBuilder.html Groovy JSONBuilder] nach JSON konvertiert.
+
+''' XML '''
+
+Zur XML-Generierung wird der angegebene Groovy-Code im Kontext eines [http://groovy.codehaus.org/Creating+XML+using+Groovy%27s+MarkupBuilder Groovy MarkupBuilder] evaluiert und nach XML konvertiert.
+
+
+====== Security ======
+
+Der Zugriff auf gesicherte Services ist per Basic Authentication möglich. Es wird empfohlen, auf derartige Services nur SSL-verschlüsselt (per HTTPS) zuzugreifen, da die Zugangsdaten sonst ungesichert über das Netzwerk übertragen werden.
+
+Zur Aktivierung von Basic Authentication ist der Konfiguration ein <code><authentication><realm></code>-Abschnitt hinzuzufügen. Die eigentlichen Zugangsdaten werden in den Portlet-Preferences gespeichert. Über die Angabe <code>encryption-algorithm="pgp"</code> wird das Passwort dabei verschlüsselt. Am ReST-Container wird die Konfiguration dann über <code>realm="..."</code> referenziert.
+
+<pre class="brush:xml">
+	<authentication>
+		<realm name="test">
+			<credentials>
+				<username preference-key="test.username"/>
+				<password preference-key="test.password" encryption-algorithm="pgp"/>
+			</credentials>
+		</realm>
+	</authentication>
+	<page>
+		<table id="material">
+			<rest-container baseUrl="http://localhost:9876" realm="test">
+	...
+</pre>
+
+====<columns>====
+Das <code>&lt;columns&gt;</code>-Element ist das Vaterelement von beliebig vielen <code>&lt;column&gt;</code>-Elementen.
+
+=====<column>=====
+Ein Column beschreibt eine Spalte in der Tabellenansicht und sein Attribut <code>name</code> muss mit den Spaltennamen der Ergebnismenge übereinstimmen. Primärschlüssel werden mit dem Attribute <code>primary-key="true"</code> gekennzeichnet. Mit dem Attribute <code>editable="true"</code> lassen sich die Spalten für den  Editiermodus bzw. Insertmodus freischalten, da die Spalten im Standardverhalten nicht editierbar sind. Ausgenommen sind Primärschlüsselspalten, die z. Zt. generell schreibgeschützt sein müssen.
+
+Mit <code>hidden="true | in-form | in-table"</code> können Spalten ausgeblendet werden.
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Werte für das Attribut hidden 
+!Beschreibung 
+|-
+| true || Spalte ist in allen Masken ausgeblendet
+|-
+| false || Spalte ist in allen Masken sichtbar
+|-
+| in-form || Spalte ist im Formular-Edit-Modus nicht sichtbar
+|-
+| in-table || Spalte ist im Inline-Edit-Modus nicht sichtbar
+|}
+    
+Die vorgegebene Reihenfolge der Column-Elemente beeinflusst die dargestellte Spaltenreihenfolge in der Tabellenansicht. 
+Per <code>multiline="true"</code> erscheint im Editiermodus die Eingabe mehrzeilig und umgebrochen, die Dimension der Elemente richtet sich an die Höhe und Breite der Spalte. Im Ansichtsmodus werden diese Textinhalte ebenfalls umgebrochen. Diese Einstellung ist nur für unterstützte Datentypen verfügbar.
+
+Das Attribute <code>input-prompt</code> fügt einen grauen Hinweistext in ein Textelement, dieser Text verschwindet sobald sich das Element im Focus befindet oder einen echten Wert erhält.        
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Attribut 
+!Beschreibung 
+!Pflicht
+!Standard 
+|-
+| name|| Der Spaltenname aus der SQL Ergebnismenge || ja ||
+|-
+| title || Ein Titel für die Spaltenüberschrift || nein || Der Spaltenname
+|-
+| longtitle || Eine längere Beschreibung, die als Tooltip im Tabellenheader bzw. an den Feldern des Edit-Formulars angezeigt wird || nein || nicht gesetzt
+|-
+| primary-key || true, falls es sich um ein Primärschlüssel handelt || nein || false
+|-
+| editable || true, wenn diese Spalte änderbar sein soll. || nein || false
+|-
+| hidden || wenn true, wird die Spalte nicht im Ansichtsmodus angezeigt, jedoch im Bearbeitungsmodus   || nein || false
+|-
+| width || Die Breite einer Spalte in Pixeln || nein|| Wird an den verfügbaren Platz angepasst
+|-
+| multiline || Die Eingabe erscheint als mehrzeiliges Textfeld. Die Zeilienhöhe kann dann durch row-height am <code>table</code>-Element beeinflusst werden. || nein|| false
+|-
+| validate || Komma-separierte Liste von Validierungsregeln. || nein || 
+|-
+| validation-message || Fehlermeldung bei fehlgeschlagener Validierung || nein || 
+|-
+| input-prompt || Anzeigetext bei leerem Eingabefeld || nein || 
+|-
+| style || Die hinterlegte Methode wird aufgerufen, wenn die Spalte gerendert wird.  || nein || 
+|-
+| default || Closure für Standardwert (leerer String => kein Default) || nein || 
+|-
+| generator || Groovy-Script, dass eine Vaadin-Komponente für die Anzeige in der Tabelle liefert || nein || 
+|-
+| generated-value || Groovy-Script, dass den zu exportierenden Wert einer generierten Spalte liefert || nein || 
+|-
+| generated-type || der Typ der generierten Spalte - wird für den Export benötigt, z. Zt. werden java.lang.String, java.lang.Integer, java.lang.Double und java.math.BigDecimal unterstützt || nein || 
+|-
+| display-format || das für die Anzeige eingestellte Format. Es wird u.a. java-date-Format und [http://openbook.galileodesign.de/javainsel5/javainsel04_006.htm#Rxx747java04006040001591F0121D0 java-number-Format] genutzt|| nein ||
+|}
+
+Zusätzlich zu den per <code>column</code> fest deklarierten Elementen lassen sich per Scripting auch dynamisch Spalten hinzufügen. Ebenso lässt sich per Scripting die vorgegebene Reihenfolge der Spalten ändern sowie Spalten aus- und einblenden. Siehe dazu Abschnitt [[#Spalten dynamisch hinzufügen und entfernen|Spalten dynamisch hinzufügen und entfernen]]
+
+======Checkbox======
+Für die Eingabe lassen sich auch Checkboxen definieren. Dabei werden die Attribute <code>checked-value</code> und <code>unchecked-value</code> definiert.
+
+<code>checked-value</code> ist der  Wert, der eine ausgewählte Checkbox definiert.
+
+<code>unchecked-value</code> definiert eine nicht aus ausgewählte Checkbox.
+<pre class="brush:xml">
+   <column name="CVARCHAR_11" editable="true">
+      <checkbox checked-value="true" unchecked-value="false"/>
+   </column>
+
+   <column name="CVARCHAR_22" editable="true">
+      <checkbox checked-value="validiert" unchecked-value=""/>
+   </column>
+</pre>
+Im Editiertmodus steht eine Checkbox für die Eingabe zur Verfügung. Dieser ist entsprechend der Attribute <code>checked-value</code> und <code>unchecked-value</code> vorselektiert. Sollte keines der beiden Werte matchen, ist die Checkbox nicht selektiert.
+
+Im Anzeigemodus ist das Verhalten ähnlich. Anders als im Editiertmodus wird der tatsächliche Wert angegezeigt, wenn weder <code>checked-value</code> noch <code>unchecked-value</code> zur Spalte matchen.
+
+======Standardwert======
+Mit dem Attribut <code>default</code> kann ein ein Standardwert für die Spalte definiert werden. Dieser wird automatisch beim Erzeugen einer neuen Zeile in die entsprechende Spalte eingesetzt.
+
+In Spalten mit dem Datentyp Timestamp kann <code>$now</code> verwendet werden. Beim Erzeugen der neuen Zeile wird dann der aktuelle Timestamp eingesetzt.
+<pre class="brush:xml">
+   <columns>
+	<column name="ORT" editable="true" default="Solingen" />
+	<column name="TIMESTAMP" editable="true" default="$now" />
+   </columns>
+</pre>
+
+======Zellen einfärben======
+Über das Scripting lassen sich einzelne Zellen in einer Spalte farblich markieren. Die hinterlegte Methode darf entweder <code>warn</code> oder <code>error</code> zurückgeben. <code>warn</code> wird gelb dargestellt, <code>error</code> wird rot dargestellt.
+
+Es können alle Farben (bzw. deren Bezeichnung) unter [[ISIS/EAI-Portal/EAI-Administration/CRUD-Portlet/Anwenderdokumentation#Styles|Styles]] genutzt werden.
+
+<pre class="brush:xml">
+<table>
+   <database-table datasource="eai" tablename="test_crud2" />
+   <columns>
+      ...
+      <column name="Spalte" style="getColumnStyle(row, columnName)" />
+   </columns>
+</table>
+...
+<script><![CDATA[
+def getColumnStyle(row, columnName) 
+{
+   if (row.values[columnName] > 44) 
+   {
+      return 'error'
+   }
+   return null;
+}
+]]></script>
+</pre>
+
+======Validierung======
+Komma-separierte Liste von Validierungsregeln. Im Fehlerfall wird die im Attribut validation-message angegebene Meldung ausgegeben. Folgende Regeln werden unterstützt:
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Validator
+!Beschreibung 
+!Beispiel
+|-
+| maxlen || Maximale Eingabelänge eines Formularelements, Textfelder werden auf diese Länge initialisiert.  || maxlen=8
+|-
+| required || Definiert eine Eingabepflichtfeld; ist das Feld leer oder <code>NULL</code>, schlägt die Validierung fehl. || required
+|-
+| regexp || Eine Validierungsregel für einen gültigen [http://download.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html Java konformen] Ausdruck. Zu beachten gilt dass Kommazeichen ein Escape-Zeichen vorangestellt werden muss (<code>\\,</code>).|| <code>regexp=[a-zA-Z\\,]+</code>
+|}
+<pre class="brush:xml">
+   <columns>
+	<column name="ID" primary-key="true" hidden="true"/>
+	<column name="NAME" width="150" editable="true" input-prompt="Eingabe Name"/>
+	<column name="WERT" editable="true" multiline="true" validate="maxlen=30" validation-message="Die Eingabelänge ist auf 30 Zeichen beschränkt."/>
+        <column name="CREATED" title="Erzeugt am"/>
+   </columns>
+</pre>
+
+
+
+======<date>======
+
+Über das Element <code>date</code> lässt sich eine Datumsspalte mit einem DatePicker versehen.
+
+
+<span id="selection"></span>
+
+======<select>======
+Das Element <code>select</code> beschreibt ein Auswahleingabeelement(ComboBox), dass man anstelle einer Standardeingabe definieren kann. Diese Felder müssen jedoch weiterhin per <code>editable="true"</code> für die Bearbeitung aktiviert werden.   
+Die jeweiligen Auswahloptionen lassen sich fix per <code>option</code>-Elemente festlegen oder dynamisch als SQL-Select Anweisung (query).
+
+'''Tokens'''
+
+In Tabellen ist auch eine Mehrfachauswahl über "Tokens" möglich. Dies funktioniert nur bei Textdatenfeldern. Die einzelnen Werte werden dafür konkateniert.
+
+<pre class="brush:xml">
+<column name="EMAILS" editable="true">
+	<select display="tokens">
+		<option key="Frank.Demmel@noreply.com">Frank Demmel</option> 
+		<option key="Max.Mustermann@noreply.com">Max Mustermann</option> 
+		<option key="Daniel.Duesentrieb@noreply.com">Daniel Düsentrieb</option> 
+	</select>
+</column>
+</pre>
+
+=======<option>=======
+Ein <code>option</code>-Element besteht aus einem Attribut <code>key</code>, welches den Wert der Eingabe beinhaltet und dem Text innerhalb des Elements, das den Anzeigetext im Drop-Down-Element repräsentiert. 
+<pre class="brush:xml">
+     <column name="Auswahl" editable="true">
+       <select>
+          <option key="1">Auswahl 1</option>
+          <option key="2">Auswahl 2</option>
+       </select>
+     </column>
+</pre>
+
+
+=======<query>=======
+Das <code>query</code>-Element umschließt die SQL-Abfrage auf die Auswahloptionen. Hierbei ist zu beachten, dass in der Ergebnismenge eine Spalte als <code>key</code> und eine weitere als <code>title</code> benannt werden. Weiterhin werden alle Optionswerte als Zeichenketten behandelt, so dass beispielsweise Datumsspalten zuerst in ein korrektes Format transformiert werden müssen.   
+
+Im <query> TAG muss (zumindest beim Nutzen in <field>) die Datasource angegeben werden (z. B. <query datasource="ikdatatool"> select ... </query>
+
+<pre class="brush:xml">
+     <column name="Auswahl" editable="true">
+        <select>
+           <query>SELECT c1 AS key, c2 AS title FROM table1</query>
+        </select>
+     </column>
+</pre>
+
+'''Beispiel: Datum'''
+<pre class="brush:xml">
+     <column name="Date" editable="true">
+        <select> 
+           <query>select to_char(cdate_nn, 'dd.MM.yyyy') as key , cvarchar5_nn as title from TEST_CRUD2</query>
+        </select>
+     </column>
+</pre>
+
+Eine Sortierung der Ausgabe kann im SQL durch den Term <code>ORDER BY ...</code> erfolgen.
+
+'''Optimierungsmöglichkeiten'''
+
+Über das ''initialize''-Attribut lässt sich das Ladeverhalten von Queries steuern.
+* ''eager'': (default) Lädt die Optionsliste zum Startzeitpunkt und beim Refresh sychron nach
+* ''lazy'': Lädt die Optionliste erst bei Zugriff, genauer: Wenn im Optionslistenfeld erstmalig eine Filtereingabe erfolgt.
+* ''async'': Verhält sich wie ''lazy'', nur dass die  Optionsliste im Hintergrund vorgeladen wird, so dass sie bestenfalls beim ersten Zugriff direkt zur Verfügung steht
+
+=======<dynamic>=======
+Die Einträge des Auswahleingabeelements lassen sich über ein <code>dynamic</code>-Element dynamisch über ein Skript erzeugen. 
+
+Beispiel Zufallszahlen:
+<pre class="brush:xml">
+...
+<column name="Auswahl" editable="true">
+   <select>
+      <dynamic options="createOptionMap(row, columnName)"/>
+   </select>
+</column>
+...
+<script><![CDATA[
+   random = new Random()
+
+   def createOptionMap(row, columnName) {
+      def ret = (1..50).collect { random.nextInt(200-100+1)+100 }
+      def currValue = row.values[columnName]
+      return [currValue] + ret
+   } 
+]]></script>
+</pre>
+
+===<form>===
+Die <code>form</code>-Elemente konfigurieren Eingabeformulare für die Suche bzw. die Filterung auf die Ergebnismengen. Ein Formular bezieht sich auf alle ihm folgenden Datenquellen, so lange keine weitere Formulardefinition die Suche neu beschreibt.
+
+Ein Formular kann <code>field</code>-Elemente für Eingaben und <code>action</code>-Elemente für die Aktionen enthalten, die über die Vorgabe im Attribut <code>columns</code> in Spalten angeordnet werden. Bei einem einspaltigen Layout wird die Feldbeschriftung links vor dem Eingabefeld dargestellt und bei mehrspaltigen Layout über den Feldern.
+
+Weiterhin kann im Attribut <code>triggerOnChanges</code> die ID einer Action innerhalb des Formulars definiert werden. Diese Action wird dann ausgeführt, sobald sich etwas in einem Formularfeld ändert. Die entsprechende Action wird dann automatisch ausgeblendet.
+
+====<field>====
+Ein <code>field</code> benötigt ein Namen (<code>name</code>), über den es den Ergebnismengen zugeordnet werden kann. Im Titel (<code>title</code>) kann eine optionale Feldbeschriftung festgelegt werden. Ein <code>input-promt</code> wird als grauer Text angezeigt wenn das zu füllende Feld noch keinen Wert enthält. Mit Hilfe eines <code>default</code> lassen sich gültige Eingabewerte vorbelegen.
+
+'''Feldvalidierung'''
+Die <code>fied</code>-Validierung ist identisch zur <code>column</code>-[[#Validierung|Validierung]].
+
+'''Textfeld'''
+Texteingabefelder benötigen keine weitere Konfiguration, sondern werden rein über das <code>field</code> abgebildet. Alle weiteren Eingabeelemente haben einen speziellen Konfigurationstypen (checkox/select/date).  
+
+
+=====<checkbox>=====
+Ein Checkbox-Formularelement besitzt das Attribut <code>unchecked-value</code>, es gibt den Feldwert im unselektierten Zustand vor. Wenn das Attribut nicht gesetzt ist, wird auf dieses Feld nicht im nicht-selektierten Zustand gefiltert. Das Attribut <code>checked-value</code> muss gesetzt sein und gibt den Feldwert für den selektierten Zustand vor.
+
+[[#Checkbox|siehe auch hier.]]
+
+=====<select>=====
+[[#selection|siehe hier]]
+
+
+=====<date>=====
+<code>date</code> dient der Datumsfilterung und beschreibt eine Datepicker-Formularkomponente. Über das <code>format</code> Attribut lässt sich die Datumsanzeigeformat definieren, weiterhin beschreibt es die Granularität der Filterung. Beispielsweise filtert das <code>format="yyyy"</code> die Auswahl auf das ausgewählte Jahr. Das Format muss nach dem [http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html SimpleDateFormat] gültig sein, die Filtergranularität wird bis auf Millisekunden unterstützt.
+
+Beispiel Datepicker:
+<pre class="brush:xml">
+<field name="TIME_STAMP" title="TIME_STAMP" >
+	<date format="dd.MM.yyyy"/>
+</field>
+</pre>
+
+
+
+<span id="action"></span>
+
+====<action>====    
+Ein <code>action</code>-Element beschreibt eine Aktion hinter einem Formular-Button. Das Attribute <code>title</code> gibt die Beschriftung an und der <code>type</code> die Aktion. Die Aufzurufende Funktion im Skript beim Betätigen des Buttons wird über das Attribut <code>onExecution</code> konfiguriert. Das Attribut <code>id</code> wird benötigt, wenn die hinterlegte Aktion über ein Trigger aufgerufen werden soll. Folgende Aktionen werden unterstützt:   
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Type
+!Beschreibung
+!Besonderheiten
+|-
+| search || Führt eine Suche auf die Datenquellen aus.
+|-
+| reset || Setzt das Formular und Filter auf die Anfangswerte zurück. 
+|}
+
+<span id="triggers"></span>
+=====<triggers>=====
+Das <code>triggers</code>-Element ist das Vaterelement von beliebig vielen <trigger>-Elementen. Nach der Ausführung der Aktion des aktuellen Buttons werden alle getriggerten Aktionen ausgeführt.
+
+<pre class="brush:xml">
+...
+<action title="Suchen" type="search" id="searchAction">
+   <triggers>
+      <trigger action="otherSearchAction" />
+   </triggers>
+</action>
+...
+</pre>
+
+======<trigger>======
+
+Ein <code>trigger</code>-Element beschreibt eine Verküpfung zu einem anderen Button. Das Attribut <code>action</code> verweist auf ein <code>id</code> Attribut eines Buttons.
+
+Beispiel 1:
+Nach der Suche des ersten Buttons wird die Suche des zweiten Buttons ausgeführt.
+<pre class="brush:xml">
+...
+<action title="Suchen" type="search" id="searchAction">
+   <triggers>
+      <trigger action="otherSearchAction_1" />
+   </triggers>
+</action>
+...
+...
+<action title="Suchen" type="search" id="otherSearchAction_1" />
+...
+</pre>
+
+Beispiel 2:
+Die Closure <code>closureInButton(it)</code> und <code>closureInTable(it)</code> werden aufgerufen, wenn der Reset-Button betätigt wird.
+
+<pre class="brush:xml">
+...
+<action title="Suchen" type="reset" id="searchAction">
+   <triggers>
+      <trigger action="closureAktion_1" />
+      <trigger action="tabellenAktion_1" />
+   </triggers>
+</action>
+...
+...
+<form>
+...
+<action title="Closure-Aktion" id="closureAktion_1" onExecution="closureInButton(it)" />
+...
+</form>
+...
+...
+<table>
+   <database-table datasource="datasource" tablename="tablename" />
+   <action onExecution="closureInTable(it)" title="Tabellenbutton" id="tabellenAktion_1" />
+</table>
+...
+</pre>
+
+=====<search>=====
+Standardverhalten der Suche ist, dass alle Formularfeldinhalte mit einer <code>und</code>-Verknüpfung gesucht werden. Dieses Verhalten lässt sich über das <code>search</code>-Element konfigurieren.
+
+Beispiel:
+Standardsuche
+<pre class="brush:xml">
+  <form>
+   <field name="feld_1" title="Spalte 1" />
+   <field name="feld_2" title="Spalte 2" />
+   <action title="Suchen">
+     <search/>
+   </action>
+  </form>
+</pre>
+
+Insbesondere bei langlaufenden Queries ist eine Beschränkung der Suchfunktion wünschenswert. Über folgende Einstellung lässt sich die Suche so konfigurieren, dass mindestens ein Filterkriterium verlangt wird. Dies wird üblicherweise in Kombination mit eine <code>filter-policy</code> an der Tabellenkonfiguration eingesetzt.
+
+<pre class="brush:xml">
+  <search requires-filter="true"/>
+  <table>
+     <database-query datasource="test" filter-policy="nothing">
+  ...
+</pre>
+
+Eine Suche kann außerdem mit einem Zeitlimit versehen werden. Dies wird mit dem <code>timeoutInSeconds</code>-Attribut definiert.
+
+Beispiel:
+Zeitlimit setzen
+<pre class="brush:xml">
+<search timeoutInSeconds="15">
+...
+</search>
+</pre>
+
+Wenn die Suche dann länger als die angegebene Zeit (im Beispiel 15 Sekunden) benötigt wird die Suche abgebrochen und ein entsprechender Warnhinweis angezeigt.
+Der Wert 0 ist der Standard und deaktiviert die Zeitlimitierung. Werte kleiner 0 werden ignoriert. Es ist zu beachten, dass der Timeout sich auf die max. Dauer einer einzelnen Datenbankquery bezieht. Da teilweise mehrere Queries für eine Suche notwendig sind, kann die tatsächliche Reaktionszeit höher ausfallen.
+
+Es ist auch möglich ein Zeitlimit per Skript über die Action zu setzen. Dazu muss die Action über ihre ID ermittelt werden. Über die Eigenschaft <code>timeout</code> kann dann ein Zeitlimit in Sekunden definiert werden. Auch hier gilt: 0 deaktiviert das Zeitlimit und Werte kleiner 0 werden ignoriert.
+
+Das Filterverhalten lässt sich über <code><contains ...  case-sensitive="true"/></code> ändern. Betroffen sind die Filter <code><starts-with></code>, <code><ends-with></code> und <code><contains></code>. Der Default hier "false". Für performante Case-Insensitive Queries gibt es alternativ noch die Möglichkeit, einen '''Index''' auf <code>UPPER(columnName)</code> zu erstellen.
+
+
+======<tables>======
+
+Im Standard wird eine Suche auf alle Tabellen angewandt, die sich im gleichen oder in untergeordneten Panels (<code><page>/<region>/<tab></code>) unterhalb des Suchformulars befinden. Wird ein weiteres Formular in der Seite gefunden, werden darauffolgende Tabellen ignoriert. Wenn dieser Automatismus nicht passt, können die Tabellen auf die die Suche angewendet werden soll manuell konfiguriert werden:
+
+<pre class="brush:xml">
+<search>
+	<tables>
+		<table id="table" />
+	</tables>
+	...
+</search>
+</pre>
+
+======<apply-filters>======
+Das <code>apply-filters</code>-Element ist das Vaterelement von beliebig vielen Suchfilter-Elementen.
+
+Über das Attribut <code>table</code> lassen sich die Filter auf bestimmte Table-Elemente beschränken.
+
+=======<contains>=======
+Entspricht in SQL <code>...dbSpalte_1 = %<Wert>%...</code>
+
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <contains column="dbSpalte_1" field="formularfeld_1"/>
+   </apply-filters>
+</search>
+</pre>
+
+Wenn die einfache Like-Suche nicht ausreicht, kann per Regulärem Ausdruck <code><regexp ...></code> gesucht werden
+
+=======<starts-with>=======
+Entspricht in SQL <code>...dbSpalte_1 = <Wert>%...</code>
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <starts-with column="dbSpalte_1" field="formularfeld_1"/>
+   </apply-filters>
+</search>
+</pre>
+
+=======<ends-with>=======
+Entspricht in SQL <code>...dbSpalte_1 = %<Wert>...</code>
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <ends-with column="dbSpalte_1" field="formularfeld_1"/>
+   </apply-filters>
+</search>
+</pre>
+=======<equals>=======
+Entspricht in SQL <code>...dbSpalte_1 = <Wert>...</code>
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <contains column="dbSpalte_1" field="formularfeld_1"/>
+   </apply-filters>
+</search>
+</pre>
+=======<greater>=======
+Entspricht in SQL <code>...dbSpalte_1 < <Wert>...</code>
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <greater column="dbSpalte_1" field="formularfeld_1"/>
+   </apply-filters>
+</search>
+</pre>
+=======<greater-or-equal>=======
+Entspricht in SQL <code>...dbSpalte_1 <= <Wert>...</code>
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <greater-or-equal column="dbSpalte_1" field="formularfeld_1"/>
+   </apply-filters>
+</search>
+</pre>
+=======<less>=======
+Entspricht in SQL <code>...dbSpalte_1 > <Wert>...</code>
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <less column="dbSpalte_1" field="formularfeld_1"/>
+   </apply-filters>
+</search>
+</pre>
+=======<less-or-equal>=======
+Entspricht in SQL <code>...dbSpalte_1 >= <Wert>...</code>
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <less-or-equal column="dbSpalte_1" field="formularfeld_1"/>
+   </apply-filters>
+</search>
+</pre>
+=======<sql>=======
+Über das <code>sql</code>-Element lassen sich eigene Bedingungen definieren. 
+
+Beispiel 1:
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <sql column="ID" table="tabelle">
+         <where>IN ( SELECT ID FROM db_tabelle WHERE db_spalte_1 = $fields.feld_1.value )</where>
+      </sql>
+   </apply-filters>
+</search>
+</pre>
+
+=======<regexp>=======
+Über das <code>regexp</code>-Element lassen sich Spaltenwerte über Posix Regular Expressions filtern. Aktuell werden nur die DatabaseContainer unterstützt, bei denen die Oracle-Funktion REGEXP_LIKE zur Anwendung kommt. Die Syntax dazu lässt sich [http://docs.oracle.com/cd/B28359_01/server.111/b28286/conditions007.htm#autoId1 hier] nachlesen.
+
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <regexp column="TEXTCOL" modifiers="i"/>
+   </apply-filters>
+</search>
+</pre>
+
+=======<all>=======
+Mit dem <code>all</code> Filter lassen sich mehrere Filter mit <code>und</code> verknüpfen.
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <all>
+         <greater column="dbSpalte_1" field="formularfeld_1"/>
+         <equals column="dbSpalte_2" field="formularfeld_2"/>
+      </all>
+</search>
+</pre>
+
+=======<any>=======
+Mit dem <code>any</code> Filter lassen sich mehrere Filter mit <code>oder</code> verknüpfen.
+
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <any>
+         <equals column="dbSpalte_1" field="formularfeld_1"/>
+         <contains column="dbSpalte_2" field="formularfeld_2"/>
+      </any>
+</search>
+</pre>
+
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <any>
+         <all>
+            <greater column="dbSpalte_1" field="formularfeld_1"/>
+            <equals column="dbSpalte_2" field="formularfeld_2"/>
+         </all>
+         <greater column="dbSpalte_3" field="formularfeld_3"/>
+         <all>
+            <greater column="dbSpalte_4" field="formularfeld_4"/>
+            <equals column="dbSpalte_5" field="formularfeld_5"/>
+         </all>
+      </any>
+</search>
+</pre>
+
+=======<not>=======
+Mit dem <code>not</code> Filter lassen sich gekapselte Filter umkehren. Wenn mehrere Sub-Filter angegeben sind, so entspricht die Logik <code><not><all><subfilters/></all></not></code>
+
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <not>
+         <less column="dbSpalte_1" field="formularfeld_1"/>
+         <greater column="dbSpalte_2" field="formularfeld_1"/>
+      </not>
+</search>
+</pre>
+
+=======<nothing>=======
+Mit dem <code>nothing</code> Filter erreicht man die Anzeige einer leeren Liste. Dieser Filter wird insbesondere intern bei der filter-policy von Tabellen eingesetzt, aber auch wenn über das Scripting ein Leerfilter gewünscht wird. Im SQL wird dabei eine WHERE-Bedingung '1=0' eingefügt.
+
+<pre class="brush:xml">
+<search>
+   <apply-filters>
+      <nothing/>
+   </apply-filters>
+</search>
+</pre>
+
+=======<include-filter>=======
+Mit dem Element <code>include-filter</code> lassen sich die hinterlegten Filter eines anderen Formularbuttons inkludieren. Voraussetzung ist, dass die Spalten in der aktuellen Datenbank-Tabelle vorhanden sind. Filter mit nicht vorhandenen Spalten werden ignoriert.
+
+Beispiel 1:
+In diesem Beispiel werden die Filter <code><equals column="db_spalte_1" field="formularfeld_1"/></code> und <code><ends-with column="db_spalte_2" field="formularfeld_2"/></code> des zweiten <code>Action</code>-Elements in das erste <code>Action</code>-Element includiert.
+<pre class="brush:xml">
+...
+<action title="search" type="search" id="searchAction_1">
+   <search>
+      <apply-filters>
+         <include-filter action="searchAction_2"/>
+      </apply-filters>
+   </search>
+</action>
+...
+...
+<action title="search" type="search" id="searchAction_2">
+   <search>
+      <apply-filters>
+         <equals column="db_spalte_1" field="formularfeld_1"/>
+         <ends-with column="db_spalte_2" field="formularfeld_2"/>
+      </apply-filters>
+   </search>
+</action>
+...
+</pre>
+
+Beispiel 2:
+<pre class="brush:xml">
+...
+<action title="search" type="search" id="searchAction_1">
+   <search>
+      <apply-filters>
+         <any>
+            <equals column="db_spalte_1" field="formularfeld_11"/>
+            <include-filter action="searchAction_2"/>
+         </any>
+      </apply-filters>
+   </search>
+</action>
+...
+...
+<action title="search" type="search" id="searchAction_2">
+   <search>
+      <apply-filters>
+         <equals column="db_spalte_2" field="formularfeld_21"/>
+         <ends-with column="db_spalte_3" field="formularfeld_22"/>
+      </apply-filters>
+   </search>
+</action>
+...
+</pre>
+
+Beim Betätigen des ersten Buttons werden intern die folgenden Filter erzeugt:
+<pre class="brush:xml">
+<equals column="db_spalte_1" field="formularfeld_11"/>
+<all>
+   <equals column="db_spalte_2" field="formularfeld_21"/>
+   <ends-with column="db_spalte_3" field="formularfeld_22"/>
+</all>
+</pre>
+
+Beispiel 3:
+
+<pre class="brush:xml">
+...
+<form>
+...
+<action title="search" type="search" id="searchAction_1">
+   <search>
+      <apply-filters>
+         <equals column="db_spalte_1" field="formularfeld_11"/>
+         <include-filter action="searchAction_2"/>
+      </apply-filters>
+   </search>
+</action>
+...
+</form>
+<table sortable="true" id="table_1">
+   <database-table datasource="datasource" tablename="tablename" />
+</table>
+...
+...
+<action title="search" type="search" id="searchAction_2">
+   <search>
+      <apply-filters>
+         <equals column="db_spalte_2" field="formularfeld_21" table="otherTable_1"/>
+         <ends-with column="db_spalte_3" field="formularfeld_22"/>
+      </apply-filters>
+   </search>
+</action>
+...
+</pre>
+
+Beim Betätigen des ersten Buttons werden intern die folgenden Filter erzeugt:
+<pre>
+<equals column="db_spalte_1" field="formularfeld_11"/>
+<ends-with column="db_spalte_3" field="formularfeld_22"/>
+</pre>
+Der Filter <code><equals column="db_spalte_2" field="formularfeld_21" table="otherTable_1"/></code> wird ignoriert, da dies explizit auf das Tabellen-Element <code>otherTable_1</code> verweist.
+
+===Unterstütze Datenbank-Datentypen===
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Datentyp 
+!Sichtbar 
+!Editierbar
+!Filterbar
+|-
+| Number (Alle Numbertyps) || ja || ja || ja
+|-
+| String (Alle Zeichenketten) || ja || ja || ja
+|-
+| Timestamp || ja || nein || ja
+|-
+| Time || ja || ja || ja
+|-
+| Date || ja || ja || ja
+|-
+| CLOB/BLOB || nein || nein || nein
+|}
+
+=== Beispielkonfigurationen ===
+==== Konfiguration auf Basis von <code>&lt;database-query&gt;</code> ====
+<pre class="brush:xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table>
+			<database-query datasource="eai">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_CRUD2
+					  (
+					    CNUMBER5_2,
+					    CDATE,
+					    CTIMESTAMP,
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN,
+					    TESTDATA
+					  )
+					  VALUES
+					  (
+					    $CNUMBER5_2,
+					    $CDATE,
+					    SYSDATE,
+					    $CVARCHAR5_NN,
+					    $CNUMBER5_2_NN,
+					    $CDATE_NN,
+					    SYSDATE,
+					    $TESTDATA
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $CNUMBER5_2,
+						CDATE	      = $CDATE,
+						CVARCHAR5_NN  = $CVARCHAR5_NN,
+						CNUMBER5_2_NN = $CNUMBER5_2_NN,
+						CDATE_NN	  = $CDATE_NN,
+						TESTDATA      = $TESTDATA
+					WHERE ID          = $ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_CRUD2
+					WHERE ID = $ID
+				]]></delete>
+			</database-query>
+			<columns height="100">
+				<column name="ID" primary-key="true" hidden="true"/>
+				<column name="CNUMBER5_2" editable="true" />
+				<column name="CDATE" title="Date" editable="false" />
+				<column name="CTIMESTAMP" title="Timestamp" />
+				<column name="CVARCHAR5_NN" editable="true" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN"  />
+				<column name="TESTDATA" editable="true" width="200" />
+			</columns>
+		</table>
+	</page>
+</portlet>
+</pre>
+
+==Berechtigungen==
+
+===Berechtigungen im Liferay-GUI===
+
+Zur Pflege der Portletberechtigung werden diese mit Liferayrollen des Typs "regular" verknüpft.
+
+Dafür muss zunächst die Konfiguration des Portlets aufgerufen werden.
+
+[[Datei:PreferencesSelect.jpg]]
+
+
+Von der Konfigurationsmaske kann in die Konfiguration der Portalberechtigungen navigiert werden.
+
+[[Datei:Preferences.jpg]]
+
+
+Jede Portletberechtigung kann mit einer Pflegemaske mit Liferayrollen verknüpft werden. 
+
+Grundsätzlich gibt es zwei Einstellmöglichkeiten. <code>Mitglied</code> und <code>Permissions</code>:
+
+* <code>Mitglied</code> bedeutet: Die Liferayrolle wird mit der Portletrolle verknüpft.
+
+* <code>Permissions</code> bedeutet: Die Liferayrolle darf Berechtigungen für diese Portletrolle pflegen.
+
+[[Datei:PreferencesBerechtigung.jpg]]
+
+===Berechtigungskonfiguration im XML===
+
+Mit dem <code>role</code>-Element können im Portlet Rollen definiert werden. 
+
+<pre>
+<portlet title="Titel" xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet">
+<roles>
+   <role name="admin" />
+   <role name="benutzer" />
+</roles>
+...
+</pre>
+
+====Berechtigungen an Tags====
+
+Mit dem <code>permissions</code> Tag können Berechtigungen an den entsprechenden Tags hinzugefügt oder entfernt werden. Rechte werden sowohl in View als auch im Skript berücksichtigt. Der erste passende <code>permissions</code>-Eintrag gilt, d. h. für das unten stehende Beispiel: User in der Rolle 'admin' erhalten das 'build'-Recht, selbst wenn sie außerdem die Rolle 'benutzer' haben. Wenn keine der Regeln auf den aktuellen Benutzer zutrifft gilt das Standardverhalten. Im folgenden Fall dürfen alle Anwender die Tabelle editieren, die die Rolle "admin" haben oder keine Rolle "benutzer" haben:
+
+<pre>
+<roles>
+   <role name="admin" />
+   <role name="benutzer" />
+</roles>
+...
+...
+<table>
+   <permissions>
+      <allow roles="admin" action="build"/>
+      <deny roles="benutzer" action="build"/>
+   </permissions>
+...
+<table>
+...
+</pre>
+
+
+Folgende Actions sind abhängig von der aktuellen Komponente möglich:
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Tag 
+!Berechtigung 
+|-
+| portlet || display-generated-content
+|-
+| tabs || build
+|-
+| tab || build
+|-
+| form || build
+|-
+| table || build, edit
+|-
+| database-table, database-query, script-container, rest-container || update, add, delete
+|-
+| action (Formular und Tabelle) || build
+|-
+| column || display, edit
+|-
+| script-component || build
+|}
+
+Folgende Berechtigungen sind zu unterscheiden:
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Berechtigung
+!Beschreibung
+|-
+| build
+| Die aktuelle Komponente wird im Konfigurations-Modell instanziert. Wenn das Build-Recht nicht besteht, dann stehen die entsprechende Komponente und Sub-Komponenten zur Laufzeit weder in der GUI noch im Skript zur Verfügung.
+|-
+| display
+| Die entsprechende Komponente ist in im User Interface sichtbar. Diese Option hat keine Auswirkung auf das Scripting.
+|-
+| display-generated-content
+| Wird diese Berechtigung am Portlet entzogen, werden keine Script-Komponenten mehr angezeigt. Generierte Spalten werden leer dargestellt.
+|-
+| edit
+| Die entsprechende Komponente erlaubt Änderungen. Für Tabellen bedeuted dies z.&nbsp;B., das der EDIT-Modus zur Verfügung steht. 
+|-
+| update (Container)
+| Die Aktualisierung bestehender Zeilen ist möglich
+|-
+| add (Container)
+| Das Hinzufügen neuer Zeilen ist möglich
+|-
+| delete (Container)
+| Das Löschen von Zeilen ist möglich
+|}
+
+===== Rollen =====
+
+In der Konfiguration definierte Rollen sollten sich namentlich nicht an Origanisationseinheiten orientieren, sondern sich direkt auf die Konfiguration beziehen. Sie können direkt auf eine reguläre Liferay-Rolle verweisen (Attribut 'portal-role'). Andernfalls erfolgt die Rollenzuweisung über einen Dialog in den Portleteinstellungen, wobei auch mehrere Portalrollen einer Konfigurationsrolle zugewiesen werden können.
+
+Folgende Rollen werden automatisch vergeben:
+
+* <code>authenticated</code>: Der aktuelle Benutzer ist eingeloggt
+* <code>anonymous</code>: Der Benutzer ist nicht eingeloggt
+* <code>all</code>: Betrifft alle Rollen
+
+===== Die Rolle 'revision' =====
+
+Ist eine Portalrolle für die Revision in <code>eai-webapp-administration.properties</code> konfiguriert, so wird jede Konfiguration automatisch beim Laden um Berechtigungseinschränkungen für den Revisions-User erweitert. Folgende Rechte werden entzogen:
+
+* Die Ansicht generierter Komponenten und Tabellenspalten
+* Das Editieren von Tabellen
+* Die Anzeige von Buttons mit hinterlegten Scripten
+
+Sollte die Rolle "revision" explizit in der Konfiguration angegeben sein, erfolgt keine automatische Erweiterung, so dass ein Customizing der Revisionsrechte möglich ist.
+
+== Scripting ==
+
+Die Konfiguration kann um [http://groovy.codehaus.org/ Groovy]-Scripting ergänzt werden, um das Laufzeitverhalten anzupassen oder zu erweitern. Details zur Umsetzung des Scriptings und dessen Verwendung finden sich im [[SOFIA/EAI-Portal/EAI-Administration/CRUD-Portlet/Scripting_Konzept|Scripting-Konzept]].
+
+=== Portlet-Modell Scripting-API ===
+
+Die Scripting-API ist als Referenz 'portlet' auf die Haupt-Instanz von ScriptPortlet in Groovy-Skripten erreichbar. Die [http://jenkins.d3.uid.de/view/EAI-Portal/job/Osiris%20-%20EAI-Portal-Administration%20-%20Development%20Branch%20JavaDocs/ws/eai-portal-support-scripting/target/site/apidocs/index.html JavaDocs des aktuellen Entwicklungszweigs] beschreiben die API im Detail.
+
+=== Logging ===
+
+Für das Logging steht mit der Variable "log" die SLF4J-API eines [http://www.slf4j.org/api/org/slf4j/Logger.html Loggers] zur Verfügung: 
+
+<pre>
+    log.info "Hallo Welt"
+</pre>
+
+==== Audit Log ====
+Der Audit-Logger <code>de.uit.eai.portal.crud.auditLogger</code> steht zusätzlich zur Verfügung. Die intern ausgeführten SQL-Statements werden automatisch über diesen Logger ausgegeben.
+
+<pre>
+   audit 'Hallo Welt'
+</pre>
+
+Log4J Beispielkonfiguration:
+<pre>
+log4j.logger.de.uit.eai.portal.crud.auditLogger=INFO, audit
+log4j.appender.audit = org.apache.log4j.RollingFileAppender
+log4j.appender.audit.File = logs/audit.log
+log4j.appender.audit.Append = true
+log4j.appender.audit.MaxFileSize = 10MB
+log4j.appender.audit.DatePattern = '.'yyy-MM-dd
+log4j.appender.audit.layout = org.apache.log4j.PatternLayout
+log4j.appender.audit.layout.ConversionPattern = %d{yyyy-MM-dd HH:mm:ss} %c{1} [%p] %m%n
+</pre>
+
+=== Modale Fenster (Popup) ===
+
+==== Pop-Up ====
+
+Über das Closure <code>showPopup</code> lassen Pop-Ups anzeigen. Das Fenster besteht aus einer Kopfzeile mit Titel, einem Textbereich und einem Schießen-Button.
+
+Beispiel einfache Textmeldung:
+<pre>
+   showPopup "Titel", "Plaintext"
+</pre>
+
+
+Komplexe Formatierungen lassen sich mit Hilfe der Groovy-Klasse [http://groovy.codehaus.org/Creating+XML+using+Groovy%27s+MarkupBuilder groovy.xml.MarkupBuilder] gestalten.
+
+Beispiel Textmeldung in XHTML:
+<pre>
+showPopup "Titel", {
+      span('Überschrift')
+
+      div(style:'color:#ff0000', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.')
+
+      p()
+      table(border:'1', cellpadding:'10') {
+         tr() {
+            th('Prozent')
+            th('Währung')
+            th('Wert')
+         }
+         tr() {
+            td('77%')
+            td('€')
+            td('79')
+         }
+      }
+   }
+</pre>
+
+
+==== Bestätigungsdialog ====
+
+Für Sicherheitsabfragen existiert die Closure <code>confirm</code>, die wie folgt zu verwenden ist:
+
+<pre>
+    confirm("My Title", "Are you really really sure?", "Yes", "No") { dialog ->
+        showPopup "Titel", "Result: ${dialog.isConfirmed()}"
+    }
+</pre>
+
+Die übergebene Closure wird auch dann (unconfirmed) aufgerufen, wenn der Dialog mit 'X' geschlossen wird.
+
+==== Hinweise ====
+
+Aus dem Script heraus ist es möglich, drei Closures aufzurufen, welche jeweils verschiedene Arten von Hinweisen anzeigen: 
+* <code>showInfo</code> zeigt eine Info an.
+* <code>showWarning</code> zeigt eine Warnung an.
+* <code>showError</code> zeigt einen Fehler an.
+
+Diese Closures können wie folgt verwendet werden:
+
+<pre>
+    showInfo 'Dies ist eine Info'
+</pre>
+
+<pre>
+    showWarning 'Dies ist eine Warnung'
+</pre>
+
+<pre>
+    showError 'Dies ist ein Fehler'
+</pre>
+
+=== SQL-Zugriffe ===
+
+Innerhalb eines Skripts kann über folgende Syntax auf eine Instanz von [http://groovy.codehaus.org/Database+features groovy.sql.Sql] zugegriffen werden, um beliebige Datenbankoperationen durchzuführen.
+
+<pre>
+    sql("eai").eachRow("select * from test_crud2") { row ->
+        log.info "$row"
+    }
+</pre>
+
+=== Benutzer ===
+
+Über die Scripting-API kann über die Referenz <code>currentUser</code> auf den aktuell angemeldeten Benutzer zugreifen.
+
+Zugriff auf den Benutzernamen
+<pre>
+    // Gibt den Namen als String zurück.
+    currentUser.name
+</pre>
+
+Zugriff auf die Portalrollen des angemeldeten Benutzers im Portal
+<pre>
+    // Gibt die Rollen als Set<String> zurück.
+    currentUser.portalRoles
+</pre>
+
+Zugriff auf den Benutzerrollen
+<pre>
+    // Gibt die Rollen des aktuellen Benutzers als Set<String> zurück.
+    currentUser.roles
+</pre>
+
+=== Containerfilter ===
+Mittels <code>container.addFilters(...)</code> lassen sich per Scripting Filter auf dem Container setzten.
+
+<pre>
+   container.addFilters { equal "spalte1", "wert1" }
+   container.addFilters { greater "spalte2", 30 }
+   container.addFilters { greaterOrEqual "spalte3", 31 }
+   container.addFilters { less "spalte3", 32 }
+   container.addFilters { lessOrEqual "spalte4", 33 }
+   container.addFilters { endsWith "spalte5", "ende" }
+   container.addFilters { startsWith "spalte6", "start" }
+   container.addFilters { contains "spalte7", "wert1" }
+   container.addFilters { regexp "spalte8", "pattern", modifiers:'i' }
+   container.addFilters { any { equal "spalte9", "wert1"; less "spalte9", 22} }
+   container.addFilters { all { equal "spalte10", "wert1";  greater "spalte11", 1} }
+
+   // Alternativschreibweise
+   container.addFilters {
+      equal "spalte1", "wert1"
+      greater "spalte2", 30 
+      greaterOrEqual "spalte3", 31
+      less "spalte3", 32 
+      lessOrEqual "spalte4", 33 
+      endsWith "spalte5", "ende" 
+      startsWith "spalte6", "start" 
+      contains "spalte7", "wert1" 
+      any { 
+         equal "spalte8", "wert1"
+         less "spalte9", 22
+      }
+      all { 
+         equal "spalte10", "wert1"
+         greater "spalte11", 1
+      }
+</pre>
+
+Der Parameter "durable:true" ist optional. Filter mit dem Parameter "durable:true" werden nicht gelöscht, wenn <code>container.removeAllFilters()</code> aufgerufen wird. Beim Aufruf <code>container.removeAllFilters(true)</code> werden auch die <code>durable</code> Filter mit gelöscht.
+<pre>
+   container.addFilters { equal durable:true, "spalte1", "wert1" }
+   container.addFilters { greater durable:true, "spalte2", 30 }
+   container.addFilters { greaterOrEqual durable:true, "spalte3", 31 }
+   container.addFilters { less durable:true, "spalte3", 32 }
+   container.addFilters { lessOrEqual durable:true, "spalte4", 33 }
+   container.addFilters { endsWith durable:true, "spalte5", "ende" }
+   container.addFilters { startsWith durable:true, "spalte6", "start" }
+   container.addFilters { contains durable:true, "spalte7", "wert1" }
+   container.addFilters { any durable:true, { equal "spalte8", "wert1"; less "spalte9", 22} }
+   container.addFilters { all durable:true, { equal "spalte10", "wert1";  greater "spalte11", 1} }
+</pre>
+
+=== Script-Container ===
+Um dynamische Inhalte in einer Tabelle anzeigen zu können, kann über das Scripting ein Container implementiert werden. Alle operationen werden auf diesen Container delegiert. Dazu muss lediglich eine Klasse mit dem Interface [http://hg.d3.uid.de/eai-portal/file/default/eai-portal-support-scripting/src/main/java/de/unioninvestment/eai/portal/portlet/crud/scripting/model/ScriptContainerDelegate.java ScriptContainerDelegate] im Skript implementiert werden und am <code>script-container</code>-Tag im Attribut <code>delegate</code> mit <code>new</code> eine neue Instanz der Klasse übergeben werden.
+
+<pre>
+...
+   <table id="table1">
+      <script-container delegate="new MyCustomBackend()" />
+      ...
+   </table>
+...
+<script>
+   class MyCustomBackend implements ScriptContainerBackend {
+      ...
+   }
+</script>
+</pre>
+
+Beispielimplementierung: [http://hg.d3.uid.de/eai-portal/file/default/eai-portal-domain-crudportlet/src/test/resources/validScriptContainerConfig.xml validScriptContainerConfig.xml]
+
+==== ScriptContainerDelegate ====
+
+===== Metadaten =====
+Die Metadaten der einzelnen Spalten werden über Closure definiert:
+<pre>
+Closure metaData = {
+   ID(type:Long, readonly:true, required:true, partOfPrimaryKey:true)
+   CNUMBER5_2(type:Integer, readonly:false, required:false)
+   CTIMESTAMP(type:java.util.Date, readonly:true, required:false)
+   ...
+}
+</pre>
+Es ist zu beachten, dass das Closure <code>metaData</code> ein Pflichtattribut ist. Darin wird für jede Spalte in der Tabelle ein Closure definiert. Der Name des Closures ist der Titel der Spalte.
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Attribute 
+!Beschreibung 
+|-
+| type || Datentyp der Spalte
+|-
+| readonly || Ob die Spalte nur lesend genutzt werden soll
+|-
+| required || Ob es ein Pflichtfeld ist
+|-
+| partOfPrimaryKey || Ob der Inhalt der Spalte ein Teil des Primärschlüssels ist
+|}
+
+=== JMX ===
+Die folgenden Beispiele zeigen den Zugriff auf einen JMXWrapper. Mit dem JMXWrapper ist es möglich entweder eine Suche nach MBean-Attributen auszuführen (<code>jmxWrapper.query(String, List)</code>) oder ein MBean-Proxy vom Typ [http://groovy.codehaus.org/api/groovy/util/GroovyMBean.html <code>GroovyMBean</code>] zurückgeben zu lassen (<code>jmxWrapper.proxyFor(String)</code>).
+
+==== Suche nach MBean Attributen ====
+<pre>
+def result = jmx("<SERVER>:<PORT>").query(<QUERY>, <ATTRIBUTE>)
+</pre>
+<code><QUERY></code> Suchausdruck
+
+<code><ATTRIBUTE></code> Liste von kommaseparierten Attributsname. Keine Leerzeichen verwenden!
+
+Die Suche liefert ein <code>Map<String,Map<String,Object>></code> 
+
+Map<<code>ObjectName</code>,Map<<code>Attributsname</code>,<code>Attributswert</code>>>. 
+
+Beispiel:
+<pre>
+def result = jmx("service:jmx:rmi:///jndi/rmi://localhost:1090/jmxconnector")
+   .query("java.lang:type=ClassLoading", "LoadedClassCount,TotalLoadedClassCount")
+</pre>
+
+==== Zugriff auf einzelne [http://groovy.codehaus.org/api/groovy/util/GroovyMBean.html <code>GroovyMBeans</code>] ====
+<pre>
+GroovyMBean mBean = jmx("service:jmx:rmi:///jndi/rmi://<SERVER>:<PORT>/jmxconnector").proxyFor(<OBJECTNAME>)
+</pre>
+
+Beispiel:
+<pre>
+GroovyMBean mBean = jmx("service:jmx:rmi:///jndi/rmi://localhost:1090/jmxconnector").proxyFor("java.lang:type=ClassLoading")
+</pre>
+
+=== Ausführen eines Remote-Scripts ===
+Verfügt der Server-Node über das Remoting-Feature (Vorhandensein des MBeans <code>crud:name=script,service=CrudRemoteScript</code>),
+kann ein Remote-Script ausgeführt werden. Dieses Feature ist sehr nützlich, um nicht serialisierbare Objekte in serialisierbare Objekte umzuwandeln, die dann zum CRUD-Portlet übertragen werden können. 
+
+Es kann jedoch auch zur performanteren Abfrage von Daten sowie zur Übertragung von Binär-Dateien verwendet werden.
+
+Beispiel:
+<pre>
+   def data = jmx("service:jmx:rmi:///jndi/rmi://localhost:1090/jmxconnector").executeScript("""
+       def queues = new GroovyMBean(mbeanServer, "osiris:name=OsirisMonitorJMSMBean").listQueues()
+       return queues.collect {q -> [q.name, q.count,q.countDelta,q.messageCount,q.messageCountDelta,q.lastUpdate]}
+   """)
+</pre>
+
+=== Spalten dynamisch hinzufügen und entfernen ===
+
+Das <code>table</code>-Element bietet die Möglichkeit, dynamisch zur Laufzeit neue Spalten hinzuzufügen und zu entfernen. Zum Hinzufügen einer neuen Spalte muss einerseits der Spaltenname (eine eindeutige ID für die Spalte) und die Spaltenüberschrift übergeben werden und andererseits eine Closure, die den Inhalt der einzelnen Zellen der Spalte generiert. Die Closure bekommt die Zeile (<code>ScriptRow</code>) und den Vaadin-Builder übergeben und muss eine Vaadin-Komponenten (<code>com.vaadin.ui.Component</code>) zurückliefern.
+
+Im Skript sieht eine Methode zum Hinzufügen einer neuen Spalte so aus:
+
+ def addColumn(tableAction) {
+     def table = tableAction.table
+     table.addGeneratedColumn('column-name', 'Generierte Spalte') { row, builder ->
+       builder.label(value: 'Foo')
+ }
+
+Ein dynamisch hinzugefügte Zeile lässt sich auch wieder entfernen. Dazu ist nur der Name der Spalte (s.&nbsp;o.) anzugeben:
+
+ def removeColumn(tableAction) {
+     def table = tableAction.table
+     table.removeGeneratedColumn('column-name')
+ }
+
+Mit dieser Methode lassen sich allerdings nur die Spalten entfernen, die zuvor per <code>addGeneratedColumn</code> hinzugefügt wurden. Spalten, die per <code>column</code>-Tag deklariert wurden, lassen sich so nicht entfernen (allerdings ausblenden, siehe [[#Sichtbarkeit von Spalten beeinflussen|unten]]).
+
+Zusätzlich lässt sich per <code>hasGeneratedColumn</code> überprüfen, ob die Spalte mit einem bestimmten <code>columnName</code> hinzugefügt wurde oder nicht. Die Methode <code>clearAllGeneratedColumns</code> schließlich entfernt alle zuvor per <code>addGeneratedColumn</code> hinzugefügten Spalten.
+
+Benutzt man die Methoden <code>addGeneratedColumn</code> und <code>removeGeneratedColumn</code> direkt, wird die Tabelle nach jedem Aufruf neu gezeichnet. Möchte man mehrere Änderungen an der Tabelle direkt hintereinander durchführen, empfiehlt es sich, diese Änderungen in eine <code>renderOnce</code>-Closure zu verpacken. Die Methode <code>renderOnce</code> nimmt eine Closure entgegen; sie schaltet vor der Ausführung dieser Closure das automatische Neuzeichnen der Tabelle aus, führt die Closure aus und zeichnet die Tabelle ganz zuletzt neu. Werden mehrere Spalten hinzugefügt/entfernt, liefert dieses Verfahren eine verbesserte Rendering-Performance im Browser.
+
+Hier ein Beispiel für <code>renderOnce</code>:
+
+ def renderOnce(tableAction) {
+     def table = tableAction.table
+     table.renderOnce({
+         table.clearAllGeneratedColumns()
+         table.addGeneratedColumn('X1', 'X1') { row, builder -> builder.label(value: 'Bar') }
+         table.addGeneratedColumn('X2', 'X2') { row, builder -> builder.label(value: '42') }
+         table.addGeneratedColumn('X3', 'X3') { row, builder -> builder.label(value: '...') }
+     })
+ }
+
+Wenn die ''selben'' Spalten oft hinzugefügt und wieder entfernt werden, sollte man stattdessen ggf. als alternativen Ansatz erwägen, nur die Sichtbarkeit der Spalten zu ändern, siehe Abschnitt [[#Sichtbarkeit von Spalten beeinflussen|Sichtbarkeit von Spalten beeinflussen]].
+
+Die Methoden zum Ändern der Tabelle werden üblicherweise an zwei Stellen in der Konfiguration benutzt, einmal im <tt>onExecution</tt>-Attribut eines <tt>action</tt>-Elements oder im <tt>onInitialize</tt>-Attribut des <tt>table</tt>-Elements. Im ersten Fall wird der Methode eine <code>ScriptTableAction</code> übergeben, von der man sich die Tabelle geben lassen kann (wie in den obigen Beispielen). Im zweiten Fall wird der Methode direkt die Tabelle übergeben.
+
+Beispiele: 
+<pre>
+<action onExecution="addColumn(it)" title="Hinzufügen" />
+</pre>
+<pre>
+<table id="test-table" onInitialize="initialize(it)">
+</pre>
+
+
+=== Sichtbarkeit von Spalten beeinflussen ===
+
+Mit der Methode <tt>visibleColumns</tt> lässt sich gleichzeitig die Reihenfolge und die Sichtbarkeit der Spalten setzen. Alle Spalten, deren <code>columnName</code> in der übergebenen Liste enthalten sind, werden angezeigt, alle anderen nicht. Dies bezieht sich immer auf alle Spalten der Tabelle, egal ob per <tt>column</tt>-Tag deklariert oder per <tt>addGeneratedColumn</tt> hinzugefügt. Die Spalten werden in der Reihenfolge angeordnet, wie sie in der übergebenen Liste stehen.
+
+Beispiel:
+
+ def toggleVisibility(tableAction) {
+     def table = tableAction.table
+     visibleColumns = ['ID', 'CTIMESTAMP_NN', 'CDATE'] 
+     table.setVisibleColumns(visibleColumns)
+ }
+
+Bei per <tt>column</tt>-Tag deklarierten Spalten ist hier das Attribut <code>name</code> in der Liste zu verwenden, bei per <tt>addGeneratedColumn</tt> hinzugefügten Spalten der String, der als Argument <code>columnName</code> verwendet wurde.
+
+Die Methode <code>getVisibleColumns</code> liefert die Liste der momentan sichtbaren Spalten zurück.
+
+=== Sichtbarkeit von Table-Actions beeinflussen ===
+
+Ab: Version 1.32
+
+Die Schaltflächen, die zu einer Tabelle gehören (Table-Actions, Tag <code>action</code> innerhalb von <code>table</code>), lassen sich über die Methode <code>setTableActionVisibility</code> ein- und ausblenden. Die Methode wird auf der Tabelle aufgerufen. Das folgende Beispiel demonstriert dies anhand einer Schaltfläche, die nur im Edit-Modus sichtbar ist.
+
+ ...
+ <table onInitialize="setButtonVisibility(it, false)" onModeChange="setButtonVisibility(it, mode == 'EDIT')">
+     <database-table datasource="test" tablename="test_crud2" />
+     <action id="action" onExecution="doSomething" title="Ein Button" />
+ </table>
+ ...
+ <script><![CDATA[
+     def setButtonVisibility(table, visible) {
+         table.setTableActionVisibility('duplicate-button', visible)
+     }
+ ...
+ ]]></script>
+
+=== Zugriffsmethoden für Zeilen ===
+
+Ab: Version 1.32
+
+Das Table-Objekt bietet verschiedene Möglichkeiten, um auf bestimmte Zeilen zuzugreifen. Die meisten davon betreffen die momentan selektierten Zeilen.
+
+ // Alle selektierten Zeilen als List
+ def selectedRows = table.selectedRows()
+
+ // Die IDs aller selektierten Zeilen als Set
+ def selectedRowId = table.selection.ids.asList()
+
+ // Die IDs aller selektierten Zeilen als List
+ def selectedRowId = table.selection.ids.asList()
+
+ // Die IDs der ersten selektierten Zeile
+ def selectedRowId = table.selectedRows()[0]
+
+ // Eine Zeile anhand ihrer ID holen
+ def rowId = ...
+ def row = table.getRowById(rowId)
+
+ // Über alle Tabellenzeilen der Selektion iterieren:
+ // Bitte beachten: Diese Operation ist aufgrund eines Problems in Vaadin-Versionen < 6.8.5 extrem inperformant, wenn die Page-Grenze des Datenbank-Backend überschritten wird)
+ table.selection.eachRow { row -> log.info "Selektierte ID: " + row.values.ID }
+
+Ab: Version 1.45:
+
+ // Über alle Tabellenzeilen der aktuellen Tabelle iterieren 
+ table.eachRow { row -> log.info "Selektierte ID: " + row.values.ID }
+
+
+==== Massenoperationen ====
+
+Alle oben beschriebenen Operationen verwenden intern die Vaadin-API und kapseln Datenzugriffe vom Backend-Typ. Allerdings ist die Vaadin-API für Massenoperationen auf Datenbanken nicht so gut geeignet. Für diese Fälle gibt es bei Verwendung des DatabaseQuery-Backends die Möglichkeit, die Query für die aktuelle Ergebnismenge am Container anzufragen und z. B. eingebettet in eigene Queries wiederzuverwenden. Die Query wird als [http://groovy.codehaus.org/Strings+and+GString GString] geliefert:
+
+<pre>
+GString currentQuery = container.getCurrentQuery(preserveOrder: false)
+sql("eai").eachRow(currentQuery) { row ->
+  // do something with the row
+}
+</pre>
+
+==== Hilfsmethoden im Zusammenspiel Groovy-SQL ====
+
+Um die oben beschriebene Query auch in eigenen GString-Queries einzubetten, wurden zwei neue Methoden eingeführt: ''GString.flatten()'' und ''String.toGString()''. 
+
+Folgendes ist z. B. nicht möglich, denn Groovy-SQL macht aus jeder Variable im GString einen Prepared-Statement Parameter:
+
+ def ids = sql("eai").rows("select ID from ($currentQuery)").collect { it.ID }
+ 
+''flatten()'' führt in GStrings eingebettete Sub-GStrings zusammen, so dass Folgendes möglich ist:
+
+ // Einbetten von GString-Queries
+ GString idQuery = "select ID from ($currentQuery)".flatten()
+ def ids = sql("eai").rows(idQuery).collect { it.ID }
+ 
+ // Mix mit eigenen Parametern
+ String status = "changed"
+ GString statusQuery = "select ID from ($currentQuery) where status = $status"
+ def changedIds = sql("eai").rows(statusQuery).collect { it.ID }
+
+
+Eine weitere Hilfsmethode ist ''String.toGString()''. Diese wandelt Strings in GStrings um und kann dann zusammen mit "flatten()" benutzt werden, um eigene Queries zusammenzustellen:
+
+ // Folgendes geht z. B. nicht:
+ String idList = "1,2,3"
+ GString query = "select * from TEST where ID in ($idList)"
+ sql("eai").rows(query)
+
+ // Funktioniendes Beispiel:
+ GString idList = "1,2,3".toGString()
+ GString query = "select * from TEST where ID in ($idList)".flatten()
+ sql("eai").rows(query)
+
+Die beschriebene Funktionsweise kann zu sehr lesbarem Code führen, allerdings ist beim Schreiben und Ändern unbedingt ein gutes Verständnis des Zusammenspiels von GStrings mit [http://groovy.codehaus.org/api/groovy/sql/Sql.html Groovy-SQL] notwendig.
+
+=== Zeilen per Skript hinzufügen und vorbelegen ===
+
+Ab: Version 1.32
+
+Über die Methode <code>createNewRow(Map<String, Object>)</code> lasssen sich der Tabelle neue Zeilen hinzufügen. Die übergebene Map kann Vorbelegungen für die Werte der neuen Zeile enthalten. Die Keys sind dabei der Column Name. Im folgenden Beispiel wird eine selektierte Zeile dupliziert, d.&nbsp;h. einige Werte der selektierten Zeile werden als Werte der neuen Zeile vorbelegt.
+
+Die neue Zeile wird direkt ausgewählt und zum Editieren geöffnet.
+
+ def duplicateRow(table) {
+     if (!table.selection || table.selection.empty) {
+         showPopup "Keine Zeile ausgewählt", "Bitte wählen Sie eine Zeile zum Duplizieren aus." 
+     } else if (table.selection && table.selection.size() > 1) {
+         showPopup "Mehrere Zeilen ausgewählt", "Bitte wählen Sie nur eine Zeile zum Duplizieren aus." 
+     } else {
+         def selectedRow = table.selectedRows[0]
+         table.createNewRow([
+             'CNUMBER5_2': selectedRow.values['CNUMBER5_2'],
+             'CVARCHAR5_NN': selectedRow.values['CVARCHAR5_NN'],
+             'CNUMBER5_2_NN': selectedRow.values['CNUMBER5_2_NN']                
+         ])
+     }
+ }
+
+=== Dynamischer Schreibschutz fur Spalten und Zeilen in Tabellen ===
+
+Abgesehen von der normalen Möglichkeit Spalten vollständig editierbar oder schreibgeschützt zu machen, können sowohl ganze Zeilen als auch einzelne Felder einer Zeile dynamisch schreibgeschützt werden. Die untenstehenden Beispiel erläutern die jeweilige Verwendung.
+
+==== Zeilen dynamisch schützen ====
+
+Im untenstehenden Beispiel wird beim Anzeigen der Tabelle für jede Zeile überprüft ob in der Spalte der Wert 'freigegeben' steht und in diesem Fall die komplette Zeile schreibgeschützt, andernfalls ist die Zeile ganz normal editierbar.
+
+<pre>
+
+<page>
+  <table row-editable="isRowEditable(it, row)">
+     ...
+  </table>
+</page>
+
+<script><![CDATA[
+  def isRowEditable(table, row) {
+    // Bereits freigegebene Zeilen sind nicht mehr editierbar
+    return row.values.STATUS != 'freigegeben'
+  }
+]]></script>
+
+</pre>
+
+==== Felder dynamisch schützen ====
+
+Im Beispiel unten wird der dynamische Aspekt des Attributs des <code>editable</code>-Attributs am <code>column</code>-Element genutzt. Abgesehen von den Werten <code>true/false</code> kann in dem Attribut auch eine Groovy-Closure angegeben werden, die denn z.&nbsp;B. wie in diesem Beispiel eine komplexe Funktion des Main-Skripts aufruft um zu bestimmen ob ein Feld schreibbar ist oder nicht.
+
+Im Beispiel sind Felder von bereits freigegebenen Zeilen immer schreibgeschützt, Felder von neuen Zeilen können immer alle editiert werden. In allen anderen Fällen entscheidet der Inhalt der Zeile über den Schutz der Felder. Ist der Wert in der Spalte AcM "MEIER" kann in dieser Zeile das Feld Kirchenbak editiert werden. Ist der Wert in der Spalte AcM "SCHMITT" kann zwar nicht die Kirchenbank-, dafür aber die Zentralbank-Spalte editiert werden. In allen anderen Fällen wird als default <code>false</code> zurückgegeben und das Feld ist nicht editierbar.
+
+<pre>
+
+<page>
+  <table>
+     ...
+     <columns>
+       ...
+       <column name="STATUS" title="Freigabestatus" editable="isEditable(table, columnName, row)" />
+       <column name="ACM" title="AcM" editable="isEditable(table, columnName, row)" />
+       <column name="KIRCHENBANK" title="Kirchenbank?" editable="isEditable(table, columnName, row)" />
+       <column name="ZENTRALBANK" title="Zentralbank" editable="isEditable(table, columnName, row)" />
+       ...
+     </columns>
+  </table>
+</page>
+
+<script><![CDATA[
+  def isEditable(table, columnName, row) {
+    // Bereits freigegebene Zeilen sind nicht mehr editierbar
+    if ( row.values.STATUS == 'freigegeben' ) { return false }
+    // neue Spalten vollständig editierbar
+    else if ( row.values.STATUS == 'neu' ) { return false }
+    // Kirchenbank-Spalte editierbar für AcM Meier
+    else if ( row.values.ACM == 'MEIER' && columnName == 'KIRCHENBANK' ) { return true }
+    // Kirchenbank-Spalte nicht editierbar für AcM Schmitt
+    else if ( row.values.ACM == 'SCHMITT' && columnName == 'KIRCHENBANK' ) { return false }
+    // Zentralbank-Spalte editierbar für AcM Schmitt
+    else if ( row.values.ACM == 'SCHMITT' && columnName == 'ZENTRALBANK' ) { return true }
+    // Default: nicht editierbar
+    return false
+  }
+]]></script>
+
+</pre>
+
+=== Benutzerdefinierte GUI-Komponenten ===
+
+Um den Portlet-Entwicklern mehr Flexibilität beim Erzeugen von Oberflächen zu bieten, lassen sich durch Scripting auch weitere GUI-Komponenten abgesehen von den im Schema definierten erzeugen. Dafür wird das Element <tt>&lt;component&gt;</tt> angeboten, in dessen Attribut <tt>generator</tt> eine Closure definiert werden kann, die die generierte GUI-Komkponente zurück gibt. Innerhalb des Attributs ist über die Variable <tt>builder</tt> der Vaadin-Builder verfügbar. Die folgenden Beispiele demonstrieren die verwendung für die jeweiligen Komponenten.
+
+==== Buttons ====
+
+<pre class="brush:xml">
+<page>
+  <component generator="buildComponent(builder)" />
+</page>
+
+<script><![CDATA[
+  def buildComponent(builder) {
+    builder.button(caption:'Klick mich!', onclick: { event -> event.button.caption = 'geklickt!'})
+  }
+]]></script>
+</pre>
+
+==== Links ====
+
+<pre class="brush:xml">
+<page>
+  <component generator="buildComponent(builder)" />
+</page>
+
+<script><![CDATA[
+  def buildComponent(builder) {
+    builder.link(
+      resource: builder.externalResource('http://www.yahoo.de'), 
+      icon: builder.externalResource('http://l.yimg.com/a/i/ww/met/logo/20100909/yahoo_logo_de.png')
+    )
+  }
+]]></script>
+</pre>
+
+==== Download-Links ====
+
+<pre class="brush:xml">
+<page>
+    <component generator="buildComponent(builder)" />
+</page>
+
+<script><![CDATA[
+  def buildComponent(builder) {
+    builder.downloadLink(
+        caption: 'download-link',
+        filename: 'dateiname.txt',
+        mimetype: 'application/octet-stream',
+        stream: {
+            new java.net.URL('http://host/file).openStream()
+        }
+    )
+  }
+]]></script>
+</pre>
+
+==== Labels ====
+
+<pre class="brush:xml">
+<page>
+  <component generator="buildComponent(builder)" />
+</page>
+
+<script><![CDATA[
+  def buildComponent(builder) {
+    builder.label(caption: 'label-1')
+  }
+]]></script>
+</pre>
+
+==== Layouts ====
+
+Um benutzerdefinierte Komponenten besser anordnen zu können werden auch vertikale und horizontale Layouts unterstützt.
+
+<pre class="brush:xml">
+<page>
+  <component generator="buildVerticalLayout(builder)" />
+  <component generator="buildHorizontalLayout(builder)" />
+</page>
+
+<script><![CDATA[
+
+  def buildVerticalLayout(builder) {
+    builder.verticalLayout(spacing: true) {
+      label(caption: 'Mein Label')
+      builder.button(caption:'Klick mich!', onclick: { event -> event.button.caption = 'geklickt!'})
+    }
+  }
+  
+  def buildHorizontalLayout(builder) {
+    builder.horizontalLayout() {
+      builder.label(caption: 'Mein Label')
+      builder.button(caption:'Klick mich!', onclick: { event -> event.button.caption = 'geklickt!'})
+    }
+  }
+
+]]></script>
+</pre>
+
+==== Charting ====
+
+Im Skript steht dem Benutzer die komplette JFreeChart-API zur Verfügung, um Daten in Form von Charts darzustellen. Das folgende Beispiel zeigt, wie JFreeChart verwendet werden kann:
+
+<pre class="brush:xml">
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Charting Beispiel">
+	<page>
+		<component id="scriptComponent001" generator="buildComponent(builder)" />
+	</page>
+	<script><![CDATA[
+		import org.vaadin.addon.JFreeChartWrapper;
+		import org.jfree.chart.ChartFactory;
+		import org.jfree.chart.JFreeChart;
+		import org.jfree.chart.plot.PlotOrientation;
+		import org.jfree.data.category.CategoryDataset;
+		import org.jfree.data.category.DefaultCategoryDataset;
+		
+		def buildComponent(builder) {
+			CategoryDataset dataset = createDataset();
+			JFreeChart chart = ChartFactory.createBarChart("title", "category-axis-label", "value-axis-label", dataset, PlotOrientation.VERTICAL, true, false, false); 
+			return new JFreeChartWrapper(chart)
+		}
+		
+		def createDataset() {
+			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+			
+			// row keys...
+		        String series1 = "First";
+	        	String series2 = "Second";
+		        String series3 = "Third";
+	
+		        // column keys...
+	        	String category1 = "Category 1";
+		        String category2 = "Category 2";
+		        String category3 = "Category 3";
+		        String category4 = "Category 4";
+		        String category5 = "Category 5";
+			
+			dataset.addValue(1.0, series1, category1);
+		        dataset.addValue(4.0, series1, category2);
+		        dataset.addValue(3.0, series1, category3);
+		        dataset.addValue(5.0, series1, category4);
+		        dataset.addValue(5.0, series1, category5);
+	
+		        dataset.addValue(5.0, series2, category1);
+		        dataset.addValue(7.0, series2, category2);
+		        dataset.addValue(6.0, series2, category3);
+	        	dataset.addValue(8.0, series2, category4);
+		        dataset.addValue(4.0, series2, category5);
+	
+		        dataset.addValue(4.0, series3, category1);
+		        dataset.addValue(3.0, series3, category2);
+	        	dataset.addValue(2.0, series3, category3);
+		        dataset.addValue(3.0, series3, category4);
+		        dataset.addValue(6.0, series3, category5);
+			
+	        	return dataset;
+		}
+	]]></script>
+</portlet>
+</pre>
+
+Das Ergebnis sieht wie folgt aus:
+[[Datei:charting-example-001.png|thumb|500px|center|middle|Graph 'JFreeChart Beispiel]]
+
+Neben dem im Beispiel verwendeten '''DefaultCategoryDataset''' gibt es in JFreeChart bereits Implementierungen, die Daten aus der Datenbank aufbereiten können:
+* '''JDBCXYDataset''' (http://www.jfree.org/jfreechart/api/javadoc/org/jfree/data/jdbc/JDBCXYDataset.html)
+* '''JDBCCategoryDataset''' (http://www.jfree.org/jfreechart/api/javadoc/org/jfree/data/jdbc/JDBCCategoryDataset.html)
+* '''JDBCPieDataset''' (http://www.jfree.org/jfreechart/api/javadoc/org/jfree/data/jdbc/JDBCPieDataset.html)
+
+
+Wenn der Browser des Benutzers SVG unterstützt, werden die Charts als SVG gerendert, sonst als PNG. Stellt ein Chart viele Daten dar, kann das Anzeigen eines SVG zu Performance-Problemen führen. In diesem Fall sollte man explizit die Render-Methode wie folgt auf PNG einstellen:
+
+<pre class="brush:groovy">
+new JFreeChartWrapper(chart, JFreeChartWrapper.RenderingMode.PNG)
+</pre>
+
+==== VaadinBuilder ====
+
+Der VaadinBuilder ist eine in Groovy-Code verwendbare [http://groovy.codehaus.org/Builders Builder]-Komponente, über die sich per DSL Vaadin-Komponentenhierarchien erstellen lassen. Dies verbessert insbesondere die Lesbarkeit bei komplexeren Strukturen. Methodennamen beschreiben die zu erstellende Komponente ("button()" => com.vaadin.ui.Button) und Parameter die per Setter zu setzenden Eigenschaften.
+
+<pre class="brush:groovy">
+def layout = builder.verticalLayout {
+    label(value:'Hello World')
+}
+</pre>
+entspricht
+<pre class="brush:groovy">
+def layout = new VerticalLayout()
+def label = new Label()
+label.setValue('Hello World')
+layout.addComponent(label)
+</pre>
+
+
+'''Bitte beachten''': Die DSL ist nicht vollständig, sowohl was die verwendeten Vaadin-Komponenten als auch deren Eigenschaften angeht. Der Umfang entspricht vielmehr den bisherigen Erfordernissen aus der Entwicklung für den Bereich EAI.
+
+Ein Eindruck vom Umfang sowie weitere Beispiele finden sich in der Klasse [http://git.d3.uid.de/?p=crud2go.git;a=blob;f=eai-portal-support-vaadin/src/test/groovy/de/unioninvestment/eai/portal/support/vaadin/groovy/VaadinBuilderTest.groovy;h=b3c77cb76451feb8539e9b0fcc95c4e5286a5335;hb=HEAD VaadinBuilderTest].
+
+== Styles ==
+
+=== Mögliche Elemente ===
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Element
+!Beschreibung
+|-
+| table rowStyle="{Style_Name}" || Styling einer Tabellenzeile
+|-
+| column style="{Style_Name}" || Styling einer Tabellenspalte
+|}
+
+=== Alignment ===
+
+Das Alignment von Text in Tabellenspalten kann über folgende Styles angepasst werden:
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Element
+!Beschreibung
+|-
+| column style="'align_center'" || horizontal zentriert 
+|-
+| column style="'align_right'" || rechtsbündig 
+|}
+
+
+
+=== Union CI ===
+
+==== Primäres Farbklima (UI Blau) ====
+
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Style
+!Farbe
+!Invertiert
+|-
+| primaer_05 ||style="background-color:#E6EBF1"| #E6EBF1 || style="background-color:#DDE5ED"|#DDE5ED
+|-
+| primaer_10 ||style="background-color:#DDE5ED"| #DDE5ED|| style="background-color:#C5D2E2"|#C5D2E2
+|-
+| primaer_20 ||style="background-color:#C5D2E2"| #C5D2E2|| style="background-color:#A7BCD5"|#A7BCD5
+|-
+| primaer_35 ||style="background-color:#A7BCD5"| #A7BCD5|| style="background-color:#8DA8C5"|#8DA8C5
+|-
+| primaer_40 ||style="background-color:#8DA8C5"| #8DA8C5|| style="background-color:#5884AE"|#5884AE
+|-
+| primaer_55 ||style="background-color:#5884AE"| #5884AE|| style="background-color:#226796"|#226796
+|-
+| primaer_75 ||style="background-color:#226796"| #226796|| style="background-color:#003F74"|#003F74
+|}
+
+==== Ergänzungsfarben ====
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Style
+!Farbe
+!Invertiert
+|-
+| ergaenzung_gruen ||style="background-color:#AEC6A1"| #AEC6A1|| style="background-color:#88AC77"|#88AC77
+|-
+| ergaenzung_grau ||style="background-color:#D1D3D2"| #D1D3D2|| style="background-color:#A6AAAD"|#A6AAAD
+|}
+
+
+==== Auszeichnungsfarben ====
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Style
+!Farbe
+!Invertiert
+|-
+| auszeichnung_ocker ||style="background-color:#FBD69B"| #FBD69B|| style="background-color:#FAB94D"|#FAB94D
+|-
+| auszeichnung_rot ||style="background-color:#E0A0A0"| #E0A0A0|| style="background-color:#BF3954"|#BF3954
+|}
+
+==== Risikofarben ====
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Style
+!Farbe
+!Invertiert
+|-
+| risiko_geringe ||style="background-color:#019BF4"| #019BF4|| style="background-color:#017DC3"|#017DC3
+|-
+| risiko_moderate ||style="background-color:#00D6A1"| #00D6A1|| style="background-color:#00A57D"|#00A57D
+|-
+| risiko_erhoehte ||style="background-color:#FFF899"| #FFF899|| style="background-color:#FFF000"|#FFF000
+|-
+| risiko_hohe ||style="background-color:#FCBC69"| #FCBC69|| style="background-color:#FA9B1E"|#FA9B1E
+|-
+| risiko_sehr_hohe ||style="background-color:#FF6666"| #FF6666|| style="background-color:#FF0000"|#FF0000
+|}
+
+
+==== Finanzgruppe ====
+{|border="1" cellpadding="5" cellspacing="0" class="sortable"
+|- 
+!Style
+!Farbe
+!Invertiert
+|-
+| finanzgruppe_44 ||style="background-color:#0091FF"| #0091FF|| style="background-color:#0066B3"|#0066B3
+|-
+| finanzgruppe_08 ||style="background-color:#FF944D"| #FF944D|| style="background-color:#FF6600"|#FF6600
+|}
+
+
+
+==Hinweise und Beispiele zu der Crudportlet-Konfiguration==
+
+{{#ask: [[is related to::{{PAGENAMEE}}]] [[Kategorie:SOFIA]]
+|?has link=
+|?has name=
+|default=* Keine erfasst
+|format=ul
+|columns=4
+|template=QueryOutput23
+}}
+
+
+
+{{SOFIA-Startseite}}
+
+
+[[Category:EAI]]
+[[Category:EAI-Frontend]]
