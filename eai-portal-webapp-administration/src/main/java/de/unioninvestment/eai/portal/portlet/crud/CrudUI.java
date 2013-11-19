@@ -220,7 +220,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		PortletResponse portletResponse = VaadinPortletService
 				.getCurrentResponse().getPortletResponse();
 		if (portletResponse instanceof RenderResponse) {
-			((RenderResponse) portletResponse).setTitle(escapedTitle);
+			((RenderResponse) portletResponse).setTitle(realTitle);
 		} else {
 			// document.querySelectorAll("#portlet_crudportlet_WAR_eaiadministration_INSTANCE_qeH6QK9czlb6 .portlet-title-text")[0].childNodes[0].nodeValue
 			// = 'Releaseplaner - Applikationen'
