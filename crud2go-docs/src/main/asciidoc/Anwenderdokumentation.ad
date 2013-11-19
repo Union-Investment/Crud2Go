@@ -1,11 +1,11 @@
-
 Anwenderdokumentation
-====================
-:author:		Carsten Mjartan
+=====================
+:author: Carsten Mjartan
 :linkcss!:
-:imagesdir:		./images
+:imagesdir: ./images
 
-== Einleitung
+== Einleitung 
+
 
 In dem EAI-Administration-Portal-Server ist das CRUD-Portlet eine
 Portalanwendung, die sich, sofern es die Benutzerrechte zulassen,
@@ -19,7 +19,7 @@ Die Bedienung des Portals und des Portlets ist für Endanwender im
 *link:SOFIA/CRUD-Portlet/Allgemeines Benutzerhandbuch[Allgemeinen
 Benutzerhandbuch]* erläutert.
 
-== Benutzeroberfläche
+== Benutzeroberfläche 
 
 * Die Konfiguration des Portlets erfolgt i. d. R. einmalig direkt nach
 dessen Erstellung über eine XML-Datei, die bei entsprechenden Rechten
@@ -78,20 +78,31 @@ XSD-Einbindung kann über den folgenden Link gemacht werden:
 Das `portlet`-Element ist das Root Element der Konfiguration und kann
 über ein `titel` Attribute den Portlettitel definieren.
 
-[cols=",,,",options="header",]
+[cols="2,3,1,2",options="header"]
 |=======================================================================
-|Attribut |Beschreibung |Pflicht |Standard
-|titel |Der Portlet Titel. |nein |[multiblock cell omitted]
+|Attribut
+|Beschreibung 
+|Pflicht 
+|Standard
 
-|refresh-on-page-reload |Wenn aktiviert, werden beim Neuladen einer
-Seite mit einer bereits geladenen Konfiguration die Daten aller Tabellen
-und Dropdowns aktualisiert. |nein |false
+|title 
+|Der Portlet Titel. 
+|nein 
+|[multiblock cell omitted]
 
-|onRefresh |Closure, die bei einem Refresh des Portlets augerufen wird
-|nein |[multiblock cell omitted]
+|refresh-on-page-reload 
+|Wenn aktiviert, werden beim Neuladen einer Seite mit einer bereits geladenen Konfiguration die Daten aller Tabellen und Dropdowns aktualisiert. 
+|nein 
+|false
 
-|onReload |Closure, die bem Reload der Portalseite aufgerufen wird, z.
-B. um einen Refresh selbst zu kontrollieren |nein
+|onRefresh 
+|Closure, die bei einem Refresh des Portlets augerufen wird
+|nein 
+|[multiblock cell omitted]
+
+|onReload 
+|Closure, die bem Reload der Portalseite aufgerufen wird, z. B. um einen Refresh selbst zu kontrollieren 
+|nein
 |[multiblock cell omitted]
 |=======================================================================
 
