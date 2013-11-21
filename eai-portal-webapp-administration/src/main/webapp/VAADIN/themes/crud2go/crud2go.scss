@@ -245,8 +245,16 @@
 		font-weight: bold;
 	}
 
-    td.v-table-cell-content-linethrough {
-      text-decoration-line: line-through;
+    /* Sonstiges */
+
+    tr.v-table-row-linethrough, td.v-table-cell-content-linethrough {
+        text-decoration: line-through;
     }
+
+    /* fuer Multiline ... */
+    tr.v-table-row-linethrough .v-label, td.v-table-cell-content-linethrough .v-label {
+      text-decoration: line-through;
+    }
+
 }
 

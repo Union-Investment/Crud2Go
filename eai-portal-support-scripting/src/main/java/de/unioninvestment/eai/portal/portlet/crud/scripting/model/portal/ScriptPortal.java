@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal;
 
 import java.io.Serializable;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,8 +69,22 @@ public class ScriptPortal implements Serializable {
 			throws URISyntaxException {
 		portal.open(friendlyUrl, args);
 	}
-	
-	public Map<String,String[]> getParameters() {
+
+    /**
+     * Öffnet eine Portalseite im Browser.
+     *
+     * @param friendlyUrl
+     *            "friendly URL" der Portalseite
+     *
+     * @throws URISyntaxException
+     *             falls die sich ergebende URI syntaktisch inkorrekt ist
+     */
+    public void open(String friendlyUrl)
+            throws URISyntaxException {
+        portal.open(friendlyUrl, null);
+    }
+
+    public Map<String,String[]> getParameters() {
 		return portal.getParameters();
 	}
 }

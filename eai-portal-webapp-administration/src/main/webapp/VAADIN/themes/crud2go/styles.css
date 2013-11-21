@@ -5968,6 +5968,10 @@ body .crud2go.v-app {
 	font-weight: bold;
 }
 
-.crud2go td.v-table-cell-content-linethrough {
-	text-decoration-line: line-through;
+.crud2go tr.v-table-row-linethrough, .crud2go td.v-table-cell-content-linethrough {
+	text-decoration: line-through;
+}
+
+.crud2go tr.v-table-row-linethrough .v-label, .crud2go td.v-table-cell-content-linethrough .v-label {
+	text-decoration: line-through;
 }

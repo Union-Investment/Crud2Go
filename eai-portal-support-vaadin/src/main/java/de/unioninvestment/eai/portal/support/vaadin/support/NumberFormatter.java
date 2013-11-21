@@ -109,7 +109,7 @@ public class NumberFormatter implements Converter<String, Number> {
 
 		} catch (Exception e) {
 			throw new ConversionException(
-					"Bitte geben Sie einge gültige Zahl vom Typ '"
+					"Bitte geben Sie eine gültige Zahl vom Typ '"
 							+ targetClass.getSimpleName() + "' an.");
 		}
 

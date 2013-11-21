@@ -216,6 +216,13 @@ public class Portal {
 		return result;
 	}
 
+    /**
+     * Opens a new portal page in the current browser window
+     *
+     * @param friendlyUrl the url of the target page
+     * @param parameters map of strings that are passed as portal parameters
+     * @throws URISyntaxException
+     */
 	public void open(String friendlyUrl, Map<String,String> parameters) throws URISyntaxException {
 		URIBuilder uriBuilder = new URIBuilder(friendlyUrl);
 		if (parameters != null) {
