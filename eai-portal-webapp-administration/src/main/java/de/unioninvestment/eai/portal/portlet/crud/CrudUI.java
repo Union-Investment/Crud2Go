@@ -498,30 +498,34 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	public void handleRenderRequest(final RenderRequest request,
 			RenderResponse response, UI ui) {
 		LOG.debug("Handling render request...");
-		if (portletDomain != null) {
-			if (portletDomain.getTitle() != null) {
-				response.setTitle(portletDomain.getTitle());
-			}
-			if (firstLoad) {
-				firstLoad = false;
-			} else if (request.getPortletMode() == PortletMode.VIEW) {
-				accessSynchronously(new Runnable() {
-					@Override
-					public void run() {
-						portletDomain.handleReload();
-					}
-				});
-			}
-		}
-		if (portletUriFragmentUtility != null) {
-			// portletUriFragmentUtility.setInitialFragment();
-		}
-		accessSynchronously(new Runnable() {
-			@Override
-			public void run() {
-				handleViewChange(request);
-			}
-		});
+        if (getSession() != null) {
+            if (portletDomain != null) {
+                if (portletDomain.getTitle() != null) {
+                    response.setTitle(portletDomain.getTitle());
+                }
+                if (firstLoad) {
+                    firstLoad = false;
+                } else if (request.getPortletMode() == PortletMode.VIEW) {
+                    accessSynchronously(new Runnable() {
+                        @Override
+                        public void run() {
+                            portletDomain.handleReload();
+                        }
+                    });
+                }
+            }
+            if (portletUriFragmentUtility != null) {
+                // portletUriFragmentUtility.setInitialFragment();
+            }
+            accessSynchronously(new Runnable() {
+                @Override
+                public void run() {
+                    handleViewChange(request);
+                }
+            });
+        } else {
+            LOG.warn("Session is NULL during render request");
+        }
 	}
 
 	@Override

@@ -60,6 +60,8 @@ import org.springframework.mock.web.portlet.MockPortletURL;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.vaadin.server.Page;
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
@@ -161,6 +163,11 @@ public class CrudUITest extends SpringPortletContextTest {
 	@Rule
 	public LiferayContext liferayContext = new LiferayContext("4711", 14008L);
 
+	private VaadinSession vaadinSession;
+
+	@Mock
+	private VaadinService vaadinServiceMock;
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		MockitoAnnotations.initMocks(this);
@@ -194,6 +201,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		when(Page.getCurrent().getWebBrowser()).thenReturn(browserMock);
 		when(browserMock.getLocale()).thenReturn(Locale.GERMANY);
 
+		vaadinSession = new VaadinSession(vaadinServiceMock);
 	}
 
 	/**
@@ -428,11 +436,25 @@ public class CrudUITest extends SpringPortletContextTest {
 		initializeUI();
 		app.setPortletDomain(portletMock);
 		app.initializing = false;
+		app.setSession(vaadinSession);
 		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.VIEW);
+		
 
 		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
 
 		verify(portletMock, times(1)).handleReload();
+	}
+
+	@Test
+	public void shouldIgnoreRenderRequestsWithoutSession() {
+		initializeUI();
+		app.setPortletDomain(portletMock);
+		app.initializing = false;
+		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.VIEW);
+		
+		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+
+		verify(portletMock, never()).handleReload();
 	}
 
 	@Test
