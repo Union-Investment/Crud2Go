@@ -92,16 +92,24 @@ public class CrudUITest extends SpringPortletContextTest {
 	@InjectMocks
 	private CrudUI app = new CrudUI() {
 		@Override
-		public void accessSynchronously(Runnable runnable) throws com.vaadin.ui.UIDetachedException {
+		public void accessSynchronously(Runnable runnable)
+				throws com.vaadin.ui.UIDetachedException {
 			runnable.run();
 		};
+
 		@Override
 		public Future<Void> access(Runnable runnable) {
 			runnable.run();
 			return null;
 		};
-		protected org.springframework.context.ApplicationContext getSpringContext(com.vaadin.server.VaadinRequest request) {
+
+		protected org.springframework.context.ApplicationContext getSpringContext(
+				com.vaadin.server.VaadinRequest request) {
 			return null;
+		};
+
+		public VaadinSession getSession() {
+			return vaadinSession;
 		};
 	};
 
@@ -200,8 +208,6 @@ public class CrudUITest extends SpringPortletContextTest {
 
 		when(Page.getCurrent().getWebBrowser()).thenReturn(browserMock);
 		when(browserMock.getLocale()).thenReturn(Locale.GERMANY);
-
-		vaadinSession = new VaadinSession(vaadinServiceMock);
 	}
 
 	/**
@@ -240,7 +246,8 @@ public class CrudUITest extends SpringPortletContextTest {
 		provideUserWithRoles();
 		initializeUI();
 
-		verify(liferayContext.getVaadinSessionMock()).setErrorHandler(isA(CrudErrorHandler.class));
+		verify(liferayContext.getVaadinSessionMock()).setErrorHandler(
+				isA(CrudErrorHandler.class));
 	}
 
 	private void initializeUI() {
@@ -413,9 +420,8 @@ public class CrudUITest extends SpringPortletContextTest {
 
 		when(
 				scriptModelFactoryMock.getBuilder(any(EventBus.class),
-						any(Portlet.class),
-						any((Map.class))))
-				.thenAnswer(new Answer<ScriptModelBuilder>() {
+						any(Portlet.class), any((Map.class)))).thenAnswer(
+				new Answer<ScriptModelBuilder>() {
 					@Override
 					public ScriptModelBuilder answer(InvocationOnMock invocation)
 							throws Throwable {
@@ -436,9 +442,8 @@ public class CrudUITest extends SpringPortletContextTest {
 		initializeUI();
 		app.setPortletDomain(portletMock);
 		app.initializing = false;
-		app.setSession(vaadinSession);
 		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.VIEW);
-		
+		vaadinSession = new VaadinSession(vaadinServiceMock);
 
 		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
 
@@ -450,8 +455,9 @@ public class CrudUITest extends SpringPortletContextTest {
 		initializeUI();
 		app.setPortletDomain(portletMock);
 		app.initializing = false;
+		vaadinSession = null;
 		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.VIEW);
-		
+
 		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
 
 		verify(portletMock, never()).handleReload();
@@ -463,15 +469,21 @@ public class CrudUITest extends SpringPortletContextTest {
 		app.setPortletDomain(portletMock);
 		app.initializing = false;
 		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.EDIT);
-		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
-
-		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+		vaadinSession = new VaadinSession(vaadinServiceMock);
+		try {
+			app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+			app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+			
+		} catch (Exception e) {
+			// ignore exceptions
+		}
 
 		verify(portletMock, never()).handleReload();
 	}
 
 	@Test
 	public void shouldNotInformPortletDomainAboutReloadOnInitializingRenderRequest() {
+		vaadinSession = new VaadinSession(vaadinServiceMock);
 		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
 		verify(portletMock, never()).handleReload();
 	}
