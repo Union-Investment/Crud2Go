@@ -163,6 +163,10 @@ public class SourceTransformer {
 							&& SCRIPT_TAG.equals(nameLocalPart)) {
 						String value = getSrcAttribute(element);
 						if (value != null) {
+							if(!value.endsWith("groovy")){
+								throw new IOException("Incorrect include path "+value+" in script element. It does not have groovy extension");
+							}
+							
 							insertScriptContent = true;
 							scriptContent = getScriptContent(basePath, value);
 							result = RESULT.PORTLET_PROCESSING_DONE;
