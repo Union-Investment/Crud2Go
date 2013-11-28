@@ -138,6 +138,17 @@
     	border-color: $error;
 	}
 
+	// error in editform datefield
+	.v-datefield-error .v-datefield-textfield {
+    	border: 1px solid $error;	
+	}
+		
+	// error in editform dropdown
+	.v-filterselect-error .v-filterselect-input {
+    	border: 1px solid $error;
+	}
+	
+
 	.v-label-error {
 		color: $error;
     	font-weight: bold;

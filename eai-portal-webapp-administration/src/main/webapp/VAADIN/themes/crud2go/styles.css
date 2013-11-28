@@ -5106,6 +5106,14 @@ body .crud2go.v-app {
 	border-color: #ff0000;
 }
 
+.crud2go .v-datefield-error .v-datefield-textfield {
+	border: 1px solid #ff0000;
+}
+
+.crud2go .v-filterselect-error .v-filterselect-input {
+	border: 1px solid #ff0000;
+}
+
 .crud2go .v-label-error {
 	color: #ff0000;
 	font-weight: bold;
