@@ -93,7 +93,7 @@ public class FieldValidatorFactory {
 		}
 		String msg = validationMessage;
 		if (msg == null) {
-			msg = Context.getMessage("portlet.crud.error.validation.defaultMessage");
+			msg = Context.getMessage("portlet.crud.error.validation.defaultMessage", commaSeparatedRules);
 		}
 
 		String[] ruleList = commaDelimitedListToStringArray(
