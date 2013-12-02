@@ -160,6 +160,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 	private RequestProcessingLabel requestProcessingLabel;
 
+	private TimingPortletListener timingPortletListener;
+
 	/**
 	 * Initialisierung des PortletPresenter.
 	 * 
@@ -167,10 +169,6 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	@Override
 	public void doInit(VaadinRequest request) {
 		autowireUiDependencies(request);
-		
-		// deprecated, but currently the only way
-		VaadinPortletSession portletSession = (VaadinPortletSession) VaadinPortletSession
-				.getCurrent();
 
 		VaadinSession.getCurrent().setErrorHandler(new CrudErrorHandler());
 
@@ -185,7 +183,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		recreateEditPage();
 		refreshViews();
 
-		portletSession.addPortletListener(this);
+		getPortletSession().addPortletListener(this);
 	}
 
 	private void autowireUiDependencies(VaadinRequest request) {
@@ -194,7 +192,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			context.getAutowireCapableBeanFactory().autowireBean(this);
 		}
 	}
-	
+
 	protected ApplicationContext getSpringContext(VaadinRequest request) {
 		PortletRequest currentRequest = VaadinPortletService
 				.getCurrentPortletRequest();
@@ -210,7 +208,6 @@ public class CrudUI extends LiferayUI implements PortletListener,
 					"Found no current portlet request. Did you subclass PortletApplication in your Vaadin Application?");
 		}
 	}
-
 
 	private void tryToSetPortletTitle(String title) {
 		String realTitle = title != null ? title : Context
@@ -369,17 +366,16 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		if (settings.isDisplayRequestProcessingInfo()) {
 			if (requestProcessingLabel == null) {
 				requestProcessingLabel = new RequestProcessingLabel();
-				VaadinPortletSession portletSession = (VaadinPortletSession) VaadinPortletSession
-						.getCurrent();
-				portletSession.addPortletListener(new TimingPortletListener(
-						requestProcessingLabel));
-			} 
+				timingPortletListener = new TimingPortletListener(
+						requestProcessingLabel);
+				getPortletSession().addPortletListener(timingPortletListener);
+			}
 			viewPage.addComponent(requestProcessingLabel);
 			viewPage.setComponentAlignment(requestProcessingLabel,
 					Alignment.MIDDLE_RIGHT);
 		}
 	}
-	
+
 	private ConfigStatus getConfigStatus(Config portletConfig) {
 		if (portletConfig == null) {
 			return ConfigStatus.NO_CONFIG;
@@ -442,11 +438,21 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		dropConfiguration();
 		destroyDomain();
 
+		removeTimingPortletListener();
+
 		removeAddedComponentsFromView();
 
 		viewPage.removeAllComponents();
 
 		addHiddenPortletId(viewPage);
+	}
+
+	private void removeTimingPortletListener() {
+		if (timingPortletListener != null) {
+			getPortletSession().removePortletListener(timingPortletListener);
+			timingPortletListener = null;
+		}
+
 	}
 
 	private void recreateEditPage() {
@@ -489,43 +495,61 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		container.addComponent(labelForCommunityId);
 	}
 
+	@Override
+	public void detach() {
+		getPortletSession().removePortletListener(this);
+		removeTimingPortletListener();
+	}
+
+	private VaadinPortletSession getPortletSession() {
+		// deprecated, but currently the only way
+		VaadinPortletSession portletSession = (VaadinPortletSession) VaadinPortletSession
+				.getCurrent();
+		return portletSession;
+	}
+
 	/**
 	 * Setzt den konfigurierten PortletPresenter-Title während des
-	 * Render-Request.
+	 * Render-Request. Erkennung von Reloads / Seitenwechseln.
 	 * 
-	 * {@inheritDoc}
+	 * @param ui
+	 *            ist hier immer NULL. Da die PortletSession aber nur pro
+	 *            Portletinstanz gilt kann <code>this</code> verwendet werden.
 	 */
+	@Override
 	public void handleRenderRequest(final RenderRequest request,
 			RenderResponse response, UI ui) {
 		LOG.debug("Handling render request...");
-        if (getSession() != null) {
-            if (portletDomain != null) {
-                if (portletDomain.getTitle() != null) {
-                    response.setTitle(portletDomain.getTitle());
-                }
-                if (firstLoad) {
-                    firstLoad = false;
-                } else if (request.getPortletMode() == PortletMode.VIEW) {
-                    accessSynchronously(new Runnable() {
-                        @Override
-                        public void run() {
-                            portletDomain.handleReload();
-                        }
-                    });
-                }
-            }
-            if (portletUriFragmentUtility != null) {
-                // portletUriFragmentUtility.setInitialFragment();
-            }
-            accessSynchronously(new Runnable() {
-                @Override
-                public void run() {
-                    handleViewChange(request);
-                }
-            });
-        } else {
-            LOG.warn("Session is NULL during render request");
-        }
+		if (getSession() != null) {
+			if (portletDomain != null) {
+				if (portletDomain.getTitle() != null) {
+					response.setTitle(portletDomain.getTitle());
+				}
+				if (firstLoad) {
+					firstLoad = false;
+				} else if (request.getPortletMode() == PortletMode.VIEW) {
+					accessSynchronously(new Runnable() {
+						@Override
+						public void run() {
+							portletDomain.handleReload();
+						}
+					});
+				}
+			}
+			if (portletUriFragmentUtility != null) {
+				// portletUriFragmentUtility.setInitialFragment();
+			}
+			accessSynchronously(new Runnable() {
+				@Override
+				public void run() {
+					handleViewChange(request);
+				}
+			});
+		} else {
+			// TODO check production logs and then remove query
+			// should not happen any more as listener is removed on detach
+			LOG.warn("Session is NULL during render request");
+		}
 	}
 
 	@Override
@@ -548,7 +572,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	@Override
 	public void handleResourceRequest(ResourceRequest request,
 			ResourceResponse response, UI ui) {
-		
+
 		LOG.debug("Handling resource request...");
 		handleViewChange(request);
 	}
