@@ -3,7 +3,7 @@
 	title="Einfaches Remote Backend Beispiel">
 	<page>
 		<table>
-			<jmx-container server="service:jmx:rmi:///jndi/rmi://10.253.129.8:1090/jmxconnector">
+			<jmx-container server="10.253.129.8:1090">
 				<attribute name="Name" type="java.lang.String" readonly="true">
 					<server-side-getter>
 						<![CDATA[

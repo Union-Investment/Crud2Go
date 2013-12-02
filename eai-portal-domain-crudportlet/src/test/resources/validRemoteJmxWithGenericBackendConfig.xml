@@ -3,22 +3,17 @@
 	title="Beispiel für Script-Container">
 	<page>
 		<table id="table1">
-			<script-container delegate="new MyCustomBackend()" />
+			<script-container delegate="backend" />
 			<action onExecution="it.table.refresh()" title="refresh"></action>
 		</table>
 
 	</page>
 	<script><![CDATA[
-	class Global {
-			static portlet
-			static jmx
-		}
-		
-		Global.portlet = portlet
-		Global.jmx = jmx
+	
+	backend = new MyCustomBackend(main:this)
 	
     class MyCustomBackend implements ScriptContainerBackend {
-    
+    	def main
     	
 		Closure metaData = {
 			FILENAME(type:String,readonly:true, required:true, partOfPrimaryKey:true)
@@ -27,7 +22,7 @@
 		}
 		
 		List read() {
-			def file = Global.jmx("service:jmx:rmi:///jndi/rmi://localhost:1090/jmxconnector").executeScript("return new File('C:\\\\')")
+			def file = main.jmx("localhost:1090").executeScript("return new File('C:\\\\')")
 			return file.listFiles().collect {currentFile -> [currentFile.name,currentFile.absolutePath,new java.util.Date(currentFile.lastModified())]}
 		}
 		

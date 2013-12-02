@@ -22,14 +22,18 @@
 			</action>
 		</form>
 		<table id="table1">
-			<script-container delegate="new MyCustomBackend()" />
+			<script-container delegate="backend" />
 			<action onExecution="it.table.refresh()" title="refresh"></action>
 		</table>
 
 	</page>
 	<script><![CDATA[
+
+	backend = new MyCustomBackend(main: this)
+
     class MyCustomBackend implements ScriptContainerBackend {
-    
+        def main
+
     	Map data = [:] as LinkedHashMap
     	
 		Closure metaData = {
@@ -73,6 +77,7 @@
 				} else if (row.isDeleted()) {
 					data.remove(row.values.ID)	
 				}
+				main.log.info "Processing row with ID ${row.id.asMap()}"
 			}
 		}
 	}
