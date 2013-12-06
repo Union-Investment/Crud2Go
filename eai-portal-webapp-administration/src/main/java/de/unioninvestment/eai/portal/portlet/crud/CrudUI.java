@@ -154,7 +154,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 	ConfigStatus status = ConfigStatus.START;
 	boolean initializing = true;
-	boolean firstLoad = false; // true only after config change via edit page
+    boolean configChanged = false;
 
 	Config portletConfig;
 
@@ -258,6 +258,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	private void handleConfigurationUpdatedEvent(ConfigurationUpdatedEvent event) {
 		cleanupViewPage();
 		initializeEventBus();
+        configChanged = true;
+
 		if (!event.isConfigurable()) {
 			PortletUtils.switchPortletMode(PortletMode.VIEW);
 		}
@@ -525,9 +527,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 				if (portletDomain.getTitle() != null) {
 					response.setTitle(portletDomain.getTitle());
 				}
-				if (firstLoad) {
-					firstLoad = false;
-				} else if (request.getPortletMode() == PortletMode.VIEW) {
+				if (!configChanged && request.getPortletMode() == PortletMode.VIEW) {
 					accessSynchronously(new Runnable() {
 						@Override
 						public void run() {
@@ -536,6 +536,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 					});
 				}
 			}
+
 			if (portletUriFragmentUtility != null) {
 				// portletUriFragmentUtility.setInitialFragment();
 			}
@@ -545,6 +546,9 @@ public class CrudUI extends LiferayUI implements PortletListener,
 					handleViewChange(request);
 				}
 			});
+
+            configChanged = false;
+
 		} else {
 			// TODO check production logs and then remove query
 			// should not happen any more as listener is removed on detach
@@ -586,7 +590,6 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			// }
 			if (request.getPortletMode() == PortletMode.VIEW) {
 				if (getContent() != viewPage && status == ConfigStatus.UNKNOWN) {
-					firstLoad = true;
 					refreshViews();
 				}
 				setContent(viewPage);
