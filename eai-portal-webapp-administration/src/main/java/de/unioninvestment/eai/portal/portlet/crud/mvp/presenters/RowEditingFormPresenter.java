@@ -196,8 +196,8 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	public void save() {
 		try {
 			List<String> modifiedFieldNames = getModifiedFieldNames();
+            Map<String, Object> modifiedColumnNames = getModifiedFieldValues(modifiedFieldNames);
 			getView().commit();
-			Map<String, Object> modifiedColumnNames = getModifiedFieldValues(modifiedFieldNames);
 
 			try {
 				fireRowChangeEvent(modifiedColumnNames);
