@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.services;
 
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
@@ -52,7 +54,7 @@ public class ConfigurationCachingServiceAspect {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ConfigurationCachingServiceAspect.class);
 	
-	@Autowired
+	@Autowired @Qualifier("portletCache")
 	private Ehcache cache;
 
 	@Autowired
@@ -141,7 +143,7 @@ public class ConfigurationCachingServiceAspect {
 		return portletId + "." + communityId;
 	}
 
-	public void setCache(Ehcache cache) {
+	public void setCache(Cache cache) {
 		this.cache = cache;
 	}
 

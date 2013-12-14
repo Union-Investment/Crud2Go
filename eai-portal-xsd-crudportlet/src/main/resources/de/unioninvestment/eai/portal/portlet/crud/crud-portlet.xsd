@@ -2780,6 +2780,13 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="cached" type="boolean" use="optional">
+					<annotation>
+						<documentation>
+							Angabe, ob die Anfrage gecached werden soll
+						</documentation>
+					</annotation>
+				</attribute>
 			</extension>
 		</simpleContent>
 	</complexType>

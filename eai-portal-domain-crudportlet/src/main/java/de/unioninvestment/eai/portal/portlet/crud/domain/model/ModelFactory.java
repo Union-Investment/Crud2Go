@@ -37,6 +37,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.QueryOptionListRepository;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
@@ -67,6 +68,9 @@ public class ModelFactory {
 
 	@Autowired
 	private CryptorFactory cryptorFactory;
+
+	@Autowired
+	private QueryOptionListRepository queryOptionListRepository;
 
 	/**
 	 * Konstruktor.
@@ -261,7 +265,7 @@ public class ModelFactory {
 	public QueryOptionList getQueryOptionList(EventBus eventBus,
 			SelectConfig config, String datasource) {
 		return new QueryOptionList(config, eventBus,
-				connectionPoolFactory.getPool(datasource), prefetchExecutor);
+				queryOptionListRepository, datasource, prefetchExecutor);
 	}
 
 }

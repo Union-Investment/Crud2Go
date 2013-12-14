@@ -23,13 +23,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,20 +42,20 @@ import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.springframework.jdbc.core.RowMapper;
+
+import com.google.common.collect.ImmutableMap;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.InitializeTypeConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.QueryConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.QueryOptionListRepository;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public class QueryOptionListTest {
@@ -68,10 +66,7 @@ public class QueryOptionListTest {
 	private EventBus eventBusMock;
 
 	@Mock
-	private ResultSet resultSet;
-
-	@Mock
-	private ConnectionPool connectionPool;
+	private QueryOptionListRepository repositoryMock;
 
 	private SelectConfig config;
 
@@ -95,6 +90,7 @@ public class QueryOptionListTest {
 
 		QueryConfig queryConfig = new QueryConfig();
 		queryConfig.setValue(query);
+		queryConfig.setCached(false);
 		config.setQuery(queryConfig);
 
 	}
@@ -102,28 +98,16 @@ public class QueryOptionListTest {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void shouldSupportQueryForOptions() {
-		selection = new QueryOptionList(config, eventBusMock, connectionPool,
-				executorMock);
+		selection = new QueryOptionList(config, eventBusMock, repositoryMock,
+				"ds", executorMock);
 
-		String nullSafeQuery = QueryOptionList.nullSafeQuery(query);
-		doAnswer(new Answer<Object>() {
-			@Override
-			public Object answer(InvocationOnMock invocation) throws Throwable {
-				RowMapper<?> rowmapper = (RowMapper<?>) invocation
-						.getArguments()[1];
+		ImmutableMap<String, String> exampleOptions = ImmutableMap
+				.<String, String> builder() //
+				.put("key1", "title1") //
+				.put("key2", "title").build();
 
-				when(resultSet.getString("key")).thenReturn("key1");
-				when(resultSet.getString("title")).thenReturn("title1");
-
-				rowmapper.mapRow(resultSet, 0);
-
-				when(resultSet.getString("key")).thenReturn("key2");
-				when(resultSet.getString("title")).thenReturn("title2");
-				rowmapper.mapRow(resultSet, 1);
-				return null;
-			}
-		}).when(connectionPool).executeWithJdbcTemplate(
-				Mockito.eq(nullSafeQuery), Mockito.any(RowMapper.class));
+		when(repositoryMock.getOptions("ds", query, false))
+				.thenReturn(exampleOptions);
 
 		Iterator<Entry<String, String>> it = selection.getOptions(null)
 				.entrySet().iterator();
@@ -133,20 +117,11 @@ public class QueryOptionListTest {
 	}
 
 	@Test
-	public void shouldCreateQueryWithoutNullValues() {
-		assertThat(
-				QueryOptionList
-						.nullSafeQuery("select a as key, b as title from table"),
-				is("select key, title from (select a as key, b as title from table) where key is not null and title is not null"));
-	}
-
-	@Test
 	@SuppressWarnings("unchecked")
 	public void shouldPrefetchOnLoadWithAsyncConfig() {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
 
-		new QueryOptionList(config,
-				eventBusMock, connectionPool, executorMock);
+		new QueryOptionList(config, eventBusMock, repositoryMock, "ds", executorMock);
 
 		verify(executorMock).submit(any(Callable.class));
 	}
@@ -158,7 +133,7 @@ public class QueryOptionListTest {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
 		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
 		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, connectionPool, executorMock);
+				eventBusMock, repositoryMock, "ds", executorMock);
 
 		queryOptionList.refresh();
 
@@ -172,8 +147,7 @@ public class QueryOptionListTest {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
 		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
 		final QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock,
-				connectionPool, executorMock);
+				eventBusMock, repositoryMock, "ds", executorMock);
 
 		when(futureMock.get()).thenAnswer(new Answer<Object>() {
 			public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -192,8 +166,7 @@ public class QueryOptionListTest {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
 		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
 		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock,
-				connectionPool, executorMock);
+				eventBusMock, repositoryMock, "ds", executorMock);
 
 		when(futureMock.get()).thenThrow(
 				new ExecutionException(new RuntimeException("Test")));
@@ -209,7 +182,7 @@ public class QueryOptionListTest {
 		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
 
 		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, connectionPool, executorMock) {
+				eventBusMock, repositoryMock, "ds", executorMock) {
 			protected java.util.Map<String, String> loadOptions() {
 				return singletonMap("A", "B");
 			};
@@ -227,7 +200,7 @@ public class QueryOptionListTest {
 		options.put("key", "value");
 
 		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, connectionPool, executorMock);
+				eventBusMock, repositoryMock, "ds", executorMock);
 		queryOptionList.setOptions(options);
 
 		final List<OptionList> result = new ArrayList<OptionList>();
@@ -252,7 +225,7 @@ public class QueryOptionListTest {
 		options.put("key", "value");
 
 		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, connectionPool, executorMock);
+				eventBusMock, repositoryMock, "ds", executorMock);
 		queryOptionList.setOptions(options);
 
 		queryOptionList.addChangeListener(listenerMock);
@@ -267,7 +240,7 @@ public class QueryOptionListTest {
 		Map<String, String> options = new HashMap<String, String>();
 
 		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, connectionPool, executorMock);
+				eventBusMock, repositoryMock, "ds", executorMock);
 		queryOptionList.setOptions(options);
 
 		verify(eventBusMock).addHandler(PortletRefreshedEvent.class,
@@ -277,5 +250,5 @@ public class QueryOptionListTest {
 
 		assertThat(queryOptionList.getOptions(), is(nullValue()));
 	}
-	
+
 }

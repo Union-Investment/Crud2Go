@@ -29,7 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -52,7 +52,7 @@ public class ConfigurationCachingServiceAspectTest {
 	private ConfigurationCachingServiceAspect cachingAspect = new ConfigurationCachingServiceAspect();;
 
 	@Mock
-	private Ehcache cacheMock;
+	private Cache cacheMock;
 
 	@Mock
 	private Settings settingsMock;

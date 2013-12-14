@@ -26,5 +26,12 @@
         timeToLiveSeconds="0"
         overflowToDisk="false"
         />
+
+    <cache name="optionListCache"
+        maxElementsInMemory="500"
+        timeToIdleSeconds="900"
+        timeToLiveSeconds="0"
+        overflowToDisk="false"
+        />
 </ehcache>
 

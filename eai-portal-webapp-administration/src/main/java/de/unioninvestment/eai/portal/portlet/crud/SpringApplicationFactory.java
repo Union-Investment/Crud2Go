@@ -18,18 +18,25 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.core.io.ClassPathResource;
 import org.xml.sax.SAXException;
 
 import com.cybercom.vaadin.spring.UIScope;
@@ -52,7 +59,6 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFac
  * 
  * @author carsten.mjartan
  */
-@Lazy
 @Configuration
 public class SpringApplicationFactory {
 
@@ -147,6 +153,35 @@ public class SpringApplicationFactory {
 	@Bean
 	public List<EditorSupport> editorSupport() {
 		return getDataTypeHelpers(EditorSupport.class);
+	}
+
+	/*
+	 * Caching
+	 */
+
+	@Bean
+	public CacheManager cacheManager() throws IOException {
+		return CacheManager.newInstance(cacheConfigLocation().getInputStream());
+	}
+
+	private ClassPathResource cacheConfigLocation() {
+		ClassPathResource configLocation = new ClassPathResource(
+				"eai/ehcache.xml", SpringApplicationFactory.class.getClassLoader());
+		if (!configLocation.exists()) {
+			configLocation = new ClassPathResource("ehcache.xml",
+					SpringApplicationFactory.class.getClassLoader());
+		}
+		return configLocation;
+	}
+
+	@Bean @Qualifier("portletCache")
+	public Ehcache portletCache() throws IOException {
+		return cacheManager().getEhcache("portletCache");
+	}
+
+	@Bean @Qualifier("optionListCache")
+	public Ehcache optionListCache(CacheManager cacheManager) throws IOException {
+		return cacheManager().getEhcache("optionListCache");
 	}
 
 	/**

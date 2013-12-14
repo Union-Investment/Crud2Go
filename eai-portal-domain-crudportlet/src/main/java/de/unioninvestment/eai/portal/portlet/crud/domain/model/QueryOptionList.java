@@ -18,9 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -30,12 +27,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.RowMapper;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.InitializeTypeConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.QueryOptionListRepository;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
@@ -59,13 +55,19 @@ public class QueryOptionList extends VolatileOptionList {
 	private volatile Map<String, String> options;
 
 	private String query;
-	private ConnectionPool connectionPool;
 	private Object lock = new Object();
 	private String id;
 	private boolean lazy;
 	private boolean prefetched;
+	private boolean useCache;
+	
 	private final ExecutorService prefetchExecutor;
 
+	private QueryOptionListRepository repository;
+
+	private String dataSource;
+	
+	
 	/**
 	 * Konstruktor mit Parametern. Wird verwendet, wenn die Optionen aus der
 	 * Daten Datenbank gelesen werden sollen.
@@ -79,13 +81,16 @@ public class QueryOptionList extends VolatileOptionList {
 	 *            executes the prefetch operation, if configured
 	 */
 	public QueryOptionList(SelectConfig config, EventBus eventBus,
-			ConnectionPool connectionPool, ExecutorService asyncExecutor) {
+			QueryOptionListRepository repository, String dataSource, ExecutorService asyncExecutor) {
 		super(eventBus);
-		this.connectionPool = connectionPool;
+		this.dataSource = dataSource;
 		this.prefetchExecutor = asyncExecutor;
-
+		this.repository = repository;
+		
 		this.id = config.getId();
 		this.query = config.getQuery().getValue();
+
+		this.useCache = !Boolean.FALSE.equals(config.getQuery().isCached()); 
 
 		InitializeTypeConfig initialize = config.getQuery().getInitialize();
 		this.lazy = initialize.equals(InitializeTypeConfig.LAZY)
@@ -187,38 +192,12 @@ public class QueryOptionList extends VolatileOptionList {
 		LOGGER.debug("Loading option list {}", logId());
 		long startTime = System.currentTimeMillis();
 
-		String nullSafeQuery = nullSafeQuery(query);
-		final LinkedHashMap<String, String> newOptions = new LinkedHashMap<String, String>();
-		connectionPool.executeWithJdbcTemplate(nullSafeQuery,
-				new RowMapper<Object>() {
-					@Override
-					public Object mapRow(ResultSet rs, int rowNum)
-							throws SQLException {
-						newOptions.put(rs.getString("key"),
-								rs.getString("title"));
-						return null;
-					}
-				});
+		Map<String, String> newOptions = repository.getOptions(dataSource, query, useCache);
 
 		long duration = System.currentTimeMillis() - startTime;
 		LOGGER.debug("Finished loading option list {} ({}ms)", logId(),
 				duration);
 		return newOptions;
-	}
-
-	/**
-	 * Macht eine Abfrage NULL-Sicher.
-	 * 
-	 * @param query
-	 *            Abfrage
-	 * @return NULL-Sichere-Abfrage
-	 */
-	static String nullSafeQuery(String query) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("select key, title from (");
-		sb.append(query);
-		sb.append(") where key is not null and title is not null");
-		return sb.toString();
 	}
 
 	/**

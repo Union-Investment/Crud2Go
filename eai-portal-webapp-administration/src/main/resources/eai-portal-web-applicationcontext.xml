@@ -78,23 +78,6 @@
 	<jee:jndi-lookup id="dataSource"
 		jndi-name="${portlet.crud.storage.datasource}" />
 
-	<!-- Caching -->
-
-	<bean id="cacheManager"
-		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-		<property name="configLocation">
-			<value>classpath:ehcache.xml</value>
-		</property>
-	</bean>
-
-	<bean id="crudCacheFactory" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
-		<property name="cacheManager">
-			<ref local="cacheManager" />
-		</property>
-		<property name="cacheName">
-			<value>crudPortletCache</value>
-		</property>
-	</bean>
 
 	<!-- Threading -->
 
