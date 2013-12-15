@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für eine Tabelle auf Basis einer Query">
+	<page>
+		<form id="form_TEST_CRUD2" columns="8">
+			<field name="ID" />
+			<field name="CNUMBER5_2" />
+			<field name="CDATE" />
+			<field name="CTIMESTAMP" />
+			<field name="CVARCHAR5_NN" />
+			<field name="CNUMBER5_2_NN">
+				<select id="dropdown">
+					<query datasource="test">
+						select CNUMBER5_2_NN as key, CNUMBER5_2_NN as title from test_crud2
+					</query>
+				</select>
+			</field>
+			<field name="CDATE_NN" />
+			<field name="CTIMESTAMP_NN" />
+			<field name="TESTDATA" />
+			<action title="Suche" id="search_TEST_CRUD2">
+				<search>
+					<apply-filters>
+						<equals column="ID" field="ID" />
+						<equals column="CNUMBER5_2" field="CNUMBER5_2" />
+						<equals column="CDATE" field="CDATE" />
+						<equals column="CTIMESTAMP" field="CTIMESTAMP" />
+						<contains column="CVARCHAR5_NN" field="CVARCHAR5_NN"
+							case-sensitive="true" />
+						<equals column="CNUMBER5_2_NN" field="CNUMBER5_2_NN" />
+						<equals column="CDATE_NN" field="CDATE_NN" />
+						<equals column="CTIMESTAMP_NN" field="CTIMESTAMP_NN" />
+						<contains column="TESTDATA" field="TESTDATA"
+							case-sensitive="true" />
+					</apply-filters>
+				</search>
+			</action>
+			<action title="Suche zurücksetzen" id="reset_TEST_CRUD2">
+				<reset />
+			</action>
+		</form>
+		<table id="table" row-height="30" >
+			<database-query datasource="test" onCommit="portlet.elements.dropdown.refresh()">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_CRUD2
+					  (
+					    CNUMBER5_2,
+					    CDATE,
+					    CTIMESTAMP,
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN,
+					    TESTDATA
+					  )
+					  VALUES
+					  (
+					    $row.values.CNUMBER5_2,
+					    $row.values.CDATE,
+					    SYSDATE,
+					    $row.values.CVARCHAR5_NN,
+					    $row.values.CNUMBER5_2_NN,
+					    $row.values.CDATE_NN,
+					    SYSDATE,
+					    $row.values.TESTDATA
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						ID			  = $row.values.ID,
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CDATE	      = $row.values.CDATE,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+						CDATE_NN	  = $row.values.CDATE_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.id.ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_CRUD2
+					WHERE ID = $row.id.ID
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true" editable="true" />
+				<column name="CNUMBER5_2" title="Zahl" editable="true" />
+				<column name="CDATE" editable="false" />
+				<column name="CTIMESTAMP" />
+				<column name="CVARCHAR5_NN" editable="true"
+					longtitle="CVARCHAR5 (Pflichtfeld)" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN" hidden="true" />
+				<column name="TESTDATA" editable="true" width="300"
+					validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt" />
+			</columns>
+		</table>
+	</page>
+</portlet>

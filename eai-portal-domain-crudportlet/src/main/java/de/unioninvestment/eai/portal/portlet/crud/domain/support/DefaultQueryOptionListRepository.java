@@ -37,6 +37,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 
@@ -45,8 +48,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool
 public class DefaultQueryOptionListRepository implements
 		QueryOptionListRepository {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(DefaultQueryOptionListRepository.class);
+	private static final Logger CACHE_LOGGER = LoggerFactory
+			.getLogger("de.unioninvestment.crud2go.optionListCache");
 
 	ConnectionPoolFactory connectionPoolFactory;
 
@@ -71,11 +74,12 @@ public class DefaultQueryOptionListRepository implements
 	private Map<String, String> getOptionsWithCaching(String dataSource, String query) {
 		Serializable key = createKey(dataSource, query);
 		Element element = cache.get(key);
-
+		Map<String, String> options = null;
+		
 		if (element == null) {
 		    try {
 		        // Value not cached - fetch it
-		        Map<String, String> options = getOptionsFromDatabase(dataSource, query);
+		        options = getOptionsFromDatabase(dataSource, query);
 		        element = new Element(key, options);
 		        
 		    } catch (final Throwable throwable) {
@@ -86,15 +90,20 @@ public class DefaultQueryOptionListRepository implements
 		        
 		    } finally {
 		        cache.put(element);
+		        CACHE_LOGGER.debug("Caching option list [{}] ({} elements)", key, options.size());
 		    }
+		} else {
+			options = (Map<String, String>) element.getObjectValue();
+	        CACHE_LOGGER.debug("Using cached option list [{}] ({} elements)", key, options.size());
 		}
-		return (Map<String, String>) element.getObjectValue();
+		return options;
 	}
 
 	static String createKey(String dataSource, String query) {
-		return dataSource + "|" + query;
+		Iterable<String> lines = Splitter.on('\n').trimResults().omitEmptyStrings().split(query);
+		return dataSource + "|" + Joiner.on(' ').join(lines);
 	}
-
+	
 	private Map<String, String> getOptionsFromDatabase(String dataSource, String query) {
 		ConnectionPool pool = connectionPoolFactory.getPool(dataSource);
 		
@@ -129,8 +138,17 @@ public class DefaultQueryOptionListRepository implements
 		return sb.toString();
 	}
 
+    @Override
 	public boolean isQueryInCache(String dataSource, String query) {
 		return cache.isKeyInCache(createKey(dataSource, query));
 	}
 
+	@Override
+	public void evict(String datasSource, String query) {
+		String key = createKey(datasSource, query);
+		boolean evicted = cache.remove(key);
+		if (evicted) {
+			CACHE_LOGGER.debug("Removed option list from cache [{}]", key);
+		}
+	}
 }

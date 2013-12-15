@@ -72,7 +72,6 @@ public class DefaultQueryOptionListRepositoryTest {
 	@Captor
 	private ArgumentCaptor<Element> elementCaptor;
 
-
 	private static CacheManager singletonManager;
 
 	@BeforeClass
@@ -80,18 +79,20 @@ public class DefaultQueryOptionListRepositoryTest {
 		singletonManager = CacheManager.create();
 		singletonManager.addCache("testCache");
 	}
-	
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 
-		when(connectionPoolFactoryMock.getPool("ds")).thenReturn(connectionPoolMock);
-		
+		when(connectionPoolFactoryMock.getPool("ds")).thenReturn(
+				connectionPoolMock);
+
 		cache = singletonManager.getCache("testCache");
 		cache.removeAll();
 
-		repository = new DefaultQueryOptionListRepository(connectionPoolFactoryMock, cache);
-		
+		repository = new DefaultQueryOptionListRepository(
+				connectionPoolFactoryMock, cache);
+
 		stubDatabaseInteraction();
 	}
 
@@ -139,8 +140,9 @@ public class DefaultQueryOptionListRepositoryTest {
 		assertThat(it.next().getKey(), is("key1"));
 		assertThat(it.next().getKey(), is("key2"));
 		assertThat(it.hasNext(), is(false));
-		
-		assertThat((Map<String,String>)cache.get(createKey(query)).getObjectValue(), equalTo(options));
+
+		assertThat((Map<String, String>) cache.get(createKey(query))
+				.getObjectValue(), equalTo(options));
 	}
 
 	@Test
@@ -150,13 +152,14 @@ public class DefaultQueryOptionListRepositoryTest {
 		Map<String, String> options2 = repository.getOptions("ds", query, true);
 
 		assertThat(options2, equalTo(options));
-		verify(connectionPoolMock, times(1)).executeWithJdbcTemplate(Mockito.anyString(), Mockito.any(RowMapper.class));
+		verify(connectionPoolMock, times(1)).executeWithJdbcTemplate(
+				Mockito.anyString(), Mockito.any(RowMapper.class));
 	}
 
 	@Test
 	public void shouldInformAboutExistenceInCacheWithoutLocking() {
 		assertThat(repository.isQueryInCache("ds", query), is(false));
-		
+
 		repository.getOptions("ds", query, true);
 		assertThat(repository.isQueryInCache("ds", query), is(true));
 	}
@@ -171,5 +174,12 @@ public class DefaultQueryOptionListRepositoryTest {
 				DefaultQueryOptionListRepository
 						.nullSafeQuery("select a as key, b as title from table"),
 				is("select key, title from (select a as key, b as title from table) where key is not null and title is not null"));
+	}
+
+	@Test
+	public void shouldCreateKeyNormalizingWhitespaces() {
+		assertThat(DefaultQueryOptionListRepository.createKey("ds",
+				"   \t\tselect * \n\t\tfrom x\nwhere 1=2\n"),
+				is("ds|select * from x where 1=2"));
 	}
 }

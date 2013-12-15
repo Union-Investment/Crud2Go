@@ -98,8 +98,7 @@ public class QueryOptionListTest {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void shouldSupportQueryForOptions() {
-		selection = new QueryOptionList(config, eventBusMock, repositoryMock,
-				"ds", executorMock);
+		selection = createDefaultQueryOptionList();
 
 		ImmutableMap<String, String> exampleOptions = ImmutableMap
 				.<String, String> builder() //
@@ -116,12 +115,17 @@ public class QueryOptionListTest {
 		assertThat(it.hasNext(), is(false));
 	}
 
+	private QueryOptionList createDefaultQueryOptionList() {
+		return new QueryOptionList(config, eventBusMock, repositoryMock,
+				"ds", executorMock, false);
+	}
+
 	@Test
 	@SuppressWarnings("unchecked")
 	public void shouldPrefetchOnLoadWithAsyncConfig() {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
 
-		new QueryOptionList(config, eventBusMock, repositoryMock, "ds", executorMock);
+		createDefaultQueryOptionList();
 
 		verify(executorMock).submit(any(Callable.class));
 	}
@@ -132,8 +136,7 @@ public class QueryOptionListTest {
 			throws InterruptedException, ExecutionException {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
 		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
-		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, repositoryMock, "ds", executorMock);
+		QueryOptionList queryOptionList = createDefaultQueryOptionList();
 
 		queryOptionList.refresh();
 
@@ -146,8 +149,7 @@ public class QueryOptionListTest {
 			throws InterruptedException, ExecutionException {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
 		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
-		final QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, repositoryMock, "ds", executorMock);
+		final QueryOptionList queryOptionList = createDefaultQueryOptionList();
 
 		when(futureMock.get()).thenAnswer(new Answer<Object>() {
 			public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -165,8 +167,7 @@ public class QueryOptionListTest {
 			throws InterruptedException, ExecutionException {
 		config.getQuery().setInitialize(InitializeTypeConfig.ASYNC);
 		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
-		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, repositoryMock, "ds", executorMock);
+		QueryOptionList queryOptionList = createDefaultQueryOptionList();
 
 		when(futureMock.get()).thenThrow(
 				new ExecutionException(new RuntimeException("Test")));
@@ -182,7 +183,7 @@ public class QueryOptionListTest {
 		when(executorMock.submit(any(Callable.class))).thenReturn(futureMock);
 
 		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, repositoryMock, "ds", executorMock) {
+				eventBusMock, repositoryMock, "ds", executorMock, false) {
 			protected java.util.Map<String, String> loadOptions() {
 				return singletonMap("A", "B");
 			};
@@ -199,8 +200,7 @@ public class QueryOptionListTest {
 		Map<String, String> options = new HashMap<String, String>();
 		options.put("key", "value");
 
-		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, repositoryMock, "ds", executorMock);
+		QueryOptionList queryOptionList = createDefaultQueryOptionList();
 		queryOptionList.setOptions(options);
 
 		final List<OptionList> result = new ArrayList<OptionList>();
@@ -224,8 +224,7 @@ public class QueryOptionListTest {
 		Map<String, String> options = new HashMap<String, String>();
 		options.put("key", "value");
 
-		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, repositoryMock, "ds", executorMock);
+		QueryOptionList queryOptionList = createDefaultQueryOptionList();
 		queryOptionList.setOptions(options);
 
 		queryOptionList.addChangeListener(listenerMock);
@@ -239,8 +238,7 @@ public class QueryOptionListTest {
 	public void shouldRefreshOnRefreshedEvent() {
 		Map<String, String> options = new HashMap<String, String>();
 
-		QueryOptionList queryOptionList = new QueryOptionList(config,
-				eventBusMock, repositoryMock, "ds", executorMock);
+		QueryOptionList queryOptionList = createDefaultQueryOptionList();
 		queryOptionList.setOptions(options);
 
 		verify(eventBusMock).addHandler(PortletRefreshedEvent.class,

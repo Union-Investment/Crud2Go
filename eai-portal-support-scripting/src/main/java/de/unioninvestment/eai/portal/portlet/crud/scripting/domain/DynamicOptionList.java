@@ -125,10 +125,10 @@ public class DynamicOptionList extends VolatileOptionList {
 	}
 
 	@Override
-	public void refresh() {
+	public void refresh(RefreshPolicy policy) {
 		fireChangeEvent(false);
 	}
-
+	
 	@Override
 	public boolean isLazy() {
 		return false;

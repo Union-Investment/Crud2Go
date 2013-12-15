@@ -65,12 +65,15 @@ public class ModelFactory {
 	@Autowired
 	@Qualifier("prefetchExecutor")
 	private ExecutorService prefetchExecutor;
-
+	
 	@Autowired
 	private CryptorFactory cryptorFactory;
 
 	@Autowired
 	private QueryOptionListRepository queryOptionListRepository;
+
+	@Value("${portlet.crud.optionListCache.cacheDefault}")
+	private boolean useOptionListCacheByDefault;
 
 	/**
 	 * Konstruktor.
@@ -265,7 +268,7 @@ public class ModelFactory {
 	public QueryOptionList getQueryOptionList(EventBus eventBus,
 			SelectConfig config, String datasource) {
 		return new QueryOptionList(config, eventBus,
-				queryOptionListRepository, datasource, prefetchExecutor);
+				queryOptionListRepository, datasource, prefetchExecutor, useOptionListCacheByDefault);
 	}
 
 }

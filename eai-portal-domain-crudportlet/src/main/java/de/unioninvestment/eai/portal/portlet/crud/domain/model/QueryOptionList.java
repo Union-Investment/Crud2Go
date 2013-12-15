@@ -60,14 +60,15 @@ public class QueryOptionList extends VolatileOptionList {
 	private boolean lazy;
 	private boolean prefetched;
 	private boolean useCache;
-	
+
 	private final ExecutorService prefetchExecutor;
 
 	private QueryOptionListRepository repository;
 
 	private String dataSource;
-	
-	
+
+	private boolean useCacheByDefault;
+
 	/**
 	 * Konstruktor mit Parametern. Wird verwendet, wenn die Optionen aus der
 	 * Daten Datenbank gelesen werden sollen.
@@ -75,22 +76,26 @@ public class QueryOptionList extends VolatileOptionList {
 	 * @param config
 	 *            Konfiguration der Auswahl-Box
 	 * @param eventBus
-	 * @param connectionPool
-	 *            Connection-Pool
+	 * @param repository
+	 *            repository for query retrieval which also provides caching
+	 *            functionality
 	 * @param asyncExecutor
 	 *            executes the prefetch operation, if configured
 	 */
 	public QueryOptionList(SelectConfig config, EventBus eventBus,
-			QueryOptionListRepository repository, String dataSource, ExecutorService asyncExecutor) {
+			QueryOptionListRepository repository, String dataSource,
+			ExecutorService asyncExecutor, boolean useCacheByDefault) {
 		super(eventBus);
 		this.dataSource = dataSource;
 		this.prefetchExecutor = asyncExecutor;
 		this.repository = repository;
-		
+		this.useCacheByDefault = useCacheByDefault;
+
 		this.id = config.getId();
 		this.query = config.getQuery().getValue();
 
-		this.useCache = !Boolean.FALSE.equals(config.getQuery().isCached()); 
+		this.useCache = config.getQuery().isCached() == null ? useCacheByDefault
+				: config.getQuery().isCached();
 
 		InitializeTypeConfig initialize = config.getQuery().getInitialize();
 		this.lazy = initialize.equals(InitializeTypeConfig.LAZY)
@@ -192,7 +197,8 @@ public class QueryOptionList extends VolatileOptionList {
 		LOGGER.debug("Loading option list {}", logId());
 		long startTime = System.currentTimeMillis();
 
-		Map<String, String> newOptions = repository.getOptions(dataSource, query, useCache);
+		Map<String, String> newOptions = repository.getOptions(dataSource,
+				query, useCache);
 
 		long duration = System.currentTimeMillis() - startTime;
 		LOGGER.debug("Finished loading option list {} ({}ms)", logId(),
@@ -215,8 +221,11 @@ public class QueryOptionList extends VolatileOptionList {
 	 * Entfernt die gepufferten Werte.
 	 */
 	@Override
-	public void refresh() {
+	public void refresh(RefreshPolicy policy) {
 		synchronized (lock) {
+			if (policy == RefreshPolicy.FROM_SOURCE && useCache) {
+				repository.evict(dataSource, query);
+			}
 			options = null;
 			if (prefetched) {
 				startPrefetch();

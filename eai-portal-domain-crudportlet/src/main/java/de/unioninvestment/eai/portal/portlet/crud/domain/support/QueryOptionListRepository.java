@@ -23,5 +23,9 @@ import java.util.Map;
 
 public interface QueryOptionListRepository {
 
-	public Map<String,String> getOptions(String dataSource, String query, boolean useCache);
+	Map<String,String> getOptions(String dataSource, String query, boolean useCache);
+
+    boolean isQueryInCache(String dataSource, String query);
+
+    void evict(String datasSource, String query);
 }

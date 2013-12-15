@@ -12,6 +12,11 @@ public abstract class VolatileOptionList implements OptionList,
 
 	private static final long serialVersionUID = 1L;
 	
+	public enum RefreshPolicy {
+		FROM_CACHE,
+		FROM_SOURCE
+	}
+	
 	private EventRouter<OptionListChangeEventHandler, OptionListChangeEvent> changeEventRouter = new EventRouter<OptionListChangeEventHandler, OptionListChangeEvent>();
 
 	/**
@@ -42,8 +47,12 @@ public abstract class VolatileOptionList implements OptionList,
 	 */
 	@Override
 	public void onPortletRefresh(PortletRefreshedEvent event) {
-		refresh();
+		refresh(RefreshPolicy.FROM_CACHE);
 	}
 
-	public abstract void refresh();
+	public void refresh() {
+		refresh(RefreshPolicy.FROM_SOURCE);
+	}
+	
+	public abstract void refresh(RefreshPolicy policy);
 }
