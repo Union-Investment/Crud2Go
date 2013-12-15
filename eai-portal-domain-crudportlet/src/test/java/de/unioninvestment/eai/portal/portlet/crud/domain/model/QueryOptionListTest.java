@@ -81,6 +81,8 @@ public class QueryOptionListTest {
 	@Mock
 	private Future<?> futureMock;
 
+	private QueryConfig queryConfig;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -88,9 +90,8 @@ public class QueryOptionListTest {
 
 		query = "Select a as key, b as title from table";
 
-		QueryConfig queryConfig = new QueryConfig();
+		queryConfig = new QueryConfig();
 		queryConfig.setValue(query);
-		queryConfig.setCached(false);
 		config.setQuery(queryConfig);
 
 	}
@@ -105,8 +106,8 @@ public class QueryOptionListTest {
 				.put("key1", "title1") //
 				.put("key2", "title").build();
 
-		when(repositoryMock.getOptions("ds", query, false))
-				.thenReturn(exampleOptions);
+		when(repositoryMock.getOptions("ds", query, false)).thenReturn(
+				exampleOptions);
 
 		Iterator<Entry<String, String>> it = selection.getOptions(null)
 				.entrySet().iterator();
@@ -116,8 +117,8 @@ public class QueryOptionListTest {
 	}
 
 	private QueryOptionList createDefaultQueryOptionList() {
-		return new QueryOptionList(config, eventBusMock, repositoryMock,
-				"ds", executorMock, false);
+		return new QueryOptionList(config, eventBusMock, repositoryMock, "ds",
+				executorMock, false);
 	}
 
 	@Test
@@ -235,8 +236,9 @@ public class QueryOptionListTest {
 	}
 
 	@Test
-	public void shouldRefreshOnRefreshedEvent() {
+	public void shouldRefreshFromCacheOnRefreshedEvent() {
 		Map<String, String> options = new HashMap<String, String>();
+		queryConfig.setCached(true);
 
 		QueryOptionList queryOptionList = createDefaultQueryOptionList();
 		queryOptionList.setOptions(options);
@@ -247,6 +249,20 @@ public class QueryOptionListTest {
 		queryOptionList.onPortletRefresh(null);
 
 		assertThat(queryOptionList.getOptions(), is(nullValue()));
+		verifyZeroInteractions(repositoryMock);
+	}
+
+	@Test
+	public void shoudRefreshFromDatabaseByDefault() {
+		Map<String, String> options = new HashMap<String, String>();
+		queryConfig.setCached(true);
+		
+		QueryOptionList queryOptionList = createDefaultQueryOptionList();
+		queryOptionList.setOptions(options);
+
+		queryOptionList.refresh();
+
+		verify(repositoryMock).evict("ds", query);
 	}
 
 }

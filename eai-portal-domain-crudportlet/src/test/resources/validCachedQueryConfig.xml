@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
-	title="Beispiel für eine Tabelle auf Basis einer Query">
+	title="Beispiel für eine Tabelle auf Basis einer Query" refresh-on-page-reload="true">
 	<page>
 		<form id="form_TEST_CRUD2" columns="8">
 			<field name="ID" />
@@ -39,7 +39,7 @@
 				<reset />
 			</action>
 		</form>
-		<table id="table" row-height="30" >
+		<table id="table" >
 			<database-query datasource="test" onCommit="portlet.elements.dropdown.refresh()">
 				<query><![CDATA[
 					SELECT * FROM test_crud2
