@@ -5041,6 +5041,10 @@ body .crud2go.v-app {
 	margin-right: -24px;
 }
 
+.crud2go .v-button:active .v-button-wrap, .crud2go .v-button.v-pressed .v-button-wrap, .crud2go .v-button:focus .v-button-wrap {
+	background: #d4d4d4 url(/html/themes/classic/images/portlet/header_bg.png) repeat-x 0 0 !important;
+}
+
 .crud2go .v-csslayout-actions .v-button + .v-button {
 	margin-left: 5px;
 }

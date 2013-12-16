@@ -53,7 +53,7 @@
 	$error: #ff0000;
 	
 	
-	/* Liferay theme bugfix */
+	/* Liferay theme bugfixes */
 	
 	.v-datefield-popupcalendar {
 		padding-right: 24px;
@@ -62,6 +62,12 @@
 	.v-datefield-button {
 		margin-right: -24px;
 	}
+
+	/* Bugfix for Buttons looking like pressed on focus */
+	.v-button:active .v-button-wrap, .v-button.v-pressed .v-button-wrap, .v-button:focus .v-button-wrap {
+ 		background: #d4d4d4 url(/html/themes/classic/images/portlet/header_bg.png) repeat-x 0 0 !important;
+	}
+
 
     /* Insert your theme rules here */
 
