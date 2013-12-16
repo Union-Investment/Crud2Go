@@ -101,7 +101,11 @@ public class QueryOptionList extends VolatileOptionList {
 		this.lazy = initialize.equals(InitializeTypeConfig.LAZY)
 				|| initialize.equals(InitializeTypeConfig.ASYNC);
 		this.prefetched = initialize.equals(InitializeTypeConfig.ASYNC);
-		if (prefetched) {
+		
+		if (useCache) {
+			options = repository.getOptionsFromCache(dataSource, query);
+		}
+		if (options == null && prefetched) {
 			startPrefetch();
 		}
 	}
@@ -224,7 +228,7 @@ public class QueryOptionList extends VolatileOptionList {
 	public void refresh(RefreshPolicy policy) {
 		synchronized (lock) {
 			if (policy == RefreshPolicy.FROM_SOURCE && useCache) {
-				repository.evict(dataSource, query);
+				repository.remove(dataSource, query);
 			}
 			options = null;
 			if (prefetched) {

@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -249,7 +250,7 @@ public class QueryOptionListTest {
 		queryOptionList.onPortletRefresh(null);
 
 		assertThat(queryOptionList.getOptions(), is(nullValue()));
-		verifyZeroInteractions(repositoryMock);
+		verify(repositoryMock, never()).remove("ds", query);
 	}
 
 	@Test
@@ -262,7 +263,7 @@ public class QueryOptionListTest {
 
 		queryOptionList.refresh();
 
-		verify(repositoryMock).evict("ds", query);
+		verify(repositoryMock).remove("ds", query);
 	}
 
 }

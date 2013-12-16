@@ -44,7 +44,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 
 @Component
-@SuppressWarnings( "unchecked" )
+@SuppressWarnings("unchecked")
 public class DefaultQueryOptionListRepository implements
 		QueryOptionListRepository {
 
@@ -53,72 +53,88 @@ public class DefaultQueryOptionListRepository implements
 
 	ConnectionPoolFactory connectionPoolFactory;
 
+	Ehcache underlyingCache;
 	BlockingCache cache;
 
 	@Autowired
-	public DefaultQueryOptionListRepository(ConnectionPoolFactory connectionPoolFactory,
+	public DefaultQueryOptionListRepository(
+			ConnectionPoolFactory connectionPoolFactory,
 			@Qualifier("optionListCache") Ehcache cache) {
 		this.connectionPoolFactory = connectionPoolFactory;
-		this.cache = new BlockingCache(cache);
+		this.underlyingCache = cache;
+		this.cache = new BlockingCache(underlyingCache);
 	}
 
 	@Override
-	public Map<String, String> getOptions(String dataSource, String query, boolean useCache) {
+	public Map<String, String> getOptions(String dataSource, String query,
+			boolean useCache) {
 		if (useCache) {
-	        return getOptionsWithCaching(dataSource,query);
+			return getOptionsWithCaching(dataSource, query);
 		} else {
-			return getOptionsFromDatabase(dataSource,query);
+			return getOptionsFromDatabase(dataSource, query);
 		}
 	}
 
-	private Map<String, String> getOptionsWithCaching(String dataSource, String query) {
+	@Override
+	public Map<String, String> getOptionsFromCache(String dataSource,
+			String query) {
+		String key = createKey(dataSource, query);
+		Element element = underlyingCache.get(key);
+		return element == null ? null : (Map<String, String>) element.getObjectValue();
+	}
+
+	private Map<String, String> getOptionsWithCaching(String dataSource,
+			String query) {
 		Serializable key = createKey(dataSource, query);
-		Element element = cache.get(key);
+		Element element = cache.get(key); // creates a lock if the element does not exist 
 		Map<String, String> options = null;
-		
+
 		if (element == null) {
-		    try {
-		        // Value not cached - fetch it
-		        options = getOptionsFromDatabase(dataSource, query);
-		        element = new Element(key, options);
-		        
-		    } catch (final Throwable throwable) {
-		        // Could not fetch - Ditch the entry from the cache and rethrow
-		        // release the lock you acquired
-		        element = new Element(key, null);
-		        throw new CacheException("Could not fetch object for cache entry with key \"" + key + "\".", throwable);
-		        
-		    } finally {
-		        cache.put(element);
-		        CACHE_LOGGER.debug("Caching option list [{}] ({} elements)", key, options.size());
-		    }
+			try {
+				// Value not cached - fetch it
+				options = getOptionsFromDatabase(dataSource, query);
+				element = new Element(key, options);
+
+			} catch (final Throwable throwable) {
+				// Could not fetch - Ditch the entry from the cache and rethrow
+				// release the lock you acquired
+				element = new Element(key, null);
+				throw new CacheException(
+						"Could not fetch object for cache entry with key \""
+								+ key + "\".", throwable);
+
+			} finally {
+				cache.put(element);
+				CACHE_LOGGER.debug("Caching option list [{}] ({} elements)",
+						key, options.size());
+			}
 		} else {
 			options = (Map<String, String>) element.getObjectValue();
-	        CACHE_LOGGER.debug("Using cached option list [{}] ({} elements)", key, options.size());
+			CACHE_LOGGER.debug("Using cached option list [{}] ({} elements)",
+					key, options.size());
 		}
 		return options;
 	}
 
 	static String createKey(String dataSource, String query) {
-		Iterable<String> lines = Splitter.on('\n').trimResults().omitEmptyStrings().split(query);
+		Iterable<String> lines = Splitter.on('\n').trimResults()
+				.omitEmptyStrings().split(query);
 		return dataSource + "|" + Joiner.on(' ').join(lines);
 	}
-	
-	private Map<String, String> getOptionsFromDatabase(String dataSource, String query) {
+
+	private Map<String, String> getOptionsFromDatabase(String dataSource,
+			String query) {
 		ConnectionPool pool = connectionPoolFactory.getPool(dataSource);
-		
+
 		String nullSafeQuery = nullSafeQuery(query);
 		final LinkedHashMap<String, String> newOptions = new LinkedHashMap<String, String>();
-		pool.executeWithJdbcTemplate(nullSafeQuery,
-				new RowMapper<Object>() {
-					@Override
-					public Object mapRow(ResultSet rs, int rowNum)
-							throws SQLException {
-						newOptions.put(rs.getString("key"),
-								rs.getString("title"));
-						return null;
-					}
-				});
+		pool.executeWithJdbcTemplate(nullSafeQuery, new RowMapper<Object>() {
+			@Override
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+				newOptions.put(rs.getString("key"), rs.getString("title"));
+				return null;
+			}
+		});
 
 		return newOptions;
 	}
@@ -138,16 +154,16 @@ public class DefaultQueryOptionListRepository implements
 		return sb.toString();
 	}
 
-    @Override
+	@Override
 	public boolean isQueryInCache(String dataSource, String query) {
 		return cache.isKeyInCache(createKey(dataSource, query));
 	}
 
 	@Override
-	public void evict(String datasSource, String query) {
+	public void remove(String datasSource, String query) {
 		String key = createKey(datasSource, query);
-		boolean evicted = cache.remove(key);
-		if (evicted) {
+		boolean removed = cache.remove(key);
+		if (removed) {
 			CACHE_LOGGER.debug("Removed option list from cache [{}]", key);
 		}
 	}
