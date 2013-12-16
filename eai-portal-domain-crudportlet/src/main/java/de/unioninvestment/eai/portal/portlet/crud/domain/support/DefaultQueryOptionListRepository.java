@@ -95,6 +95,9 @@ public class DefaultQueryOptionListRepository implements
 				options = getOptionsFromDatabase(dataSource, query);
 				element = new Element(key, options);
 
+				CACHE_LOGGER.debug("Caching option list [{}] ({} elements)",
+						key, options.size());
+
 			} catch (final Throwable throwable) {
 				// Could not fetch - Ditch the entry from the cache and rethrow
 				// release the lock you acquired
@@ -105,8 +108,6 @@ public class DefaultQueryOptionListRepository implements
 
 			} finally {
 				cache.put(element);
-				CACHE_LOGGER.debug("Caching option list [{}] ({} elements)",
-						key, options.size());
 			}
 		} else {
 			options = (Map<String, String>) element.getObjectValue();

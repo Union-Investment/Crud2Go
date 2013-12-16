@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
@@ -143,6 +145,32 @@ public class DefaultQueryOptionListRepositoryTest {
 
 		assertThat((Map<String, String>) cache.get(createKey(query))
 				.getObjectValue(), equalTo(options));
+	}
+
+	@Test(expected=CacheException.class)
+	public void shouldHandleExceptionsProperly() {
+		when(connectionPoolFactoryMock.getPool("ds")).thenThrow(new IllegalArgumentException("unknown"));
+
+		repository.getOptions("ds", query, true);
+	}
+
+	@Test
+	public void shouldProperlyHandleSecondRetry() {
+		when(connectionPoolFactoryMock.getPool("ds")).thenThrow(new IllegalArgumentException("unknown"));
+		try {
+			repository.getOptions("ds", query, true);			
+		} catch (CacheException e) {
+			// expected that
+		}
+		assertThat(repository.isQueryInCache("ds", query), is(false));
+		
+		reset(connectionPoolFactoryMock);
+		when(connectionPoolFactoryMock.getPool("ds")).thenReturn(
+				connectionPoolMock);
+		Map<String, String> options = repository.getOptions("ds", query, true);
+		
+		assertThat(options.size(), is(2));
+		assertThat(repository.isQueryInCache("ds", query), is(true));
 	}
 
 	@Test
