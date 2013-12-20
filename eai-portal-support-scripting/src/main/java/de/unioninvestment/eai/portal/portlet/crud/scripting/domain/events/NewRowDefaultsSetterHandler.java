@@ -24,6 +24,9 @@ import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.data.util.converter.Converter;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
@@ -41,6 +44,11 @@ import de.unioninvestment.eai.portal.support.vaadin.context.Context;
  * 
  */
 public class NewRowDefaultsSetterHandler implements CreateEventHandler {
+	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(NewRowDefaultsSetterHandler.class);
+	
+	
 	private static final long serialVersionUID = 42L;
 	private final Map<String, Closure<?>> defaultValues;
 
@@ -73,6 +81,7 @@ public class NewRowDefaultsSetterHandler implements CreateEventHandler {
 
 			String value = result != null ? result.toString() : null;
 			if (value == null || !value.isEmpty()) {
+				LOGGER.debug("Setting {} to default value '{}'", columnName, value);
 				row.setText(columnName, value);
 			}
 		}
