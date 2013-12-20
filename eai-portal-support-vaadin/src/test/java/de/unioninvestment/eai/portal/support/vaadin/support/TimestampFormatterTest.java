@@ -25,6 +25,7 @@ import static org.junit.Assert.assertThat;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -55,6 +56,18 @@ public class TimestampFormatterTest {
 		assertEquals("01.01.2011 15:23:22.123456789",
 				formatter.convertToPresentation(timestampNanos, String.class,
 						Locale.GERMANY));
+	}
+
+	@Test
+	public void shouldFormatAndReparseNow() {
+		Date now = new Date();
+		Timestamp nowTs = new Timestamp(now.getTime());
+		TimestampFormatter formatter = new TimestampFormatter(null);
+		String presentation = formatter.convertToPresentation(nowTs, String.class,
+				Locale.GERMANY);
+		Timestamp model = formatter.convertToModel(presentation, Timestamp.class, Locale.GERMANY);
+		
+		assertEquals(nowTs, model);
 	}
 
 	@Test
