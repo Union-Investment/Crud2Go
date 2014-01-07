@@ -18,7 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.user;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -35,8 +34,4 @@ public class UserFactoryTest {
 				notNullValue());
 	}
 
-	@Test
-	public void shouldReturnUserName() {
-		assertThat(new UserFactory().getCurrentUserName(), is("Anonymous"));
-	}
 }

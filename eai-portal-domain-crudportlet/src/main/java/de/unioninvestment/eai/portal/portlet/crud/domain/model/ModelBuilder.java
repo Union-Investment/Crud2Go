@@ -72,6 +72,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidde
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Init;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
@@ -102,6 +103,7 @@ public class ModelBuilder {
 	private final int defaultSelectWidth;
 
 	private final ModelFactory factory;
+	private final UserFactory userFactory;
 
 	private Map<Object, Object> mappings = new HashMap<Object, Object>();
 
@@ -112,6 +114,7 @@ public class ModelBuilder {
 	private List<Form> forms = new ArrayList<Form>();
 
 	private final EventBus eventBus;
+
 
 	/**
 	 * Konstruktor mit Parameter.
@@ -129,12 +132,13 @@ public class ModelBuilder {
 	 * @param config
 	 *            Portlet Konfiguration
 	 */
-	public ModelBuilder(EventBus eventBus, ModelFactory factory,
+	public ModelBuilder(EventBus eventBus, ModelFactory factory, UserFactory userFactory,
 			ResetFormAction resetFormAction,
 			FieldValidatorFactory fieldValidatorFactory,
 			int defaultSelectWidth, Config config) {
 		this.eventBus = eventBus;
 		this.factory = factory;
+		this.userFactory = userFactory;
 		this.resetFormAction = resetFormAction;
 		this.fieldValidatorFactory = fieldValidatorFactory;
 		this.defaultSelectWidth = defaultSelectWidth;
@@ -157,7 +161,7 @@ public class ModelBuilder {
 		buildRoles();
 		buildAuthenticationRealms();
 
-		currentUser = new CurrentUser(portlet.getRoles());
+		currentUser = userFactory.getCurrentUser(portlet);
 		context.setCurrentUser(currentUser);
 
 		if (config.getPortletConfig().getPage() != null) {

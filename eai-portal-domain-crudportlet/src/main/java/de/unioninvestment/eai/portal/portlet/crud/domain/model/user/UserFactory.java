@@ -41,16 +41,4 @@ public class UserFactory {
 	public CurrentUser getCurrentUser(Portlet portlet) {
 		return new CurrentUser(portlet.getRoles());
 	}
-
-	/**
-	 * 
-	 * @return Benutzername
-	 */
-	public String getCurrentUserName() {
-		CurrentUser currentUser = new CurrentUser(null);
-		String name = currentUser.getName();
-		name = name == null ? "Anonymous" : name;
-
-		return name;
-	}
 }

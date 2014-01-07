@@ -35,6 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
@@ -63,10 +64,13 @@ public class ModelFactoryTest {
 	@Mock
 	private FieldValidatorFactory fieldValidatorFactoryMock;
 
+	@Mock
+	private UserFactory userFactoryMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		factory = new ModelFactory(connectionPoolFactoryMock,
+		factory = new ModelFactory(connectionPoolFactoryMock, userFactoryMock,
 				prefetchExecutorMock, resetFormActionMock,
 				fieldValidatorFactoryMock, 20);
 	}

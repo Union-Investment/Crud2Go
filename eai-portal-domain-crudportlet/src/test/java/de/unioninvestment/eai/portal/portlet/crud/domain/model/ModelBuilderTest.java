@@ -50,8 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -62,6 +60,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.matchers.InstanceOf;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.liferay.portal.kernel.exception.PortalException;
@@ -87,6 +87,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.Fil
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
@@ -96,8 +97,6 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationExcepti
 
 @SuppressWarnings("unchecked")
 public class ModelBuilderTest {
-
-	private static JAXBContext jaxbContext;
 
 	@Mock
 	private DatabaseTableContainer tableContainerMock;
@@ -171,6 +170,9 @@ public class ModelBuilderTest {
 	@Rule
 	public LiferayContext liferayContext = new LiferayContext();
 
+	@Mock
+	private UserFactory userFactoryMock;
+	
 	private static PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
 
 	@Before
@@ -183,6 +185,14 @@ public class ModelBuilderTest {
 				.setService(resourceActionLocalServiceMock);
 
 		mockExistingResourceWithTestAction();
+
+		when(userFactoryMock.getCurrentUser(any(Portlet.class))).thenAnswer(new Answer<CurrentUser>() {
+			@Override
+			public CurrentUser answer(InvocationOnMock invocation)
+					throws Throwable {
+				return new CurrentUser(((Portlet)invocation.getArguments()[0]).getRoles());
+			}
+		});
 
 		when(connectionPoolFactoryMock.getPool(Mockito.eq("test"))).thenReturn(
 				connectionPoolMock);
@@ -214,7 +224,7 @@ public class ModelBuilderTest {
 
 	private ModelBuilder createTestBuilder(Config config) {
 
-		return new ModelBuilder(eventBus, factoryMock, resetFormActionMock,
+		return new ModelBuilder(eventBus, factoryMock, userFactoryMock, resetFormActionMock,
 				fieldValidatorFactoryMock, 300, config);
 	}
 

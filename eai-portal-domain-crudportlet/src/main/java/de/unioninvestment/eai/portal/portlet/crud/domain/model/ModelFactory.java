@@ -37,6 +37,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.QueryOptionListRepository;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
@@ -54,6 +55,9 @@ public class ModelFactory {
 	private ConnectionPoolFactory connectionPoolFactory;
 
 	@Autowired
+	private UserFactory userFactory;
+
+	@Autowired
 	private ResetFormAction resetFormAction;
 
 	@Autowired
@@ -65,7 +69,7 @@ public class ModelFactory {
 	@Autowired
 	@Qualifier("prefetchExecutor")
 	private ExecutorService prefetchExecutor;
-	
+
 	@Autowired
 	private CryptorFactory cryptorFactory;
 
@@ -95,11 +99,14 @@ public class ModelFactory {
 	 *            FieldValidatorFactory
 	 * @param defaultSelectWidth
 	 *            Breite der Selectboxen
+	 * @param userFactory
 	 */
 	public ModelFactory(ConnectionPoolFactory connectionPoolFactory,
-			ExecutorService prefetchExecutor, ResetFormAction resetFormAction,
+			UserFactory userFactory, ExecutorService prefetchExecutor,
+			ResetFormAction resetFormAction,
 			FieldValidatorFactory fieldValidatorFactory, int defaultSelectWidth) {
 		this.connectionPoolFactory = connectionPoolFactory;
+		this.userFactory = userFactory;
 		this.prefetchExecutor = prefetchExecutor;
 		this.resetFormAction = resetFormAction;
 		this.fieldValidatorFactory = fieldValidatorFactory;
@@ -116,7 +123,7 @@ public class ModelFactory {
 	 * @return Model-Builder
 	 */
 	public ModelBuilder getBuilder(EventBus eventBus, Config config) {
-		return new ModelBuilder(eventBus, this, resetFormAction,
+		return new ModelBuilder(eventBus, this, userFactory, resetFormAction,
 				fieldValidatorFactory, defaultSelectWidth, config);
 	}
 
@@ -267,8 +274,8 @@ public class ModelFactory {
 
 	public QueryOptionList getQueryOptionList(EventBus eventBus,
 			SelectConfig config, String datasource) {
-		return new QueryOptionList(config, eventBus,
-				queryOptionListRepository, datasource, prefetchExecutor, useOptionListCacheByDefault);
+		return new QueryOptionList(config, eventBus, queryOptionListRepository,
+				datasource, prefetchExecutor, useOptionListCacheByDefault);
 	}
 
 }

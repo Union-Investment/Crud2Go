@@ -36,6 +36,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
@@ -50,6 +51,7 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 
 	protected EventBus eventBus;
 	protected ConnectionPoolFactory connectionPoolFactory;
+	protected UserFactory userFactory;
 	protected ResetFormAction resetFormAction;
 	protected FieldValidatorFactory fieldValidatorFactory;
 	protected int defaultSelectWidth = 300;
@@ -62,11 +64,11 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 	public LiferayContext liferayContext = new LiferayContext(TEST_PORTLET_ID,
 			TEST_COMMUNITY_ID);
 
-
 	@Before
 	public void initializeDependencies() {
 		eventBus = new EventBus();
 		connectionPoolFactory = mock(ConnectionPoolFactory.class);
+		userFactory = new UserFactory();
 		resetFormAction = mock(ResetFormAction.class);
 		fieldValidatorFactory = mock(FieldValidatorFactory.class);
 		defaultSelectWidth = 300;
@@ -84,8 +86,8 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 
 	protected ModelBuilder createModelBuilder(PortletConfig configuration) {
 		ModelFactory factory = new ModelFactory(connectionPoolFactory,
-				prefetchExecutor, resetFormAction, fieldValidatorFactory,
-				defaultSelectWidth);
+				userFactory, prefetchExecutor, resetFormAction,
+				fieldValidatorFactory, defaultSelectWidth);
 		return factory.getBuilder(eventBus, new Config(configuration,
 				resourceIds, null, null));
 	}
@@ -94,11 +96,12 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 			throws JAXBException {
 
 		InputStream stream = ModelSupport.class.getClassLoader()
-                    .getResourceAsStream(configRessource);
-        return createConfiguration(stream);
+				.getResourceAsStream(configRessource);
+		return createConfiguration(stream);
 	}
 
-	protected PortletConfig createConfiguration(InputStream stream) throws JAXBException {
+	protected PortletConfig createConfiguration(InputStream stream)
+			throws JAXBException {
 		return unmarshaller.unmarshal(stream);
 	}
 
