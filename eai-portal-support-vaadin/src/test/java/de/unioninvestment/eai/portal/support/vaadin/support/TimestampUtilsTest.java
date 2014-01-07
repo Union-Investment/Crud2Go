@@ -94,6 +94,12 @@ public class TimestampUtilsTest {
 		assertEquals(timestamp1,
 				TimestampUtils.parseTimestamp("01.01.2011 15:23:22.000000000"));
 		assertEquals(timestamp1,
+				TimestampUtils.parseTimestamp("01.01.2011 15:23:22.000"));
+		assertEquals(timestamp1,
+				TimestampUtils.parseTimestamp("01.01.2011 15:23:22.00"));
+		assertEquals(timestamp1,
+				TimestampUtils.parseTimestamp("01.01.2011 15:23:22.0"));
+		assertEquals(timestamp1,
 				TimestampUtils.parseTimestamp("01.01.2011 15:23:22"));
 
 		assertEquals(timestampMidnight,

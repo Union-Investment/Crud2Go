@@ -26,6 +26,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.util.converter.Converter.ConversionException;
 
 /**
@@ -100,8 +101,11 @@ public abstract class TimestampUtils {
 				String internalValue = reformatToInternal(value);
 				result = Timestamp.valueOf(internalValue);
 
-			} else if (value.length() == DATETIME_FORMAT.length() + 4) {
-				String internalValue = reformatToInternal(value + "000000");
+			} else if (value.length() >= DATETIME_FORMAT.length() + 2) {
+				// fill up nanoseconds
+				String fullTimestamp = Strings.padEnd(value,
+						DATETIME_FORMAT.length() + 10, '0');
+				String internalValue = reformatToInternal(fullTimestamp);
 				result = Timestamp.valueOf(internalValue);
 
 			} else if (value.length() == DATETIME_FORMAT.length()) {
