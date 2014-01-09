@@ -244,6 +244,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 	private final boolean editable;
 
 	private RowEditableChecker editableChecker;
+	private RowDeletableChecker deletableChecker;
+
 	private Table.Presenter presenter;
 
 	/**
@@ -303,6 +305,10 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	public void setRowEditableChecker(RowEditableChecker checker) {
 		this.editableChecker = checker;
+	}
+
+	public void setRowDeletableChecker(RowDeletableChecker checker) {
+		this.deletableChecker = checker;
 	}
 
 	/**
@@ -483,6 +489,22 @@ public class Table extends Component implements Component.ExpandableComponent,
 			rowIsEditable = editableChecker.isEditable(row);
 		}
 		return this.isEditable() && rowIsEditable;
+	}
+
+	/**
+	 * Prüft, ob die aktuelle Zeile gelöscht werden darf.
+	 * 
+	 * @param row
+	 *            die Zeile
+	 * @return ob die aktuelle Zeile gelöscht werden darf
+	 */
+	public boolean isRowDeletable(ContainerRowId rowId) {
+		boolean rowIsDeletable = true;
+		if (deletableChecker != null) {
+			ContainerRow row = container.getRow(rowId, false, true);
+			rowIsDeletable = deletableChecker.isDeletable(row);
+		}
+		return rowIsDeletable;
 	}
 
 	/**

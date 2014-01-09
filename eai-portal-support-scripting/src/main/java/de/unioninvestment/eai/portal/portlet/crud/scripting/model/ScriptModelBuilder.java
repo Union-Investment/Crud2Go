@@ -483,6 +483,13 @@ public class ScriptModelBuilder {
 			table.setRowEditableChecker(new RowEditableCheckerImpl(table,
 					rowEditableClosure));
 		}
+		GroovyScript rowDeletableScript = tc.getRowDeletable();
+		if (rowDeletableScript != null) {
+			Closure<Object> rowDeletableClosure = scriptBuilder
+					.buildClosure(rowDeletableScript);
+			table.setRowDeletableChecker(new RowDeletableCheckerImpl(table,
+					rowDeletableClosure));
+		}
 
 		if (table.getColumns() != null) {
 			for (TableColumn column : table.getColumns()) {

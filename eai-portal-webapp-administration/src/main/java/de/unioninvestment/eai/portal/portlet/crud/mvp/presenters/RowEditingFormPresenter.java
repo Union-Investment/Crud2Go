@@ -151,6 +151,10 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		return !table.isRowEditable(containerRow);
 	}
 
+	private boolean isTableRowDeletable(ContainerRow containerRow) {
+		return container.isDeleteable() && table.isRowDeletable(containerRow.getId());
+	}
+
 	@Override
 	public void onDoubleClick(TableDoubleClickEvent event) {
 		if (table.getMode() == Table.Mode.EDIT) {
@@ -174,7 +178,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 				getView().hideFormError();
 				getView().displayRow(currentContainerRow,
 						table.isRowEditable(currentContainerRow),
-						tablePresenter.isDeleteable());
+						isTableRowDeletable(currentContainerRow));
 			} catch (RuntimeException e) {
 				parentPanel.detachDialog();
 				throw e;
@@ -333,7 +337,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		table.changeSelection(singleton(otherRowId));
 		getView().displayRow(currentContainerRow,
 				!isTableRowReadonly(currentContainerRow),
-				container.isDeleteable());
+				isTableRowDeletable(currentContainerRow));
 	}
 
 	@Override

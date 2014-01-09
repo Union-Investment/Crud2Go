@@ -144,20 +144,10 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 
 	@Test
 	public void shouldCompileAllClosureScripts() throws JAXBException,
-			SAXException, ScriptingException {
-		PortletConfig portletConfig = createConfiguration("validFormConfigWithScript.xml");
-
-		compiler.compileAllScripts(portletConfig);
-
-		verify(scriptCompilerMock, times(7)).compileScript(anyString());
-	}
-
-	@Test
-	public void shouldCompileClosureScriptsAllEvents() throws JAXBException,
 			SAXException, ScriptingException, InstantiationException,
 			IllegalAccessException {
 		ScriptCompiler scriptCompiler = new ScriptCompiler();
-		PortletConfig portletConfig = createConfiguration("validAllEventsConfig.xml");
+		PortletConfig portletConfig = createConfiguration("validAllClosuresConfig.xml");
 		new ConfigurationScriptsCompiler(scriptCompiler)
 				.compileAllScripts(portletConfig);
 
@@ -172,6 +162,10 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		assertThat(getTable(portletConfig).getOnSelectionChange().getClazz(),
 				notNullValue());
 		assertThat(getTable(portletConfig).getOnRowChange().getClazz(),
+				notNullValue());
+		assertThat(getTable(portletConfig).getRowEditable().getClazz(),
+				notNullValue());
+		assertThat(getTable(portletConfig).getRowDeletable().getClazz(),
 				notNullValue());
 		assertThat(getFormAction(portletConfig).getOnExecution().getClazz(),
 				notNullValue());
@@ -195,6 +189,8 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		assertThat(getDatabaseQuery(portletConfig).getDelete().getStatement()
 				.getClazz(), notNullValue());
 
+		// TODO add missing closures
+		
 		assertScriptExecution(portletConfig);
 	}
 

@@ -104,12 +104,18 @@ public class TableTest {
 
 	@Mock
 	private ContainerRow containerRowMock;
+	
+	@Mock
+	private ContainerRowId containerRowIdMock;
 
 	@Mock
 	private Item itemMock;
 
 	@Mock
 	private RowEditableChecker rowEditableCheckerMock;
+
+	@Mock
+	private RowDeletableChecker rowDeletableCheckerMock;
 
 	@Mock
 	private Table.Presenter presenterMock;
@@ -119,6 +125,7 @@ public class TableTest {
 
 	@Mock
 	private Portlet portletMock;
+
 
 	@Before
 	public void setUp() {
@@ -139,6 +146,7 @@ public class TableTest {
 		when(rowEditableCheckerMock.isEditable(containerRowMock)).thenReturn(
 				false);
 		table.setRowEditableChecker(rowEditableCheckerMock);
+		table.setRowDeletableChecker(rowDeletableCheckerMock);
 
 		boolean result = table.isRowEditable(containerRowMock);
 
@@ -148,12 +156,32 @@ public class TableTest {
 	}
 
 	@Test
-	public void shouldReturnRowIsEditableAsDefault() {
+	public void shouldReturnRowIsNotEditableAsDefault() {
 		assertThat(table.isRowEditable(containerRowMock), is(true));
 
 		table = new Table(config, tableColumns, false);
 
 		assertThat(table.isRowEditable(containerRowMock), is(false));
+	}
+
+	@Test
+	public void shouldReturnDeletableCheckerResult() {
+		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(containerRowMock);
+		when(rowDeletableCheckerMock.isDeletable(containerRowMock)).thenReturn(
+				false);
+		table.setRowDeletableChecker(rowDeletableCheckerMock);
+
+		boolean result = table.isRowDeletable(containerRowIdMock);
+
+		verify(rowDeletableCheckerMock).isDeletable(containerRowMock);
+
+		assertThat(result, is(false));
+	}
+
+	@Test
+	public void shouldReturnRowIsDeletableAsDefault() {
+		table = new Table(config, tableColumns, false);
+		assertThat(table.isRowDeletable(containerRowIdMock), is(true));
 	}
 
 	@Test

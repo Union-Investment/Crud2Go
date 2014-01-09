@@ -1262,13 +1262,13 @@
 		</annotation>
 		<complexContent>
 			<extension base="tns:FilterConfig">
-                <attribute name="column" type="string" use="required">
-                    <annotation>
-                        <documentation>
-                            Name der Tabellenspalte
-                        </documentation>
-                    </annotation>
-                </attribute>
+				<attribute name="column" type="string" use="required">
+					<annotation>
+						<documentation>
+							Name der Tabellenspalte
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="field" type="string" use="required">
 					<annotation>
 						<documentation>
@@ -1644,6 +1644,14 @@
 							Zeile
 							entscheiden kann, ob die Zeile editierbar ist oder
 							schreibgeschuetzt.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="row-deletable" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Closure, die dynamisch abhaengig vom Inhalt der
+							Zeile entscheiden kann, ob die Zeile gelöscht werden kann.
 						</documentation>
 					</annotation>
 				</attribute>

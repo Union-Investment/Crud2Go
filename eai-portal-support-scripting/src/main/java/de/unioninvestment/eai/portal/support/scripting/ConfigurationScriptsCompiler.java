@@ -269,10 +269,10 @@ public class ConfigurationScriptsCompiler {
 	}
 
 	private void compileRowEditableClosure(TableConfig table, String location) {
-		if (table.getRowEditable() != null) {
-			compileClosure(table.getRowEditable(), "it,row", location
-					+ "/row-editable");
-		}
+		compileClosure(table.getRowEditable(), "it,row", location
+				+ "/row-editable");
+		compileClosure(table.getRowDeletable(), "it,row", location
+				+ "/row-deletable");
 	}
 
 	private void compileAllClosureScripts(Dynamic dynamicSelect, String location) {

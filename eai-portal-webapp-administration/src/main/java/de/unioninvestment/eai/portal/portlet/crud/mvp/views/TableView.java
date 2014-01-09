@@ -63,6 +63,13 @@ public interface TableView extends View {
 		 * @return liefert, ob das Löschen von Zeilen zugelassen ist.
 		 */
 		boolean isDeleteable();
+		
+		/**
+		 * 
+		 * @param itemId die ItemId der Zeile
+		 * @return <code>true</code>, falls die Zeile gelöscht werden darf
+		 */
+		boolean isRowDeletable(Object itemId);
 
 		/**
 		 * 

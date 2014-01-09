@@ -58,6 +58,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -502,9 +503,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 		Set<Object> selection = (Set<Object>) table.getValue();
 
-		if (!ignoreSelectionChange && !removalInProgress && inEditMode()
-				&& !presenter.isFormEditEnabled()
-				&& isLeavingUncommittedRow(selection)) {
+		if (shouldCommitOnSelectionChange(selection)) {
 			if (!commit()) {
 				rollbackSelection();
 			} else {
@@ -522,6 +521,12 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 				table.enableContentRefreshing(true);
 			}
 		}
+	}
+
+	private boolean shouldCommitOnSelectionChange(Set<Object> newSelection) {
+		return !ignoreSelectionChange && !removalInProgress && inEditMode()
+				&& !presenter.isFormEditEnabled()
+				&& isLeavingUncommittedRow(newSelection);
 	}
 
 	private boolean isSingleSelection(Set<Object> selection) {
@@ -545,6 +550,19 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		} else {
 			uncommittedItemId = selection.iterator().next();
 		}
+		updateDeleteButtonStatus(selection, uncommittedItemId);
+	}
+
+	private void updateDeleteButtonStatus(Set<Object> selection, Object singleItemId) {
+		boolean deletable = false;
+		if (inEditMode() && presenter.isDeleteable()) {
+			if (singleItemId != null && presenter.isRowDeletable(singleItemId)) {
+				deletable = true;
+			} else if (selection.size() > 1) {
+				deletable = true;
+			}
+		}
+		removeButton.setEnabled(deletable);
 	}
 
 	private boolean inEditMode() {
@@ -605,7 +623,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			// ein Commit aus
 			ignoreSelectionChange = suppressCommit;
 			unselectAll();
-			uncommittedItemId = newItemId;
+			updateUncommittedItemId(singleton(newItemId));
 			table.select(newItemId);
 			table.setCurrentPageFirstItemId(newItemId);
 			if (presenter.isFormEditEnabled()) {
@@ -620,41 +638,58 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	 * Action Methode fuer das Löschen von Datenzeilen.
 	 */
 	public void onRemoveRow() {
-
-		if (table.isEditable() && uncommittedItemId != null) {// Löschen einer
-																// Datenzeile
-			Object nextItemId = table.nextItemId(uncommittedItemId);
-			if (nextItemId == null) {
-				nextItemId = table.prevItemId(uncommittedItemId);
-			}
-			try {
-				removalInProgress = true;
-
-				table.removeItem(uncommittedItemId);
-				commit();
-
-			} finally {
-				removalInProgress = false;
-			}
-
-			uncommittedItemId = nextItemId;
-			table.setValue(singleton(nextItemId));
-
-		} else {// Löschen einer Selektion
-			@SuppressWarnings("unchecked")
-			Set<Object> selection = (Set<Object>) table.getValue();
-			try {
-				removalInProgress = true;
-				for (Object selectedRow : selection) {
-					table.removeItem(selectedRow);
-				}
-				commit();
-			} finally {
-				removalInProgress = false;
-			}
+		if (table.isEditable() && uncommittedItemId != null) {
+			removeCurrentRowSelectNextRow();
+		} else {
+			removeCurrentSelectionItemsThatAreDeletable();
 		}
 	}
 
+	private void removeCurrentRowSelectNextRow() {
+		Object nextItemId = getRowToSelectAfterRemoval();
+		try {
+			removalInProgress = true;
+
+			table.removeItem(uncommittedItemId);
+			commit();
+
+		} finally {
+			removalInProgress = false;
+		}
+		updateUncommittedItemId(singleton(nextItemId));
+		table.setValue(singleton(nextItemId));
+	}
+
+	private Object getRowToSelectAfterRemoval() {
+		Object nextItemId = table.nextItemId(uncommittedItemId);
+		if (nextItemId == null) {
+			nextItemId = table.prevItemId(uncommittedItemId);
+		}
+		return nextItemId;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void removeCurrentSelectionItemsThatAreDeletable() {
+		Set<Object> selection = (Set<Object>) table.getValue();
+		try {
+			removalInProgress = true;
+			int all = selection.size();
+			int removed = 0; 
+			for (Object selectedItemId : selection) {
+				if (presenter.isRowDeletable(selectedItemId)) {
+					table.removeItem(selectedItemId);
+					removed++;
+				}
+			}
+			commit();
+			if (removed < all) {
+				Notification.show(getMessage("portlet.crud.table.rowsPartlyDeleted", removed, all), Type.WARNING_MESSAGE);
+			}
+		} finally {
+			removalInProgress = false;
+		}
+	}
+	
 	@Override
 	public void onRevertChanges() {
 		try {
@@ -678,6 +713,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	 * Wechselt zwischen Anzeige- und Editiermodus. Beim Verlassen des
 	 * Editiermodus wird ein Commit durchgeführt.
 	 */
+	@SuppressWarnings("unchecked")
 	public void onChangeMode() {
 		// Wechsel zwischen View und Edit Mode
 		if (table.isEditable() && commit()) {
@@ -714,6 +750,9 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			table.setColumnCollapsingAllowed(false);
 			updateVisibleColumns(true);
 			presenter.switchMode(Mode.EDIT);
+			
+			updateDeleteButtonStatus((Set<Object>)table.getValue(), uncommittedItemId);
+			
 			LOG.debug("Setze den Editiermodus");
 		}
 	}

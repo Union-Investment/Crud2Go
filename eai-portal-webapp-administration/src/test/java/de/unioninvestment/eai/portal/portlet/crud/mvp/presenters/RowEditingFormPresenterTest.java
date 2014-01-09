@@ -192,6 +192,20 @@ public class RowEditingFormPresenterTest {
 	}
 
 	@Test
+	public void shouldDisplayRowOnShowDialogRequest() {
+		when(tableMock.isRowEditable(containerRowMock)).thenReturn(true);
+
+		when(containerRowMock.getId()).thenReturn(containerRowIdMock);
+		when(containerMock.isDeleteable()).thenReturn(true);
+		when(tableMock.isRowDeletable(containerRowIdMock)).thenReturn(true);
+
+		presenter.showDialog(containerRowMock);
+
+		verify(viewMock).displayRow(containerRowMock, true,  true);
+	}
+
+
+	@Test
 	public void shouldCommitContainerOnSave() {
 		presenter.save();
 
@@ -393,11 +407,16 @@ public class RowEditingFormPresenterTest {
 	@Test
 	public void shouldPassEditableAndDeletableStatusForNextRow() {
 		presenter.showDialog(containerRowMock);
+
 		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(
 				otherRowIdMock);
 		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(otherRowMock);
 		when(tableMock.isRowEditable(otherRowMock)).thenReturn(true);
+
 		when(containerMock.isDeleteable()).thenReturn(true);
+		when(otherRowMock.getId()).thenReturn(otherRowIdMock);
+		when(tableMock.isRowDeletable(otherRowIdMock)).thenReturn(true);
+		
 		reset(viewMock);
 		
 		presenter.nextRow();

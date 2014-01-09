@@ -138,6 +138,12 @@ public class TablePresenter extends
 	public boolean isDeleteable() {
 		return container.isDeleteable();
 	}
+	
+	@Override
+	public boolean isRowDeletable(Object itemId) {
+		ContainerRowId containerRowId = container.convertInternalRowId(itemId);
+		return getModel().isRowDeletable(containerRowId);
+	}
 
 	/**
 	 * {@inheritDoc}
