@@ -33,6 +33,7 @@ import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
@@ -210,4 +211,36 @@ public class DefaultQueryOptionListRepositoryTest {
 				"   \t\tselect * \n\t\tfrom x\nwhere 1=2\n"),
 				is("ds|select * from x where 1=2"));
 	}
+
+	@Test
+    public void shouldRemoveExactQuery() {
+        repository.getOptions("ds", query, true);
+        repository.remove("ds", query);
+        assertThat(repository.isQueryInCache("ds", query), is(false));
+    }
+
+    @Test
+    public void shouldRemoveMatchingQueriesByPattern() {
+        query = "select a as key, b as title from table t inner join table2 t2 on t1.id = t2.id where t2.name = 'table3'";
+
+        checkRemovalByPattern("ds", "from table", true);
+        checkRemovalByPattern("ds", "from t", true);
+        checkRemovalByPattern("ds", "\\btable\\b", true);
+        checkRemovalByPattern("ds", "\\btable2\\b", true);
+        checkRemovalByPattern("ds", "\\btable3\\b", true); // keep that in mind
+        checkRemovalByPattern("ds", "(?i)\\bTABLE\\b", true);
+        checkRemovalByPattern("ds", "^"+query+"$", true);
+
+        checkRemovalByPattern("otherds", "from table", false);
+        checkRemovalByPattern("ds", "FROM TABLE", false);
+        checkRemovalByPattern("ds", "\bfrom t\b", false);
+    }
+
+    private void checkRemovalByPattern(String dataSource, String pattern, boolean expectRemoval) {
+        repository.getOptions("ds", query, true);
+        repository.removeAll(dataSource, Pattern.compile(pattern));
+        assertThat(repository.isQueryInCache("ds", query), is(!expectRemoval));
+    }
+
+
 }

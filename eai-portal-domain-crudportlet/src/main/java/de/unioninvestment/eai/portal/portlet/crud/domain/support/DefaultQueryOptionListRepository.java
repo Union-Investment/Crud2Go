@@ -22,8 +22,13 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.support;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
@@ -117,13 +122,19 @@ public class DefaultQueryOptionListRepository implements
 		return options;
 	}
 
+
 	static String createKey(String dataSource, String query) {
-		Iterable<String> lines = Splitter.on('\n').trimResults()
-				.omitEmptyStrings().split(query);
-		return dataSource + "|" + Joiner.on(' ').join(lines);
+        String normalizedQuery = normalizeQuery(query);
+        return dataSource + "|" + normalizedQuery;
 	}
 
-	private Map<String, String> getOptionsFromDatabase(String dataSource,
+    private static String normalizeQuery(String query) {
+        Iterable<String> lines = Splitter.on('\n').trimResults()
+                .omitEmptyStrings().split(query);
+        return Joiner.on(' ').join(lines);
+    }
+
+    private Map<String, String> getOptionsFromDatabase(String dataSource,
 			String query) {
 		ConnectionPool pool = connectionPoolFactory.getPool(dataSource);
 
@@ -168,4 +179,31 @@ public class DefaultQueryOptionListRepository implements
 			CACHE_LOGGER.debug("Removed option list from cache [{}]", key);
 		}
 	}
+
+    public void removeAll(String dataSource, Pattern pattern) {
+        List<Object> keysToRemove = findAllMatchingKeys(dataSource, pattern);
+        for (Object cacheKey : keysToRemove) {
+            boolean removed = cache.remove(cacheKey);
+            if (removed) {
+                CACHE_LOGGER.debug("Removed option list from cache [{}]", cacheKey);
+            }
+        }
+    }
+
+    List<Object> findAllMatchingKeys(String dataSource, Pattern pattern) {
+        List<Object> cacheKeys = cache.getKeys();
+        List<Object> keysToRemove = new LinkedList<Object>();
+        for(Object cacheKey : cacheKeys) {
+            Iterator<String> spliterator = Splitter.on('|').split((String) cacheKey).iterator();
+            String ds = spliterator.next();
+            if (ds.equals(dataSource)) {
+                String query = spliterator.next();
+                Matcher matcher = pattern.matcher(query);
+                if (matcher.find()) {
+                    keysToRemove.add(cacheKey);
+                }
+            }
+        }
+        return keysToRemove;
+    }
 }
