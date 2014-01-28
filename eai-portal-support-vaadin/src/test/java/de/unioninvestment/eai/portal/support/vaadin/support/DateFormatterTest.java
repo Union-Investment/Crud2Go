@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.support.vaadin.support;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.sql.Date;
@@ -49,5 +50,15 @@ public class DateFormatterTest {
 		assertThat(
 				type.convertToPresentation(date1, String.class, Locale.GERMANY),
 				is("01.01.2011 00:00:00"));
+	}
+
+	@Test
+	public void shouldParseCorrectly() {
+		DateFormatter type = new DateFormatter(null);
+
+		assertThat(type.convertToModel(null, Date.class, Locale.GERMANY),
+				is(nullValue()));
+		assertEquals(date1, type.convertToModel("01.01.2011 00:00:00",
+				Date.class, Locale.GERMANY));
 	}
 }
