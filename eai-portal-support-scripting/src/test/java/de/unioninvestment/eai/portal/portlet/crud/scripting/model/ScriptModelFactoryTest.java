@@ -34,6 +34,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public class ScriptModelFactoryTest {
@@ -62,7 +63,7 @@ public class ScriptModelFactoryTest {
 		MockitoAnnotations.initMocks(this);
 
 		scriptModelFactory = new ScriptModelFactory(connectionPoolFactoryMock,
-				userFactoryMock, portalMock);
+				userFactoryMock, portalMock, DatabaseDialect.ORACLE);
 	}
 
 	@Test

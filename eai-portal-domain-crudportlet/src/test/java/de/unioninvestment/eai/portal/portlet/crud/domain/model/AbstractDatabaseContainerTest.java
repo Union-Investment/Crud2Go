@@ -466,7 +466,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 	public void shouldAddRegExpFilter() {
 		shouldAddFilterType(
 				new RegExpFilter("NAME", "bla", "i"),
-				de.unioninvestment.eai.portal.support.vaadin.filter.OracleRegExpFilter.class);
+				de.unioninvestment.eai.portal.support.vaadin.filter.DatabaseRegExpFilter.class);
 	}
 
 	@Test

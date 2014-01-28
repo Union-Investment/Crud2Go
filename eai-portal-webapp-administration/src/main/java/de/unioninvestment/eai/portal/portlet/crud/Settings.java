@@ -25,12 +25,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
+import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilterTranslator;
+import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilterTranslator;
+import de.unioninvestment.eai.portal.support.vaadin.filter.OracleRegExpFilterTranslator;
+import de.unioninvestment.eai.portal.support.vaadin.filter.SQLFilterTranslator;
 
 /**
  * Liefert Einstellugen für die CRUD-Applikation.
@@ -50,6 +59,12 @@ public class Settings {
 
 	@Value("${portlet.crud.help.url}")
 	private String helpUrl;
+
+	@Value("${portlet.crud.storage.dialect}")
+	private DatabaseDialect storageDialect;
+
+	@Value("${portlet.crud.databaseBackend.dialect}")
+	private DatabaseDialect databaseBackendDialect;
 
 	@Value("${portlet.crud.storage.configcache.enabled}")
 	private boolean cacheEnabled;
@@ -74,7 +89,7 @@ public class Settings {
 
 	@Value("${portlet.crud.displayRequestProcessingInfo}")
 	private boolean displayRequestProcessingInfo;
-		
+
 	private URL propertiesLocation = Settings.class.getClassLoader()
 			.getResource("eai/eai-portal-administration.properties");
 
@@ -188,12 +203,41 @@ public class Settings {
 		return displayRequestProcessingInfo;
 	}
 
-	public void setDisplayRequestProcessingInfo(boolean displayRequestProcessingInfo) {
+	public void setDisplayRequestProcessingInfo(
+			boolean displayRequestProcessingInfo) {
 		this.displayRequestProcessingInfo = displayRequestProcessingInfo;
 	}
 
 	public boolean isCacheCheckForUpdates() {
 		return cacheCheckForUpdates;
+	}
+
+	@PostConstruct
+	public void bootstrap() {
+		prepareVaadinFilterTranslators();
+		prepareVaadinSqlQuoting();
+	}
+
+	private void prepareVaadinSqlQuoting() {
+		QueryBuilder.setStringDecorator(databaseBackendDialect
+				.getStringDecorator());
+	}
+
+	void prepareVaadinFilterTranslators() {
+		QueryBuilder.addFilterTranslator(new AdvancedStringFilterTranslator());
+		QueryBuilder.addFilterTranslator(new SQLFilterTranslator());
+		QueryBuilder.addFilterTranslator(new NothingFilterTranslator());
+
+		switch (databaseBackendDialect) {
+		case ORACLE:
+			QueryBuilder
+					.addFilterTranslator(new OracleRegExpFilterTranslator());
+			break;
+		case MYSQL:
+			break;
+		default:
+			break;
+		}
 	}
 
 }

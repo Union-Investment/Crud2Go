@@ -37,7 +37,6 @@ import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
-import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseContainerRow;
@@ -53,26 +52,13 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
  * @author markus.bonsch
  * 
  */
-public class ScriptDatabaseQueryDelegate implements DatabaseQueryDelegate {
-
-	@SuppressWarnings("unused")
-	private static final String RETURN_ALL = "*";
-
-	@SuppressWarnings("unused")
-	private static final String RETURN_COUNT = "COUNT(*)";
+public class ScriptDatabaseModificationsDelegate implements
+		DatabaseQueryDelegate {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOG = LoggerFactory
-			.getLogger(ScriptDatabaseQueryDelegate.class);
-
-	private List<Filter> filters;
-
-	private List<OrderBy> orderBys;
-
-	private final String queryString;
-
-	private final List<String> primaryKeyColumns;
+			.getLogger(ScriptDatabaseModificationsDelegate.class);
 
 	private DataContainer container;
 
@@ -84,6 +70,8 @@ public class ScriptDatabaseQueryDelegate implements DatabaseQueryDelegate {
 
 	private AuditLogger auditLogger;
 
+	private DatabaseQueryDelegate queryDelegate;
+
 	/**
 	 * Konstruktor.
 	 * 
@@ -94,9 +82,9 @@ public class ScriptDatabaseQueryDelegate implements DatabaseQueryDelegate {
 	 * @param primaryKeyColumns
 	 *            Liste der Spaltennamen der Primärschlüssel
 	 */
-	public ScriptDatabaseQueryDelegate(final DataContainer container,
-			final String queryString, List<String> primaryKeyColumns) {
-		this(container, queryString, null, null, null, primaryKeyColumns, null);
+	public ScriptDatabaseModificationsDelegate(final DataContainer container,
+			DatabaseQueryDelegate queryDelegate) {
+		this(container, null, null, null, null, queryDelegate);
 	}
 
 	/**
@@ -104,8 +92,6 @@ public class ScriptDatabaseQueryDelegate implements DatabaseQueryDelegate {
 	 * 
 	 * @param container
 	 *            Datenbankcontainer
-	 * @param queryString
-	 *            Der SQL SELECT String
 	 * @param insertStatement
 	 *            Die Closure für INSERT Statements
 	 * @param updateStatement
@@ -114,169 +100,78 @@ public class ScriptDatabaseQueryDelegate implements DatabaseQueryDelegate {
 	 *            Die Closure für DELETE Statements
 	 * @param primaryKeyColumns
 	 *            Liste der Spaltennamen der Primärschlüssel
+	 * @param queryDelegate
 	 */
-	public ScriptDatabaseQueryDelegate(DataContainer container,
-			String queryString, StatementWrapper insertStatement,
-			StatementWrapper updateStatement, StatementWrapper deleteStatement,
-			List<String> primaryKeyColumns, CurrentUser currentUser) {
+	public ScriptDatabaseModificationsDelegate(DataContainer container,
+			StatementWrapper insertStatement, StatementWrapper updateStatement,
+			StatementWrapper deleteStatement, CurrentUser currentUser,
+			DatabaseQueryDelegate queryDelegate) {
 		this.container = container;
-		this.queryString = queryString;
-		this.primaryKeyColumns = primaryKeyColumns;
 		this.insertStatement = insertStatement;
 		this.updateStatement = updateStatement;
 		this.deleteStatement = deleteStatement;
+		this.queryDelegate = queryDelegate;
 		this.auditLogger = new AuditLogger(currentUser);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	@Deprecated
 	public String getQueryString(int offset, int limit) {
-		throw new UnsupportedOperationException("Use getQueryStatement method.");
+		return queryDelegate.getQueryString(offset, limit);
 	}
 
 	@Override
 	public StatementHelper getQueryStatement(int offset, int limit) {
-		StatementHelper sh = new StatementHelper();
-		StringBuffer query = new StringBuffer();
-
-		if (offset >= 0 && limit > 0) {
-			query.append("SELECT * FROM (");
-			query.append("SELECT x.*, ROWNUM AS \"rownum\" FROM (");
-		}
-		query.append("SELECT * FROM (");
-		query.append(queryString);
-
-		query.append(")");
-		if (limit == 1 && (filters == null || filters.size() == 0)) {
-			// Abfrage der Metadaten - keine Zeilen zurückliefern
-			query.append("WHERE 1=0");
-		} else {
-			query.append(QueryBuilder.getWhereStringForFilters(filters, sh));
-			query.append(getOrderByString());
-		}
-
-		if (offset >= 0 && limit > 0) {
-			query.append(")x ");
-			query.append(") WHERE \"rownum\" BETWEEN ")
-					.append(Integer.toString(offset + 1)).append(" AND ")
-					.append(Integer.toString(offset + limit));
-		}
-
-		sh.setQueryString(query.toString());
-		return sh;
+		return queryDelegate.getQueryStatement(offset, limit);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public StatementHelper getIndexStatement(RowId rowId) {
-		StatementHelper sh = new StatementHelper();
-		StringBuffer query = new StringBuffer();
-
-		query.append("SELECT * FROM (");
-		query.append("SELECT x.*, ROWNUM AS \"rownum\" FROM (");
-		query.append("SELECT * FROM (");
-		query.append(queryString);
-		query.append(")");
-		query.append(QueryBuilder.getWhereStringForFilters(filters, sh));
-		query.append(getOrderByString());
-		query.append(") x ");
-		query.append(")");
-
-		int idx = 0;
-		for (String idName : primaryKeyColumns) {
-			if (idx == 0) {
-				query.append(" WHERE ");
-			} else {
-				query.append(" AND ");
-			}
-			query.append(QueryBuilder.quote(idName)).append("=?");
-			sh.addParameterValue(rowId.getId()[idx]);
-
-			idx++;
-		}
-
-		sh.setQueryString(query.toString());
-		LOG.debug("Query Index Statement: " + sh.toString());
-		return sh;
+		return queryDelegate.getIndexStatement(rowId);
 	}
 
-	private String getOrderByString() {
-		StringBuffer orderBuffer = new StringBuffer();
-		if (orderBys != null && !orderBys.isEmpty()) {
-			orderBuffer.append(" ORDER BY ");
-			OrderBy lastOrderBy = orderBys.get(orderBys.size() - 1);
-			for (OrderBy orderBy : orderBys) {
-				orderBuffer.append(QueryBuilder.quote(orderBy.getColumn()));
-				if (orderBy.isAscending()) {
-					orderBuffer.append(" ASC");
-				} else {
-					orderBuffer.append(" DESC");
-				}
-				if (orderBy != lastOrderBy) {
-					orderBuffer.append(", ");
-				}
-			}
-		}
-
-		return orderBuffer.toString();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	@Deprecated
 	public String getCountQuery() {
-		throw new UnsupportedOperationException("Use getCountStatement method.");
+		return queryDelegate.getCountQuery();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public StatementHelper getCountStatement() {
-		StatementHelper sh = new StatementHelper();
-		StringBuffer query = new StringBuffer();
-
-		query.append("SELECT COUNT(*) FROM (");
-		query.append(queryString);
-		query.append(")").append(
-				QueryBuilder.getWhereStringForFilters(filters, sh));
-
-		sh.setQueryString(query.toString());
-		LOG.debug("Query Count Statement: " + sh.getQueryString());
-		return sh;
+		return queryDelegate.getCountStatement();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
+	@Deprecated
+	public String getContainsRowQueryString(Object... keys) {
+		return queryDelegate.getContainsRowQueryString(keys);
+	}
+
+	@Override
+	public StatementHelper getContainsRowQueryStatement(Object... keys) {
+		return queryDelegate.getContainsRowQueryStatement(keys);
+	}
+
+	@Override
+	public StatementHelper getRowByIdStatement(RowId rowId) {
+		return queryDelegate.getRowByIdStatement(rowId);
+	}
+
 	@Override
 	public void setFilters(List<Filter> filters) {
-		this.filters = filters;
+		queryDelegate.setFilters(filters);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void setOrderBy(List<OrderBy> orderBys) {
-		this.orderBys = orderBys;
+		queryDelegate.setOrderBy(orderBys);
 	}
 
 	@Override
 	public List<OrderBy> getOrderBy() {
-		return orderBys;
+		return queryDelegate.getOrderBy();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int storeRow(Connection conn, RowItem row) throws SQLException {
 		if (isNewRow(row)) {
@@ -454,50 +349,5 @@ public class ScriptDatabaseQueryDelegate implements DatabaseQueryDelegate {
 			throw new UnsupportedOperationException(
 					"Unbekannter Statement-Typ: " + deleteStatement.getType());
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@Deprecated
-	public String getContainsRowQueryString(Object... keys) {
-		throw new UnsupportedOperationException(
-				"Please use getContainsRowQueryStatement method.");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public StatementHelper getContainsRowQueryStatement(Object... keys) {
-		throw new UnsupportedOperationException(
-				"Implemented at the next userstory.");
-	}
-
-	@Override
-	public StatementHelper getRowByIdStatement(RowId rowId) {
-		StatementHelper sh = new StatementHelper();
-		StringBuffer query = new StringBuffer();
-
-		query.append("SELECT * FROM (");
-		query.append(queryString);
-		query.append(")");
-		int idx = 0;
-		for (String idName : primaryKeyColumns) {
-			if (idx == 0) {
-				query.append(" WHERE ");
-			} else {
-				query.append(" AND ");
-			}
-			query.append(QueryBuilder.quote(idName)).append("=?");
-			sh.addParameterValue(rowId.getId()[idx]);
-
-			idx++;
-		}
-
-		sh.setQueryString(query.toString());
-		LOG.debug("Query Count Statement: " + sh.toString());
-		return sh;
 	}
 }

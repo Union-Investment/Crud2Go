@@ -57,7 +57,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
-import de.unioninvestment.eai.portal.support.vaadin.table.CrudOracleGenerator;
+import de.unioninvestment.eai.portal.support.vaadin.table.OracleCrudSQLGenerator;
 
 public class TableQueryEventWrapperTest {
 
@@ -124,7 +124,7 @@ public class TableQueryEventWrapperTest {
 		when(pkRSMock.next()).thenReturn(true, false);
 		when(pkRSMock.getString("COLUMN_NAME")).thenReturn("ID");
 
-		CrudOracleGenerator sqlGenerator = new CrudOracleGenerator();
+		OracleCrudSQLGenerator sqlGenerator = new OracleCrudSQLGenerator();
 		tableQueryEventWrapper = new TableQueryEventWrapper(containerMock,
 				tableName, connectionPoolMock, sqlGenerator,
 				onInsertEventRouterMock, onUpdateEventRouterMock,

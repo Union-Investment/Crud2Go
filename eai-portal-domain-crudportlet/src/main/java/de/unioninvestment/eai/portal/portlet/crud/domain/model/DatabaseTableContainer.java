@@ -29,8 +29,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.container.TableQueryEve
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
-import de.unioninvestment.eai.portal.support.vaadin.table.CrudOracleGenerator;
+import de.unioninvestment.eai.portal.support.vaadin.table.CrudSQLGenerator;
+import de.unioninvestment.eai.portal.support.vaadin.table.DefaultCrudSQLGenerator;
+import de.unioninvestment.eai.portal.support.vaadin.table.OracleCrudSQLGenerator;
 
 /**
  * Repräsentation eines Datenbanktabellen-basierten Vaadin Containers als
@@ -61,6 +64,8 @@ public class DatabaseTableContainer extends AbstractDatabaseContainer {
 
 	private final int sizeValidTimeout;
 
+	private DatabaseDialect dialect;
+
 	/**
 	 * Konstruktor.
 	 * 
@@ -85,12 +90,12 @@ public class DatabaseTableContainer extends AbstractDatabaseContainer {
 	 *            Aktueller Benutzername
 	 */
 	public DatabaseTableContainer(EventBus eventBus, String datasource,
-			String tablename,
-			ConnectionPool connectionPool, boolean insertable,
-			boolean updateable, boolean deleteable, CurrentUser currentUser,
-			Map<String, String> formatPattern,
+			String tablename, ConnectionPool connectionPool,
+			boolean insertable, boolean updateable, boolean deleteable,
+			CurrentUser currentUser, Map<String, String> formatPattern,
 			List<ContainerOrder> containerOrders, FilterPolicy filterPolicy,
-			int pageLength, int exportPageLength, int sizeValidTimeout) {
+			int pageLength, int exportPageLength, int sizeValidTimeout,
+			DatabaseDialect dialect) {
 		super(eventBus, formatPattern, containerOrders, filterPolicy);
 		this.datasource = datasource;
 		this.tablename = tablename;
@@ -101,13 +106,14 @@ public class DatabaseTableContainer extends AbstractDatabaseContainer {
 		this.currentUser = currentUser;
 		this.pageLength = pageLength;
 		this.sizeValidTimeout = sizeValidTimeout;
+		this.dialect = dialect;
 	}
 
 	@Override
 	@SuppressWarnings("all")
 	protected SQLContainerEventWrapper createVaadinContainer() {
 		try {
-			CrudOracleGenerator sqlGenerator = new CrudOracleGenerator();
+			CrudSQLGenerator sqlGenerator = createSqlGenerator(dialect);
 
 			queryDelegate = new TableQueryEventWrapper(this, tablename,
 					connectionPool, sqlGenerator, getOnInsertEventRouter(),
@@ -144,6 +150,22 @@ public class DatabaseTableContainer extends AbstractDatabaseContainer {
 			throw new BusinessException("portlet.crud.error.tableNotFound",
 					datasource, tablename);
 		}
+	}
+
+	private CrudSQLGenerator createSqlGenerator(DatabaseDialect dialect) {
+		CrudSQLGenerator sqlGenerator;
+		switch (dialect) {
+		case ORACLE:
+			sqlGenerator = new OracleCrudSQLGenerator();
+			break;
+		case MYSQL:
+			sqlGenerator = new DefaultCrudSQLGenerator();
+			break;
+		default:
+			throw new UnsupportedOperationException("Dialect " + dialect
+					+ " is not supported in DatabaseTableContainer");
+		}
+		return sqlGenerator;
 	}
 
 	@Override

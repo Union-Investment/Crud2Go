@@ -21,6 +21,9 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 
 import java.text.MessageFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.server.VaadinPortletService;
 import com.vaadin.ui.Label;
 
@@ -31,6 +34,9 @@ public class RequestProcessingLabel extends Label {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(RequestProcessingLabel.class);
+	
 	public RequestProcessingLabel() {
 		setSizeUndefined();
 	}
@@ -50,6 +56,7 @@ public class RequestProcessingLabel extends Label {
 		String message = MessageFormat.format("{0}ms ({1}ms@db)", duration,
 				dbDuration);
 		setValue(message);
+		LOGGER.debug("Request processed in {}", message);
 	}
 
 }

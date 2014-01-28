@@ -21,9 +21,11 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 import groovy.lang.Closure;
 import groovy.lang.Script;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
@@ -32,6 +34,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
@@ -60,7 +63,11 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptP
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.scripting.ScriptJMXWrapper;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
+import de.unioninvestment.eai.portal.support.vaadin.database.MySQLDatabaseQueryDelegate;
+import de.unioninvestment.eai.portal.support.vaadin.database.OracleDatabaseQueryDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
 
 /**
  * Factory für Script-Modell-Instanzen. Nicht für die Nutzung aus Scripten
@@ -74,6 +81,7 @@ public class ScriptModelFactory {
 	private final ConnectionPoolFactory connectionPoolFactory;
 	private final UserFactory userFactory;
 	private Portal portal;
+	private DatabaseDialect databaseDialect;
 
 	/**
 	 * @param connectionPoolFactory
@@ -83,11 +91,15 @@ public class ScriptModelFactory {
 	 *            Kactory-Objekt zum Erzeugen von Benutzer-Objekten.
 	 */
 	@Autowired
-	public ScriptModelFactory(ConnectionPoolFactory connectionPoolFactory,
-			UserFactory userFactory, Portal portal) {
+	public ScriptModelFactory(
+			ConnectionPoolFactory connectionPoolFactory,
+			UserFactory userFactory,
+			Portal portal,
+			@Value("${portlet.crud.databaseBackend.dialect}") DatabaseDialect databaseDialect) {
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.userFactory = userFactory;
 		this.portal = portal;
+		this.databaseDialect = databaseDialect;
 	}
 
 	/**
@@ -299,5 +311,33 @@ public class ScriptModelFactory {
 
 	public ScriptComponent getScriptTextArea(TextArea component) {
 		return new ScriptTextArea();
+	}
+
+	public ScriptDatabaseModificationsDelegate getDatabaseQueryDelegate(
+			DatabaseQueryContainer databaseQueryContainer, String queryString,
+			StatementWrapper insertStatement, StatementWrapper updateStatement,
+			StatementWrapper deleteStatement, List<String> primaryKeyColumns,
+			CurrentUser currentUser) {
+
+		DatabaseQueryDelegate queryDelegate;
+		switch (databaseDialect) {
+		case ORACLE:
+			queryDelegate = new OracleDatabaseQueryDelegate(queryString,
+					primaryKeyColumns);
+			break;
+		case MYSQL:
+			queryDelegate = new MySQLDatabaseQueryDelegate(queryString,
+					primaryKeyColumns);
+			break;
+		default:
+			throw new UnsupportedOperationException("Database dialect "
+					+ databaseDialect + " is not supported");
+		}
+
+		ScriptDatabaseModificationsDelegate delegate = new ScriptDatabaseModificationsDelegate(
+				databaseQueryContainer, insertStatement, updateStatement,
+				deleteStatement, currentUser, queryDelegate);
+
+		return delegate;
 	}
 }

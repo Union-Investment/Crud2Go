@@ -27,7 +27,7 @@ import com.vaadin.data.Item;
  * @author markus.bonsch
  * 
  */
-public class OracleRegExpFilter implements Filter {
+public class DatabaseRegExpFilter implements Filter {
 
 	private static final long serialVersionUID = 42L;
 
@@ -48,7 +48,7 @@ public class OracleRegExpFilter implements Filter {
 	 *            newline, 'm': '^' and '$' match line begin/end in multiline
 	 *            string
 	 */
-	public OracleRegExpFilter(String column, String pattern,
+	public DatabaseRegExpFilter(String column, String pattern,
 			String matchParameter) {
 		this.column = column;
 		this.pattern = pattern;

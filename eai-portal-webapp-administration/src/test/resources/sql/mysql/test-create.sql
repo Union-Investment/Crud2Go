@@ -13,7 +13,7 @@ CREATE TABLE T (
 );
 
 CREATE TABLE TEST_CRUD2 (
-    id INT auto_increment,
+    ID INT auto_increment,
     CNUMBER5_2 NUMERIC(5 , 2 ),
     CDATE DATE,
     CTIMESTAMP DATETIME,

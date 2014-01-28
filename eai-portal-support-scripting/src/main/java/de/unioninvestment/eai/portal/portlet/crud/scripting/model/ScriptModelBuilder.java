@@ -214,7 +214,8 @@ public class ScriptModelBuilder {
 				scriptBuilder.getMainScript(), auditLogger));
 
 		for (ScriptConfig script : findPropertyScripts(config).values()) {
-			scriptBuilder.registerAndRunPropertyScript(script.getProperty(), script.getValue());
+			scriptBuilder.registerAndRunPropertyScript(script.getProperty(),
+					script.getValue());
 		}
 		scriptBuilder.runMainScript();
 
@@ -228,7 +229,8 @@ public class ScriptModelBuilder {
 				if (mainScript == null) {
 					mainScript = script;
 				} else {
-					throw new ConfigurationException("Only one main script allowed");
+					throw new ConfigurationException(
+							"Only one main script allowed");
 				}
 			}
 		}
@@ -236,12 +238,13 @@ public class ScriptModelBuilder {
 	}
 
 	private Map<String, ScriptConfig> findPropertyScripts(PortletConfig config) {
-		Map<String,ScriptConfig> propertyScripts = new HashMap<String,ScriptConfig>();
+		Map<String, ScriptConfig> propertyScripts = new HashMap<String, ScriptConfig>();
 		for (ScriptConfig script : config.getScript()) {
 			String property = script.getProperty();
 			if (property != null) {
 				if (propertyScripts.containsKey(property)) {
-					throw new ConfigurationException("Script property must be unique: " + property);
+					throw new ConfigurationException(
+							"Script property must be unique: " + property);
 				} else {
 					propertyScripts.put(property, script);
 				}
@@ -517,7 +520,8 @@ public class ScriptModelBuilder {
 		if (table.getColumns() != null) {
 			for (TableColumn column : table.getColumns()) {
 				if (column instanceof SelectionTableColumn) {
-					OptionList optionList = ((SelectionTableColumn) column).getOptionList();
+					OptionList optionList = ((SelectionTableColumn) column)
+							.getOptionList();
 					if (optionList != null && optionList.getId() != null) {
 						scriptPortlet.addElementById(optionList.getId(),
 								new ScriptOptionList(optionList));
@@ -562,10 +566,11 @@ public class ScriptModelBuilder {
 
 			CurrentUser currentUser = userFactory.getCurrentUser(portlet);
 
-			ScriptDatabaseQueryDelegate delegate = new ScriptDatabaseQueryDelegate(
-					databaseQueryContainer, config.getQuery(), insertStatement,
-					updateStatement, deleteStatement,
-					columns.getPrimaryKeyNames(), currentUser);
+			ScriptDatabaseModificationsDelegate delegate = factory
+					.getDatabaseQueryDelegate(databaseQueryContainer,
+							config.getQuery(), insertStatement,
+							updateStatement, deleteStatement,
+							columns.getPrimaryKeyNames(), currentUser);
 
 			databaseQueryContainer.setDatabaseQueryDelegate(delegate);
 		}
@@ -628,8 +633,8 @@ public class ScriptModelBuilder {
 					DynamicOptionList optionList = factory
 							.getDynamicOptionList(dynamicSelectionClosure,
 									columnConfig.getSelect(), table, eventBus);
-					((SelectionTableColumn)table.getColumns().get(columnConfig.getName()))
-							.setOptionList(optionList);
+					((SelectionTableColumn) table.getColumns().get(
+							columnConfig.getName())).setOptionList(optionList);
 				}
 			}
 		}
@@ -764,8 +769,8 @@ public class ScriptModelBuilder {
 				.get(container)).getDelegate();
 		Closure<Object> delegateClosure = scriptBuilder
 				.buildClosure(delegateScript);
-		container.setDelegate(new ScriptContainerDelegate(
-                delegateClosure, container));
+		container.setDelegate(new ScriptContainerDelegate(delegateClosure,
+				container));
 	}
 
 	private void populateOnUpdateClosure(DataContainer container,

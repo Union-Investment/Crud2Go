@@ -69,6 +69,7 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptP
 import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
 import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 
 @ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
 public class ScriptModelBuilderTest extends ModelSupport {
@@ -127,7 +128,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		MockitoAnnotations.initMocks(this);
 
 		factory = new ScriptModelFactory(connectionPoolFactoryMock,
-				userFactoryMock, portalMock);
+				userFactoryMock, portalMock, DatabaseDialect.ORACLE);
 
 		when(scriptBuilderMock.buildClosure(any(GroovyScript.class)))
 				.thenAnswer(new Answer<Object>() {

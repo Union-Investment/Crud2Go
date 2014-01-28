@@ -48,7 +48,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseContainer
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
-import de.unioninvestment.eai.portal.support.vaadin.table.CrudOracleGenerator;
+import de.unioninvestment.eai.portal.support.vaadin.table.CrudSQLGenerator;
 
 /**
  * Unterklasse von {@link TableQuery}, die bei INSERT, UPDATE, DELETE und COMMIT
@@ -241,7 +241,7 @@ public class TableQueryEventWrapper extends CrudTableQuery implements
 
 	@Override
 	public int getIndexById(RowId rowId) {
-		CrudOracleGenerator sqlGenerator = (CrudOracleGenerator) getSqlGenerator();
+		CrudSQLGenerator sqlGenerator = (CrudSQLGenerator) getSqlGenerator();
 		final StatementHelper sh = sqlGenerator.getIndexStatement(rowId,
 				getTableName(), filters, orderBys);
 

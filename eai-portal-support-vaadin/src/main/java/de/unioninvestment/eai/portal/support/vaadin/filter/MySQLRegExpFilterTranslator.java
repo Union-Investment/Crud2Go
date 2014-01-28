@@ -31,7 +31,7 @@ import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
  * @author carsten.mjartan
  * 
  */
-public class OracleRegExpFilterTranslator implements FilterTranslator {
+public class MySQLRegExpFilterTranslator implements FilterTranslator {
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,16 +44,14 @@ public class OracleRegExpFilterTranslator implements FilterTranslator {
 	public String getWhereStringForFilter(Filter filter, StatementHelper sh) {
 
 		DatabaseRegExpFilter regexpFilter = (DatabaseRegExpFilter) filter;
-
+		if (regexpFilter.getMatchParameter() != null) {
+			throw new IllegalArgumentException("Modifiers are not supported by MySQL REGEXP");
+		}
+		
 		String columnName = QueryBuilder.quote(regexpFilter.getColumn());
 		sh.addParameterValue(regexpFilter.getPattern());
 
-		if (regexpFilter.getMatchParameter() != null) {
-			sh.addParameterValue(regexpFilter.getMatchParameter());
-			return MessageFormat.format("REGEXP_LIKE({0},?,?)", columnName);
-		} else {
-			return MessageFormat.format("REGEXP_LIKE({0},?)", columnName);
-		}
+		return MessageFormat.format("{0} REGEXP ?", columnName);
 	}
 
 }

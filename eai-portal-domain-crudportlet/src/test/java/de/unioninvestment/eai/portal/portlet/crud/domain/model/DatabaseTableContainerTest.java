@@ -40,6 +40,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.container.TimeoutableQu
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 public class DatabaseTableContainerTest
@@ -63,7 +64,7 @@ public class DatabaseTableContainerTest
 		DatabaseTableContainer databaseTableContainer = new DatabaseTableContainer(
 				eventBus, "eai", "test", connectionPoolMock, true, true, true,
 				new TestUser("Benutzer"), displayPatternMock,
-				new ArrayList<ContainerOrder>(), null, 100, 1000, 0);
+				new ArrayList<ContainerOrder>(), null, 100, 1000, 0, DatabaseDialect.ORACLE);
 
 		databaseTableContainer.setQueryDelegate(queryDelegateMock);
 		when(queryDelegateMock.getPrimaryKeyColumns()).thenReturn(

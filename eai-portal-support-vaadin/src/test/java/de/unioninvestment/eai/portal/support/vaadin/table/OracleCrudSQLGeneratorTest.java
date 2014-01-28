@@ -30,16 +30,21 @@ import com.vaadin.data.util.filter.Compare.Equal;
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 
-public class CrudOracleGeneratorTest {
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 
-	private CrudOracleGenerator crudOracleGenerator;
+public class OracleCrudSQLGeneratorTest {
+
+	private CrudSQLGenerator crudOracleGenerator;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 
-		crudOracleGenerator = new CrudOracleGenerator();
+		QueryBuilder.setStringDecorator(DatabaseDialect.ORACLE.getStringDecorator());		
+
+		crudOracleGenerator = new OracleCrudSQLGenerator();
 		crudOracleGenerator.setPrimaryKeyColumns(asList(new String[] { "ID" }));
 	}
 
@@ -52,7 +57,7 @@ public class CrudOracleGeneratorTest {
 		String queryString = queryStatement.getQueryString();
 
 		assertEquals(
-				"SELECT * FROM (SELECT x.*, ROWNUM AS \"rownum\" FROM (SELECT * FROM TestCrud2 ORDER BY \"ID\" ASC) x ) WHERE ID=?",
+				"SELECT * FROM (SELECT x.*, ROWNUM AS \"rownum\" FROM (SELECT * FROM TestCrud2 ORDER BY \"ID\" ASC) x ) WHERE \"ID\"=?",
 				queryString);
 	}
 
@@ -65,7 +70,7 @@ public class CrudOracleGeneratorTest {
 		String queryString = queryStatement.getQueryString();
 
 		assertEquals(
-				"SELECT * FROM (SELECT x.*, ROWNUM AS \"rownum\" FROM (SELECT * FROM TestCrud2 ORDER BY \"TEST\" ASC) x ) WHERE ID=?",
+				"SELECT * FROM (SELECT x.*, ROWNUM AS \"rownum\" FROM (SELECT * FROM TestCrud2 ORDER BY \"TEST\" ASC) x ) WHERE \"ID\"=?",
 				queryString);
 	}
 
@@ -78,7 +83,7 @@ public class CrudOracleGeneratorTest {
 		String queryString = queryStatement.getQueryString();
 
 		assertEquals(
-				"SELECT * FROM (SELECT x.*, ROWNUM AS \"rownum\" FROM (SELECT * FROM TestCrud2 ORDER BY \"ID\" ASC) x  WHERE \"TEST\" = ?) WHERE ID=?",
+				"SELECT * FROM (SELECT x.*, ROWNUM AS \"rownum\" FROM (SELECT * FROM TestCrud2 ORDER BY \"ID\" ASC) x  WHERE \"TEST\" = ?) WHERE \"ID\"=?",
 				queryString);
 	}
 
@@ -94,7 +99,7 @@ public class CrudOracleGeneratorTest {
 		String queryString = queryStatement.getQueryString();
 
 		assertEquals(
-				"SELECT * FROM (SELECT x.*, ROWNUM AS \"rownum\" FROM (SELECT * FROM TestCrud2 ORDER BY \"ID\" ASC) x ) WHERE ID=? AND NAME=?",
+				"SELECT * FROM (SELECT x.*, ROWNUM AS \"rownum\" FROM (SELECT * FROM TestCrud2 ORDER BY \"ID\" ASC) x ) WHERE \"ID\"=? AND \"NAME\"=?",
 				queryString);
 	}
 }

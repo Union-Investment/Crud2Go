@@ -36,25 +36,16 @@ import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
  * 
  * @author siva.selvarajah
  */
-public class CrudOracleGenerator extends OracleGenerator {
+public class OracleCrudSQLGenerator extends OracleGenerator implements CrudSQLGenerator {
 
 	private static final long serialVersionUID = 42L;
 
 	private List<String> primaryKeyColumns;
 
-	/**
-	 * Erzeugt ein Statement, um auf eine bestimmte Zeile zugreifen zu können.
-	 * 
-	 * @param rowId
-	 *            Primärschlüssel
-	 * @param tableName
-	 *            Tabellenname
-	 * @param filters
-	 *            Filterliste
-	 * @param orderBys
-	 *            Sortierung
-	 * @return StatementHelper
+	/* (non-Javadoc)
+	 * @see de.unioninvestment.eai.portal.support.vaadin.table.CrudSQLGenerator#getIndexStatement(com.vaadin.data.util.sqlcontainer.RowId, java.lang.String, java.util.List, java.util.List)
 	 */
+	@Override
 	public StatementHelper getIndexStatement(RowId rowId, String tableName,
 			List<Filter> filters, List<OrderBy> orderBys) {
 		StatementHelper sh = generateSelectQuery(tableName, filters, orderBys,
@@ -76,23 +67,16 @@ public class CrudOracleGenerator extends OracleGenerator {
 				.append(QueryBuilder.getWhereStringForFilters(filters, sh))
 				.append(")");
 
-		int idx = 0;
-		for (String idName : primaryKeyColumns) {
-			if (idx == 0) {
-				query.append(" WHERE ");
-			} else {
-				query.append(" AND ");
-			}
-			query.append(idName).append("=?");
-			sh.addParameterValue(rowId.getId()[idx]);
-
-			idx++;
-		}
+		query.append(DefaultCrudSQLGenerator.getWhereStringForPrimaryKey(rowId, primaryKeyColumns, sh));
 
 		sh.setQueryString(query.toString());
 		return sh;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.unioninvestment.eai.portal.support.vaadin.table.CrudSQLGenerator#setPrimaryKeyColumns(java.util.List)
+	 */
+	@Override
 	public void setPrimaryKeyColumns(List<String> primaryKeyColumns) {
 		this.primaryKeyColumns = primaryKeyColumns;
 	}

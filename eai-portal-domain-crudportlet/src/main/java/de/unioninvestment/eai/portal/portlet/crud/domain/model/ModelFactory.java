@@ -39,6 +39,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Re
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.QueryOptionListRepository;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
@@ -78,6 +79,9 @@ public class ModelFactory {
 
 	@Value("${portlet.crud.optionListCache.cacheDefault}")
 	private boolean useOptionListCacheByDefault;
+
+	@Value("${portlet.crud.databaseBackend.dialect}")
+	private DatabaseDialect dialect;
 
 	/**
 	 * Konstruktor.
@@ -172,7 +176,7 @@ public class ModelFactory {
 		return new DatabaseTableContainer(eventBus, datasource, tablename,
 				pool, insertable, updateable, deleteable, currentUser,
 				formatPattern, orderBys, filterPolicy, pagelength,
-				exportPagelength, sizeValidTimeout);
+				exportPagelength, sizeValidTimeout, dialect);
 	}
 
 	/**

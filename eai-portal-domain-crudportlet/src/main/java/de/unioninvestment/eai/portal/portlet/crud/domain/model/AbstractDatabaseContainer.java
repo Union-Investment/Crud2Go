@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
-import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.TimeoutableQueryDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
@@ -39,10 +38,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerExce
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
-import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilterTranslator;
-import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilterTranslator;
-import de.unioninvestment.eai.portal.support.vaadin.filter.OracleRegExpFilterTranslator;
-import de.unioninvestment.eai.portal.support.vaadin.filter.SQLFilterTranslator;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
@@ -54,13 +49,6 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 			.getLogger(AbstractDatabaseContainer.class);
 
 	private static final long serialVersionUID = 1L;
-
-	static {
-		QueryBuilder.addFilterTranslator(new AdvancedStringFilterTranslator());
-		QueryBuilder.addFilterTranslator(new SQLFilterTranslator());
-		QueryBuilder.addFilterTranslator(new OracleRegExpFilterTranslator());
-		QueryBuilder.addFilterTranslator(new NothingFilterTranslator());
-	}
 
 	protected TimeoutableQueryDelegate queryDelegate;
 
@@ -189,7 +177,7 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 
 	private com.vaadin.data.Container.Filter buildRegExpFilter(Filter filter) {
 		RegExpFilter sqlFilter = (RegExpFilter) filter;
-		return new de.unioninvestment.eai.portal.support.vaadin.filter.OracleRegExpFilter(
+		return new de.unioninvestment.eai.portal.support.vaadin.filter.DatabaseRegExpFilter(
 				sqlFilter.getColumn(), sqlFilter.getPattern(),
 				sqlFilter.getModifiers());
 	}

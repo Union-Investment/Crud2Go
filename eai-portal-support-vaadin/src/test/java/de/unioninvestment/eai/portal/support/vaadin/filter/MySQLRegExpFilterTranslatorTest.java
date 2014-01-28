@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package de.unioninvestment.eai.portal.support.vaadin.filter;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -33,41 +34,30 @@ import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 
 import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 
-public class OracleRegExpFilterTranslatorTest {
 
+public class MySQLRegExpFilterTranslatorTest {
 	@Mock
 	private StatementHelper helperMock;
-	private OracleRegExpFilterTranslator translator;
+	private MySQLRegExpFilterTranslator translator;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		translator = new OracleRegExpFilterTranslator();
-		QueryBuilder.setStringDecorator(DatabaseDialect.ORACLE.getStringDecorator());
-	}
-
-	@Test
-	public void shouldCreateSQLWithQuestionmarksForPatternAndParameter() {
-		String sql = translator.getWhereStringForFilter(new DatabaseRegExpFilter(
-				"mycol", "abcde", "i"), helperMock);
-		assertThat(sql, is("REGEXP_LIKE(\"mycol\",?,?)"));
-	}
-
-	@Test
-	public void shouldAddPatternAndParameterAsSqlParameters() {
-		translator.getWhereStringForFilter(new DatabaseRegExpFilter("mycol",
-				"abcde", "i"), helperMock);
-
-		verify(helperMock).addParameterValue("abcde");
-		verify(helperMock).addParameterValue("i");
-		verifyNoMoreInteractions(helperMock);
+		translator = new MySQLRegExpFilterTranslator();
+		QueryBuilder.setStringDecorator(DatabaseDialect.MYSQL.getStringDecorator());
 	}
 
 	@Test
 	public void shouldCreateSQLWithQuestionmarkForPattern() {
 		String sql = translator.getWhereStringForFilter(new DatabaseRegExpFilter(
 				"mycol", "abcde", null), helperMock);
-		assertThat(sql, is("REGEXP_LIKE(\"mycol\",?)"));
+		assertThat(sql, is("`mycol` REGEXP ?"));
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldFailIfModifiersAreGiven() {
+		translator.getWhereStringForFilter(new DatabaseRegExpFilter(
+				"mycol", "abcde", "i"), helperMock);
 	}
 
 	@Test

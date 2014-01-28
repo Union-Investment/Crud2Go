@@ -1442,7 +1442,8 @@
 				<attribute name="modifiers" type="string">
 					<annotation>
 						<documentation>
-							match_parameter der regexp_like() methode
+							bei Oracle: match_parameter der regexp_like()
+							methode; von MySQL nicht unterstützt
 						</documentation>
 					</annotation>
 				</attribute>
