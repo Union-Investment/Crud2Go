@@ -10,6 +10,12 @@
 	</context-param>
 
 	<context-param>
+		<description>Active Spring Profile, taken from Maven configuration</description>
+		<param-name>spring.profiles.active</param-name>
+		<param-value>${storage.dialect}_STORAGE</param-value>
+	</context-param>
+
+	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			classpath*:eai-portal-web-applicationcontext.xml,
@@ -17,6 +23,9 @@
 		</param-value>
 	</context-param>
 
+	<session-config>
+		<session-timeout>${session.timeout}</session-timeout>
+	</session-config>
 
 	<!-- Listeners -->
 	<listener>

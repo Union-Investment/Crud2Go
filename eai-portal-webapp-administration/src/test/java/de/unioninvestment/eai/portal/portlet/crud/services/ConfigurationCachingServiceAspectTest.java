@@ -43,7 +43,7 @@ import org.mockito.MockitoAnnotations;
 
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
-import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
+import de.unioninvestment.eai.portal.portlet.crud.persistence.DefaultConfigurationDao;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
 
 public class ConfigurationCachingServiceAspectTest {
@@ -58,7 +58,7 @@ public class ConfigurationCachingServiceAspectTest {
 	private Settings settingsMock;
 
 	@Mock
-	private ConfigurationDao configurationDaoMock;
+	private DefaultConfigurationDao configurationDaoMock;
 
 	@Mock
 	private ProceedingJoinPoint jpMock;

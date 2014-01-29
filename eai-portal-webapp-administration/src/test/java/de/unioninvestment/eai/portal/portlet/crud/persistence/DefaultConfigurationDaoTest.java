@@ -49,10 +49,10 @@ import org.xml.sax.SAXException;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao.StreamProcessor;
 
-public class ConfigurationDaoTest {
+public class DefaultConfigurationDaoTest {
 
-	ConfigurationDao configurationDao;
-	private static ConfigurationDao configurationDaoDerby;
+	DefaultConfigurationDao configurationDao;
+	private static DefaultConfigurationDao configurationDaoDerby;
 
 	@Mock
 	JdbcTemplate mockJdbcTemplate;
@@ -66,6 +66,7 @@ public class ConfigurationDaoTest {
 	public static void init() {
 		ctx = new ClassPathXmlApplicationContext(
 				"eai-portal-web-test-applicationcontext.xml");
+		ctx.getEnvironment().setActiveProfiles("ORACLE_STORAGE");
 		JdbcTemplate template = ctx.getBean("jdbcTemplate", JdbcTemplate.class);
 		template.execute("CREATE TABLE ADM_CONFIG" + "("
 				+ "ID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
@@ -77,18 +78,20 @@ public class ConfigurationDaoTest {
 				+ "DATE_CREATED TIMESTAMP NOT NULL," //
 				+ "DATE_UPDATED TIMESTAMP NOT NULL default current timestamp" //
 				+ ")");
-		configurationDaoDerby = ctx.getBean(ConfigurationDao.class);
+		configurationDaoDerby = ctx.getBean(DefaultConfigurationDao.class);
 	}
 
 	@AfterClass
 	public static void destroy() {
-		ctx.close();
+		if (ctx != null) {
+			ctx.close();
+		}
 	}
 	
 	@Before
 	public void setUp() throws JAXBException, SAXException {
 		MockitoAnnotations.initMocks(this);
-		configurationDao = new ConfigurationDao(mockJdbcTemplate);
+		configurationDao = new DefaultConfigurationDao(mockJdbcTemplate);
 	}
 
 	@Test
@@ -184,7 +187,6 @@ public class ConfigurationDaoTest {
 				.thenReturn(config);
 
 		StreamProcessor<PortletConfig> processor = new StreamProcessor<PortletConfig>() {
-
 			@Override
 			public PortletConfig process(InputStream stream, ConfigurationMetaData metaData) {
 				return new PortletConfig();

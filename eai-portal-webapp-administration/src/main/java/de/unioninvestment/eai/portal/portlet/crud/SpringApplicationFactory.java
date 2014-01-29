@@ -42,7 +42,7 @@ import com.cybercom.vaadin.spring.UIScope;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
-import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
+import de.unioninvestment.eai.portal.portlet.crud.persistence.DefaultConfigurationDao;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.crud.services.DefaultConfigurationService;
 import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler;
@@ -62,7 +62,7 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFac
 public class SpringApplicationFactory {
 
 	@Autowired
-	private ConfigurationDao configurationDao;
+	private DefaultConfigurationDao configurationDao;
 
 	@Autowired
 	private Settings settings;

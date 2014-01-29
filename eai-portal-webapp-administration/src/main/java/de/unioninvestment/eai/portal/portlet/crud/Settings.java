@@ -18,9 +18,13 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud;
 
+import static java.util.Collections.sort;
+
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -32,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
@@ -90,6 +95,8 @@ public class Settings {
 	@Value("${portlet.crud.displayRequestProcessingInfo}")
 	private boolean displayRequestProcessingInfo;
 
+	private URL defaultPropertiesLocation = Settings.class.getClassLoader()
+			.getResource("eai-portal-administration.properties");
 	private URL propertiesLocation = Settings.class.getClassLoader()
 			.getResource("eai/eai-portal-administration.properties");
 
@@ -172,7 +179,9 @@ public class Settings {
 			props = new Properties();
 			if (propertiesLocation != null) {
 				try {
+					props.load(defaultPropertiesLocation.openStream());
 					props.load(propertiesLocation.openStream());
+					
 				} catch (IOException e) {
 					throw new TechnicalCrudPortletException(
 							"Error reading properties file", e);
@@ -214,8 +223,35 @@ public class Settings {
 
 	@PostConstruct
 	public void bootstrap() {
+		logConfigurationInfo();
 		prepareVaadinFilterTranslators();
 		prepareVaadinSqlQuoting();
+	}
+
+	private void logConfigurationInfo() {
+		StringBuilder builder = new StringBuilder("\n");
+		String minusLine = Strings.repeat("-", 80) + '\n';
+		builder.append(minusLine);
+		builder.append("Crud2Go\n");
+		builder.append(minusLine);
+		addSortedListOfConfigurationProperties(builder);
+		builder.append(minusLine);
+		LOGGER.info(builder.toString());
+	}
+
+	private void addSortedListOfConfigurationProperties(StringBuilder builder) {
+		loadPropertiesAndDefaults();
+		List<String> lines = new ArrayList<String>(props.size());
+		for (Entry<Object, Object> entry : props.entrySet()) {
+			String key = entry.getKey().toString();
+			if (!key.contains("password")) {
+				lines.add(Strings.padEnd(key + ":", 50, ' ') + entry.getValue());
+			}
+		}
+		sort(lines);
+		for (String line : lines) {
+			builder.append(line).append('\n');
+		}
 	}
 
 	private void prepareVaadinSqlQuoting() {

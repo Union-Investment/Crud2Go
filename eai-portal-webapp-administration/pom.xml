@@ -16,8 +16,14 @@
 	<properties>
 		<gwt.draftCompile>false</gwt.draftCompile>
 		<gwt.style>OBFUSCATED</gwt.style>
+		<liferay.deployDir>d:/Projekte/eai-portal/data/svn_sofia/eai-portal-server/target/jboss-as-7.1.1.Final/liferay/deploy</liferay.deployDir>
+
+		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+		<!-- Filtering properties -->
 		<maven.build.number>${project.version}-${maven.build.timestamp}</maven.build.number>
-        <liferay.deployDir>d:/Projekte/eai-portal/data/svn_sofia/eai-portal-server/target/jboss-as-7.1.1.Final/liferay/deploy</liferay.deployDir>
+		<jboss.module.version>main</jboss.module.version>
+		<session.timeout>30</session.timeout>
+		<storage.dialect>ORACLE</storage.dialect>
 	</properties>
 
 	<dependencies>
@@ -298,6 +304,39 @@
 					<encoding>ISO-8859-1</encoding>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<webResources>
+						<webResource>
+							<directory>${basedir}/src/main/webapp</directory>
+							<includes>
+								<include>WEB-INF/jboss-deployment-structure.xml</include>
+								<include>WEB-INF/web.xml</include>
+							</includes>
+							<!-- 
+							<excludes>
+								<exclude>WEB-INF/jboss-deployment-structure.xml</exclude>
+								<exclude>WEB-INF/web.xml</exclude>
+							</excludes>
+							 -->
+							<filtering>true</filtering>
+						</webResource>
+						<!-- 
+						<webResource>
+							<directory>${basedir}/src/main/webapp/WEB-INF</directory>
+							<includes>
+								<include>jboss-deployment-structure.xml</include>
+								<include>web.xml</include>
+							</includes>
+							<targetPath>WEB-INF</targetPath>
+							<filtering>true</filtering>
+						</webResource>
+						 -->
+					</webResources>
+				</configuration>
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -393,16 +432,16 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>wagon-maven-plugin</artifactId>
-                <version>1.0-beta-4</version>
-                <configuration>
-                    <fromDir>${project.build.directory}</fromDir>
-                    <includes>eai-administration.war</includes>
-                    <url>file://${liferay.deployDir}</url>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>wagon-maven-plugin</artifactId>
+				<version>1.0-beta-4</version>
+				<configuration>
+					<fromDir>${project.build.directory}</fromDir>
+					<includes>eai-administration.war</includes>
+					<url>file://${liferay.deployDir}</url>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -414,17 +453,28 @@
 					<name>production</name>
 				</property>
 			</activation>
+			<properties>
+				<session.timeout>480</session.timeout>
+			</properties>
+		</profile>
+		<profile>
+			<id>mysql</id>
+			<activation>
+				<property>
+					<name>mysql</name>
+				</property>
+			</activation>
+			<properties>
+				<jboss.module.version>mysql</jboss.module.version>
+				<storage.dialect>MYSQL</storage.dialect>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
-							<webResources>
-								<resource>
-									<directory>${basedir}/src/main/webapp-production</directory>
-								</resource>
-							</webResources>
+							<classifier>mysql</classifier>
 						</configuration>
 					</plugin>
 				</plugins>

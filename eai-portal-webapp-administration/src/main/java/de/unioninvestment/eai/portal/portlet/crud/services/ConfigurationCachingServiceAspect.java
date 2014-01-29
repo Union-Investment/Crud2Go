@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
-import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
+import de.unioninvestment.eai.portal.portlet.crud.persistence.DefaultConfigurationDao;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
 
 /**
@@ -61,7 +61,7 @@ public class ConfigurationCachingServiceAspect {
 	private Settings settings;
 
 	@Autowired
-	private ConfigurationDao dao;
+	private DefaultConfigurationDao dao;
 
 	/**
 	 * Leerer Konstruktor.

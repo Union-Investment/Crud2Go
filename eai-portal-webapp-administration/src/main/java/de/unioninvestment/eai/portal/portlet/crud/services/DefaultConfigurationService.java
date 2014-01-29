@@ -50,11 +50,12 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao.StreamProcessor;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
+import de.unioninvestment.eai.portal.portlet.crud.persistence.DefaultConfigurationDao;
 import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler;
 
 /**
  * Implementierung des {@link ConfigurationService}. Die Konfiguration wird über
- * das {@link ConfigurationDao} im XML-Format gelesen und gespeichert und per
+ * das {@link DefaultConfigurationDao} im XML-Format gelesen und gespeichert und per
  * JAXB deserialisiert.
  * 
  * @author carsten.mjartan
@@ -147,7 +148,8 @@ public class DefaultConfigurationService implements ConfigurationService {
 	}
 
 	Config buildPortletConfig(InputStream stream, String portletId,
-			long communityId, ConfigurationMetaData metaData) throws JAXBException {
+			long communityId, ConfigurationMetaData metaData)
+			throws JAXBException {
 		PortletConfig config = unmarshaller.unmarshal(stream);
 		applyRevisionToConfig(config);
 		compiler.compileAllScripts(config);
@@ -167,7 +169,8 @@ public class DefaultConfigurationService implements ConfigurationService {
 			}
 		}
 
-		return new Config(config, roleResourceIDs, metaData.getFileName(), metaData.getUpdated());
+		return new Config(config, roleResourceIDs, metaData.getFileName(),
+				metaData.getUpdated());
 	}
 
 	private void applyRevisionToConfig(PortletConfig portletConfig) {
@@ -193,10 +196,10 @@ public class DefaultConfigurationService implements ConfigurationService {
 		Long readRoleResourceIdPrimKey = readRoleResourceIdPrimKey(portletId,
 				communityId, roleId);
 		if (readRoleResourceIdPrimKey == null) {
-			readRoleResourceIdPrimKey = dao.readNextRoleResourceIdPrimKey();
-			dao.storeRoleResourceIdPrimKey(readRoleResourceIdPrimKey,
-					PortletRole.createRoleResourceId(portletId, communityId,
-							roleId));
+			String resourceId = PortletRole.createRoleResourceId(portletId,
+					communityId, roleId);
+			readRoleResourceIdPrimKey = dao
+					.storeRoleResourceIdPrimKey(resourceId);
 		}
 		return readRoleResourceIdPrimKey;
 	}
@@ -221,8 +224,13 @@ public class DefaultConfigurationService implements ConfigurationService {
 	@Override
 	public String readConfigAsString(String portletId, long communityId)
 			throws IOException {
-		InputStream stream = dao.readConfigAsStream(portletId, communityId);
-		return IOUtils.toString(stream, "UTF-8");
+		return dao.readConfigStream(portletId, communityId, new StreamProcessor<String>() {
+			@Override
+			public String process(InputStream stream,
+					ConfigurationMetaData metaData) throws IOException {
+				return stream == null ? null : IOUtils.toString(stream, "UTF-8");
+			}
+		});
 	}
 
 	@Override

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<roles>
+		<role name="admin" />
+		<role name="benutzer" />
+	</roles>
+	<page>
+		<table id="table1" row-height="30" editable="true">
+			<permissions>
+				<deny roles="anonymous" action="edit" />
+			</permissions>
+			<database-query datasource="mysqltest">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_CRUD2
+					  (
+					    CNUMBER5_2,
+					    CDATE,
+					    CTIMESTAMP,
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN,
+					    TESTDATA
+					  )
+					  VALUES
+					  (
+					    $row.values.CNUMBER5_2,
+					    $row.values.CDATE,
+					    SYSDATE,
+					    $row.values.CVARCHAR5_NN,
+					    $row.values.CNUMBER5_2_NN,
+					    $row.values.CDATE_NN,
+					    SYSDATE,
+					    $row.values.TESTDATA
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CDATE	      = $row.values.CDATE,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+						CDATE_NN	  = $row.values.CDATE_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.values.ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_CRUD2
+					WHERE ID = $row.values.ID
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true" />
+				<column name="CNUMBER5_2" title="Zahl" editable="true" />
+				<column name="CDATE" editable="false" />
+				<column name="CTIMESTAMP" />
+				<column name="CVARCHAR5_NN" editable="true" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN" hidden="true" />
+				<column name="TESTDATA" editable="true" width="300"
+					validate="maxlen=80,required" />
+			</columns>
+			<action id="tableAction" title="Not built for anonymous" onExecution="">
+				<permissions>
+					<deny roles="anonymous" action="build" />
+				</permissions>
+			</action>
+		</table>
+		<tabs>
+			<tab id="tab1" title="Tab 1">
+				<permissions>
+					<deny roles="anonymous" action="build" />
+				</permissions>
+				<form>
+					<field name="field" />
+					<action title="Senden" />
+				</form>
+			</tab>
+			<tab id="tab2" title="Tab 2">
+				<form>
+					<field name="field" />
+					<action id="formAction" title="Not built for anonymous">
+						<permissions>
+							<deny roles="anonymous" action="build" />
+						</permissions>
+					</action>
+				</form>
+			</tab>
+			<tab title="Tab mit build-Berechtigung" id="tab3">
+				<table id="table2">
+					<permissions>
+						<deny roles="anonymous" action="build" />
+					</permissions>
+					<database-table datasource="mysqltest" tablename="test_crud2" />
+				</table>
+			</tab>
+			<tab title="Tab 4" id="tab4">
+				<table id="table3">
+					<database-table datasource="mysqltest" tablename="test_crud2" />
+				</table>
+			</tab>
+			<tab title="Column mit edit-Berechtigung" id="tab5">
+				<table id="table4">
+					<database-table datasource="mysqltest" tablename="test_crud2" />
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true">
+							<permissions>
+								<deny roles="anonymous" action="edit" />
+							</permissions>
+						</column>
+					</columns>
+				</table>
+			</tab>
+			<tab title="Column mit display-Berechtigung" id="tab6">
+				<table id="table5">
+					<database-table datasource="mysqltest" tablename="test_crud2" />
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true">
+							<permissions>
+								<deny roles="anonymous" action="display" />
+							</permissions>
+						</column>
+					</columns>
+				</table>
+			</tab>
+			<tab title="Query-Container (anonymous ohne CRUD-Berechtigungen)" id="tab7">
+				<table id="table6">
+					<database-query datasource="mysqltest">
+						<permissions>
+							<deny roles="anonymous" action="insert" />
+							<deny roles="anonymous" action="update" />
+							<deny roles="anonymous" action="delete" />
+						</permissions>
+					<query><![CDATA[
+					SELECT * FROM (SELECT * FROM test_crud2) c
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_CRUD2
+					  (
+					    CNUMBER5_2,
+					    CDATE,
+					    CTIMESTAMP,
+					    CVARCHAR5_NN,
+					    CNUMBER5_2_NN,
+					    CDATE_NN,
+					    CTIMESTAMP_NN,
+					    TESTDATA
+					  )
+					  VALUES
+					  (
+					    $row.values.CNUMBER5_2,
+					    $row.values.CDATE,
+					    SYSDATE,
+					    $row.values.CVARCHAR5_NN,
+					    $row.values.CNUMBER5_2_NN,
+					    $row.values.CDATE_NN,
+					    SYSDATE,
+					    $row.values.TESTDATA
+					  )
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_CRUD2 SET 
+						CNUMBER5_2	  = $row.values.CNUMBER5_2,
+						CDATE	      = $row.values.CDATE,
+						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+						CDATE_NN	  = $row.values.CDATE_NN,
+						TESTDATA      = $row.values.TESTDATA
+					WHERE ID          = $row.values.ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_CRUD2
+					WHERE ID = $row.values.ID
+				]]></delete>
+					</database-query>
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true" />
+					</columns>
+				</table>
+			</tab>
+			
+			<tab title="Table-Container (anonymous ohne CRUD-Berechtigungen)" id="tab8">
+				<table id="table7">
+					<database-table datasource="mysqltest" tablename="test_crud2">
+						<permissions>
+							<deny roles="anonymous" action="insert" />
+							<deny roles="anonymous" action="update" />
+							<deny roles="anonymous" action="delete" />
+						</permissions>
+					</database-table>
+				</table>
+			</tab>
+		</tabs>
+		<tabs>
+			<permissions>
+				<deny roles="anonymous" action="build" />
+			</permissions>
+			<tab title="Noch ein Tab" id="tab01">
+				<table id="table01">
+					<database-table datasource="mysqltest" tablename="test_crud2" />
+					<columns>
+						<column name="ID" title="ID" primary-key="true" />
+						<column name="CNUMBER5_2" title="Zahl" editable="true" />
+					</columns>
+				</table>
+			</tab>
+		</tabs>
+	</page>
+</portlet>

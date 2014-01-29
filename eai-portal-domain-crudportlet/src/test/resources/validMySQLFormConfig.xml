@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches CLob Beispiel">
+	<page>
+		<table id="table" row-height="30" edit-form="true">
+			<database-query datasource="mysqltest">
+				<query><![CDATA[
+					SELECT * FROM TEST_CLOB
+				]]></query>
+				<insert><![CDATA[
+					INSERT INTO TEST_CLOB(TEXT,DATA) 
+					VALUES($row.values.TEXT,$row.values.DATA)
+				]]></insert>
+				<update><![CDATA[
+					UPDATE TEST_CLOB 
+					SET TEXT=$row.values.TEXT,DATA=$row.values.DATA 
+					WHERE id = $row.values.ID
+				]]></update>
+				<delete><![CDATA[
+					DELETE FROM TEST_CLOB
+					WHERE ID = $row.values.ID
+				]]></delete>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true"/>
+				<column name="TEXT" title="Text" editable="true" />
+				<column name="DATA" title="ClobDaten" multiline="true" editable="true" rows="10"/>
+			</columns>
+		</table>
+	</page>
+	<script><![CDATA[
+
+	]]></script>
+
+</portlet>

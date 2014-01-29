@@ -18,14 +18,17 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.services;
 
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
@@ -44,14 +47,14 @@ import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
-import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
+import de.unioninvestment.eai.portal.portlet.crud.persistence.DefaultConfigurationDao;
 import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler;
 
 public class DefaultConfigurationServiceTest {
 
 	private static final class FileStreamingConfigurationDao extends
-			ConfigurationDao {
+			DefaultConfigurationDao {
 
 		private final InputStream configXmlStream;
 
@@ -64,14 +67,18 @@ public class DefaultConfigurationServiceTest {
 		@Override
 		public <T> T readConfigStream(String portletId, long communityId,
 				StreamProcessor<T> processor) {
-			return processor.process(configXmlStream,
-					new ConfigurationMetaData("test", new Date(), new Date(),
-							"test.xml"));
+			try {
+				return processor.process(configXmlStream,
+						new ConfigurationMetaData("test", new Date(), new Date(),
+								"test.xml"));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
 	private static final class ExceptionThrowingConfigurationDao extends
-			ConfigurationDao {
+			DefaultConfigurationDao {
 
 		private ExceptionThrowingConfigurationDao() {
 			super(null);
@@ -85,7 +92,7 @@ public class DefaultConfigurationServiceTest {
 	}
 
 	@Mock
-	private ConfigurationDao daoMock;
+	private DefaultConfigurationDao daoMock;
 
 	private DefaultConfigurationService service;
 
@@ -207,7 +214,7 @@ public class DefaultConfigurationServiceTest {
 				.thenReturn(null);
 		when(daoMock.readRoleResourceIdPrimKey("PortletId_17808_user5"))
 				.thenReturn(null);
-		when(daoMock.readNextRoleResourceIdPrimKey()).thenReturn(1L, 2L);
+		when(daoMock.storeRoleResourceIdPrimKey(anyString())).thenReturn(1L, 2L);
 
 		Config config = service.buildPortletConfig(configStream, "PortletId",
 				17808L, metaDataMock);
@@ -293,7 +300,7 @@ public class DefaultConfigurationServiceTest {
 		final InputStream configXmlStream = getClass().getClassLoader()
 				.getResourceAsStream(configXml);
 
-		ConfigurationDao dao = new FileStreamingConfigurationDao(null,
+		DefaultConfigurationDao dao = new FileStreamingConfigurationDao(null,
 				configXmlStream);
 		service = new DefaultConfigurationService(dao, compilerMock,
 				settingsMock);

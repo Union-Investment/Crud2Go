@@ -27,7 +27,7 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	
-	<bean id="configurationDAO" class="de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationDao">
+	<bean id="configurationDAO" class="de.unioninvestment.eai.portal.portlet.crud.persistence.DefaultConfigurationDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate"/>
 	</bean>
 	
