@@ -19,8 +19,11 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
+import java.sql.Statement;
 
 import com.vaadin.data.util.sqlcontainer.connection.JDBCConnectionPool;
 import com.vaadin.data.util.sqlcontainer.query.TableQuery;
@@ -41,34 +44,70 @@ import com.vaadin.data.util.sqlcontainer.query.generator.SQLGenerator;
 public class CrudTableQuery extends TableQuery implements
 		TimeoutableQueryDelegate {
 
-	private TimeoutConnectionWrapper wrapper = new TimeoutConnectionWrapper();
+	private int queryTimeout;
 
-	
 	public CrudTableQuery(String tableName, JDBCConnectionPool connectionPool) {
-		super(tableName, connectionPool);
+		super(tableName, TimeoutableConnectionWrapper.wrapPool(connectionPool));
 	}
 
 	public CrudTableQuery(String tableName, JDBCConnectionPool connectionPool,
 			SQLGenerator sqlGenerator) {
-		super(tableName, connectionPool, sqlGenerator);
+		super(tableName, TimeoutableConnectionWrapper.wrapPool(connectionPool),
+				sqlGenerator);
 	}
 
 	@Override
 	protected Connection getConnection() throws SQLException {
-		if (wrapper != null) {
-			return wrapper.wrapConnection(super.getConnection());
-		} else {
-			return super.getConnection();
-		}
+		Connection connection = super.getConnection();
+		((TimeoutableConnection) connection).setDefaultTimeout(queryTimeout);
+		return connection;
 	}
+
+	/*
+	 * This method is overridden as sometimes the wrapped delegate of the active
+	 * connection is passed and in that case doesn't have to be released.
+	 */
+	@Override
+	protected void releaseConnection(Connection conn, Statement statement,
+            ResultSet rs) throws SQLException {
+        try {
+            try {
+                if (null != rs) {
+                    rs.close();
+                }
+            } finally {
+                if (null != statement) {
+                    if (statement instanceof PreparedStatement) {
+                        try {
+                            ((PreparedStatement) statement).clearParameters();
+                        } catch (Exception e) {
+                            // will be closed below anyway
+                        }
+                    }
+                    statement.close();
+                }
+            }
+        } finally {
+        	if (conn != null) {
+        		if (!isInTransaction()) {
+        			conn.close();
+        		} else {
+        			Connection activeConnection = getConnection();
+        			if (conn != activeConnection && (!(activeConnection instanceof TimeoutableConnection) || (((TimeoutableConnection)activeConnection).getWrappedConnection() != conn))) {
+        				conn.close();
+        			}
+        		}
+        	}
+        }
+    }
 
 	@Override
 	public int getQueryTimeout() {
-		return wrapper.getQueryTimeout();
+		return queryTimeout;
 	}
 
 	@Override
 	public void setQueryTimeout(int seconds) {
-		wrapper.setQueryTimeout(seconds);
+		this.queryTimeout = seconds;
 	}
 }
