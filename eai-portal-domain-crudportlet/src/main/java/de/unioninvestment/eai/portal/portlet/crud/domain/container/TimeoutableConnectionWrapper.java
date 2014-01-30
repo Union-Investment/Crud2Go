@@ -20,6 +20,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
@@ -97,7 +98,11 @@ public class TimeoutableConnectionWrapper {
 				return stmt;
 
 			} else {
-				return method.invoke(delegate, args);
+				try {
+					return method.invoke(delegate, args);
+				} catch (InvocationTargetException e) {
+					throw e.getTargetException();
+				}
 			}
 		}
 
