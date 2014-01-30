@@ -23,8 +23,8 @@
 
 		<!-- Replaced the resource-bundle config by portlet-info, as it causes a bug that prevents hot deployment with jboss 7 -->
 		<portlet-info>
-			<title>CRUD-Portlet</title>
-			<short-title>CRUD-Portlet</short-title>
+			<title>${portlet.title}</title>
+			<short-title>${portlet.shortTitle}</short-title>
 		</portlet-info>
 				
 	</portlet>

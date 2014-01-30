@@ -24,6 +24,8 @@
 		<jboss.module.version>main</jboss.module.version>
 		<session.timeout>30</session.timeout>
 		<storage.dialect>ORACLE</storage.dialect>
+		<portlet.title>Crud2Go</portlet.title>
+		<portlet.shortTitle>Crud2Go</portlet.shortTitle>
 	</properties>
 
 	<dependencies>
@@ -313,27 +315,11 @@
 							<directory>${basedir}/src/main/webapp</directory>
 							<includes>
 								<include>WEB-INF/jboss-deployment-structure.xml</include>
+								<include>WEB-INF/portlet.xml</include>
 								<include>WEB-INF/web.xml</include>
 							</includes>
-							<!-- 
-							<excludes>
-								<exclude>WEB-INF/jboss-deployment-structure.xml</exclude>
-								<exclude>WEB-INF/web.xml</exclude>
-							</excludes>
-							 -->
 							<filtering>true</filtering>
 						</webResource>
-						<!-- 
-						<webResource>
-							<directory>${basedir}/src/main/webapp/WEB-INF</directory>
-							<includes>
-								<include>jboss-deployment-structure.xml</include>
-								<include>web.xml</include>
-							</includes>
-							<targetPath>WEB-INF</targetPath>
-							<filtering>true</filtering>
-						</webResource>
-						 -->
 					</webResources>
 				</configuration>
 			</plugin>
@@ -467,6 +453,8 @@
 			<properties>
 				<jboss.module.version>mysql</jboss.module.version>
 				<storage.dialect>MYSQL</storage.dialect>
+				<portlet.title>Crud2Go (MySQL)</portlet.title>
+				<portlet.shortTitle>Crud2Go4MySQL</portlet.shortTitle>
 			</properties>
 			<build>
 				<plugins>
