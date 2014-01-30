@@ -267,7 +267,8 @@ public class TableQueryEventWrapper extends CrudTableQuery implements
 		for (Object id : itemPropertyIds) {
 			sb.append(id);
 			sb.append(" : ");
-			sb.append(row.getItemProperty(id));
+			Object value = row.getItemProperty(id).getValue();
+			sb.append(value == null ? "null" : value.toString());
 			sb.append(", ");
 		}
 		sb.append(">");
