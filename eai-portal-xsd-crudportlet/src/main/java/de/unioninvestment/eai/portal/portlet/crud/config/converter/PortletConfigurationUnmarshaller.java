@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.config.converter;
 
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -39,40 +40,46 @@ import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
  * @author carsten.mjartan
  */
 public class PortletConfigurationUnmarshaller {
-	private JAXBContext context;
-
-	private Schema schema;
+	private static final JAXBContext context = createContext();
+	private static Schema schema = createSchema();
 
 	/**
 	 * Initialisierung des JAXB-Kontexts.
 	 * 
 	 * @throws JAXBException
 	 *             bei Fehlern in der JAXB-Konfiguration
-	 * @throws SAXException
-	 *             bei Fehlern bei der Analyse des Konfigurations-Schemas
 	 */
-	public PortletConfigurationUnmarshaller() {
-		if (context == null) {
-			initialize();
-		}
-	}
-
-	private synchronized void initialize() {
+	private static JAXBContext createContext() {
 		try {
-			ClassLoader classLoader = getClass().getClassLoader();
+			ClassLoader classLoader = PortletConfigurationUnmarshaller.class
+					.getClassLoader();
 
-			this.context = JAXBContext.newInstance(
+			return JAXBContext.newInstance(
 					"de.unioninvestment.eai.portal.portlet.crud.config",
 					classLoader);
 
-			SchemaFactory factory = SchemaFactory
-					.newInstance("http://www.w3.org/2001/XMLSchema");
-			InputStream is = classLoader
-					.getResourceAsStream("de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
-			schema = factory.newSchema(new StreamSource(is));
-
 		} catch (JAXBException e) {
 			throw new RuntimeException("Error initializing JAXB", e);
+		}
+	}
+
+	/**
+	 * Initialisierung des crud-portlet Schemas.
+	 * 
+	 * @throws SAXException
+	 *             bei Fehlern bei der Analyse des Konfigurations-Schemas
+	 */
+	private static Schema createSchema() {
+		try {
+			ClassLoader classLoader = PortletConfigurationUnmarshaller.class
+					.getClassLoader();
+
+			SchemaFactory factory = SchemaFactory
+					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			InputStream is = classLoader
+					.getResourceAsStream("de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
+			return factory.newSchema(new StreamSource(is));
+
 		} catch (SAXException e) {
 			throw new RuntimeException("Error initializing JAXB", e);
 		}

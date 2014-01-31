@@ -21,22 +21,16 @@ package de.unioninvestment.eai.portal.portlet.crud.validation;
 import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 import com.vaadin.data.Validator;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
-import de.unioninvestment.eai.portal.portlet.crud.config.validation.ConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.config.validation.SecurityValidationVisitor;
 import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationProcessor;
 
@@ -53,30 +47,6 @@ public class ConfigurationUploadValidator implements Validator {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(ConfigurationUploadValidator.class);
 
-	private static final SchemaFactory factory = SchemaFactory
-			.newInstance("http://www.w3.org/2001/XMLSchema");
-	private static Schema schema;
-
-	static {
-		InputStream is = ConfigurationUploadValidator.class
-				.getClassLoader()
-				.getResourceAsStream(
-						"de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
-		try {
-			schema = factory.newSchema(new StreamSource(is));
-
-		} catch (SAXException e) {
-			LOG.error("XSD is invalid or not found: " + e, e);
-		}
-	}
-
-	/**
-	 * Generiert einen ConfigurationValidator.
-	 * 
-	 */
-	public ConfigurationUploadValidator() {
-	}
-
 	@Override
 	public void validate(Object value) {
 		if ((value instanceof byte[]) && !isValid(value)) {
@@ -87,31 +57,24 @@ public class ConfigurationUploadValidator implements Validator {
 
 	public boolean isValid(Object value) {
 		try {
-			javax.xml.validation.Validator xsdValidator = schema.newValidator();
-			xsdValidator.validate(new StreamSource(new ByteArrayInputStream(
-					(byte[]) value)));
-
-			PortletConfig portletConfig = unmarshal(value);
+			PortletConfig portletConfig = validateAndUnmarshal(value);
 
 			validateSecurity(portletConfig);
 
-		} catch (ConfigurationException e) {
-			LOG.warn("Konfiguration ist nicht valide: " + e.getMessage());
-			return false;
-
 		} catch (Exception e) {
-			LOG.warn("XSD is invalid or not found: " + e, e);
+			LOG.warn("Konfiguration ist nicht valide: " + e.getMessage(), e);
 			return false;
 		}
 
 		return true;
 	}
 
-	private PortletConfig unmarshal(Object value) throws JAXBException,
-			SAXException {
-		return new PortletConfigurationUnmarshaller()
-				.unmarshal(new ByteArrayInputStream((byte[]) value));
-
+	private PortletConfig validateAndUnmarshal(Object value)
+			throws JAXBException {
+		ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) value);
+		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
+				.unmarshal(stream);
+		return portletConfig;
 	}
 
 	private void validateSecurity(PortletConfig portletConfig) {
