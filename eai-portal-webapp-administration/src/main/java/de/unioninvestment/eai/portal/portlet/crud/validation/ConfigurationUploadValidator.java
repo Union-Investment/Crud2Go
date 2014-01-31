@@ -53,27 +53,28 @@ public class ConfigurationUploadValidator implements Validator {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(ConfigurationUploadValidator.class);
 
-	private final SchemaFactory factory = SchemaFactory
+	private static final SchemaFactory factory = SchemaFactory
 			.newInstance("http://www.w3.org/2001/XMLSchema");
-	private javax.xml.validation.Validator xsdValidator;
+	private static Schema schema;
+
+	static {
+		InputStream is = ConfigurationUploadValidator.class
+				.getClassLoader()
+				.getResourceAsStream(
+						"de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
+		try {
+			schema = factory.newSchema(new StreamSource(is));
+
+		} catch (SAXException e) {
+			LOG.error("XSD is invalid or not found: " + e, e);
+		}
+	}
 
 	/**
 	 * Generiert einen ConfigurationValidator.
 	 * 
 	 */
 	public ConfigurationUploadValidator() {
-		InputStream is = getClass().getClassLoader().getResourceAsStream(
-				"de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
-		Schema schema;
-		try {
-			schema = factory.newSchema(new StreamSource(is));
-
-			xsdValidator = schema.newValidator();
-
-		} catch (SAXException e) {
-			LOG.error("XSD is invalid or not found: " + e, e);
-		}
-
 	}
 
 	@Override
@@ -86,6 +87,7 @@ public class ConfigurationUploadValidator implements Validator {
 
 	public boolean isValid(Object value) {
 		try {
+			javax.xml.validation.Validator xsdValidator = schema.newValidator();
 			xsdValidator.validate(new StreamSource(new ByteArrayInputStream(
 					(byte[]) value)));
 
