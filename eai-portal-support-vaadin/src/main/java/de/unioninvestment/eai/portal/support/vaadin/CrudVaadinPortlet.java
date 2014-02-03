@@ -18,6 +18,9 @@
  */
 package de.unioninvestment.eai.portal.support.vaadin;
 
+import javax.portlet.PortletPreferences;
+import javax.portlet.RenderRequest;
+
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinPortlet;
@@ -44,5 +47,18 @@ public class CrudVaadinPortlet extends VaadinPortlet {
 
 		// initializePlugin(service);
 		return service;
+	}
+
+	/**
+	 * Return the portlet title from the portlet preferences,
+	 */
+	@Override
+	protected String getTitle(RenderRequest request) {
+		PortletPreferences prefs = request.getPreferences();
+		String portletTitle = prefs.getValue("ui-portlet-title", null);
+		if (portletTitle != null) {
+			return portletTitle;
+		}
+		return super.getTitle(request);
 	}
 }
