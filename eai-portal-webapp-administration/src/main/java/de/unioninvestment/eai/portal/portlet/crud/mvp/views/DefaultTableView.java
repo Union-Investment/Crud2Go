@@ -550,19 +550,21 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		} else {
 			uncommittedItemId = selection.iterator().next();
 		}
-		updateDeleteButtonStatus(selection, uncommittedItemId);
+		updateRemoveButtonStatus(selection, uncommittedItemId);
 	}
 
-	private void updateDeleteButtonStatus(Set<Object> selection, Object singleItemId) {
-		boolean deletable = false;
-		if (inEditMode() && presenter.isDeleteable()) {
-			if (singleItemId != null && presenter.isRowDeletable(singleItemId)) {
-				deletable = true;
-			} else if (selection.size() > 1) {
-				deletable = true;
+	private void updateRemoveButtonStatus(Set<Object> selection, Object singleItemId) {
+		if (removeButton != null) {
+			boolean deletable = false;
+			if (inEditMode() && presenter.isDeleteable()) {
+				if (singleItemId != null && presenter.isRowDeletable(singleItemId)) {
+					deletable = true;
+				} else if (selection.size() > 1) {
+					deletable = true;
+				}
 			}
+			removeButton.setEnabled(deletable);
 		}
-		removeButton.setEnabled(deletable);
 	}
 
 	private boolean inEditMode() {
@@ -751,7 +753,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			updateVisibleColumns(true);
 			presenter.switchMode(Mode.EDIT);
 			
-			updateDeleteButtonStatus((Set<Object>)table.getValue(), uncommittedItemId);
+			updateRemoveButtonStatus((Set<Object>)table.getValue(), uncommittedItemId);
 			
 			LOG.debug("Setze den Editiermodus");
 		}
