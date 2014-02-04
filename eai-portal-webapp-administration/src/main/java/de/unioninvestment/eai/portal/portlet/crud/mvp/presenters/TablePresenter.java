@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.data.Item;
 import com.vaadin.ui.Table.ColumnGenerator;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowEvent;
@@ -40,6 +42,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DisplayMode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
@@ -53,7 +56,7 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView;
 public class TablePresenter extends
 		AbstractComponentPresenter<Table, TableView> implements
 		TableView.Presenter, ShowEventHandler<Tab>, Table.Presenter,
-		SelectionEventHandler {
+		SelectionEventHandler, ModeChangeEventHandler<Table, Mode> {
 
 	private static final long serialVersionUID = 2L;
 
@@ -62,8 +65,6 @@ public class TablePresenter extends
 
 	private DataContainer container;
 	private boolean isInitializeView = false;
-
-	private RowEditingFormPresenter rowEditingFormPresenter;
 
 	private Set<String> generatedColumIds = new HashSet<String>();
 
@@ -77,15 +78,27 @@ public class TablePresenter extends
 	 * 
 	 * 
 	 */
+	@SuppressWarnings("serial")
 	public TablePresenter(TableView view, Table model) {
 		super(view, model);
 		container = getModel().getContainer();
 		getModel().addSelectionEventHandler(this);
+		getModel().addModeChangeEventHandler(this);
+		getModel().addDisplayModeChangeEventHandler(
+				new ModeChangeEventHandler<Table, Table.DisplayMode>() {
+					@Override
+					public void onModeChange(
+							ModeChangeEvent<Table, DisplayMode> event) {
+						handleDisplayModeChange(event.getMode());
+					}
+				});
 	}
 
-	public void setRowEditingFormPresenter(
-			RowEditingFormPresenter rowEditingFormPresenter) {
-		this.rowEditingFormPresenter = rowEditingFormPresenter;
+	protected void handleDisplayModeChange(DisplayMode mode) {
+		if (mode == DisplayMode.TABLE) {
+			revertChanges();
+			updateViewViewMode(getModel().getMode());
+		}
 	}
 
 	/**
@@ -138,7 +151,7 @@ public class TablePresenter extends
 	public boolean isDeleteable() {
 		return container.isDeleteable();
 	}
-	
+
 	@Override
 	public boolean isRowDeletable(Object itemId) {
 		ContainerRowId containerRowId = container.convertInternalRowId(itemId);
@@ -167,6 +180,22 @@ public class TablePresenter extends
 	public void onShow(ShowEvent<Tab> event) {
 		if (!isInitializeView) {
 			initializeView();
+		}
+	}
+
+	@Override
+	public void onModeChange(ModeChangeEvent<Table, Mode> event) {
+		// TODO optimize: only change something if in DisplayMode.TABLE
+		if (getModel().getDisplayMode() == DisplayMode.TABLE) {
+			updateViewViewMode(event.getMode());
+		}
+	}
+
+	private void updateViewViewMode(Mode mode) {
+		if (mode == Mode.VIEW) {
+			getView().switchToViewMode();
+		} else {
+			getView().switchToEditMode();
 		}
 	}
 
@@ -266,18 +295,7 @@ public class TablePresenter extends
 
 	@Override
 	public void openRowEditingForm() {
-		if (rowEditingFormPresenter != null) {
-			Set<ContainerRowId> selection = getModel().getSelection();
-			if (selection.size() > 0) {
-				ContainerRowId containerRowId = selection.iterator().next();
-
-				ContainerRow containerRow = getModel().getContainer().getRow(
-						containerRowId, false, false);
-
-				rowEditingFormPresenter.showDialog(containerRow);
-
-			}
-		}
+		getModel().changeDisplayMode(DisplayMode.FORM);
 	}
 
 	/**
@@ -319,7 +337,7 @@ public class TablePresenter extends
 	public void download(Download download) {
 		getView().download(download);
 	}
-	
+
 	@Override
 	public void renderOnce(DynamicColumnChanges changes) {
 		boolean tableContentRefreshWasEnabled = getView()

@@ -66,6 +66,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
@@ -210,8 +211,12 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		when(propertyMock.isReadOnly()).thenReturn(false);
 
 		when(containerMock.getItem(any())).thenReturn(itemMock);
+		
+		when(modelTableMock.isEditable()).thenReturn(true);
+		when(modelTableMock.getMode()).thenReturn(Mode.EDIT);
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
+		
 		when(tableColumnsMock.isComboBox("test")).thenReturn(true);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
 		when(tableColumnMock.isEditable(rowMock)).thenReturn(true);
@@ -268,6 +273,8 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		when(containerFieldMock.isReadonly()).thenReturn(false);
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
 		when(tableColumnMock.isEditable(rowMock)).thenReturn(true);
+		when(modelTableMock.isEditable()).thenReturn(true);
+		when(modelTableMock.getMode()).thenReturn(Mode.EDIT);
 
 		prepareCheckBoxTest(String.class, "1", false);
 
@@ -298,6 +305,8 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		when(containerFieldMock.isReadonly()).thenReturn(false);
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
 		when(tableColumnMock.isEditable(rowMock)).thenReturn(true);
+		when(modelTableMock.isEditable()).thenReturn(true);
+		when(modelTableMock.getMode()).thenReturn(Mode.EDIT);
 
 		prepareCheckBoxTest(Number.class, 1, false);
 
@@ -353,6 +362,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		when(containerMock.getItem(any())).thenReturn(itemMock);
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
+		
 		when(tableColumnsMock.isComboBox("test")).thenReturn(false);
 		when(tableColumnsMock.isCheckbox("test")).thenReturn(true);
 		when(tableColumnsMock.getCheckBox("test"))

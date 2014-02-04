@@ -151,9 +151,6 @@ public interface TableView extends View {
 		 */
 		public boolean isFormEditEnabled();
 
-		/**
-		 * Öffnet den FormularEdit-Dialog.
-		 */
 		public void openRowEditingForm();
 	}
 
@@ -303,5 +300,9 @@ public interface TableView extends View {
 	 * @param download the generator
 	 */
 	void download(Download download);
+
+	void switchToViewMode();
+
+	void switchToEditMode();
 
 }

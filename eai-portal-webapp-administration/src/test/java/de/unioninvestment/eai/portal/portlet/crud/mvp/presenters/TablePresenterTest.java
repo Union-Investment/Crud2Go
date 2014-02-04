@@ -41,6 +41,7 @@ import org.junit.Test;
 
 import com.vaadin.ui.Table;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DisplayMode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 
 public class TablePresenterTest extends AbstractTablePresenterTest {
@@ -59,6 +60,12 @@ public class TablePresenterTest extends AbstractTablePresenterTest {
 				modelMock, 15, 2.0);
 	}
 
+	@Test
+	public void shouldRollbackAndDeselectAllOnDisplayModeChangeToTable() {
+		presenter.handleDisplayModeChange(DisplayMode.TABLE);
+		verify(viewMock).onRevertChanges();
+	}
+	
 	@Test
 	public void shouldReturnTableIsReadonlyIfContainerIsNotEditable() {
 		when(modelMock.isEditable()).thenReturn(true);

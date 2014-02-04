@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -36,8 +37,10 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerBlob;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
@@ -45,6 +48,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Panel;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DisplayMode;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PanelContentView;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.RowEditingFormView;
 
@@ -54,8 +59,9 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.RowEditingFormView;
  * 
  * @author siva.selvarajah
  */
+@SuppressWarnings("serial")
 public class RowEditingFormPresenter extends DialogPresenter implements
-		TableDoubleClickEventHandler, RowEditingFormView.Presenter {
+		RowEditingFormView.Presenter {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOG = LoggerFactory
@@ -107,16 +113,81 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	private void initialize() {
 
 		getView().initialize(this, table);
-
-		table.addTableDoubleClickEventHandler(this);
-		backButton.addClickListener(new ClickListener() {
-			private static final long serialVersionUID = 1L;
-
+		table.addModeChangeEventHandler(new ModeChangeEventHandler<Table, Table.Mode>() {
 			@Override
-			public void buttonClick(ClickEvent event) {
-				tablePresenter.revertChanges();
+			public void onModeChange(ModeChangeEvent<Table, Mode> event) {
+				handleModeChange(event.getMode());
 			}
 		});
+
+		table.addDisplayModeChangeEventHandler(new ModeChangeEventHandler<Table, Table.DisplayMode>() {
+			@Override
+			public void onModeChange(ModeChangeEvent<Table, DisplayMode> event) {
+				handleDisplayModeChange(event.getSource().getDisplayMode());
+			}
+		});
+		table.addSelectionEventHandler(new SelectionEventHandler() {
+			@Override
+			public void onSelectionChange(SelectionEvent selectionEvent) {
+				handleSelectionChange();
+			}
+		});
+		backButton.addClickListener(new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				table.changeDisplayMode(DisplayMode.TABLE);
+			}
+		});
+	}
+
+	protected void handleDisplayModeChange(DisplayMode displayMode) {
+		if (displayMode == DisplayMode.FORM) {
+			parentPanel.attachDialog(dialogId);
+			updateButtonsForMode(table.getMode());
+			displayCurrentTableSelection();
+		} else {
+			if (isAttached()) {
+				parentPanel.detachDialog();
+			}
+		}
+	}
+
+	protected void handleSelectionChange() {
+		if (table.getDisplayMode() == DisplayMode.FORM) {
+			displayCurrentTableSelection();
+		}
+	}
+
+	protected void handleModeChange(Mode mode) {
+		if (table.getDisplayMode() == DisplayMode.FORM) {
+			updateButtonsForMode(mode);
+			displayCurrentRow();
+		}
+	}
+
+	private void displayCurrentTableSelection() {
+		Set<ContainerRowId> selection = table.getSelection();
+		if (selection.size() == 1) {
+			ContainerRow selectedRow = table.getContainer().getRow(
+					selection.iterator().next(), false, true);
+			displayRow(selectedRow);
+		}
+	}
+
+	private void updateButtonsForMode(Mode mode) {
+		if (mode == Mode.VIEW) {
+			getView().updateButtonsForViewMode();
+		} else {
+			getView().updateButtonsForEditMode();
+		}
+	}
+
+	@Override
+	public void changeMode() {
+		boolean success = trySave();
+		if (success) {
+			table.changeMode();
+		}
 	}
 
 	@Override
@@ -142,47 +213,43 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	private boolean isReadOnly(ContainerRow containerRow, String fieldName) {
 		boolean isReadOnly = containerRow.getFields().get(fieldName)
 				.isReadonly()
-				|| isTableRowReadonly(containerRow);
+				|| !isTableRowEditable(containerRow);
 
 		return isReadOnly;
 	}
 
-	private boolean isTableRowReadonly(ContainerRow containerRow) {
-		return !table.isRowEditable(containerRow);
+	private boolean isTableRowEditable(ContainerRow containerRow) {
+		return table.getMode() == Mode.EDIT
+				&& table.isRowEditable(currentContainerRow);
 	}
 
 	private boolean isTableRowDeletable(ContainerRow containerRow) {
-		return container.isDeleteable() && table.isRowDeletable(containerRow.getId());
-	}
-
-	@Override
-	public void onDoubleClick(TableDoubleClickEvent event) {
-		if (table.getMode() == Table.Mode.EDIT) {
-			showDialog(event.getRow());
-		}
+		return container.isDeleteable() && table.getMode() == Mode.EDIT
+				&& table.isRowDeletable(containerRow.getId());
 	}
 
 	/**
 	 * Öffnet das Formular zum editieren der Zeile.
 	 * 
 	 * @param currentContainerRow
-	 *            Aktuelle Zeile
+	 *            Anzuzeigende Zeile
 	 */
-	public void showDialog(ContainerRow currentContainerRow) {
+	public void displayRow(ContainerRow currentContainerRow) {
 		if (currentContainerRow != null) {
 			this.currentContainerRow = currentContainerRow;
+			displayCurrentRow();
+		}
+	}
 
-			parentPanel.attachDialog(dialogId);
-
-			try {
-				getView().hideFormError();
-				getView().displayRow(currentContainerRow,
-						table.isRowEditable(currentContainerRow),
-						isTableRowDeletable(currentContainerRow));
-			} catch (RuntimeException e) {
-				parentPanel.detachDialog();
-				throw e;
-			}
+	private void displayCurrentRow() {
+		try {
+			getView().hideFormError();
+			getView().displayRow(currentContainerRow,
+					isTableRowEditable(currentContainerRow),
+					isTableRowDeletable(currentContainerRow));
+		} catch (RuntimeException e) {
+			table.changeDisplayMode(DisplayMode.TABLE);
+			throw e;
 		}
 	}
 
@@ -196,11 +263,19 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		}
 	}
 
+
 	@Override
 	public void save() {
+		boolean success = trySave();
+		if (success) {
+			table.changeDisplayMode(DisplayMode.TABLE);
+		}
+	}
+	
+	private boolean trySave() {
 		try {
 			List<String> modifiedFieldNames = getModifiedFieldNames();
-            Map<String, Object> modifiedColumnNames = getModifiedFieldValues(modifiedFieldNames);
+			Map<String, Object> modifiedColumnNames = getModifiedFieldValues(modifiedFieldNames);
 			getView().commit();
 
 			try {
@@ -208,11 +283,12 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 				container.commit();
 
-				parentPanel.detachDialog();
+				return true;
 
 			} catch (Exception e) {
 				LOG.error("Error during form commit: {}", e.getMessage());
 				getView().showFormError(e.getMessage());
+				return false;
 			}
 
 		} catch (Buffered.SourceException e) {
@@ -220,16 +296,19 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 					.getMessage();
 			LOG.error("Error during form commit: {}", rootCauseMessage);
 			getView().showFormError(rootCauseMessage);
+			return false;
 
 		} catch (CommitException e) {
 			String rootCauseMessage = ExceptionUtils.getRootCause(e)
 					.getMessage();
 			LOG.error("Error during form commit: {}", rootCauseMessage);
 			getView().showFormError(rootCauseMessage);
+			return false;
 
 		} catch (Exception e) {
 			LOG.error("Error during form commit!", e);
 			getView().showFormError(ExceptionUtils.getRootCause(e).toString());
+			return false;
 		}
 
 	}
@@ -294,7 +373,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		ContainerRowId containerRowId = currentContainerRow.getId();
 		container.removeRows(singleton(containerRowId));
 
-		parentPanel.detachDialog();
+		table.changeDisplayMode(DisplayMode.TABLE);
 	}
 
 	@Override
@@ -331,13 +410,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	}
 
 	private void switchToRow(ContainerRowId otherRowId) {
-		currentContainerRow = container.getRow(otherRowId, false, true);
-
-		getView().hideFormError();
 		table.changeSelection(singleton(otherRowId));
-		getView().displayRow(currentContainerRow,
-				!isTableRowReadonly(currentContainerRow),
-				isTableRowDeletable(currentContainerRow));
 	}
 
 	@Override
@@ -348,7 +421,6 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 	@Override
 	public void cancel() {
-		parentPanel.detachDialog();
-		tablePresenter.revertChanges();
+		table.changeDisplayMode(DisplayMode.TABLE);
 	}
 }

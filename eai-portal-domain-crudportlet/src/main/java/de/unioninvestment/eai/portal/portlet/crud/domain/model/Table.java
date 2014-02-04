@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import static java.util.Collections.singleton;
 import static java.util.Collections.unmodifiableSet;
 import groovy.lang.Closure;
 
@@ -225,6 +226,10 @@ public class Table extends Component implements Component.ExpandableComponent,
 		VIEW, EDIT
 	};
 
+	public enum DisplayMode {
+		TABLE, FORM
+	}
+
 	private final TableConfig config;
 	private final TableColumns columns;
 	private DataContainer container;
@@ -234,11 +239,13 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	private EventRouter<SelectionEventHandler, SelectionEvent> selectionEventRouter = new EventRouter<SelectionEventHandler, SelectionEvent>();
 	private EventRouter<TableDoubleClickEventHandler, TableDoubleClickEvent> doubleClickEventRouter = new EventRouter<TableDoubleClickEventHandler, TableDoubleClickEvent>();
-	private EventRouter<ModeChangeEventHandler<Table, Mode>, ModeChangeEvent<Table, Mode>> onEditEventRouter = new EventRouter<ModeChangeEventHandler<Table, Mode>, ModeChangeEvent<Table, Mode>>();
+	private EventRouter<ModeChangeEventHandler<Table, Mode>, ModeChangeEvent<Table, Mode>> editModeChangeEventRouter = new EventRouter<ModeChangeEventHandler<Table, Mode>, ModeChangeEvent<Table, Mode>>();
+	private EventRouter<ModeChangeEventHandler<Table, DisplayMode>, ModeChangeEvent<Table, DisplayMode>> displayModeChangeEventRouter = new EventRouter<ModeChangeEventHandler<Table, DisplayMode>, ModeChangeEvent<Table, DisplayMode>>();
 	private EventRouter<RowChangeEventHandler, RowChangeEvent> rowChangeEventRouter = new EventRouter<RowChangeEventHandler, RowChangeEvent>();
 	private EventRouter<InitializeEventHandler<Table>, InitializeEvent<Table>> initializeEventRouter = new EventRouter<InitializeEventHandler<Table>, InitializeEvent<Table>>();
 
-	private Mode mode;
+	private Mode mode = Mode.VIEW;
+	private DisplayMode displayMode = DisplayMode.TABLE;
 
 	private Set<ContainerRowId> selection = new LinkedHashSet<ContainerRowId>();
 	private final boolean editable;
@@ -391,6 +398,15 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 */
 	public void doubleClick(ContainerRow row) {
 		doubleClickEventRouter.fireEvent(new TableDoubleClickEvent(this, row));
+		if (config.isEditForm()) {
+			changeDisplayMode(DisplayMode.FORM);
+			changeSelection(singleton(row.getId()));
+		}
+	}
+
+	public void changeMode() {
+		Mode newMode = mode == Mode.VIEW ? Mode.EDIT : Mode.VIEW;
+		changeMode(newMode);
 	}
 
 	/**
@@ -400,9 +416,39 @@ public class Table extends Component implements Component.ExpandableComponent,
 	public void changeMode(Mode mode) {
 		if (this.mode != mode) {
 			this.mode = mode;
-			onEditEventRouter.fireEvent(new ModeChangeEvent<Table, Mode>(this,
-					mode));
+			editModeChangeEventRouter
+					.fireEvent(new ModeChangeEvent<Table, Mode>(this, mode));
 		}
+	}
+
+	public void changeDisplayMode() {
+		DisplayMode newDisplayMode = displayMode == DisplayMode.TABLE ? DisplayMode.FORM : DisplayMode.TABLE;
+		changeDisplayMode(newDisplayMode);
+	}
+
+
+	/**
+	 * @param mode
+	 *            der im View gesetzte Modus
+	 */
+	public void changeDisplayMode(DisplayMode displayMode) {
+		if (this.displayMode != displayMode) {
+			this.displayMode = displayMode;
+			displayModeChangeEventRouter
+					.fireEvent(new ModeChangeEvent<Table, DisplayMode>(this,
+							displayMode));
+		}
+	}
+
+	/**
+	 * Fügt einen Event Handler für die Änderung des Anzeigemodus hinzu.
+	 * 
+	 * @param handler
+	 *            Event Handler
+	 */
+	public void addDisplayModeChangeEventHandler(
+			ModeChangeEventHandler<Table, DisplayMode> handler) {
+		displayModeChangeEventRouter.addHandler(handler);
 	}
 
 	/**
@@ -435,7 +481,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 */
 	public void addModeChangeEventHandler(
 			ModeChangeEventHandler<Table, Mode> onEditEventHandler) {
-		onEditEventRouter.addHandler(onEditEventHandler);
+		editModeChangeEventRouter.addHandler(onEditEventHandler);
 	}
 
 	/**
@@ -484,11 +530,13 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @return ob die aktuelle Zeile editiert werden darf
 	 */
 	public boolean isRowEditable(ContainerRow row) {
-		boolean rowIsEditable = true;
-		if (editableChecker != null) {
-			rowIsEditable = editableChecker.isEditable(row);
+		if (!isEditable()) {
+			return false;
 		}
-		return this.isEditable() && rowIsEditable;
+		if (editableChecker != null && !editableChecker.isEditable(row)) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -751,6 +799,13 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 */
 	public Mode getMode() {
 		return mode;
+	}
+
+	/**
+	 * @return the current display mode
+	 */
+	public DisplayMode getDisplayMode() {
+		return displayMode;
 	}
 
 }

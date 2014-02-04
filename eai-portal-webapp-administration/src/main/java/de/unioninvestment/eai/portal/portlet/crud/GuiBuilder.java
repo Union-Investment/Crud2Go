@@ -139,17 +139,13 @@ public class GuiBuilder implements Serializable {
 					&& ((Table) element).isFormEditEnabled()) {
 
 				Table table = (Table) element;
-				RowEditingFormPresenter rowEditingFormDialogPresenter = buildRowEditingFormDialogPresenter(
-						table, panel, dialogPresenterMap,
-						(TablePresenter) presenter);
-
-				((TablePresenter) presenter)
-						.setRowEditingFormPresenter(rowEditingFormDialogPresenter);
+				buildRowEditingFormDialogPresenter(table, panel,
+						dialogPresenterMap, (TablePresenter) presenter);
 			}
 		}
 	}
 
-	private RowEditingFormPresenter buildRowEditingFormDialogPresenter(
+	private void buildRowEditingFormDialogPresenter(
 			Table table, Panel parentPanel,
 			Map<String, DialogPresenter> dialogPresenterMap,
 			TablePresenter tablePresenter) {
@@ -163,8 +159,6 @@ public class GuiBuilder implements Serializable {
 				tablePresenter);
 
 		dialogPresenterMap.put(dialogId, presenter);
-
-		return presenter;
 	}
 
 	private Map<String, DialogPresenter> buildDialogPresenters(Portlet portlet,

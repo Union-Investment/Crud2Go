@@ -50,6 +50,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.TableColumnSelectionContext;
 import de.unioninvestment.eai.portal.support.vaadin.context.Context;
@@ -142,16 +143,28 @@ public class DefaultCrudFieldFactory implements TableFieldFactory,
 
 	private boolean isReadonly(ContainerRow row, Object propertyId,
 			String propertyIdString) {
+		if (!modelTable.isEditable()) {
+			return true;
+		}
+		if (modelTable.getMode() == Mode.VIEW) {
+			return true;
+		}
 		boolean fieldIsReadonlyByContainer = row.getFields().get(propertyId)
 				.isReadonly();
-		if (modelTable.getColumns() == null) {
-			return fieldIsReadonlyByContainer;
+		if (fieldIsReadonlyByContainer) {
+			return true;
 		}
-		boolean rowIsReadonly = !modelTable.isRowEditable(row);
-		TableColumn column = modelTable.getColumns().get(propertyIdString);
-		boolean cellIsConfiguredAsReadonly = !column.isEditable(row);
-		return rowIsReadonly || cellIsConfiguredAsReadonly
-				|| fieldIsReadonlyByContainer;
+		if (modelTable.getColumns() != null) {
+			if (!modelTable.isRowEditable(row)) {
+				return true;
+			}
+			TableColumn column = modelTable.getColumns().get(propertyIdString);
+			boolean cellIsConfiguredAsReadonly = !column.isEditable(row);
+			if (cellIsConfiguredAsReadonly) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void fillSelections(AbstractSelect select, ContainerRowId rowId,
@@ -171,7 +184,6 @@ public class DefaultCrudFieldFactory implements TableFieldFactory,
 		tokens.setContainerDataSource(container);
 		tokens.setTokenCaptionMode(ItemCaptionMode.ITEM);
 	}
-
 
 	private OptionListContainer createOptionListContainer(ContainerRowId rowId,
 			Object propertyId) {
@@ -210,7 +222,7 @@ public class DefaultCrudFieldFactory implements TableFieldFactory,
 							dataContainer.getFormat(propertyId.toString()));
 			fillSelections(tokens, row.getId(), propertyId);
 			return tokens;
-			
+
 		} else if (isCheckbox(propertyId, displayer)) {
 
 			de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxTableColumn checkBoxModel = modelTable
@@ -225,7 +237,7 @@ public class DefaultCrudFieldFactory implements TableFieldFactory,
 				checkBox.setEnabled(false);
 			}
 			return checkBox;
-			
+
 		} else if (!readonly && isDatePicker(propertyId, displayer)) {
 			String format = modelTable.getColumns() == null ? null : modelTable
 					.getColumns().get(propertyId.toString()).getDisplayFormat();

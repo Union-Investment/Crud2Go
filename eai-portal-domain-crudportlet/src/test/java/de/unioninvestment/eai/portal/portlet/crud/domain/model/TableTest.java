@@ -19,7 +19,9 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -28,6 +30,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -59,6 +62,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHa
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DisplayMode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.EmptyColumnGenerator;
@@ -70,6 +74,9 @@ public class TableTest {
 
 	@Captor
 	private ArgumentCaptor<ModeChangeEvent<Table, Mode>> modeChangeEventCaptor;
+
+	@Captor
+	private ArgumentCaptor<ModeChangeEvent<Table, DisplayMode>> displayModeChangeEventCaptor;
 
 	@Captor
 	private ArgumentCaptor<SelectionEvent> selectionChangeEventCaptor;
@@ -104,7 +111,7 @@ public class TableTest {
 
 	@Mock
 	private ContainerRow containerRowMock;
-	
+
 	@Mock
 	private ContainerRowId containerRowIdMock;
 
@@ -126,6 +133,8 @@ public class TableTest {
 	@Mock
 	private Portlet portletMock;
 
+	@Mock
+	private ModeChangeEventHandler<Table, DisplayMode> displayModeChangeEventHandlerMock;
 
 	@Before
 	public void setUp() {
@@ -166,7 +175,8 @@ public class TableTest {
 
 	@Test
 	public void shouldReturnDeletableCheckerResult() {
-		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(containerRowMock);
+		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(
+				containerRowMock);
 		when(rowDeletableCheckerMock.isDeletable(containerRowMock)).thenReturn(
 				false);
 		table.setRowDeletableChecker(rowDeletableCheckerMock);
@@ -218,6 +228,47 @@ public class TableTest {
 	}
 
 	@Test
+	public void shouldNotFireModeChangeEventIfNothingChanges() {
+		table.addModeChangeEventHandler(modeChangeListenerMock);
+
+		table.changeMode(Mode.VIEW);
+
+		verifyZeroInteractions(modeChangeListenerMock);
+	}
+
+	@Test
+	public void shouldChangeModes() {
+		assertThat(table.getMode(), is(Mode.VIEW));
+		table.changeMode();
+		assertThat(table.getMode(), is(Mode.EDIT));
+		table.changeMode();
+		assertThat(table.getMode(), is(Mode.VIEW));
+	}
+
+	@Test
+	public void shouldChangeDisplayModes() {
+		assertThat(table.getDisplayMode(), is(DisplayMode.TABLE));
+		table.changeDisplayMode();
+		assertThat(table.getDisplayMode(), is(DisplayMode.FORM));
+		table.changeDisplayMode();
+		assertThat(table.getDisplayMode(), is(DisplayMode.TABLE));
+	}
+	
+	@Test
+	public void shouldFireEventOnDisplayModeChange() {
+		table.addDisplayModeChangeEventHandler(displayModeChangeEventHandlerMock);
+		table.changeDisplayMode(DisplayMode.FORM);
+		verifyDisplayModeChangeEvent(table, DisplayMode.FORM);
+	}
+
+	@Test
+	public void shouldNotFireEventWhenDisplayModeAlreadySet() {
+		table.addDisplayModeChangeEventHandler(displayModeChangeEventHandlerMock);
+		table.changeDisplayMode(DisplayMode.TABLE);
+		verifyZeroInteractions(displayModeChangeEventHandlerMock);
+	}
+	
+	@Test
 	public void shouldFireSelectionChangeEvent() {
 
 		table.addSelectionEventHandler(selectionChangeListenerMock);
@@ -227,11 +278,17 @@ public class TableTest {
 				"INDEX")));
 		table.changeSelection(selectionRowId);
 
+		verifySelectionChangeEvent(table, selectionRowId);
+	}
+
+	private void verifySelectionChangeEvent(Table expectedTable,
+			Set<ContainerRowId> expectedSelection) {
 		verify(selectionChangeListenerMock).onSelectionChange(
 				selectionChangeEventCaptor.capture());
-
 		assertThat(selectionChangeEventCaptor.getValue().getSource(),
-				is((Object) table));
+				is((Object) expectedTable));
+		assertThat(selectionChangeEventCaptor.getValue().getSelection(),
+				equalTo(expectedSelection));
 	}
 
 	@Test
@@ -239,12 +296,40 @@ public class TableTest {
 		table.addTableDoubleClickEventHandler(doubleClickEventHandler);
 		table.doubleClick(containerRowMock);
 
+		verifyDoubleClickEvent(table, containerRowMock);
+	}
+
+	private void verifyDoubleClickEvent(Table expectedTable,
+			ContainerRow expectedRow) {
 		verify(doubleClickEventHandler).onDoubleClick(
 				tableDoubleClickEventCaptor.capture());
 		assertThat(tableDoubleClickEventCaptor.getValue().getSource(),
-				is(table));
+				is(expectedTable));
 		assertThat(tableDoubleClickEventCaptor.getValue().getRow(),
-				is(containerRowMock));
+				is(expectedRow));
+	}
+
+	@Test
+	public void shouldSwitchToFormViewAndChangeSelectionOnDoubleClickEventWithFormEditing() {
+		config.setEditForm(true);
+		table.addDisplayModeChangeEventHandler(displayModeChangeEventHandlerMock);
+		table.addSelectionEventHandler(selectionChangeListenerMock);
+		when(containerRowMock.getId()).thenReturn(containerRowIdMock);
+
+		table.doubleClick(containerRowMock);
+
+		verifyDisplayModeChangeEvent(table, DisplayMode.FORM);
+		verifySelectionChangeEvent(table, singleton(containerRowIdMock));
+	}
+
+	private void verifyDisplayModeChangeEvent(Table expectedTable,
+			DisplayMode expectedDisplayMode) {
+		verify(displayModeChangeEventHandlerMock).onModeChange(
+				displayModeChangeEventCaptor.capture());
+		assertThat(displayModeChangeEventCaptor.getValue().getSource(),
+				is(expectedTable));
+		assertThat(displayModeChangeEventCaptor.getValue().getMode(),
+				is(expectedDisplayMode));
 	}
 
 	@Test

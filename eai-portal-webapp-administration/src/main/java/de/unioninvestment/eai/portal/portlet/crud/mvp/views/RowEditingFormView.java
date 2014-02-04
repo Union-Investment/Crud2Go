@@ -94,6 +94,8 @@ public interface RowEditingFormView extends PanelContentView {
 		public List<String> getVisibleFields();
 
 		void addClobFields(Item item);
+
+		void changeMode();
 	}
 
 	/**
@@ -133,5 +135,9 @@ public interface RowEditingFormView extends PanelContentView {
 	void addClobField(TableColumn tableColumn, boolean readOnly);
 
 	void hideFormError();
+
+	void updateButtonsForViewMode();
+
+	void updateButtonsForEditMode();
 
 }

@@ -29,9 +29,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -41,12 +43,14 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
@@ -55,6 +59,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Panel;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DisplayMode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.DefaultRowEditingFormView;
@@ -109,6 +114,9 @@ public class RowEditingFormPresenterTest {
 	@Mock
 	private ContainerRowId otherRowIdMock;
 
+	@Mock
+	private PanelPresenter parentPanelPresenterMock;
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -137,16 +145,14 @@ public class RowEditingFormPresenterTest {
 	}
 
 	@Test
-	public void shouldAttachPresenterAsDoubleClickHandler() {
-		verify(tableMock).addTableDoubleClickEventHandler(presenter);
+	public void shouldAttachItselfAsDisplayModeChangeEventHandler() {
+		verify(tableMock).addDisplayModeChangeEventHandler(
+				any(ModeChangeEventHandler.class));
 	}
 
 	@Test
 	public void shouldAttachDialogOnDoubleClick() {
-		when(tableMock.getMode()).thenReturn(Mode.EDIT);
-		when(tableDoubleClickEventMock.getRow()).thenReturn(containerRowMock);
-
-		presenter.onDoubleClick(tableDoubleClickEventMock);
+		presenter.handleDisplayModeChange(DisplayMode.FORM);
 
 		verify(parentPanelMock).attachDialog("id1");
 	}
@@ -192,18 +198,18 @@ public class RowEditingFormPresenterTest {
 	}
 
 	@Test
-	public void shouldDisplayRowOnShowDialogRequest() {
+	public void shouldDisplayRowOnRequest() {
 		when(tableMock.isRowEditable(containerRowMock)).thenReturn(true);
+		when(tableMock.getMode()).thenReturn(Mode.EDIT);
 
 		when(containerRowMock.getId()).thenReturn(containerRowIdMock);
 		when(containerMock.isDeleteable()).thenReturn(true);
 		when(tableMock.isRowDeletable(containerRowIdMock)).thenReturn(true);
 
-		presenter.showDialog(containerRowMock);
+		presenter.displayRow(containerRowMock);
 
-		verify(viewMock).displayRow(containerRowMock, true,  true);
+		verify(viewMock).displayRow(containerRowMock, true, true);
 	}
-
 
 	@Test
 	public void shouldCommitContainerOnSave() {
@@ -213,10 +219,10 @@ public class RowEditingFormPresenterTest {
 	}
 
 	@Test
-	public void shouldDetachDialogOnSave() {
+	public void shouldReturnToTableOnSave() {
 		presenter.save();
 
-		verify(parentPanelMock).detachDialog();
+		verify(tableMock).changeDisplayMode(DisplayMode.TABLE);
 	}
 
 	@Test
@@ -227,22 +233,32 @@ public class RowEditingFormPresenterTest {
 	}
 
 	@Test
-	public void shouldDetachDialogOnCancel() {
-		presenter.cancel();
-
+	public void shouldDetachAttachedDialogOnDisplayModeChange() {
+		presenter.notifyAboutBeingAttached(parentPanelPresenterMock);
+		presenter.handleDisplayModeChange(DisplayMode.TABLE);
 		verify(parentPanelMock).detachDialog();
 	}
 
+	/**
+	 * This happens if backButton was pressed
+	 */
 	@Test
-	public void shouldRevertChangesOnCancel() {
+	public void shouldNotDetachAlreadyDetachedDialogOnDisplayModeChange() {
+		presenter.handleDisplayModeChange(DisplayMode.TABLE);
+
+		verify(parentPanelMock, never()).detachDialog();
+	}
+
+	@Test
+	public void shouldSwitchDisplayModeOnCancel() {
 		presenter.cancel();
 
-		verify(tablePresenterMock).revertChanges();
+		verify(tableMock).changeDisplayMode(DisplayMode.TABLE);
 	}
 
 	@Test
 	public void shouldRemoveRowOnDelete() {
-		presenter.showDialog(containerRowMock);
+		presenter.displayRow(containerRowMock);
 
 		presenter.delete();
 
@@ -251,12 +267,12 @@ public class RowEditingFormPresenterTest {
 	}
 
 	@Test
-	public void shouldDetachDialogOnDelete() {
-		presenter.showDialog(containerRowMock);
+	public void shouldReturnToTableOnDelete() {
+		presenter.displayRow(containerRowMock);
 
 		presenter.delete();
 
-		verify(parentPanelMock).detachDialog();
+		verify(tableMock).changeDisplayMode(DisplayMode.TABLE);
 	}
 
 	@Test
@@ -270,9 +286,9 @@ public class RowEditingFormPresenterTest {
 				asList("A", "B", "C"));
 		when(viewMock.isFieldModifed("B")).thenReturn(true);
 
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.FORM);
 		when(tableMock.getMode()).thenReturn(Mode.EDIT);
-		when(tableDoubleClickEventMock.getRow()).thenReturn(containerRowMock);
-		presenter.onDoubleClick(tableDoubleClickEventMock);
+		presenter.displayRow(containerRowMock);
 
 		when(containerRowMock.getFields()).thenReturn(
 				singletonMap("B", containerFieldMock));
@@ -292,8 +308,9 @@ public class RowEditingFormPresenterTest {
 		when(viewMock.isFieldModifed("B")).thenReturn(true);
 
 		when(tableMock.getMode()).thenReturn(Mode.EDIT);
-		when(tableDoubleClickEventMock.getRow()).thenReturn(containerRowMock);
-		presenter.onDoubleClick(tableDoubleClickEventMock);
+		when(tableMock.getSelection())
+				.thenReturn(singleton(containerRowIdMock));
+		presenter.handleSelectionChange();
 
 		when(containerMock.isCLob("B")).thenReturn(true);
 
@@ -305,8 +322,70 @@ public class RowEditingFormPresenterTest {
 	}
 
 	@Test
+	public void shouldHideErrorsOnSelectionChange() {
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.FORM);
+		when(tableMock.getSelection()).thenReturn(singleton(containerRowIdMock));
+		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(containerRowMock);
+
+		presenter.handleSelectionChange();
+		
+		verify(viewMock).hideFormError();
+	}
+
+	@Test
+	public void shouldDisplayTheNewRowOnSelectionChange() {
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.FORM);
+		when(tableMock.getSelection()).thenReturn(singleton(containerRowIdMock));
+		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(containerRowMock);
+
+		presenter.handleSelectionChange();
+		
+		verify(viewMock).displayRow(Mockito.eq(containerRowMock), any(Boolean.class), any(Boolean.class));
+	}
+	
+	@Test
+	public void shouldPassEditableAndDeletableStatusForNewRow() {
+		presenter.displayRow(containerRowMock);
+
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.FORM);
+		when(tableMock.getSelection()).thenReturn(singleton(otherRowIdMock));
+		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(
+				otherRowMock);
+		when(tableMock.isRowEditable(otherRowMock)).thenReturn(true);
+		when(tableMock.getMode()).thenReturn(Mode.EDIT);
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.FORM);
+
+		when(containerMock.isDeleteable()).thenReturn(true);
+		when(otherRowMock.getId()).thenReturn(otherRowIdMock);
+		when(tableMock.isRowDeletable(otherRowIdMock)).thenReturn(true);
+
+		reset(viewMock);
+
+		presenter.handleSelectionChange();
+
+		verify(viewMock).displayRow(otherRowMock, true, true);
+	}
+
+
+
+	@Test
+	public void shouldReDisplayTheCurrentRowOnModeChange() {
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.FORM);
+		when(tableMock.getSelection()).thenReturn(singleton(containerRowIdMock));
+		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(containerRowMock);
+
+		presenter.handleSelectionChange();
+		reset(viewMock);
+		
+		presenter.handleModeChange(Mode.EDIT);
+		
+		verify(viewMock).displayRow(Mockito.eq(containerRowMock), any(Boolean.class), any(Boolean.class));
+	}
+
+
+	@Test
 	public void shouldTellThatNextRowDoesNotExists() {
-		presenter.showDialog(containerRowMock);
+		presenter.displayRow(containerRowMock);
 		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(null);
 
 		boolean result = presenter.hasNextRow();
@@ -316,7 +395,7 @@ public class RowEditingFormPresenterTest {
 
 	@Test
 	public void shouldTellThatNextRowExists() {
-		presenter.showDialog(containerRowMock);
+		presenter.displayRow(containerRowMock);
 		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(
 				otherRowIdMock);
 
@@ -327,7 +406,7 @@ public class RowEditingFormPresenterTest {
 
 	@Test
 	public void shouldTellThatPreviousRowDoesNotExists() {
-		presenter.showDialog(containerRowMock);
+		presenter.displayRow(containerRowMock);
 		when(containerMock.previousRowId(containerRowIdMock)).thenReturn(null);
 
 		boolean result = presenter.hasPreviousRow();
@@ -337,7 +416,7 @@ public class RowEditingFormPresenterTest {
 
 	@Test
 	public void shouldTellThatPreviousRowExists() {
-		presenter.showDialog(containerRowMock);
+		presenter.displayRow(containerRowMock);
 		when(containerMock.previousRowId(containerRowIdMock)).thenReturn(
 				otherRowIdMock);
 
@@ -345,14 +424,13 @@ public class RowEditingFormPresenterTest {
 
 		assertTrue(result);
 	}
-	
+
 	@Test
 	public void shouldDoNothingIfNextRowDoesNotExist() {
-		presenter.showDialog(containerRowMock);
-		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(
-				null);
+		presenter.displayRow(containerRowMock);
+		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(null);
 		reset(viewMock, tableMock);
-		
+
 		boolean switched = presenter.nextRow();
 
 		verifyNoMoreInteractions(viewMock, tableMock);
@@ -361,11 +439,10 @@ public class RowEditingFormPresenterTest {
 
 	@Test
 	public void shouldDoNothingIfPreviousRowDoesNotExist() {
-		presenter.showDialog(containerRowMock);
-		when(containerMock.previousRowId(containerRowIdMock)).thenReturn(
-				null);
+		presenter.displayRow(containerRowMock);
+		when(containerMock.previousRowId(containerRowIdMock)).thenReturn(null);
 		reset(viewMock, tableMock);
-		
+
 		boolean switched = presenter.previousRow();
 
 		verifyNoMoreInteractions(viewMock, tableMock);
@@ -374,53 +451,76 @@ public class RowEditingFormPresenterTest {
 
 	@Test
 	public void shouldSwitchToPreviousRowIfItExists() {
-		presenter.showDialog(containerRowMock);
+		presenter.displayRow(containerRowMock);
 		when(containerMock.previousRowId(containerRowIdMock)).thenReturn(
 				otherRowIdMock);
-		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(otherRowMock);
+		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(
+				otherRowMock);
 		reset(viewMock, tableMock);
-		
+
 		boolean switched = presenter.previousRow();
-		
+
 		verify(tableMock).changeSelection(singleton(otherRowIdMock));
-		verify(viewMock).hideFormError();
-		verify(viewMock).displayRow(otherRowMock, false, false);
 		assertTrue(switched);
 	}
 
 	@Test
 	public void shouldSwitchToNextRowIfItExists() {
-		presenter.showDialog(containerRowMock);
+		presenter.displayRow(containerRowMock);
 		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(
 				otherRowIdMock);
-		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(otherRowMock);
+		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(
+				otherRowMock);
 		reset(viewMock, tableMock);
-		
+
 		boolean switched = presenter.nextRow();
-		
+
 		verify(tableMock).changeSelection(singleton(otherRowIdMock));
-		verify(viewMock).hideFormError();
-		verify(viewMock).displayRow(otherRowMock, false, false);
 		assertTrue(switched);
 	}
 
 	@Test
-	public void shouldPassEditableAndDeletableStatusForNextRow() {
-		presenter.showDialog(containerRowMock);
+	public void shouldUpdateButtonsForViewModeOnModeChange() {
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.FORM);
+		presenter.handleModeChange(Mode.EDIT);
+		verify(viewMock).updateButtonsForEditMode();
+	}
 
-		when(containerMock.nextRowId(containerRowIdMock)).thenReturn(
-				otherRowIdMock);
-		when(containerMock.getRow(otherRowIdMock, false, true)).thenReturn(otherRowMock);
-		when(tableMock.isRowEditable(otherRowMock)).thenReturn(true);
+	@Test
+	public void shouldUpdateButtonsForEditModeOnModeChange() {
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.FORM);
+		presenter.handleModeChange(Mode.VIEW);
+		verify(viewMock).updateButtonsForViewMode();
+	}
 
-		when(containerMock.isDeleteable()).thenReturn(true);
-		when(otherRowMock.getId()).thenReturn(otherRowIdMock);
-		when(tableMock.isRowDeletable(otherRowIdMock)).thenReturn(true);
-		
+	@Test
+	public void shouldDisplayCurrentRowOnModeChange() {
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.FORM);
+		presenter.handleModeChange(Mode.EDIT);
+		verify(viewMock).displayRow(any(ContainerRow.class), any(Boolean.class), any(Boolean.class));
+	}
+
+	@Test
+	public void shouldIgnoreModeChangesForDisplayModeTable() {
 		reset(viewMock);
-		
-		presenter.nextRow();
-		
-		verify(viewMock).displayRow(otherRowMock, true, true);
+		when(tableMock.getDisplayMode()).thenReturn(DisplayMode.TABLE);
+
+		presenter.handleModeChange(Mode.EDIT);
+
+		verifyZeroInteractions(viewMock);
+	}
+	
+	@Test
+	public void shouldSaveOnModeChange() {
+		presenter.changeMode();
+		verify(containerMock).commit();
+		verify(tableMock).changeMode();
+	}
+	
+	@Test
+	public void shouldNotChangeModeOnFailureDuringSave() {
+		doThrow(new RuntimeException()).when(containerMock).commit();
+		presenter.changeMode();
+		verify(tableMock, never()).changeMode();
 	}
 }

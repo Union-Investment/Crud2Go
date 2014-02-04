@@ -18,6 +18,8 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
+import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
@@ -63,7 +65,6 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFa
 public class DefaultRowEditingFormView extends DefaultPanelContentView
 		implements RowEditingFormView {
 
-
 	private static final long serialVersionUID = 1L;
 
 	private Presenter presenter;
@@ -84,6 +85,10 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	private Label errorLabel;
 
 	private CrudFieldFactory fieldFactory;
+
+	private CssLayout footerLayout;
+
+	private Button switchModeButton = null;
 
 	/**
 	 * Konstruktor.
@@ -111,7 +116,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		this.presenter = presenter;
 
 		prepareFieldFactory(tableModel);
-		buildViewComponents();
+		buildViewComponents(tableModel.isEditable());
 	}
 
 	private void prepareFieldFactory(Table tableModel) {
@@ -122,7 +127,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		this.fieldFactory = validationWrapper;
 	}
 
-	private void buildViewComponents() {
+	private void buildViewComponents(boolean addSwitchModeButton) {
 		fieldLayout = new FormLayout();
 		addComponent(fieldLayout);
 
@@ -131,11 +136,24 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		errorLabel.setVisible(false);
 		addComponent(errorLabel);
 
-		CssLayout footerLayout = new CssLayout();
+		footerLayout = new CssLayout();
 		footerLayout.setStyleName("actions");
 		addComponent(footerLayout);
 
-		saveButton = new Button("Speichern");
+		if (addSwitchModeButton) {
+			switchModeButton = new Button(getMessage("portlet.crud.button.editMode"));
+			switchModeButton.addClickListener(new ClickListener() {
+				private static final long serialVersionUID = 1L;
+				
+				@Override
+				public void buttonClick(ClickEvent event) {
+					presenter.changeMode();
+				}
+			});
+			footerLayout.addComponent(switchModeButton);
+		}
+
+		saveButton = new Button(getMessage("portlet.crud.button.save"));
 		saveButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -144,9 +162,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				presenter.save();
 			}
 		});
-		footerLayout.addComponent(saveButton);
 
-		resetButton = new Button("Zurücksetzen");
+		resetButton = new Button(getMessage("portlet.crud.button.reset"));
 		resetButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -155,9 +172,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				presenter.resetFields();
 			}
 		});
-		footerLayout.addComponent(resetButton);
 
-		deleteButton = new Button("Löschen");
+		deleteButton = new Button(getMessage("portlet.crud.button.remove"));
 		deleteButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -166,9 +182,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				presenter.delete();
 			}
 		});
-		footerLayout.addComponent(deleteButton);
 
-		previousRowButton = new Button("Vorheriger");
+		previousRowButton = new Button(getMessage("portlet.crud.button.previousRow"));
 		previousRowButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -177,9 +192,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				presenter.previousRow();
 			}
 		});
-		footerLayout.addComponent(previousRowButton);
 
-		nextRowButton = new Button("Nächster");
+		nextRowButton = new Button(getMessage("portlet.crud.button.nextRow"));
 		nextRowButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -188,9 +202,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				presenter.nextRow();
 			}
 		});
-		footerLayout.addComponent(nextRowButton);
 
-		Button cancelButton = new Button("Abbrechen");
+		Button cancelButton = new Button(getMessage("portlet.crud.button.cancel"));
 		cancelButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -199,7 +212,27 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				presenter.cancel();
 			}
 		});
-		footerLayout.addComponent(cancelButton);
+		footerLayout.addComponents(saveButton, saveButton, deleteButton,
+				previousRowButton, nextRowButton, cancelButton);
+	}
+
+	@Override
+	public void updateButtonsForViewMode() {
+		if (switchModeButton != null) {
+			switchModeButton.setCaption(getMessage("portlet.crud.button.editMode"));
+		}
+		saveButton.setVisible(false);
+		resetButton.setVisible(false);
+	}
+
+	@Override
+	public void updateButtonsForEditMode() {
+		if (switchModeButton != null) {
+			switchModeButton.setCaption(getMessage("portlet.crud.button.viewMode"));
+		}
+		saveButton.setVisible(true);
+		resetButton.setVisible(true);
+		
 	}
 
 	@Override
@@ -219,9 +252,11 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				// see https://dev.vaadin.com/ticket/11753
 				boolean initiallyReadonly = field.isReadOnly();
 				if (initiallyReadonly) {
-					field.setPropertyDataSource(binder.getItemDataSource().getItemProperty(fieldName));
+					field.setPropertyDataSource(binder.getItemDataSource()
+							.getItemProperty(fieldName));
 				} else {
-					// only bind if not readonly, so that readonly fields are not part of the commit()
+					// only bind if not readonly, so that readonly fields are
+					// not part of the commit()
 					binder.bind(field, fieldName);
 				}
 				addFieldToLayout(field);
@@ -294,7 +329,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		blobField.setSpacing(true);
 
 		final FileMetadata metadata = tableColumn.getFileMetadata();
-		Assert.notNull(metadata, "Missing file metadata for field '" + tableColumn.getName() + "'");
+		Assert.notNull(metadata, "Missing file metadata for field '"
+				+ tableColumn.getName() + "'");
 		if (!containerBlob.isEmpty()) {
 			StreamSource streamSource = containerBlob.getStreamSource();
 			StreamResource resource = new StreamResource(streamSource,
@@ -381,9 +417,11 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		// see https://dev.vaadin.com/ticket/11753
 		boolean initiallyReadonly = area.isReadOnly();
 		if (initiallyReadonly) {
-			area.setPropertyDataSource(binder.getItemDataSource().getItemProperty(columnName));
+			area.setPropertyDataSource(binder.getItemDataSource()
+					.getItemProperty(columnName));
 		} else {
-			// only bind if not readonly, so that readonly fields are not part of the commit()
+			// only bind if not readonly, so that readonly fields are not part
+			// of the commit()
 			binder.bind(area, columnName);
 		}
 

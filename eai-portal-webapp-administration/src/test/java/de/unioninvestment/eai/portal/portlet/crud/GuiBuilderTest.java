@@ -201,21 +201,4 @@ public class GuiBuilderTest extends SpringPortletContextTest {
 				any(TablePresenter.class));
 	}
 
-	@Test
-	public void shouldSetReferenceToEditingFormPresenter() {
-		when(pageMock.getElements()).thenReturn(
-				Arrays.asList(new Component[] { tableMock }));
-		when(tableMock.isFormEditEnabled()).thenReturn(true);
-
-		when(
-				presenterFactoryMock.rowEditingFormPresenter(any(Dialog.class),
-						any(Panel.class), any(String.class), any(Table.class),
-						any(TablePresenter.class))).thenReturn(
-				rowEditingFormPresenterMock);
-
-		new GuiBuilder(presenterFactoryMock).build(portletMock);
-
-		verify(tablePresenterMock).setRowEditingFormPresenter(
-				rowEditingFormPresenterMock);
-	}
 }

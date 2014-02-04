@@ -305,7 +305,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				onChangeMode();
+				presenter.switchMode(tableModel.getMode() == Mode.VIEW ? Mode.EDIT : Mode.VIEW);
 			}
 		});
 		revertButton.addClickListener(new Button.ClickListener() {
@@ -712,12 +712,11 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	/**
-	 * Wechselt zwischen Anzeige- und Editiermodus. Beim Verlassen des
+	 * Wechselt in den Anzeigemodus. Beim Verlassen des
 	 * Editiermodus wird ein Commit durchgeführt.
 	 */
-	@SuppressWarnings("unchecked")
-	public void onChangeMode() {
-		// Wechsel zwischen View und Edit Mode
+	@Override
+	public void switchToViewMode() {
 		if (table.isEditable() && commit()) {
 
 			table.setEditable(false);
@@ -734,31 +733,31 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			setCollapsedColumns(lastCollapsedColumns);
 
 			updateVisibleColumns(false);
-			presenter.switchMode(Mode.VIEW);
 			LOG.debug("Setze den Ansichtsmodus");
-
-		} else {
-			table.setEditable(true);
-
-			editButton.setCaption(getMessage("portlet.crud.button.viewMode"));
-			table.removeStyleName("crudViewMode");
-			table.addStyleName("crudEditMode");
-
-			insertButton.setVisible(true);
-			revertButton.setVisible(true);
-			removeButton.setVisible(true);
-
-			lastCollapsedColumns = getCollapsedColumns();
-			table.setColumnCollapsingAllowed(false);
-			updateVisibleColumns(true);
-			presenter.switchMode(Mode.EDIT);
-			
-			updateRemoveButtonStatus((Set<Object>)table.getValue(), uncommittedItemId);
-			
-			LOG.debug("Setze den Editiermodus");
 		}
 	}
+	
+	@Override
+	public void switchToEditMode() {
+		table.setEditable(true);
 
+		editButton.setCaption(getMessage("portlet.crud.button.viewMode"));
+		table.removeStyleName("crudViewMode");
+		table.addStyleName("crudEditMode");
+
+		insertButton.setVisible(true);
+		revertButton.setVisible(true);
+		removeButton.setVisible(true);
+
+		lastCollapsedColumns = getCollapsedColumns();
+		table.setColumnCollapsingAllowed(false);
+		updateVisibleColumns(true);
+		
+		updateRemoveButtonStatus((Set<Object>)table.getValue(), uncommittedItemId);
+		
+		LOG.debug("Setze den Editiermodus");
+	}
+	
 	private Layout initButtonBar() {
 		CssLayout buttonbar = new CssLayout();
 		buttonbar.setStyleName("actions");
