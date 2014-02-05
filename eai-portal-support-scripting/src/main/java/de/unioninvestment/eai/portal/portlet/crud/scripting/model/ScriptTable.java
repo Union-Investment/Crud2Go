@@ -221,6 +221,13 @@ public class ScriptTable extends ScriptComponent {
 	}
 
 	/**
+	 * @return <code>true</code>, falls direct edit für die Tabelle aktiv ist
+	 */
+	public boolean isDirectEdit() {
+		return table.isDirectEdit();
+	}
+
+	/**
 	 * @return liefert den aktuellen Editiermodus 'VIEW' oder 'EDIT' zurück.
 	 */
 	public String getMode() {
