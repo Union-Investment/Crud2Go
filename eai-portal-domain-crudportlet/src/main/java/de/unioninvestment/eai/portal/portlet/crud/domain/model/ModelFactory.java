@@ -67,8 +67,8 @@ public class ModelFactory {
 	@Value("${portlet.crud.table.select.default-width}")
 	private int defaultSelectWidth;
 
-	@Value("${portlet.crud.table.separateEditMode}")
-	private boolean separateEditMode;
+	@Value("${portlet.crud.table.directEdit}")
+	private boolean directEdit;
 
 	@Autowired
 	@Qualifier("prefetchExecutor")
@@ -119,7 +119,7 @@ public class ModelFactory {
 		this.resetFormAction = resetFormAction;
 		this.fieldValidatorFactory = fieldValidatorFactory;
 		this.defaultSelectWidth = defaultSelectWidth;
-		this.separateEditMode = separateEditMode;
+		this.directEdit = separateEditMode;
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class ModelFactory {
 	 */
 	public ModelBuilder getBuilder(EventBus eventBus, Config config) {
 		return new ModelBuilder(eventBus, this, userFactory, resetFormAction,
-				fieldValidatorFactory, defaultSelectWidth, config, separateEditMode);
+				fieldValidatorFactory, defaultSelectWidth, config, directEdit);
 	}
 
 	public Realm getAuthenticationRealm(AuthenticationRealmConfig config) {

@@ -3,7 +3,7 @@
 	title="Beispiel für die Deaktivierung des separaten Editiermodus">
 	<page>
 		<region title="Separater Edit-Mode">
-			<table id="table" separate-edit-mode="true">
+			<table id="table" direct-edit="false" >
 				<database-query datasource="test">
 					<query><![CDATA[
 					SELECT * FROM test_crud2
@@ -64,7 +64,7 @@
 			</table>
 		</region>
 		<region title="Direct Edit">
-			<table id="table2" separate-edit-mode="false">
+			<table id="table2" direct-edit="true" >
 				<database-query datasource="test">
 					<query><![CDATA[
 					SELECT * FROM test_crud2
@@ -125,7 +125,7 @@
 			</table>
 		</region>
 		<region title="Direct Form Edit">
-			<table id="table3" separate-edit-mode="false" edit-form="true">
+			<table id="table3" direct-edit="true" edit-form="true">
 				<database-query datasource="test">
 					<query><![CDATA[
 					SELECT * FROM test_crud2

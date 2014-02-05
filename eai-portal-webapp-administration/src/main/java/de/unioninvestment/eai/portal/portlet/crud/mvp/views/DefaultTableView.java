@@ -304,7 +304,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void addCrudButtonListeners() {
-		if (tableModel.isSeparateEditMode()) {
+		if (!tableModel.isDirectEdit()) {
 			editButton.addClickListener(new Button.ClickListener() {
 				@Override
 				public void buttonClick(ClickEvent event) {
@@ -730,7 +730,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 			table.setEditable(false);
 
-			if (tableModel.isSeparateEditMode()) {
+			if (!tableModel.isDirectEdit()) {
 				editButton
 						.setCaption(getMessage("portlet.crud.button.editMode"));
 				table.removeStyleName("crudEditMode");
@@ -755,7 +755,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	public void switchToEditMode() {
 		table.setEditable(true);
 
-		if (tableModel.isSeparateEditMode()) {
+		if (!tableModel.isDirectEdit()) {
 			editButton.setCaption(getMessage("portlet.crud.button.viewMode"));
 			table.removeStyleName("crudViewMode");
 			table.addStyleName("crudEditMode");
@@ -782,7 +782,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		buttonbar.setStyleName("actions");
 
 		if (!this.presenter.isReadonly()) {
-			if (tableModel.isSeparateEditMode()) {
+			if (!tableModel.isDirectEdit()) {
 				editButton = new Button(
 						getMessage("portlet.crud.button.editMode"));
 				editButton.setEnabled(true);

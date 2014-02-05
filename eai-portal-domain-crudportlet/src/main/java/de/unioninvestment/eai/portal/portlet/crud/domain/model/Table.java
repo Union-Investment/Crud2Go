@@ -249,7 +249,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	private Set<ContainerRowId> selection = new LinkedHashSet<ContainerRowId>();
 	private final boolean editable;
-	private final boolean separateEditMode;
+	private final boolean directEdit;
 
 	private RowEditableChecker editableChecker;
 	private RowDeletableChecker deletableChecker;
@@ -266,12 +266,12 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @param editable
 	 *            Ob die Tabelle editierbar ist
 	 */
-	public Table(TableConfig config, TableColumns tableColumns, boolean editable, boolean separateEditMode) {
+	public Table(TableConfig config, TableColumns tableColumns, boolean editable, boolean directEdit) {
 		this.config = config;
 		this.columns = tableColumns;
 		this.editable = editable;
-		this.separateEditMode = separateEditMode;
-		this.mode = separateEditMode || !editable ? Mode.VIEW : Mode.EDIT;
+		this.directEdit = directEdit;
+		this.mode = directEdit && editable ? Mode.EDIT : Mode.VIEW;
 	}
 
 	/**
@@ -411,8 +411,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 		}
 	}
 
-	public boolean isSeparateEditMode() {
-		return separateEditMode;
+	public boolean isDirectEdit() {
+		return directEdit;
 	}
 	
 	public void changeMode() {

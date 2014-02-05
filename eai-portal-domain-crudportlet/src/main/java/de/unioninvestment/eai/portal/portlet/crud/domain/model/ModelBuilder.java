@@ -115,7 +115,7 @@ public class ModelBuilder {
 
 	private final EventBus eventBus;
 
-	private boolean separateEditModeDefault;
+	private boolean directEditDefault;
 
 	/**
 	 * Konstruktor mit Parameter.
@@ -138,7 +138,7 @@ public class ModelBuilder {
 	public ModelBuilder(EventBus eventBus, ModelFactory factory,
 			UserFactory userFactory, ResetFormAction resetFormAction,
 			FieldValidatorFactory fieldValidatorFactory,
-			int defaultSelectWidth, Config config, boolean separateEditMode) {
+			int defaultSelectWidth, Config config, boolean directEditDefault) {
 		this.eventBus = eventBus;
 		this.factory = factory;
 		this.userFactory = userFactory;
@@ -146,7 +146,7 @@ public class ModelBuilder {
 		this.fieldValidatorFactory = fieldValidatorFactory;
 		this.defaultSelectWidth = defaultSelectWidth;
 		this.config = config;
-		this.separateEditModeDefault = separateEditMode;
+		this.directEditDefault = directEditDefault;
 	}
 
 	/**
@@ -467,9 +467,9 @@ public class ModelBuilder {
 
 			boolean editable = currentUser.hasPermission(tableConfig,
 					Table.Permission.EDIT, tableConfig.isEditable());
-			boolean separateEditMode = tableConfig.isSeparateEditMode() != null ? tableConfig
-					.isSeparateEditMode() : this.separateEditModeDefault;
-			Table table = new Table(tableConfig, tableColumns, editable, separateEditMode);
+			boolean directEdit = tableConfig.isDirectEdit() != null ? tableConfig
+					.isDirectEdit() : this.directEditDefault;
+			Table table = new Table(tableConfig, tableColumns, editable, directEdit);
 			mappings.put(table, tableConfig);
 			portlet.addElementById(tableConfig.getId(), table);
 
