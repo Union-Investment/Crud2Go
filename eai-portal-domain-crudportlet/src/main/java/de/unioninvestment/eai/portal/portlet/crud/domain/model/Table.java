@@ -244,8 +244,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 	private EventRouter<RowChangeEventHandler, RowChangeEvent> rowChangeEventRouter = new EventRouter<RowChangeEventHandler, RowChangeEvent>();
 	private EventRouter<InitializeEventHandler<Table>, InitializeEvent<Table>> initializeEventRouter = new EventRouter<InitializeEventHandler<Table>, InitializeEvent<Table>>();
 
-	private Mode mode = Mode.VIEW;
-	private DisplayMode displayMode = DisplayMode.TABLE;
+	Mode mode = Mode.VIEW;
+	DisplayMode displayMode = DisplayMode.TABLE;
 
 	private Set<ContainerRowId> selection = new LinkedHashSet<ContainerRowId>();
 	private final boolean editable;
@@ -397,10 +397,14 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 *            Zeile
 	 */
 	public void doubleClick(ContainerRow row) {
-		doubleClickEventRouter.fireEvent(new TableDoubleClickEvent(this, row));
-		if (config.isEditForm()) {
+		if (config.isEditForm()
+				&& (doubleClickEventRouter.getRegisteredHandlerSize() == 0
+				|| mode == Mode.EDIT)) {
+
 			changeDisplayMode(DisplayMode.FORM);
 			changeSelection(singleton(row.getId()));
+		} else {
+			doubleClickEventRouter.fireEvent(new TableDoubleClickEvent(this, row));
 		}
 	}
 
@@ -422,10 +426,10 @@ public class Table extends Component implements Component.ExpandableComponent,
 	}
 
 	public void changeDisplayMode() {
-		DisplayMode newDisplayMode = displayMode == DisplayMode.TABLE ? DisplayMode.FORM : DisplayMode.TABLE;
+		DisplayMode newDisplayMode = displayMode == DisplayMode.TABLE ? DisplayMode.FORM
+				: DisplayMode.TABLE;
 		changeDisplayMode(newDisplayMode);
 	}
-
 
 	/**
 	 * @param mode
@@ -468,9 +472,13 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @param handler
 	 *            Eventhandler
 	 */
-	public void addTableDoubleClickEventHandler(
-			TableDoubleClickEventHandler handler) {
+	public void addDoubleClickEventHandler(TableDoubleClickEventHandler handler) {
 		doubleClickEventRouter.addHandler(handler);
+	}
+
+	public void removeDoubleClickEventHandler(
+			TableDoubleClickEventHandler doubleClickEventHandler) {
+		doubleClickEventRouter.removeHandler(doubleClickEventHandler);
 	}
 
 	/**

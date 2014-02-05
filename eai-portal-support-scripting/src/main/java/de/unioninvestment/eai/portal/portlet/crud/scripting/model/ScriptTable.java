@@ -57,6 +57,7 @@ import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
  * 
  * @author siva.selvarajah
  */
+@SuppressWarnings("serial")
 public class ScriptTable extends ScriptComponent {
 
 	private Table table;
@@ -72,6 +73,8 @@ public class ScriptTable extends ScriptComponent {
 	private Map<String, Closure<?>> generatedColumnClosures = new HashMap<String, Closure<?>>();
 
 	private ScriptTableSelection currentSelection;
+
+	TableDoubleClickEventHandler doubleClickEventHandler = null;
 
 	/**
 	 * Konstruktor mit Parameter.
@@ -187,7 +190,33 @@ public class ScriptTable extends ScriptComponent {
 	 *            die Closure
 	 */
 	public void setOnDoubleClick(Closure<?> onDoubleClick) {
+		if (onDoubleClick == null) {
+			removeExistingDoubleClickEventHandler();
+		} else {
+			addMissingDoubleClickEventHandler();
+		}
 		this.onDoubleClick = onDoubleClick;
+	}
+
+	private void addMissingDoubleClickEventHandler() {
+		if (doubleClickEventHandler == null) {
+			doubleClickEventHandler = new TableDoubleClickEventHandler() {
+				@Override
+				public void onDoubleClick(TableDoubleClickEvent event) {
+					ScriptRow scriptRow = new ScriptRow(event.getRow());
+					ScriptTable.this.onDoubleClick.call(ScriptTable.this,
+							scriptRow);
+				}
+			};
+			table.addDoubleClickEventHandler(doubleClickEventHandler);
+		}
+	}
+
+	private void removeExistingDoubleClickEventHandler() {
+		if (doubleClickEventHandler != null) {
+			table.removeDoubleClickEventHandler(doubleClickEventHandler);
+			doubleClickEventHandler = null;
+		}
 	}
 
 	/**
@@ -244,9 +273,6 @@ public class ScriptTable extends ScriptComponent {
 
 	private void initializeEventHandler(final Table table) {
 		table.addSelectionEventHandler(new SelectionEventHandler() {
-
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public void onSelectionChange(SelectionEvent selectionEvent) {
 				Set<ScriptRowId> selectedRowIds = new HashSet<ScriptRowId>();
@@ -264,22 +290,7 @@ public class ScriptTable extends ScriptComponent {
 			}
 		});
 
-		table.addTableDoubleClickEventHandler(new TableDoubleClickEventHandler() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void onDoubleClick(TableDoubleClickEvent event) {
-				if (onDoubleClick != null) {
-					ScriptRow scriptRow = new ScriptRow(event.getRow());
-					onDoubleClick.call(ScriptTable.this, scriptRow);
-				}
-			}
-		});
-
 		table.addModeChangeEventHandler(new ModeChangeEventHandler<Table, Mode>() {
-
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public void onModeChange(ModeChangeEvent<Table, Mode> event) {
 				if (onModeChange != null) {
@@ -290,8 +301,6 @@ public class ScriptTable extends ScriptComponent {
 		});
 
 		table.addRowChangeEventHandler(new RowChangeEventHandler() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public void rowChange(RowChangeEvent event) {
 				if (onRowChange != null) {
@@ -303,8 +312,6 @@ public class ScriptTable extends ScriptComponent {
 		});
 
 		table.addInitializeEventHandler(new InitializeEventHandler<Table>() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public void onInitialize(InitializeEvent<Table> event) {
 				if (onInitialize != null) {
@@ -485,10 +492,9 @@ public class ScriptTable extends ScriptComponent {
 		return new ScriptRow(table.createNewRow(mapValuesToModel(values)));
 	}
 
-	private Map<String, Object> mapValuesToModel(
-			Map<String, Object> values) {
+	private Map<String, Object> mapValuesToModel(Map<String, Object> values) {
 		if (values == null) {
-			return Collections.<String,Object>emptyMap();
+			return Collections.<String, Object> emptyMap();
 		} else {
 			return new TransformedEntryMap<String, Object, Object>(values,
 					ScriptField.SCRIPT_TO_MODEL_VALUE_TRANSFORMER);

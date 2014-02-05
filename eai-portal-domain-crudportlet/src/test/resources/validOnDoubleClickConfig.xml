@@ -2,7 +2,7 @@
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
 	title="Beispiel für DoubleClick-Event">
 	<page>
-		<table id="table" row-height="30" onDoubleClick="handleDoubleClick(it,row)">
+		<table id="table" row-height="30" onDoubleClick="handleDoubleClick(it,row)" edit-form="true">
 			<database-query datasource="test">
 				<query><![CDATA[
 					SELECT * FROM test_crud2

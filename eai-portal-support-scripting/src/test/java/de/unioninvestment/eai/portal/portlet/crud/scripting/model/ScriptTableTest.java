@@ -30,6 +30,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import groovy.lang.Closure;
@@ -93,6 +94,9 @@ public class ScriptTableTest {
 	@Mock
 	private Closure<?> onDoubleClickClosureMock;
 
+	@Mock
+	private Closure<?> otherDoubleClickClosureMock;
+
 	@Captor
 	private ArgumentCaptor<ModeChangeEventHandler<Table, Mode>> modeChangeEventCaptor;
 
@@ -124,6 +128,7 @@ public class ScriptTableTest {
 
 	@Mock
 	private ContainerBlob containerBlobMock;
+
 
 	@Before
 	public void setUp() {
@@ -222,11 +227,11 @@ public class ScriptTableTest {
 	}
 
 	@Test
-	public void shouldDoubleClickEvent() {
+	public void shouldFireDoubleClickEvent() {
 
 		scriptTable.setOnDoubleClick(onDoubleClickClosureMock);
 
-		verify(tableMock).addTableDoubleClickEventHandler(
+		verify(tableMock).addDoubleClickEventHandler(
 				doubleClickEventCaptor.capture());
 
 		TableDoubleClickEvent doubleClickEvent = new TableDoubleClickEvent(
@@ -238,17 +243,30 @@ public class ScriptTableTest {
 	}
 
 	@Test
-	public void shouldDoubleClickEventNull() {
+	public void shouldRemoveExistingEventHandlerOnNullDoubleClickEventHandler() {
 
-		verify(tableMock).addTableDoubleClickEventHandler(
+		scriptTable.setOnDoubleClick(onDoubleClickClosureMock);
+
+		verify(tableMock).addDoubleClickEventHandler(
 				doubleClickEventCaptor.capture());
 
-		TableDoubleClickEvent doubleClickEvent = new TableDoubleClickEvent(
-				tableMock, containerRowMock);
-		doubleClickEventCaptor.getValue().onDoubleClick(doubleClickEvent);
+		scriptTable.setOnDoubleClick(null);
+		verify(tableMock).removeDoubleClickEventHandler(
+				doubleClickEventCaptor.getValue());
+	}
 
-		verify(onDoubleClickClosureMock, never()).call(any(ScriptTable.class),
-				any(ScriptRow.class));
+	@Test
+	public void shouldNotAddDoubleClickEventHandlerTwice() {
+		scriptTable.setOnDoubleClick(onDoubleClickClosureMock);
+		scriptTable.setOnDoubleClick(otherDoubleClickClosureMock);
+		verify(tableMock, times(1)).addDoubleClickEventHandler(any(TableDoubleClickEventHandler.class));
+	}
+
+
+	@Test
+	public void shouldIgnoreNullDoubleClickEventHandler() {
+		scriptTable.setOnDoubleClick(null);
+		verify(tableMock, never()).addDoubleClickEventHandler(any(TableDoubleClickEventHandler.class));
 	}
 
 	@Test

@@ -29,6 +29,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -253,7 +254,7 @@ public class TableTest {
 		table.changeDisplayMode();
 		assertThat(table.getDisplayMode(), is(DisplayMode.TABLE));
 	}
-	
+
 	@Test
 	public void shouldFireEventOnDisplayModeChange() {
 		table.addDisplayModeChangeEventHandler(displayModeChangeEventHandlerMock);
@@ -267,7 +268,7 @@ public class TableTest {
 		table.changeDisplayMode(DisplayMode.TABLE);
 		verifyZeroInteractions(displayModeChangeEventHandlerMock);
 	}
-	
+
 	@Test
 	public void shouldFireSelectionChangeEvent() {
 
@@ -292,10 +293,9 @@ public class TableTest {
 	}
 
 	@Test
-	public void shouldFireDoubleClickEvent() {
-		table.addTableDoubleClickEventHandler(doubleClickEventHandler);
+	public void shouldFireDoubleClickEventIfHandlerIsRegistered() {
+		table.addDoubleClickEventHandler(doubleClickEventHandler);
 		table.doubleClick(containerRowMock);
-
 		verifyDoubleClickEvent(table, containerRowMock);
 	}
 
@@ -310,16 +310,55 @@ public class TableTest {
 	}
 
 	@Test
-	public void shouldSwitchToFormViewAndChangeSelectionOnDoubleClickEventWithFormEditing() {
-		config.setEditForm(true);
+	public void shouldSwitchToFormViewAndChangeSelectionOnDoubleClickWithFormEditing() {
 		table.addDisplayModeChangeEventHandler(displayModeChangeEventHandlerMock);
 		table.addSelectionEventHandler(selectionChangeListenerMock);
 		when(containerRowMock.getId()).thenReturn(containerRowIdMock);
 
+		verifySwitchToFormViewAndSelectionChangeOnDoubleClick(Mode.VIEW, false,
+				false, false, false, false);
+		verifySwitchToFormViewAndSelectionChangeOnDoubleClick(Mode.VIEW, false,
+				false, false, false, false);
+		verifySwitchToFormViewAndSelectionChangeOnDoubleClick(Mode.VIEW, true,
+				true, true, false, false);
+		verifySwitchToFormViewAndSelectionChangeOnDoubleClick(Mode.VIEW, false,
+				true, false, true, true);
+		verifySwitchToFormViewAndSelectionChangeOnDoubleClick(Mode.EDIT, true,
+				true, false, true, false); // selection already changed
+	}
+
+	private void verifySwitchToFormViewAndSelectionChangeOnDoubleClick(
+			Mode mode, boolean hasDoubleClickHandler, boolean editForm,
+			boolean shouldFireDoubleClickEvent, boolean shouldSwitch,
+			boolean shouldFireSelectionChange) {
+
+		table.removeDoubleClickEventHandler(doubleClickEventHandler);
+		if (hasDoubleClickHandler) {
+			table.addDoubleClickEventHandler(doubleClickEventHandler);
+		}
+		config.setEditForm(editForm);
+		table.mode = mode;
+		table.displayMode = DisplayMode.TABLE;
+		reset(doubleClickEventHandler, displayModeChangeEventHandlerMock,
+				selectionChangeListenerMock);
+
 		table.doubleClick(containerRowMock);
 
-		verifyDisplayModeChangeEvent(table, DisplayMode.FORM);
-		verifySelectionChangeEvent(table, singleton(containerRowIdMock));
+		if (hasDoubleClickHandler && shouldFireDoubleClickEvent) {
+			verifyDoubleClickEvent(table, containerRowMock);
+		} else if (hasDoubleClickHandler) {
+			verifyZeroInteractions(doubleClickEventHandler);
+		}
+		if (shouldSwitch) {
+			verifyDisplayModeChangeEvent(table, DisplayMode.FORM);
+		} else {
+			verifyZeroInteractions(displayModeChangeEventHandlerMock);
+		}
+		if (shouldFireSelectionChange) {
+			verifySelectionChangeEvent(table, singleton(containerRowIdMock));
+		} else {
+			verifyZeroInteractions(selectionChangeListenerMock);
+		}
 	}
 
 	private void verifyDisplayModeChangeEvent(Table expectedTable,
