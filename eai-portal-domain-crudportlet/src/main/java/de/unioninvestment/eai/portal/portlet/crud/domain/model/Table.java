@@ -244,11 +244,12 @@ public class Table extends Component implements Component.ExpandableComponent,
 	private EventRouter<RowChangeEventHandler, RowChangeEvent> rowChangeEventRouter = new EventRouter<RowChangeEventHandler, RowChangeEvent>();
 	private EventRouter<InitializeEventHandler<Table>, InitializeEvent<Table>> initializeEventRouter = new EventRouter<InitializeEventHandler<Table>, InitializeEvent<Table>>();
 
-	Mode mode = Mode.VIEW;
+	Mode mode;
 	DisplayMode displayMode = DisplayMode.TABLE;
 
 	private Set<ContainerRowId> selection = new LinkedHashSet<ContainerRowId>();
 	private final boolean editable;
+	private final boolean separateEditMode;
 
 	private RowEditableChecker editableChecker;
 	private RowDeletableChecker deletableChecker;
@@ -265,10 +266,12 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @param editable
 	 *            Ob die Tabelle editierbar ist
 	 */
-	public Table(TableConfig config, TableColumns tableColumns, boolean editable) {
+	public Table(TableConfig config, TableColumns tableColumns, boolean editable, boolean separateEditMode) {
 		this.config = config;
 		this.columns = tableColumns;
 		this.editable = editable;
+		this.separateEditMode = separateEditMode;
+		this.mode = separateEditMode || !editable ? Mode.VIEW : Mode.EDIT;
 	}
 
 	/**
@@ -408,6 +411,10 @@ public class Table extends Component implements Component.ExpandableComponent,
 		}
 	}
 
+	public boolean isSeparateEditMode() {
+		return separateEditMode;
+	}
+	
 	public void changeMode() {
 		Mode newMode = mode == Mode.VIEW ? Mode.EDIT : Mode.VIEW;
 		changeMode(newMode);

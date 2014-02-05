@@ -95,6 +95,7 @@ import de.unioninvestment.eai.portal.support.vaadin.support.BufferedTable;
  * @author carsten.mjartan
  */
 @Configurable
+@SuppressWarnings("serial")
 public class DefaultTableView extends VerticalLayout implements TableView {
 
 	private static final long serialVersionUID = 1L;
@@ -104,11 +105,14 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 	public static final int HUNDRET = 100;
 
-	private Button insertButton;
-
 	private Button editButton;
-
+	private Button saveButton;
+	private Button insertButton;
 	private Button revertButton;
+	private Button removeButton;
+
+	private Map<String, Button> actionButtons = new HashMap<String, Button>();
+	private Map<Button, TableAction> buttonToTableActionMap = new HashMap<Button, TableAction>();
 
 	/**
 	 * @deprecated Use {@link TableAction#isExportAction()} instead
@@ -121,11 +125,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	private Button csvExportButton;
 
 	private CrudTable table;
-
-	private Button removeButton;
-
-	private Map<String, Button> actionButtons = new HashMap<String, Button>();
-	private Map<Button, TableAction> buttonToTableActionMap = new HashMap<Button, TableAction>();
 
 	private TableView.Presenter presenter;
 
@@ -252,6 +251,11 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		setTableStyleRenderer();
 
 		presenter.doInitialize();
+
+		if (tableModel.getMode() == Mode.EDIT) {
+			switchToEditMode();
+		}
+
 		table.enableContentRefreshing(false);
 	}
 
@@ -300,14 +304,22 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void addCrudButtonListeners() {
-		editButton.addClickListener(new Button.ClickListener() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				presenter.switchMode(tableModel.getMode() == Mode.VIEW ? Mode.EDIT : Mode.VIEW);
-			}
-		});
+		if (tableModel.isSeparateEditMode()) {
+			editButton.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					presenter.switchMode(tableModel.getMode() == Mode.VIEW ? Mode.EDIT
+							: Mode.VIEW);
+				}
+			});
+		} else if (!tableModel.isFormEditEnabled()) {
+			saveButton.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					commit();
+				}
+			});
+		}
 		revertButton.addClickListener(new Button.ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -318,8 +330,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		});
 		if (presenter.isInsertable()) {
 			insertButton.addClickListener(new Button.ClickListener() {
-				private static final long serialVersionUID = 1L;
-
 				@Override
 				public void buttonClick(ClickEvent event) {
 					onAddBlankRow();
@@ -328,8 +338,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		}
 		if (presenter.isDeleteable()) {
 			removeButton.addClickListener(new Button.ClickListener() {
-				private static final long serialVersionUID = 1L;
-
 				@Override
 				public void buttonClick(ClickEvent event) {
 					onRemoveRow();
@@ -341,8 +349,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	private void addExportButtonListeners() {
 		if (presenter.isExcelExport()) {
 			excelExportButton.addClickListener(new Button.ClickListener() {
-				private static final long serialVersionUID = 1L;
-
 				@Override
 				public void buttonClick(ClickEvent event) {
 					exportExcelSheet();
@@ -353,8 +359,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 		if (presenter.isCSVExport()) {
 			csvExportButton.addClickListener(new Button.ClickListener() {
-				private static final long serialVersionUID = 1L;
-
 				@Override
 				public void buttonClick(ClickEvent event) {
 					exportCSVSheet();
@@ -400,7 +404,8 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void initializeTableFieldFactory() {
-		DefaultCrudFieldFactory fieldFactory = new DefaultCrudFieldFactory(table, tableModel);
+		DefaultCrudFieldFactory fieldFactory = new DefaultCrudFieldFactory(
+				table, tableModel);
 
 		fieldFactory.setCreateFormFieldForTable(!presenter.isFormEditEnabled());
 
@@ -553,11 +558,13 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		updateRemoveButtonStatus(selection, uncommittedItemId);
 	}
 
-	private void updateRemoveButtonStatus(Set<Object> selection, Object singleItemId) {
+	private void updateRemoveButtonStatus(Set<Object> selection,
+			Object singleItemId) {
 		if (removeButton != null) {
 			boolean deletable = false;
 			if (inEditMode() && presenter.isDeleteable()) {
-				if (singleItemId != null && presenter.isRowDeletable(singleItemId)) {
+				if (singleItemId != null
+						&& presenter.isRowDeletable(singleItemId)) {
 					deletable = true;
 				} else if (selection.size() > 1) {
 					deletable = true;
@@ -676,7 +683,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		try {
 			removalInProgress = true;
 			int all = selection.size();
-			int removed = 0; 
+			int removed = 0;
 			for (Object selectedItemId : selection) {
 				if (presenter.isRowDeletable(selectedItemId)) {
 					table.removeItem(selectedItemId);
@@ -685,13 +692,15 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			}
 			commit();
 			if (removed < all) {
-				Notification.show(getMessage("portlet.crud.table.rowsPartlyDeleted", removed, all), Type.WARNING_MESSAGE);
+				Notification.show(
+						getMessage("portlet.crud.table.rowsPartlyDeleted",
+								removed, all), Type.WARNING_MESSAGE);
 			}
 		} finally {
 			removalInProgress = false;
 		}
 	}
-	
+
 	@Override
 	public void onRevertChanges() {
 		try {
@@ -712,8 +721,8 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	/**
-	 * Wechselt in den Anzeigemodus. Beim Verlassen des
-	 * Editiermodus wird ein Commit durchgeführt.
+	 * Wechselt in den Anzeigemodus. Beim Verlassen des Editiermodus wird ein
+	 * Commit durchgeführt.
 	 */
 	@Override
 	public void switchToViewMode() {
@@ -721,9 +730,14 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 			table.setEditable(false);
 
-			editButton.setCaption(getMessage("portlet.crud.button.editMode"));
-			table.removeStyleName("crudEditMode");
-			table.addStyleName("crudViewMode");
+			if (tableModel.isSeparateEditMode()) {
+				editButton
+						.setCaption(getMessage("portlet.crud.button.editMode"));
+				table.removeStyleName("crudEditMode");
+				table.addStyleName("crudViewMode");
+			} else if (saveButton != null) {
+				saveButton.setVisible(false);
+			}
 
 			insertButton.setVisible(false);
 			revertButton.setVisible(false);
@@ -736,14 +750,18 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			LOG.debug("Setze den Ansichtsmodus");
 		}
 	}
-	
+
 	@Override
 	public void switchToEditMode() {
 		table.setEditable(true);
 
-		editButton.setCaption(getMessage("portlet.crud.button.viewMode"));
-		table.removeStyleName("crudViewMode");
-		table.addStyleName("crudEditMode");
+		if (tableModel.isSeparateEditMode()) {
+			editButton.setCaption(getMessage("portlet.crud.button.viewMode"));
+			table.removeStyleName("crudViewMode");
+			table.addStyleName("crudEditMode");
+		} else if (saveButton != null) {
+			saveButton.setVisible(true);
+		}
 
 		insertButton.setVisible(true);
 		revertButton.setVisible(true);
@@ -752,41 +770,46 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		lastCollapsedColumns = getCollapsedColumns();
 		table.setColumnCollapsingAllowed(false);
 		updateVisibleColumns(true);
-		
-		updateRemoveButtonStatus((Set<Object>)table.getValue(), uncommittedItemId);
-		
+
+		updateRemoveButtonStatus((Set<Object>) table.getValue(),
+				uncommittedItemId);
+
 		LOG.debug("Setze den Editiermodus");
 	}
-	
+
 	private Layout initButtonBar() {
 		CssLayout buttonbar = new CssLayout();
 		buttonbar.setStyleName("actions");
 
 		if (!this.presenter.isReadonly()) {
-			if (!this.presenter.isReadonly()) {
+			if (tableModel.isSeparateEditMode()) {
 				editButton = new Button(
 						getMessage("portlet.crud.button.editMode"));
 				editButton.setEnabled(true);
 				buttonbar.addComponent(editButton);
-
-				revertButton = new Button(
-						getMessage("portlet.crud.button.reset"));
-				revertButton.setVisible(false);
-				revertButton.setEnabled(true);
-				buttonbar.addComponent(revertButton);
-
-				insertButton = new Button(
-						getMessage("portlet.crud.button.blankRow"));
-				insertButton.setVisible(false);
-				insertButton.setEnabled(presenter.isInsertable());
-				buttonbar.addComponent(insertButton);
-
-				removeButton = new Button(
-						getMessage("portlet.crud.button.removeRow"));
-				removeButton.setVisible(false);
-				removeButton.setEnabled(presenter.isDeleteable());
-				buttonbar.addComponent(removeButton);
+			} else if (!tableModel.isFormEditEnabled()) {
+				saveButton = new Button(getMessage("portlet.crud.button.save"));
+				saveButton.setVisible(false);
+				saveButton.setEnabled(true);
+				buttonbar.addComponent(saveButton);
 			}
+
+			revertButton = new Button(getMessage("portlet.crud.button.reset"));
+			revertButton.setVisible(false);
+			revertButton.setEnabled(true);
+			buttonbar.addComponent(revertButton);
+
+			insertButton = new Button(
+					getMessage("portlet.crud.button.blankRow"));
+			insertButton.setVisible(false);
+			insertButton.setEnabled(presenter.isInsertable());
+			buttonbar.addComponent(insertButton);
+
+			removeButton = new Button(
+					getMessage("portlet.crud.button.removeRow"));
+			removeButton.setVisible(false);
+			removeButton.setEnabled(presenter.isDeleteable());
+			buttonbar.addComponent(removeButton);
 		}
 		if (presenter.isExcelExport()) {
 			excelExportButton = new Button("Excel");
@@ -982,9 +1005,10 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 	@Override
 	public void download(Download download) {
-		executeExport(new DownloadExportTask(UI.getCurrent(), tableModel, download, automaticDownloadIsPossible()));
+		executeExport(new DownloadExportTask(UI.getCurrent(), tableModel,
+				download, automaticDownloadIsPossible()));
 	}
-	
+
 	private void executeExport(ExportTask exportTask) {
 		table.setEnabled(false);
 		boolean automaticDownload = automaticDownloadIsPossible();

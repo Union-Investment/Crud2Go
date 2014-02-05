@@ -72,7 +72,7 @@ public class ModelFactoryTest {
 		MockitoAnnotations.initMocks(this);
 		factory = new ModelFactory(connectionPoolFactoryMock, userFactoryMock,
 				prefetchExecutorMock, resetFormActionMock,
-				fieldValidatorFactoryMock, 20);
+				fieldValidatorFactoryMock, 20, true);
 	}
 
 	@Test
@@ -81,9 +81,8 @@ public class ModelFactoryTest {
 				connectionPoolMock);
 
 		DatabaseTableContainer container = factory.getDatabaseTableContainer(
-				eventBus,
-				"eai", "test_table", true, true, true, null, displayPattern,
-				null, null, 0, 0, 0);
+				eventBus, "eai", "test_table", true, true, true, null,
+				displayPattern, null, null, 0, 0, 0);
 
 		assertThat(container, notNullValue());
 	}

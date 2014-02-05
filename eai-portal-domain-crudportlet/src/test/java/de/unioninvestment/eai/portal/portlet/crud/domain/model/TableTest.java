@@ -143,7 +143,7 @@ public class TableTest {
 
 		config.setRowHeight(20);
 
-		table = new Table(config, tableColumns, true);
+		table = new Table(config, tableColumns, true, true);
 		table.setContainer(containerMock);
 		table.setPresenter(presenterMock);
 		table.setPanel(panelMock);
@@ -169,7 +169,7 @@ public class TableTest {
 	public void shouldReturnRowIsNotEditableAsDefault() {
 		assertThat(table.isRowEditable(containerRowMock), is(true));
 
-		table = new Table(config, tableColumns, false);
+		table = new Table(config, tableColumns, false, true);
 
 		assertThat(table.isRowEditable(containerRowMock), is(false));
 	}
@@ -191,7 +191,7 @@ public class TableTest {
 
 	@Test
 	public void shouldReturnRowIsDeletableAsDefault() {
-		table = new Table(config, tableColumns, false);
+		table = new Table(config, tableColumns, false, true);
 		assertThat(table.isRowDeletable(containerRowIdMock), is(true));
 	}
 
@@ -475,5 +475,22 @@ public class TableTest {
 	public void shouldDelegateWithExportSettings() {
 		table.withExportSettings(exportMock);
 		verify(containerMock).withExportSettings(exportMock);
+	}
+	
+	@Test
+	public void shouldStartInViewModeByDefault() {
+		assertThat(table.getMode(), is(Mode.VIEW));
+	}
+	
+	@Test
+	public void shouldStartInEditModeIfSeparateModeIsDisabled() {
+		table = new Table(config, tableColumns, true, false);
+		assertThat(table.getMode(), is(Mode.EDIT));
+	}
+
+	@Test
+	public void shouldStartInViewModeIfSeparateModeIsDisabledAndNotEditable() {
+		table = new Table(config, tableColumns, false, false);
+		assertThat(table.getMode(), is(Mode.VIEW));
 	}
 }

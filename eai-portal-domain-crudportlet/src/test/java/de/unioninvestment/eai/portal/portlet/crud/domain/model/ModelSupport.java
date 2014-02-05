@@ -55,6 +55,7 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 	protected ResetFormAction resetFormAction;
 	protected FieldValidatorFactory fieldValidatorFactory;
 	protected int defaultSelectWidth = 300;
+	private boolean separateEditMode = true;
 
 	private Map<String, Long> resourceIds = new HashMap<String, Long>();
 	private ExecutorService prefetchExecutor = Executors
@@ -72,6 +73,7 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 		resetFormAction = mock(ResetFormAction.class);
 		fieldValidatorFactory = mock(FieldValidatorFactory.class);
 		defaultSelectWidth = 300;
+		separateEditMode = true;
 
 		resourceIds.put(TEST_PORTLET_ID + "_" + TEST_COMMUNITY_ID + "_admin",
 				1l);
@@ -87,7 +89,7 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 	protected ModelBuilder createModelBuilder(PortletConfig configuration) {
 		ModelFactory factory = new ModelFactory(connectionPoolFactory,
 				userFactory, prefetchExecutor, resetFormAction,
-				fieldValidatorFactory, defaultSelectWidth);
+				fieldValidatorFactory, defaultSelectWidth, separateEditMode);
 		return factory.getBuilder(eventBus, new Config(configuration,
 				resourceIds, null, null));
 	}

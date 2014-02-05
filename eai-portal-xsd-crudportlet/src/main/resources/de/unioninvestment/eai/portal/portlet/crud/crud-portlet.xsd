@@ -1546,6 +1546,14 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="separate-edit-mode" type="boolean">
+					<annotation>
+						<documentation>
+							Ob für das Editieren das Umschalten in einen
+							separaten Modus gewünscht wird
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="editable" type="boolean" default="true">
 					<annotation>
 						<documentation>

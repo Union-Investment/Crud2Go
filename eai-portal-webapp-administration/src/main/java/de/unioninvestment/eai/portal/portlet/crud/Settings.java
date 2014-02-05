@@ -92,6 +92,9 @@ public class Settings {
 	@Value("${portlet.crud.revision.portal.role}")
 	private String revisionPortalRole;
 
+	@Value("${portlet.crud.table.separateEditMode}")
+	private boolean separateEditMode;
+
 	@Value("${portlet.crud.displayRequestProcessingInfo}")
 	private boolean displayRequestProcessingInfo;
 
