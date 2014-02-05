@@ -46,6 +46,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClick
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DisplayMode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.map.TransformedEntryMap;
@@ -217,6 +218,38 @@ public class ScriptTable extends ScriptComponent {
 			table.removeDoubleClickEventHandler(doubleClickEventHandler);
 			doubleClickEventHandler = null;
 		}
+	}
+
+	/**
+	 * @return liefert den aktuellen Editiermodus 'VIEW' oder 'EDIT' zurück.
+	 */
+	public String getMode() {
+		return table.getMode().name();
+	}
+
+	/**
+	 * @param mode
+	 *            der Zielmodus. Kann nur geändert werden, wenn direct editing
+	 *            deaktiviert ist
+	 * @throws IllegalStateException
+	 *             , falls eine Änderung nicht möglich ist
+	 */
+	public void setMode(String mode) {
+		table.changeMode(Mode.valueOf(mode));
+	}
+
+	/**
+	 * @return den aktuellen Anzeigemodus 'TABLE' oder 'FORM' zurück
+	 */
+	public String getDisplayMode() {
+		return table.getDisplayMode().name();
+	}
+
+	/**
+	 * Schließt eine evtl. geöffnete Formularansicht
+	 */
+	public void closeEditForm() {
+		table.changeDisplayMode(DisplayMode.TABLE);
 	}
 
 	/**

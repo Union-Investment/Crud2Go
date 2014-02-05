@@ -3,7 +3,7 @@
 	title="Beispiel für die Deaktivierung des separaten Editiermodus">
 	<page>
 		<region title="Separater Edit-Mode">
-			<table id="table" direct-edit="false" >
+			<table id="table" direct-edit="false" edit-form="true">
 				<database-query datasource="test">
 					<query><![CDATA[
 					SELECT * FROM test_crud2
@@ -61,10 +61,13 @@
 					<column name="TESTDATA" editable="true" width="300"
 						validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt" />
 				</columns>
+				<action title="=> TABLE" onExecution="it.table.closeEditForm()" />
+				<action title="=> VIEW" onExecution="it.table.mode = 'VIEW'" />
+				<action title="=> EDIT" onExecution="it.table.mode = 'EDIT'" />
 			</table>
 		</region>
 		<region title="Direct Edit">
-			<table id="table2" direct-edit="true" >
+			<table id="table2" direct-edit="true">
 				<database-query datasource="test">
 					<query><![CDATA[
 					SELECT * FROM test_crud2

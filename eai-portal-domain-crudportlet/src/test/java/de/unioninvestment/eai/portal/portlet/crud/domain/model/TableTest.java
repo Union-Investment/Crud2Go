@@ -143,7 +143,7 @@ public class TableTest {
 
 		config.setRowHeight(20);
 
-		table = new Table(config, tableColumns, true, true);
+		table = new Table(config, tableColumns, true, false);
 		table.setContainer(containerMock);
 		table.setPresenter(presenterMock);
 		table.setPanel(panelMock);
@@ -169,7 +169,7 @@ public class TableTest {
 	public void shouldReturnRowIsNotEditableAsDefault() {
 		assertThat(table.isRowEditable(containerRowMock), is(true));
 
-		table = new Table(config, tableColumns, false, true);
+		table = new Table(config, tableColumns, false, false);
 
 		assertThat(table.isRowEditable(containerRowMock), is(false));
 	}
@@ -484,13 +484,13 @@ public class TableTest {
 	
 	@Test
 	public void shouldStartInEditModeIfSeparateModeIsDisabled() {
-		table = new Table(config, tableColumns, true, false);
+		table = new Table(config, tableColumns, true, true);
 		assertThat(table.getMode(), is(Mode.EDIT));
 	}
 
 	@Test
 	public void shouldStartInViewModeIfSeparateModeIsDisabledAndNotEditable() {
-		table = new Table(config, tableColumns, false, false);
+		table = new Table(config, tableColumns, false, true);
 		assertThat(table.getMode(), is(Mode.VIEW));
 	}
 }

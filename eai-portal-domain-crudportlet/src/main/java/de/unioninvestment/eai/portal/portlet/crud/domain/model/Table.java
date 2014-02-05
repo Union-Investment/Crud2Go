@@ -266,7 +266,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @param editable
 	 *            Ob die Tabelle editierbar ist
 	 */
-	public Table(TableConfig config, TableColumns tableColumns, boolean editable, boolean directEdit) {
+	public Table(TableConfig config, TableColumns tableColumns,
+			boolean editable, boolean directEdit) {
 		this.config = config;
 		this.columns = tableColumns;
 		this.editable = editable;
@@ -401,20 +402,20 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 */
 	public void doubleClick(ContainerRow row) {
 		if (config.isEditForm()
-				&& (doubleClickEventRouter.getRegisteredHandlerSize() == 0
-				|| mode == Mode.EDIT)) {
+				&& (doubleClickEventRouter.getRegisteredHandlerSize() == 0 || mode == Mode.EDIT)) {
 
 			changeDisplayMode(DisplayMode.FORM);
 			changeSelection(singleton(row.getId()));
 		} else {
-			doubleClickEventRouter.fireEvent(new TableDoubleClickEvent(this, row));
+			doubleClickEventRouter.fireEvent(new TableDoubleClickEvent(this,
+					row));
 		}
 	}
 
 	public boolean isDirectEdit() {
 		return directEdit;
 	}
-	
+
 	public void changeMode() {
 		Mode newMode = mode == Mode.VIEW ? Mode.EDIT : Mode.VIEW;
 		changeMode(newMode);
@@ -425,7 +426,10 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 *            der im View gesetzte Modus
 	 */
 	public void changeMode(Mode mode) {
-		if (this.mode != mode) {
+		if (directEdit) {
+			throw new IllegalStateException(
+					"Cannot change mode if direct editing is enabled");
+		} else if (this.mode != mode) {
 			this.mode = mode;
 			editModeChangeEventRouter
 					.fireEvent(new ModeChangeEvent<Table, Mode>(this, mode));
@@ -442,12 +446,15 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @param mode
 	 *            der im View gesetzte Modus
 	 */
-	public void changeDisplayMode(DisplayMode displayMode) {
-		if (this.displayMode != displayMode) {
-			this.displayMode = displayMode;
+	public void changeDisplayMode(DisplayMode newDisplayMode) {
+		if (newDisplayMode == DisplayMode.FORM && !isFormEditEnabled()) {
+			throw new IllegalStateException(
+					"Cannot change displayMode if form editing is disabled");
+		} else if (this.displayMode != newDisplayMode) {
+			this.displayMode = newDisplayMode;
 			displayModeChangeEventRouter
 					.fireEvent(new ModeChangeEvent<Table, DisplayMode>(this,
-							displayMode));
+							newDisplayMode));
 		}
 	}
 
