@@ -222,4 +222,11 @@ public class ScriptPortlet {
 	public Map<String, String> getPreferences() {
 		return new ScriptPreferences(portlet.getPreferences());
 	}
+	
+	/**
+	 * @return Zugriff auf Caching-Mechanismen
+	 */
+	public ScriptPortletCaching getCaching() {
+		return new ScriptPortletCaching(portlet.getCaching());
+	}
 }

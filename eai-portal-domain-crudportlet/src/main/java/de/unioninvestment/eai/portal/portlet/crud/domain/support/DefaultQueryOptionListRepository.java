@@ -172,22 +172,26 @@ public class DefaultQueryOptionListRepository implements
 	}
 
 	@Override
-	public void remove(String datasSource, String query) {
+	public boolean remove(String datasSource, String query) {
 		String key = createKey(datasSource, query);
 		boolean removed = cache.remove(key);
 		if (removed) {
 			CACHE_LOGGER.debug("Removed option list from cache [{}]", key);
 		}
+		return removed;
 	}
 
-    public void removeAll(String dataSource, Pattern pattern) {
+    public int removeAll(String dataSource, Pattern pattern) {
         List<Object> keysToRemove = findAllMatchingKeys(dataSource, pattern);
+        int count = 0;
         for (Object cacheKey : keysToRemove) {
             boolean removed = cache.remove(cacheKey);
             if (removed) {
+            	count++;
                 CACHE_LOGGER.debug("Removed option list from cache [{}]", cacheKey);
             }
         }
+        return count;
     }
 
     List<Object> findAllMatchingKeys(String dataSource, Pattern pattern) {

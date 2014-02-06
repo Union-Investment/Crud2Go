@@ -10,7 +10,7 @@
 			<field name="CVARCHAR5_NN" />
 			<field name="CNUMBER5_2_NN">
 				<select id="dropdown">
-					<query datasource="test">
+					<query datasource="test" cached="true">
 						select CNUMBER5_2_NN as key, CNUMBER5_2_NN as title from test_crud2
 					</query>
 				</select>
@@ -97,6 +97,19 @@
 				<column name="TESTDATA" editable="true" width="300"
 					validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt" />
 			</columns>
+			<action title="Query aus Cache löschen" onExecution="removeExactQuery()"/>
+			<action title="Queries von TEST_CRUD2 aus Cache löschen" onExecution="removeTestCrud2Queries()"/>
 		</table>
 	</page>
+	<script><![CDATA[
+		def removeExactQuery() {
+			def result = portlet.caching.invalidateQueryOptionList('test','select CNUMBER5_2_NN as key, CNUMBER5_2_NN as title from test_crud2')
+			if (result) showInfo "Liste aus Cache entfernt"
+		}
+		
+		def removeTestCrud2Queries() {
+			def result = portlet.caching.invalidateQueryOptionLists('test', ~/(?i)\bTEST_CRUD2\b/)
+			showInfo "${result} Listen aus Cache entfernt"
+		}
+	]]></script>
 </portlet>

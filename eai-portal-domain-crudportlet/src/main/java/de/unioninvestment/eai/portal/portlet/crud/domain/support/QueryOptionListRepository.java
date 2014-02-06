@@ -20,9 +20,10 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.support;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
- * Cached Repository for OptionList queries.
+ * Cached Repository for OptionList queries. 
  * 
  * @author cmj
  */
@@ -68,7 +69,20 @@ public interface QueryOptionListRepository {
 	 *            the dataSource shortname
 	 * @param query
 	 *            the query
+	 * @return <code>true</code>, falls die Query im Cache gefunden wurde
 	 */
-	void remove(String dataSource, String query);
+	boolean remove(String dataSource, String query);
+
+	/**
+	 * Removes the results of all queries matching the pattern.
+	 * 
+	 * @param dataSource
+	 * 				the dataSource shortname
+	 * @param pattern
+	 *            a pattern that is evaluated against the normalized form of the
+	 *            queries
+	 * @return die Anzahl gefundener Queries  
+	 */
+	int removeAll(String dataSource, Pattern pattern);
 
 }

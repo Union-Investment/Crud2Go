@@ -284,4 +284,8 @@ public class Portlet implements Serializable {
 		}
 		return preferences;
 	}
+	
+	public PortletCaching getCaching() {
+		return new PortletCaching();
+	}
 }
