@@ -67,8 +67,6 @@ public class QueryOptionList extends VolatileOptionList {
 
 	private String dataSource;
 
-	private boolean useCacheByDefault;
-
 	/**
 	 * Konstruktor mit Parametern. Wird verwendet, wenn die Optionen aus der
 	 * Daten Datenbank gelesen werden sollen.
@@ -89,7 +87,6 @@ public class QueryOptionList extends VolatileOptionList {
 		this.dataSource = dataSource;
 		this.prefetchExecutor = asyncExecutor;
 		this.repository = repository;
-		this.useCacheByDefault = useCacheByDefault;
 
 		this.id = config.getId();
 		this.query = config.getQuery().getValue();
