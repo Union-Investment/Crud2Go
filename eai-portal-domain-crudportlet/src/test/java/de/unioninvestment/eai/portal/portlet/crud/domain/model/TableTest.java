@@ -248,6 +248,9 @@ public class TableTest {
 
 	@Test
 	public void shouldChangeDisplayModes() {
+		config.setEditForm(true);
+		table = new Table(config, tableColumns, true, false);
+		
 		assertThat(table.getDisplayMode(), is(DisplayMode.TABLE));
 		table.changeDisplayMode();
 		assertThat(table.getDisplayMode(), is(DisplayMode.FORM));
@@ -257,9 +260,18 @@ public class TableTest {
 
 	@Test
 	public void shouldFireEventOnDisplayModeChange() {
+		config.setEditForm(true);
+		table = new Table(config, tableColumns, true, false);
 		table.addDisplayModeChangeEventHandler(displayModeChangeEventHandlerMock);
 		table.changeDisplayMode(DisplayMode.FORM);
 		verifyDisplayModeChangeEvent(table, DisplayMode.FORM);
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void shouldFailChangingDisplayModesIfFormEditIsNotEnabled() {
+		config.setEditForm(false);
+		table = new Table(config, tableColumns, true, false);
+		table.changeDisplayMode(DisplayMode.FORM);
 	}
 
 	@Test
