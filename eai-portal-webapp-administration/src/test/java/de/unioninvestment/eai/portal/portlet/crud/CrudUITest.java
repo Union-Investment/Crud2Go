@@ -27,8 +27,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,10 +41,12 @@ import java.util.Set;
 import java.util.concurrent.Future;
 
 import javax.portlet.PortletMode;
+import javax.portlet.ReadOnlyException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.portlet.ValidatorException;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -84,6 +88,7 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBui
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortlet;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
@@ -110,6 +115,10 @@ public class CrudUITest extends SpringPortletContextTest {
 
 		public VaadinSession getSession() {
 			return vaadinSession;
+		};
+		
+		public Page getPage() {
+			return liferayContext.getPageMock();
 		};
 	};
 
@@ -287,11 +296,48 @@ public class CrudUITest extends SpringPortletContextTest {
 				instanceOf(BusinessExceptionMessage.class));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldDisplayPortletViewForExistingConfiguration() {
 		initializeUI();
 
+		stubPortletInitialization();
+
+		app.refreshViews();
+
+		verify(viewPageMock, never()).addComponent(isA(BusinessExceptionMessage.class));
+		verify(viewPageMock).addComponent(portletViewMock);
+	}
+
+	@Test
+	public void shouldUpdatePortletTitleInPreferences() throws ReadOnlyException, ValidatorException, IOException {
+		initializeUI();
+		stubPortletInitialization();
+		when(portletMock.getTitle()).thenReturn("newTitle");
+
+		app.refreshViews();
+
+		verify(viewPageMock, never()).addComponent(isA(BusinessExceptionMessage.class));
+		verify(liferayContext.getPortletPreferencesMock()).setValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, "newTitle");
+		verify(liferayContext.getPortletPreferencesMock()).store();
+	}
+
+	@Test
+	public void shouldNotUpdateUnchangedPortletTitleInPreferences() throws ReadOnlyException, ValidatorException, IOException {
+		initializeUI();
+		stubPortletInitialization();
+		when(liferayContext.getPortletPreferencesMock().getValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null)).thenReturn("sameTitle");
+		when(portletMock.getTitle()).thenReturn("sameTitle");
+
+		app.refreshViews();
+
+		verify(viewPageMock, never()).addComponent(isA(BusinessExceptionMessage.class));
+		verify(liferayContext.getPortletPreferencesMock()).getValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null);
+		verifyNoMoreInteractions(liferayContext.getPortletPreferencesMock());
+	}
+
+
+	@SuppressWarnings("unchecked")
+	private void stubPortletInitialization() {
 		PortletConfig portletConfig = new PortletConfig();
 		when(
 				configurationServiceMock.isConfigured(configMock,
@@ -309,10 +355,6 @@ public class CrudUITest extends SpringPortletContextTest {
 						any(Portlet.class),
 						any((new HashMap<Object, Object>()).getClass())))
 				.thenReturn(scriptModelBuilderMock);
-
-		app.refreshViews();
-
-		verify(viewPageMock).addComponent(portletViewMock);
 	}
 
 	@Test

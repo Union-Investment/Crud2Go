@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.UriFragmentChangedEvent;
@@ -43,12 +41,10 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
  * 
  * @author siva.selvarajah
  */
-@Configurable(preConstruction = true)
 public class PortletUriFragmentUtility implements UriFragmentChangedListener {
 
 	private static final long serialVersionUID = 42L;
 
-	@Autowired
 	private EventBus eventBus;
 
 	private final Portlet model;
@@ -58,8 +54,6 @@ public class PortletUriFragmentUtility implements UriFragmentChangedListener {
 	private static final String DELIM = ",";
 
 	/**
-	 * Nur für JUnit-Test.
-	 * 
 	 * @param eventBus
 	 *            EventBus
 	 * @param model
@@ -72,6 +66,7 @@ public class PortletUriFragmentUtility implements UriFragmentChangedListener {
 		this.eventBus = eventBus;
 		this.model = model;
 		this.portletId = portletId;
+		initialize();
 	}
 
 	/**

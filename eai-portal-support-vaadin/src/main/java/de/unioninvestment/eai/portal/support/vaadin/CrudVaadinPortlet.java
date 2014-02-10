@@ -34,6 +34,7 @@ import com.vaadin.server.VaadinPortletService;
  */
 public class CrudVaadinPortlet extends VaadinPortlet {
 
+	public static final String PORTLET_TITLE_PREF_KEY = "ui-portlet-title";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -55,7 +56,7 @@ public class CrudVaadinPortlet extends VaadinPortlet {
 	@Override
 	protected String getTitle(RenderRequest request) {
 		PortletPreferences prefs = request.getPreferences();
-		String portletTitle = prefs.getValue("ui-portlet-title", null);
+		String portletTitle = prefs.getValue(PORTLET_TITLE_PREF_KEY, null);
 		if (portletTitle != null) {
 			return portletTitle;
 		}

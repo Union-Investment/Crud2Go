@@ -99,11 +99,6 @@ public class PortletUriFragmentUtilityTest {
 	}
 
 	@Test
-	public void shouldInitialize() {
-		portletUriFragmentUtility.initialize();
-	}
-
-	@Test
 	public void shouldActivateTab() {
 		when(tabMock1.getId()).thenReturn("tab01");
 		when(tabMock1.getTabs()).thenReturn(tabsMock1);

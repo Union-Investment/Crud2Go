@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,12 +28,15 @@ import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
 import javax.portlet.PortletContext;
 import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import javax.portlet.ReadOnlyException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.portlet.ValidatorException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
@@ -83,6 +87,7 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.RequestProcessing
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
+import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortlet;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
 import de.unioninvestment.eai.portal.support.vaadin.context.Context;
@@ -154,7 +159,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 	ConfigStatus status = ConfigStatus.START;
 	boolean initializing = true;
-    boolean configChanged = false;
+	boolean configChanged = false;
 
 	Config portletConfig;
 
@@ -234,6 +239,25 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		}
 	}
 
+	private void cachePortletTitle(String title) {
+		PortletPreferences preferences = VaadinPortletService.getCurrentPortletRequest().getPreferences();
+		String oldTitle = preferences.getValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null);
+		if (oldTitle == null || !oldTitle.equals(title)) {
+			try {
+				preferences.setValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, title);
+				preferences.store();
+				
+			} catch (ReadOnlyException e) {
+				LOG.error("Failed to update portlet title in preferences", e);
+			} catch (ValidatorException e) {
+				LOG.error("Failed to update portlet title in preferences", e);
+			} catch (IOException e) {
+				LOG.error("Failed to update portlet title in preferences", e);
+			}
+		}
+
+	}
+
 	private void applyBrowserLocale() {
 		setLocale(Page.getCurrent().getWebBrowser().getLocale());
 	}
@@ -258,7 +282,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	private void handleConfigurationUpdatedEvent(ConfigurationUpdatedEvent event) {
 		cleanupViewPage();
 		initializeEventBus();
-        configChanged = true;
+		configChanged = true;
 
 		if (!event.isConfigurable()) {
 			PortletUtils.switchPortletMode(PortletMode.VIEW);
@@ -416,6 +440,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			provideBackButtonFunctionality(portletId);
 
 			tryToSetPortletTitle(portletDomain.getTitle());
+			cachePortletTitle(portletDomain.getTitle());
 
 		} catch (ValidationException ve) {
 			throw new BusinessException(ve.getCode(), ve.getArgs());
@@ -427,7 +452,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	private void provideBackButtonFunctionality(String portletId) {
 		WebBrowser browser = getPage().getWebBrowser();
 		if (browser != null && !browser.isIE()) {
-			portletUriFragmentUtility = new PortletUriFragmentUtility(
+			portletUriFragmentUtility = new PortletUriFragmentUtility(eventBus,
 					portletDomain, portletId);
 		} else {
 			LOG.info("Browser not detected or is Internet Explorer. Disabling back button functionality");
@@ -527,7 +552,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 				if (portletDomain.getTitle() != null) {
 					response.setTitle(portletDomain.getTitle());
 				}
-				if (!configChanged && request.getPortletMode() == PortletMode.VIEW) {
+				if (!configChanged
+						&& request.getPortletMode() == PortletMode.VIEW) {
 					accessSynchronously(new Runnable() {
 						@Override
 						public void run() {
@@ -547,7 +573,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 				}
 			});
 
-            configChanged = false;
+			configChanged = false;
 
 		} else {
 			// TODO check production logs and then remove query
