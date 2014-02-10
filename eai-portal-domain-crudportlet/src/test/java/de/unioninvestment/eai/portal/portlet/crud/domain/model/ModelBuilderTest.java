@@ -75,6 +75,7 @@ import com.liferay.portal.service.ResourceLocalService;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.vaadin.ui.UI;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
@@ -172,6 +173,9 @@ public class ModelBuilderTest {
 
 	@Mock
 	private UserFactory userFactoryMock;
+
+	@Mock
+	private GroovyScript onDoubleClickMock;
 	
 	private static PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
 
@@ -1098,6 +1102,28 @@ public class ModelBuilderTest {
 		assertThat(innerRegion.getElements().get(0), instanceOf(Table.class));
 		assertThat(((Table) innerRegion.getElements().get(0)).getContainer(),
 				instanceOf(DatabaseTableContainer.class));
+	}
+	
+	@Test
+	public void shouldUseDirectEditDefaultIfNotSetOnTable() {
+		assertThat(ModelBuilder.calculateDirectEditFlag(true, null, null), is(true));
+		assertThat(ModelBuilder.calculateDirectEditFlag(false, null, null), is(false));
+	}
+
+	@Test
+	public void shouldUseDirectEditSettingOfTable() {
+		assertThat(ModelBuilder.calculateDirectEditFlag(true, false, null), is(false));
+		assertThat(ModelBuilder.calculateDirectEditFlag(false, true, null), is(true));
+	}
+
+	@Test
+	public void shouldDisableDirectEditOfDefaultIfDoubleClickEventIsConfigured() {
+		assertThat(ModelBuilder.calculateDirectEditFlag(true, null, onDoubleClickMock), is(false));
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void shouldFailIfDirectEditAndDoubleClickEventAreConfiguredAtTable() {
+		ModelBuilder.calculateDirectEditFlag(true, true, onDoubleClickMock);
 	}
 
 }

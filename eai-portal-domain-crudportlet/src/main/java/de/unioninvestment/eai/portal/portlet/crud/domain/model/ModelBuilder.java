@@ -467,9 +467,12 @@ public class ModelBuilder {
 
 			boolean editable = currentUser.hasPermission(tableConfig,
 					Table.Permission.EDIT, tableConfig.isEditable());
-			boolean directEdit = tableConfig.isDirectEdit() != null ? tableConfig
-					.isDirectEdit() : this.directEditDefault;
-			Table table = new Table(tableConfig, tableColumns, editable, directEdit);
+
+			boolean directEdit = calculateDirectEditFlag(directEditDefault,
+					tableConfig.isDirectEdit(), tableConfig.getOnDoubleClick());
+
+			Table table = new Table(tableConfig, tableColumns, editable,
+					directEdit);
 			mappings.put(table, tableConfig);
 			portlet.addElementById(tableConfig.getId(), table);
 
@@ -481,6 +484,22 @@ public class ModelBuilder {
 		}
 
 		return null;
+	}
+
+	static boolean calculateDirectEditFlag(boolean directEditDefault,
+			Boolean directEditOnTable, GroovyScript onDoubleClick) {
+		boolean directEdit = directEditOnTable != null ? directEditOnTable
+				: directEditDefault;
+		if (directEdit && onDoubleClick != null) {
+			if (directEditOnTable != null) {
+				throw new IllegalStateException(
+						"Direct editing not possible in combination with onDoubleClick event");
+			} else {
+				LOG.warn("Direct editing disabled in favor of onDoubleClick event handling");
+				return false;
+			}
+		}
+		return directEdit;
 	}
 
 	private void verifyPrimaryKeyColumnsArePresentIfNeccessary(
