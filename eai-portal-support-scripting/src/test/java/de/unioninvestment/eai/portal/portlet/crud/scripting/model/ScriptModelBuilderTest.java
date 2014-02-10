@@ -69,6 +69,8 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptP
 import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
 import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
+import de.unioninvestment.eai.portal.support.scripting.SqlProvider;
+import de.unioninvestment.eai.portal.support.scripting.http.HttpProvider;
 import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 
 @ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
@@ -553,6 +555,16 @@ public class ScriptModelBuilderTest extends ModelSupport {
 	}
 
 	@Test
+	public void shouldBindSqlProviderClosure() throws JAXBException {
+
+		prepare("validConfig.xml");
+		scriptModelBuilder.build();
+
+		verify(scriptBuilderMock).addBindingVariable(eq("sql"),
+				any(SqlProvider.class));
+	}
+
+	@Test
 	public void shouldBindJMXProviderClosure() throws JAXBException {
 
 		prepare("validConfig.xml");
@@ -560,6 +572,16 @@ public class ScriptModelBuilderTest extends ModelSupport {
 
 		verify(scriptBuilderMock).addBindingVariable(eq("jmx"),
 				any(JMXProvider.class));
+	}
+
+	@Test
+	public void shouldBindHttpProviderClosure() throws JAXBException {
+
+		prepare("validConfig.xml");
+		scriptModelBuilder.build();
+
+		verify(scriptBuilderMock).addBindingVariable(eq("http"),
+				any(HttpProvider.class));
 	}
 
 	@Test

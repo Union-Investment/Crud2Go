@@ -97,6 +97,7 @@ import de.unioninvestment.eai.portal.support.scripting.ScriptContainerDelegate;
 import de.unioninvestment.eai.portal.support.scripting.ScriptCustomFilterFactory;
 import de.unioninvestment.eai.portal.support.scripting.ScriptFormSQLWhereFactory;
 import de.unioninvestment.eai.portal.support.scripting.SqlProvider;
+import de.unioninvestment.eai.portal.support.scripting.http.HttpProvider;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
@@ -190,6 +191,8 @@ public class ScriptModelBuilder {
 						connectionPoolFactory));
 		scriptBuilder.addBindingVariable("jmx",
 				new JMXProvider(scriptBuilder.getMainScript()));
+		scriptBuilder.addBindingVariable("http",
+				new HttpProvider(scriptBuilder.getMainScript(), portlet));
 		scriptBuilder.addBindingVariable("log",
 				LoggerFactory.getLogger("portlet.crud.scripting.main"));
 

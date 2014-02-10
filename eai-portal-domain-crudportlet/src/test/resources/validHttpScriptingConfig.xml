@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Tabellen-Beispiel">
+	<authentication>
+		<realm name="books">
+			<credentials>
+				<username preference-key="my.username"/>
+				<password preference-key="my.password"/>
+			</credentials>
+		</realm>
+	</authentication>
+	<page>
+		<table>
+			<script-container delegate="backend"/>
+		</table>
+	</page>
+	<script><![CDATA[
+		import groovy.json.JsonBuilder
+		import groovy.json.JsonSlurper
+		
+		import org.apache.http.HttpResponse
+		import org.apache.http.client.methods.HttpDelete
+		import org.apache.http.client.methods.HttpGet
+		import org.apache.http.client.methods.HttpPost
+		import org.apache.http.client.methods.HttpPut
+		import org.apache.http.entity.ContentType
+		import org.apache.http.entity.StringEntity
+		import org.apache.http.impl.client.DefaultHttpClient
+
+		backend = new HttpContainerDelegate(this)
+		
+		class HttpContainerDelegate implements ScriptContainerBackend {
+	        def main
+	        def http
+	        def contentType
+	
+			HttpContainerDelegate(main) {
+				this.main = main
+				this.http = main.http(realm:'books')
+				this.contentType = ContentType.create('application/json', 'utf-8')
+			}
+	
+			Closure metaData = {
+				isbn(type:String, required:true, partOfPrimaryKey:true)
+				title(type:String)
+				author(type:String)
+			}
+			
+			List read() {
+		    	List data = [] as LinkedList
+		    	def request = new HttpGet('http://localhost:9080/crud2go-rest-testserver/rest/library/books')
+				HttpResponse response = http.execute(request)
+
+				ContentType contentType = ContentType.getOrDefault(response.getEntity());
+				def charset = contentType.getCharset()?:'utf-8'
+				def content = response.entity.content.getText(charset)
+				def json = new JsonSlurper().parseText(content)
+				
+				json.collect { row ->
+					[row.isbn, row.title, row.author]
+				} as ArrayList
+			}
+			
+			void update(List rows) {
+				rows.each { row ->
+					if (row.isNewItem()) {
+						postNewItem(row)
+					} else if (row.isModified()) {
+						putChangedItem(row)
+					} else if (row.isDeleted()) {
+						deleteItem(row)
+					}
+					main.log.info "Processing row with ID ${row.id.asMap()}"
+				}
+			}
+			
+			void postNewItem(row) {
+				def builder = new JsonBuilder([isbn: row.values.isbn, title:row.values.title, author:row.values.author])
+				def insert = new HttpPost('http://localhost:9080/crud2go-rest-testserver/rest/library/books')
+				insert.entity = new StringEntity(builder.toPrettyString(), contentType)
+				def response = http.execute(insert)
+				assert response.statusLine.statusCode == 204
+			}
+			
+			void putChangedItem(row) {
+				def builder = new JsonBuilder([isbn: row.values.isbn, title:row.values.title, author:row.values.author])
+				def update = new HttpPut("http://localhost:9080/crud2go-rest-testserver/rest/library/book/${row.values.isbn}")
+				update.entity = new StringEntity(builder.toPrettyString(), contentType)
+				def response = http.execute(update)
+				assert response.statusLine.statusCode == 204
+			}
+			
+			void deleteItem(row) {
+				def delete = new HttpDelete("http://localhost:9080/crud2go-rest-testserver/rest/library/book/${row.values.isbn}")
+				def response = http.execute(delete)
+				assert response.statusLine.statusCode == 204
+			}
+		}
+
+	]]></script>
+</portlet>
