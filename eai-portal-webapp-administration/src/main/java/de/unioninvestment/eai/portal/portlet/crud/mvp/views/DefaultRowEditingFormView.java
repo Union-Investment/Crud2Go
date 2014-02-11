@@ -116,7 +116,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		this.presenter = presenter;
 
 		prepareFieldFactory(tableModel);
-		buildViewComponents(tableModel.isEditable());
+		buildViewComponents(tableModel.isModeChangeable());
 	}
 
 	private void prepareFieldFactory(Table tableModel) {

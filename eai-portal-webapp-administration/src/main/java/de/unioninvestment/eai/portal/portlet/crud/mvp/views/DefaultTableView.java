@@ -267,7 +267,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		addSelectionChangeListener();
 		addDoubleClickListener();
 
-		if (!presenter.isReadonly()) {
+		if (tableModel.isEditable()) {
 			addCrudButtonListeners();
 		}
 		addExportButtonListeners();
@@ -304,7 +304,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void addCrudButtonListeners() {
-		if (!tableModel.isDirectEdit()) {
+		if (editButton != null) {
 			editButton.addClickListener(new Button.ClickListener() {
 				@Override
 				public void buttonClick(ClickEvent event) {
@@ -312,7 +312,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 							: Mode.VIEW);
 				}
 			});
-		} else if (!tableModel.isFormEditEnabled()) {
+		} else if (saveButton != null) {
 			saveButton.addClickListener(new Button.ClickListener() {
 				@Override
 				public void buttonClick(ClickEvent event) {
@@ -730,7 +730,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 			table.setEditable(false);
 
-			if (!tableModel.isDirectEdit()) {
+			if (editButton != null) {
 				editButton
 						.setCaption(getMessage("portlet.crud.button.editMode"));
 				table.removeStyleName("crudEditMode");
@@ -755,7 +755,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	public void switchToEditMode() {
 		table.setEditable(true);
 
-		if (!tableModel.isDirectEdit()) {
+		if (editButton != null) {
 			editButton.setCaption(getMessage("portlet.crud.button.viewMode"));
 			table.removeStyleName("crudViewMode");
 			table.addStyleName("crudEditMode");
@@ -781,8 +781,8 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		CssLayout buttonbar = new CssLayout();
 		buttonbar.setStyleName("actions");
 
-		if (!this.presenter.isReadonly()) {
-			if (!tableModel.isDirectEdit()) {
+		if (tableModel.isEditable()) {
+			if (tableModel.isModeChangeable()) {
 				editButton = new Button(
 						getMessage("portlet.crud.button.editMode"));
 				editButton.setEnabled(true);

@@ -72,12 +72,6 @@ public interface TableView extends View {
 		boolean isRowDeletable(Object itemId);
 
 		/**
-		 * 
-		 * @return liefert, ob nur der Lesemodus zugelassen ist.
-		 */
-		boolean isReadonly();
-
-		/**
 		 * Holt, die zur Tabelle gehörende SQL-Connection und bindet es an das
 		 * Closure und fürht diesen aus.
 		 * 

@@ -113,18 +113,6 @@ public class TablePresenter extends
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter#isReadonly()
-	 */
-	@Override
-	public boolean isReadonly() {
-		return !getModel().isEditable()
-				|| (!container.isInsertable() && !container.isUpdateable() && !container
-						.isDeleteable());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
 	 * @see de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView.Presenter#isInsertable()
 	 */
 	@Override

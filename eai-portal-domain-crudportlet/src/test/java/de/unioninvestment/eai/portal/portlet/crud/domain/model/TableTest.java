@@ -152,11 +152,32 @@ public class TableTest {
 	}
 
 	@Test
+	public void shouldReturnEditableByConditions() {
+		verifyEditable(true, true, false, false, true);
+		verifyEditable(true, false, true, false, true);
+		verifyEditable(true, false, false, true, true);
+		verifyEditable(true, false, false, false, false);
+		verifyEditable(false, true, true, true, false);
+	}
+
+	private void verifyEditable(boolean tableEditable,
+			boolean containerInsertable, boolean containerUpdateable,
+			boolean containerDeletable, boolean expectEditable) {
+
+		table = new Table(config, tableColumns, tableEditable, false);
+		when(containerMock.isInsertable()).thenReturn(containerInsertable);
+		when(containerMock.isUpdateable()).thenReturn(containerUpdateable);
+		when(containerMock.isDeleteable()).thenReturn(containerDeletable);
+		table.setContainer(containerMock);
+	}
+
+	@Test
 	public void shouldReturnEditableCheckerResult() {
 		when(rowEditableCheckerMock.isEditable(containerRowMock)).thenReturn(
 				false);
 		table.setRowEditableChecker(rowEditableCheckerMock);
 		table.setRowDeletableChecker(rowDeletableCheckerMock);
+		when(containerMock.isUpdateable()).thenReturn(true);
 
 		boolean result = table.isRowEditable(containerRowMock);
 
@@ -167,6 +188,7 @@ public class TableTest {
 
 	@Test
 	public void shouldReturnRowIsNotEditableAsDefault() {
+		when(containerMock.isUpdateable()).thenReturn(true);
 		assertThat(table.isRowEditable(containerRowMock), is(true));
 
 		table = new Table(config, tableColumns, false, false);
@@ -250,7 +272,7 @@ public class TableTest {
 	public void shouldChangeDisplayModes() {
 		config.setEditForm(true);
 		table = new Table(config, tableColumns, true, false);
-		
+
 		assertThat(table.getDisplayMode(), is(DisplayMode.TABLE));
 		table.changeDisplayMode();
 		assertThat(table.getDisplayMode(), is(DisplayMode.FORM));
@@ -267,7 +289,7 @@ public class TableTest {
 		verifyDisplayModeChangeEvent(table, DisplayMode.FORM);
 	}
 
-	@Test(expected=IllegalStateException.class)
+	@Test(expected = IllegalStateException.class)
 	public void shouldFailChangingDisplayModesIfFormEditIsNotEnabled() {
 		config.setEditForm(false);
 		table = new Table(config, tableColumns, true, false);
@@ -488,12 +510,12 @@ public class TableTest {
 		table.withExportSettings(exportMock);
 		verify(containerMock).withExportSettings(exportMock);
 	}
-	
+
 	@Test
 	public void shouldStartInViewModeByDefault() {
 		assertThat(table.getMode(), is(Mode.VIEW));
 	}
-	
+
 	@Test
 	public void shouldStartInEditModeIfSeparateModeIsDisabled() {
 		table = new Table(config, tableColumns, true, true);

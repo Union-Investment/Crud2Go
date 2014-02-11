@@ -67,28 +67,6 @@ public class TablePresenterTest extends AbstractTablePresenterTest {
 	}
 	
 	@Test
-	public void shouldReturnTableIsReadonlyIfContainerIsNotEditable() {
-		when(modelMock.isEditable()).thenReturn(true);
-		when(containerMock.isDeleteable()).thenReturn(false);
-		when(containerMock.isUpdateable()).thenReturn(false);
-		when(containerMock.isInsertable()).thenReturn(false);
-
-		boolean result = presenter.isReadonly();
-		assertThat(result, is(true));
-	}
-
-	@Test
-	public void shouldReturnTableIsReadonlyIfModelIsReadonly() {
-		when(modelMock.isEditable()).thenReturn(false);
-		when(containerMock.isDeleteable()).thenReturn(true);
-		when(containerMock.isUpdateable()).thenReturn(false);
-		when(containerMock.isInsertable()).thenReturn(false);
-
-		boolean result = presenter.isReadonly();
-		assertThat(result, is(true));
-	}
-
-	@Test
 	public void shouldReturnTableIsInsertable() {
 		when(containerMock.isInsertable()).thenReturn(true);
 

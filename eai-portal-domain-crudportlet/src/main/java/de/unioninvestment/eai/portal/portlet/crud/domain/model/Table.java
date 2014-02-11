@@ -541,7 +541,13 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @return ob die Tabelle generell editiert werden kann
 	 */
 	public boolean isEditable() {
-		return editable;
+		return editable
+				&& (container.isInsertable() || container.isUpdateable() || container
+						.isDeleteable());
+	}
+
+	public boolean isModeChangeable() {
+		return isEditable() && !isDirectEdit();
 	}
 
 	/**
