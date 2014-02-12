@@ -5,7 +5,7 @@
 		<table id="table" export="xls">
 			<database-query datasource="mysqltest">
 				<query><![CDATA[
-					SELECT * FROM test_crud2
+					SELECT * FROM TEST_CRUD2
 				]]></query>
 				<insert><![CDATA[
 					INSERT INTO TEST_CRUD2
