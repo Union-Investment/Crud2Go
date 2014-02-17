@@ -120,6 +120,11 @@ public class GenericDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
+	public List<String> getColumns() {
+		return new ArrayList<String>(metaData.getColumnNames());
+	}
+	
+	@Override
 	public ContainerClob getCLob(ContainerRowId containerRowId,
 			String columnName) {
 

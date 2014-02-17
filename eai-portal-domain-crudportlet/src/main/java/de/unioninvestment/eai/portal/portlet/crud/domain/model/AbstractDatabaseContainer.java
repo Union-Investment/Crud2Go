@@ -21,6 +21,8 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -197,4 +199,10 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 		this.queryDelegate = queryDelegate;
 	}
 
+	@Override
+	public List<String> getColumns() {
+		ArrayList<String> columns = new ArrayList<String>((Collection<String>) getVaadinContainer().getContainerPropertyIds());
+		columns.remove("rownum");
+		return columns;
+	}
 }

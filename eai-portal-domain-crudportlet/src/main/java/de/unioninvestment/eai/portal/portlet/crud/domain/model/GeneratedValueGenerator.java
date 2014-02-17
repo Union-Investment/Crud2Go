@@ -31,5 +31,5 @@ public interface GeneratedValueGenerator {
 	 * 
 	 * @return den Feldwert
 	 */
-	public Object getValue(ContainerRow row);
+	public Object getValue(ValuesRow row);
 }

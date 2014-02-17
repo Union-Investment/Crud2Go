@@ -17,51 +17,37 @@
  * under the License.
  */
 
-package de.unioninvestment.eai.portal.portlet.crud.domain.model;
+package de.unioninvestment.eai.portal.portlet.crud.export.streaming;
 
 import java.io.InputStream;
 
 /**
- * Interface that provides creation of a document to be downloaded.
+ * Interface for export target formats.
  * 
  * @author cmj
+ * 
  */
-public interface Download {
+public interface Exporter {
 
 	/**
-	 * Status Interface for updating the progress indicator.
+	 * Called first.
 	 * 
-	 * @author cmj
+	 * @param info
+	 *            about the table to export
+	 */
+	void begin(ExportInfo info);
+
+	/**
+	 * Called once per row.
 	 * 
+	 * @param itemInfo
+	 *            about the values of the next row
 	 */
-	public interface Status {
-		/**
-		 * Optionally called to allow for provision of a progress bar.
-		 * 
-		 * @param progress
-		 *            The current progress (e.g. count / size)
-		 * @throws ExportInterruptionException if the download was cancelled
-		 */
-		public void updateProgress(float progress);
-	}
+	void addRow(ItemInfo itemInfo);
 
 	/**
-	 * @return the file name of the download
+	 * @return an {@link InputStream} containing the serialized data
 	 */
-	String getFilename();
-
-	/**
-	 * @return the mime type of the download
-	 */
-	String getMimeType();
-
-	/**
-	 * Creates the document, called from within a background thread.
-	 * 
-	 * @param status
-	 *            for progress updates
-	 * @return the document content as a stream
-	 */
-	public InputStream build(Status status);
+	InputStream getInputStream();
 
 }

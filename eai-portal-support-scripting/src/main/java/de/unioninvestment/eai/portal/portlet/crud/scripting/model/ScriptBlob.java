@@ -34,7 +34,7 @@ public class ScriptBlob implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private final ContainerBlob containerBlob;
 
-	ScriptBlob(ContainerBlob containerBlob) {
+	public ScriptBlob(ContainerBlob containerBlob) {
 		super();
 		this.containerBlob = containerBlob;
 	}

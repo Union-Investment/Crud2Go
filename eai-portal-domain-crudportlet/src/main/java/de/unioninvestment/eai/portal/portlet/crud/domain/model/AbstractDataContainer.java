@@ -50,6 +50,7 @@ import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Or;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.VaadinContainerDataStream;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEvent;
@@ -66,6 +67,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.container.DataStream;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
@@ -484,6 +486,11 @@ public abstract class AbstractDataContainer implements DataContainer,
 		});
 	}
 
+	@Override
+	public DataStream getStream() {
+		return new VaadinContainerDataStream((Ordered)getVaadinContainer());
+	}
+	
 	@Override
 	public void eachRow(final EachRowCallback eachRowCallback) {
 		withTransaction(new TransactionCallback<Object>() {

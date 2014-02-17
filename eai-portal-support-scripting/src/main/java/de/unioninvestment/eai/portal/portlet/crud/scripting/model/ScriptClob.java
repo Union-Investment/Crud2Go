@@ -32,7 +32,7 @@ public class ScriptClob {
 
 	private final ContainerClob containerClob;
 
-	ScriptClob(ContainerClob containerClob) {
+	public ScriptClob(ContainerClob containerClob) {
 		this.containerClob = containerClob;
 	}
 

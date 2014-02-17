@@ -37,8 +37,10 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQueryEventWrapper;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.QueryCursorDataStream;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.container.DataStream;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
 
@@ -342,5 +344,10 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 				databaseQueryDelegate.setOrderBy(previousOrder);
 			}
 		}
+	}
+
+	@Override
+	public DataStream getStream() {
+		return new QueryCursorDataStream(getVaadinContainer(), connectionPool, getCurrentQuery(true));
 	}
 }

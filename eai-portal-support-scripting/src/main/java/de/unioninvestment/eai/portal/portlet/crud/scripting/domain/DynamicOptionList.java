@@ -29,9 +29,11 @@ import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ValuesRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.VolatileOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptFormField;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptValuesRow;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
@@ -61,8 +63,7 @@ public class DynamicOptionList extends VolatileOptionList {
 	 *            die Query-Konfiguration
 	 */
 	public DynamicOptionList(EventBus eventBus, Table table,
-			Closure<?> closure,
-			SelectConfig config) {
+			Closure<?> closure, SelectConfig config) {
 		super(eventBus);
 		this.container = table.getContainer();
 		this.optionsClosure = closure;
@@ -87,7 +88,12 @@ public class DynamicOptionList extends VolatileOptionList {
 	@Override
 	public Map<String, String> getOptions(SelectionContext context) {
 		Object result = null;
-		if (context instanceof TableColumnSelectionContext) {
+		if (context instanceof ExportColumnSelectionContext) {
+			ExportColumnSelectionContext ctx = (ExportColumnSelectionContext) context;
+			ValuesRow row = ctx.getRow();
+			ScriptValuesRow scriptRow = new ScriptValuesRow(row);
+			result = optionsClosure.call(scriptRow, ctx.getColumnName());
+		} else if (context instanceof TableColumnSelectionContext) {
 			TableColumnSelectionContext ctx = (TableColumnSelectionContext) context;
 			ScriptRow scriptRow = new ScriptRow(container.getRow(
 					ctx.getRowId(), false, true));
@@ -128,7 +134,7 @@ public class DynamicOptionList extends VolatileOptionList {
 	public void refresh(RefreshPolicy policy) {
 		fireChangeEvent(false);
 	}
-	
+
 	@Override
 	public boolean isLazy() {
 		return false;

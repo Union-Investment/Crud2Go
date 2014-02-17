@@ -28,9 +28,8 @@ import static org.mockito.Mockito.when;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.util.Collection;
+import java.util.Map;
 import java.util.NoSuchElementException;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -104,7 +103,26 @@ abstract public class ContainerRowTest {
 
 		// then
 		Mockito.verify(containerFieldMock).getValue();
-		Assert.assertEquals(value, result);
+		assertThat(result,  is((Object)value));
+	}
+
+	@Test
+	public void shouldGetValues() {
+		// given
+		String key = "test-name";
+		String value = "value";
+
+		ContainerRow row = createContainerRow();
+		row.setFields(singletonMap(key, containerFieldMock));
+
+		Mockito.when(containerFieldMock.getValue()).thenReturn(value);
+
+		// when
+		Map<String, Object> values = row.getValues();
+
+		// then
+		assertThat(values.size(), is(1));
+		assertThat(values.get(key), is((Object)value));
 	}
 
 	@Test

@@ -33,6 +33,7 @@ import com.vaadin.data.Item;
 import com.vaadin.ui.Table.ColumnGenerator;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.GeneratedColumnsDataStreamWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.InitializeEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.InitializeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEvent;
@@ -44,6 +45,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHa
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.container.DataStream;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.EmptyColumnGenerator;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 
@@ -836,4 +838,11 @@ public class Table extends Component implements Component.ExpandableComponent,
 		return displayMode;
 	}
 
+	public DataStream getStream() {
+		DataStream stream = container.getStream();
+		if (columns != null) {
+			stream = new GeneratedColumnsDataStreamWrapper(stream, container.getColumns(), columns);
+		}
+		return stream;
+	}
 }

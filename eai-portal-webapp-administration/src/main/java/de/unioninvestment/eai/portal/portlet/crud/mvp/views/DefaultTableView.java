@@ -22,10 +22,12 @@ import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMe
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -74,11 +76,12 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
-import de.unioninvestment.eai.portal.portlet.crud.export.CsvExportTask;
 import de.unioninvestment.eai.portal.portlet.crud.export.DownloadExportTask;
-import de.unioninvestment.eai.portal.portlet.crud.export.ExcelExportTask;
 import de.unioninvestment.eai.portal.portlet.crud.export.ExportDialog;
 import de.unioninvestment.eai.portal.portlet.crud.export.ExportTask;
+import de.unioninvestment.eai.portal.portlet.crud.export.streaming.CsvExporter;
+import de.unioninvestment.eai.portal.portlet.crud.export.streaming.ExcelExporter;
+import de.unioninvestment.eai.portal.portlet.crud.export.streaming.StreamingExporterDownload;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BLobColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudCellStyleGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTable;
@@ -994,19 +997,36 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void exportCSVSheet() {
-		executeExport(new CsvExportTask(UI.getCurrent(), table, tableModel,
-				automaticDownloadIsPossible()));
+		CsvExporter exporter = new CsvExporter();
+		String filename = "export_" + createFilenameTime() + ".csv";
+		Download download = new StreamingExporterDownload(filename,
+				CsvExporter.CSV_MIMETYPE, tableModel, exporter);
+		DownloadExportTask exportTask = new DownloadExportTask(UI.getCurrent(),
+				tableModel, download, automaticDownloadIsPossible());
+		executeExport(exportTask);
 	}
 
 	private void exportExcelSheet() {
-		executeExport(new ExcelExportTask(UI.getCurrent(), table, tableModel,
-				automaticDownloadIsPossible()));
+		ExcelExporter exporter = new ExcelExporter();
+		String filename = "export_" + createFilenameTime() + ".xlsx";
+		Download download = new StreamingExporterDownload(filename,
+				ExcelExporter.EXCEL_XSLX_MIMETYPE, tableModel, exporter);
+		DownloadExportTask exportTask = new DownloadExportTask(UI.getCurrent(),
+				tableModel, download, automaticDownloadIsPossible());
+		executeExport(exportTask);
 	}
 
 	@Override
 	public void download(Download download) {
-		executeExport(new DownloadExportTask(UI.getCurrent(), tableModel,
-				download, automaticDownloadIsPossible()));
+		DownloadExportTask downloadTask = new DownloadExportTask(
+				UI.getCurrent(), tableModel, download,
+				automaticDownloadIsPossible());
+		executeExport(downloadTask);
+	}
+
+	protected String createFilenameTime() {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
+		return sdf.format(new Date());
 	}
 
 	private void executeExport(ExportTask exportTask) {

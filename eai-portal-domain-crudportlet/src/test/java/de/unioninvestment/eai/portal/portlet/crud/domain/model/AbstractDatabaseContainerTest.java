@@ -159,6 +159,11 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 		}
 
 		@Override
+		public List<String> getColumns() {
+			return null;
+		}
+		
+		@Override
 		public List<String> getPrimaryKeyColumns() {
 			return asList(primaryKeys);
 		}

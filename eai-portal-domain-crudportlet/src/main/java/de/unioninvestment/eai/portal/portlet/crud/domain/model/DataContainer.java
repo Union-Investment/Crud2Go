@@ -33,6 +33,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEventHandl
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.container.DataStream;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
@@ -304,6 +305,11 @@ public interface DataContainer extends Serializable {
 	List<String> getPrimaryKeyColumns();
 
 	/**
+	 * @return die Namen aller Spalten
+	 */
+	List<String> getColumns();
+
+	/**
 	 * Fügt ein Insert-Eventhandler hinzu.
 	 * 
 	 * @param handler
@@ -557,5 +563,10 @@ public interface DataContainer extends Serializable {
 	 * @return the FilterPolicy configuration of the container
 	 */
 	FilterPolicy getFilterPolicy();
+
+	/**
+	 * @return a readonly stream of data rows
+	 */
+	DataStream getStream();
 
 }

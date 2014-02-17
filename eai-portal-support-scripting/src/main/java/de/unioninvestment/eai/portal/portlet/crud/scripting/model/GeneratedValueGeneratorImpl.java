@@ -19,8 +19,8 @@
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
 import groovy.lang.Closure;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.GeneratedValueGenerator;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ValuesRow;
 
 /**
  * Implementierung des {@link GeneratedValueGenerator}, der an eine
@@ -41,8 +41,8 @@ public class GeneratedValueGeneratorImpl implements GeneratedValueGenerator {
 	}
 
 	@Override
-	public Object getValue(ContainerRow row) {
-		ScriptRow scriptRow = new ScriptRow(row);
+	public Object getValue(ValuesRow row) {
+		ScriptValuesRow scriptRow = new ScriptValuesRow(row);
 		return closure.call(scriptRow);
 	}
 

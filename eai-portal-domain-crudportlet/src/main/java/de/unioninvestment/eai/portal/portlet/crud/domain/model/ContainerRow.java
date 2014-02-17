@@ -25,6 +25,8 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.PropertysetItem;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.map.TransformedEntryMap;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.map.ValueTransformer;
 
 /**
  * Abstrakte Modellklasse einer Datenzeile.
@@ -32,9 +34,38 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerExce
  * @author markus.bonsch
  * 
  */
-public abstract class ContainerRow implements Cloneable {
+public abstract class ContainerRow implements Cloneable, ValuesRow {
+
+	private static final FieldToValueTransformer VALUE_TRANSFORMER = new FieldToValueTransformer();
+
+	private static final class FieldToValueTransformer implements
+			ValueTransformer<ContainerField, Object> {
+		@Override
+		public Object transform(ContainerField a) {
+			return a.getValue();
+		}
+	}
+
+	private final class FieldToValueMap extends
+			TransformedEntryMap<String, ContainerField, Object> {
+		private static final long serialVersionUID = 1L;
+
+		private FieldToValueMap(Map<String, ContainerField> delegate,
+				ValueTransformer<ContainerField, Object> transformer) {
+			super(delegate, transformer);
+		}
+
+		@Override
+		public Object put(String key, Object value) {
+			ContainerField field = getFields().get(key);
+			Object oldValue = field.getValue();
+			field.setValue(value);
+			return oldValue;
+		}
+	}
 
 	protected final DataContainer container;
+	private Map<String,Object> values;
 
 	public ContainerRow(DataContainer container) {
 		this.container = container;
@@ -135,6 +166,13 @@ public abstract class ContainerRow implements Cloneable {
 		} else {
 			return containerField.getValue();
 		}
+	}
+
+	public Map<String, Object> getValues() {
+		if (values == null) {
+			values = new FieldToValueMap(getFields(), VALUE_TRANSFORMER);
+		}
+		return values;
 	}
 
 	/**

@@ -22,6 +22,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -54,6 +55,7 @@ import com.vaadin.data.util.sqlcontainer.RowId;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.GeneratedColumnsDataStreamWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.RowChangeEvent;
@@ -66,6 +68,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.Exp
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DisplayMode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.container.DataStream;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.EmptyColumnGenerator;
 
 public class TableTest {
@@ -136,6 +139,9 @@ public class TableTest {
 
 	@Mock
 	private ModeChangeEventHandler<Table, DisplayMode> displayModeChangeEventHandlerMock;
+
+	@Mock
+	private DataStream containerStreamMock;
 
 	@Before
 	public void setUp() {
@@ -526,5 +532,21 @@ public class TableTest {
 	public void shouldStartInViewModeIfSeparateModeIsDisabledAndNotEditable() {
 		table = new Table(config, tableColumns, false, true);
 		assertThat(table.getMode(), is(Mode.VIEW));
+	}
+	
+	@Test
+	public void shouldPassThroughContainerStreamIfNoGeneratedColumns() {
+		table = new Table(config, null, true, false);
+		table.setContainer(containerMock);
+
+		when(containerMock.getStream()).thenReturn(containerStreamMock);
+		assertThat(table.getStream(), sameInstance(containerStreamMock));
+	}
+	
+	@Test
+	public void shouldWrapContainerStreamForGeneratedColumns() {
+		when(containerMock.getStream()).thenReturn(containerStreamMock);
+		DataStream tableStream = table.getStream();
+		assertThat(tableStream, instanceOf(GeneratedColumnsDataStreamWrapper.class));
 	}
 }
