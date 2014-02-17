@@ -7,7 +7,7 @@
 }
 
 .v-vaadin-version:after {
-	content: "7.1.7";
+	content: "7.1.11";
 }
 
 .v-generated-body {
@@ -15,6 +15,10 @@
 	height: 100%;
 	border: 0;
 	margin: 0;
+	overflow: hidden;
+}
+
+.v-modal-window-open {
 	overflow: hidden;
 }
 
@@ -372,6 +376,14 @@
 .crud2go .v-accordion-item-content {
 	position: absolute;
 	width: 100%;
+}
+
+.crud2go .v-browserframe {
+	font-size: 0;
+}
+
+.crud2go .v-browserframe > span {
+	font-size: 11px;
 }
 
 .crud2go .v-button {
@@ -1293,6 +1305,10 @@ body .crud2go.v-app .v-app-loading {
 	overflow: auto;
 	font-size: 0;
 	line-height: normal;
+}
+
+.v-ff .crud2go .v-scrollable {
+	font-size: 11px;
 }
 
 .v-ios.v-webkit .crud2go .v-scrollable {
