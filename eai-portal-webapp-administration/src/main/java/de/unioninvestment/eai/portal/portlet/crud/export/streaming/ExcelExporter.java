@@ -38,6 +38,7 @@ import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.DateFormatConverter;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
@@ -157,6 +158,8 @@ public class ExcelExporter implements Exporter {
 
 			final CellStyle cs = getCellStyle(currentRow, col);
 			sheetCell.setCellStyle(cs);
+			CellUtil.setAlignment(sheetCell, workbook, CellStyle.ALIGN_LEFT);
+
 			if (null != value) {
 				if (!isNumeric(columnType)) {
 					if (java.util.Date.class.isAssignableFrom(columnType)) {
@@ -222,6 +225,7 @@ public class ExcelExporter implements Exporter {
 			headerCell.setCellValue(createHelper
 					.createRichTextString(columnTitles[col]));
 			headerCell.setCellStyle(getColumnHeaderStyle(currentRow, col));
+			CellUtil.setAlignment(headerCell, workbook, CellStyle.ALIGN_LEFT);
 		}
 	}
 
