@@ -87,6 +87,7 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.RequestProcessing
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
+import de.unioninvestment.eai.portal.portlet.crud.services.RequestProcessingLogService;
 import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortlet;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.PortletUtils;
@@ -240,13 +241,16 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	}
 
 	private void cachePortletTitle(String title) {
-		PortletPreferences preferences = VaadinPortletService.getCurrentPortletRequest().getPreferences();
-		String oldTitle = preferences.getValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null);
+		PortletPreferences preferences = VaadinPortletService
+				.getCurrentPortletRequest().getPreferences();
+		String oldTitle = preferences.getValue(
+				CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null);
 		if (oldTitle == null || !oldTitle.equals(title)) {
 			try {
-				preferences.setValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, title);
+				preferences.setValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY,
+						title);
 				preferences.store();
-				
+
 			} catch (ReadOnlyException e) {
 				LOG.error("Failed to update portlet title in preferences", e);
 			} catch (ValidatorException e) {
@@ -389,9 +393,14 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	}
 
 	private void addServerProcessingInfo() {
-		if (settings.isDisplayRequestProcessingInfo()) {
+		if (settings.isDisplayRequestProcessingInfo()
+				|| settings.isRequestLogEnabled()) {
 			if (requestProcessingLabel == null) {
-				requestProcessingLabel = new RequestProcessingLabel();
+				RequestProcessingLogService requestProcessingLogService = Context
+						.getBean(RequestProcessingLogService.class);
+				requestProcessingLabel = new RequestProcessingLabel(
+						requestProcessingLogService,
+						settings.isDisplayRequestProcessingInfo());
 				timingPortletListener = new TimingPortletListener(
 						requestProcessingLabel);
 				getPortletSession().addPortletListener(timingPortletListener);
@@ -675,4 +684,9 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	public boolean isInitializing() {
 		return initializing;
 	}
+
+	public Config getPortletConfig() {
+		return portletConfig;
+	}
+
 }

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="C2G_REQUEST_LOG">
+	<page>
+		<region title="Suche (aus-/einklappen)" collapsible="true"
+			collapsed="true">
+			<form id="form_C2G_REQUEST_LOG" columns="8">
+				<field name="ID" />
+				<field name="URL" />
+				<field name="SVN_URL" />
+				<field name="SQL_STMTS" />
+				<field name="SQL_COUNT" />
+				<field name="REQUEST_START" />
+				<field name="REQUEST_MS" />
+				<field name="DB_MS" />
+				<action title="Suche" id="search_C2G_REQUEST_LOG">
+					<search>
+						<tables>
+							<table id="table_C2G_REQUEST_LOG" />
+						</tables>
+						<apply-filters>
+							<contains column="URL" field="URL" case-sensitive="true" />
+							<contains column="SVN_URL" field="SVN_URL"
+								case-sensitive="true" />
+							<greater-or-equal column="SQL_COUNT" field="SQL_COUNT" />
+							<greater-or-equal column="REQUEST_MS" field="REQUEST_MS" />
+							<greater-or-equal column="DB_MS" field="DB_MS" />
+						</apply-filters>
+					</search>
+				</action>
+				<action title="Suche zurücksetzen" id="reset_C2G_REQUEST_LOG">
+					<reset />
+				</action>
+			</form>
+		</region>
+		<table id="table_C2G_REQUEST_LOG" sortable="true" export="xls"
+			edit-form="true">
+			<database-query datasource="java:/jdbc/liferayDs">
+				<default-order>
+					<order column="ID" direction="desc" />
+				</default-order>
+				<query><![CDATA[
+					select * from "C2G_REQUEST_LOG"]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" primary-key="true" />
+				<column name="URL" editable="true" />
+				<column name="SVN_URL" editable="true" />
+				<column name="SQL_STMTS" editable="true" hidden="in-table" rows="20"/>
+				<column name="SQL_COUNT" editable="true" />
+				<column name="REQUEST_START" editable="true" />
+				<column name="REQUEST_MS" editable="true" />
+				<column name="DB_MS" editable="true" />
+			</columns>
+			<action title="Aktualisieren" onExecution="it.table.refresh()" />
+		</table>
+	</page>
+</portlet>

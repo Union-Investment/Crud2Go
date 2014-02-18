@@ -27,29 +27,54 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.server.VaadinPortletService;
 import com.vaadin.ui.Label;
 
+import de.unioninvestment.eai.portal.portlet.crud.CrudUI;
+import de.unioninvestment.eai.portal.portlet.crud.services.RequestProcessingLogService;
 import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortletService;
 import de.unioninvestment.eai.portal.support.vaadin.RequestProcessingInfo;
 
+/**
+ * Label that displays request performance metrics. As it also hooks into the
+ * response generation lifecycle, it's also used to submit request logging
+ * information to the {@link RequestProcessingLogService}, even if the label is
+ * not to be displayed.
+ * 
+ * @author cmj
+ */
 public class RequestProcessingLabel extends Label {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(RequestProcessingLabel.class);
-	
-	public RequestProcessingLabel() {
+
+	private RequestProcessingLogService requestProcessingLogService;
+
+	public RequestProcessingLabel(
+			RequestProcessingLogService requestProcessingLogService,
+			boolean visible) {
+		this.requestProcessingLogService = requestProcessingLogService;
 		setSizeUndefined();
+		if (!visible) {
+			setStyleName("hidden");
+		}
 	}
 
 	@Override
 	public void beforeClientResponse(boolean initial) {
-		updateInfo();
+		RequestProcessingInfo info = ((CrudVaadinPortletService) VaadinPortletService
+				.getCurrent()).getCurrentRequestProcessingInfo();
+		addRequestLogEntry(info, CrudUI.getCurrent());
+		updateInfo(info);
+
 		super.beforeClientResponse(initial);
 	}
 
-	private void updateInfo() {
-		RequestProcessingInfo info = ((CrudVaadinPortletService) VaadinPortletService
-				.getCurrent()).getCurrentRequestProcessingInfo();
+	private void addRequestLogEntry(RequestProcessingInfo info, CrudUI ui) {
+		requestProcessingLogService //
+				.addRequestLogEntry(info, ui);
+	}
+
+	private void updateInfo(RequestProcessingInfo info) {
 		long duration = info.getTimeSinceRequestStart();
 		long dbDuration = info.getMeasuredTime("db");
 

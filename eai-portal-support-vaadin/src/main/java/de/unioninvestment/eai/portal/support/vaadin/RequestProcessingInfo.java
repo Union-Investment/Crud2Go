@@ -32,6 +32,8 @@ public class RequestProcessingInfo {
 
 	private long startTime;
 	private Map<String, Category> categories = new HashMap<String, Category>();
+	private StringBuilder sqlStatements = null;
+	private int countOfSqlStatements = 0;
 
 	public RequestProcessingInfo() {
 		startTime = System.nanoTime();
@@ -67,6 +69,27 @@ public class RequestProcessingInfo {
 	public long getMeasuredTime(String category) {
 		Category cat = categories.get(category);
 		return cat == null ? 0 : cat.duration / 1000000;
+	}
+
+	public void addSqlStatement(String newStatement) {
+		if (sqlStatements == null) {
+			sqlStatements = new StringBuilder(newStatement);
+		} else {
+			sqlStatements.append("\n----\n").append(newStatement);
+		}
+		countOfSqlStatements++;
+	}
+
+	public String getSqlStatements() {
+		return sqlStatements == null ? "" : sqlStatements.toString();
+	}
+
+	public int getCountOfSqlStatements() {
+		return countOfSqlStatements ;
+	}
+
+	public long getStartTime() {
+		return startTime;
 	}
 
 }

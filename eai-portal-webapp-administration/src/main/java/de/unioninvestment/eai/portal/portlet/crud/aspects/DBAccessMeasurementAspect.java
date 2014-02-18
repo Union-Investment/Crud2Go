@@ -18,15 +18,22 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.aspects;
 
+import groovy.lang.GString;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.jdbc.core.RowMapper;
 
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 import com.vaadin.server.VaadinPortletService;
 
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.category.GStringCategory;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.database.ExtendedSql;
 import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortletService;
 import de.unioninvestment.eai.portal.support.vaadin.RequestProcessingInfo;
 
@@ -80,6 +87,50 @@ public class DBAccessMeasurementAspect {
 	public Object measureLoadingOfOptionList(ProceedingJoinPoint pjp)
 			throws Throwable {
 		return measureAndCallMethod(pjp);
+	}
+
+	@Before("within(com.vaadin.data.util.sqlcontainer.query.FreeformQuery) && call(public * java.sql.Statement+.executeQuery(String)) && args(query)")
+	public <T> void rememberFreeformQuery(String query) {
+		rememberSqlStatement(query);
+	}
+	
+	@Before("within(com.vaadin.data.util.sqlcontainer.query.FreeformQuery) && call(public * java.sql.Connection+.prepareStatement(String)) && args(query)")
+	public <T> void rememberFreeformPreparedStatementQuery(String query) {
+		rememberSqlStatement(query);
+	}
+	
+	@Before("execution(private * de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptDatabaseModificationsDelegate.executeUpdate(..)) && args(sql, updateGString)")
+	public <T> void rememberScriptUpdate(ExtendedSql sql, GString updateGString) {
+		rememberSqlStatement(GStringCategory.toSqlString(updateGString));
+	}
+	
+	@Before("execution(private * de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptDatabaseModificationsDelegate.executeInsert(..)) && args(sql, insertGString)")
+	public <T> void rememberScriptInsert(ExtendedSql sql, GString insertGString) {
+		rememberSqlStatement(GStringCategory.toSqlString(insertGString));
+	}
+	
+	@Before("execution(public * de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool+.executeWithJdbcTemplate(..)) && args(query, rowMapper)")
+	public <T> void rememberConnectionPoolQuery(String query, RowMapper<T> rowMapper) {
+		rememberSqlStatement(query);
+	}
+	
+	@Before("execution(public * de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool+.querySingleResultWithJdbcTemplate(..)) && args(sh, rowMapper)")
+	public <T> void rememberConnectionPoolSingleResultQuery(StatementHelper sh, RowMapper<T> rowMapper) {
+		rememberSqlStatement(sh.getQueryString());
+	}
+	
+	private void rememberSqlStatement(String query) {
+		if (settings.isRequestLogEnabled()) {
+			CrudVaadinPortletService service = (CrudVaadinPortletService) VaadinPortletService
+					.getCurrent();
+			if (service != null) {
+				RequestProcessingInfo info = service
+						.getCurrentRequestProcessingInfo();
+				if (info != null) {
+					info.addSqlStatement(query);
+				}
+			}
+		}
 	}
 
 	private Object measureAndCallMethod(ProceedingJoinPoint pjp)

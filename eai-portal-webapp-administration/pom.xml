@@ -365,6 +365,10 @@
 							<artifactId>eai-portal-domain-crudportlet</artifactId>
 						</weaveDependency>
 						<weaveDependency>
+							<groupId>de.uit.eai.portal</groupId>
+							<artifactId>eai-portal-support-scripting</artifactId>
+						</weaveDependency>
+						<weaveDependency>
 							<groupId>com.vaadin</groupId>
 							<artifactId>vaadin-server</artifactId>
 						</weaveDependency>

@@ -95,6 +95,18 @@ public class Settings {
 	@Value("${portlet.crud.displayRequestProcessingInfo}")
 	private boolean displayRequestProcessingInfo;
 
+	@Value("${portlet.crud.requestLog.enabled}")
+	private boolean isRequestLogEnabled;
+
+	@Value("${portlet.crud.requestLog.minimalDurationMillis}")
+	private int requestLogMinimalDurationMillis;
+
+	@Value("${portlet.crud.requestLog.cleanup.cronExpression}")
+	private String requestLogCleanupCronExpression;
+
+	@Value("${portlet.crud.requestLog.cleanup.maxAgeDays}")
+	private Integer requestLogCleanupMaxAgeDays;
+
 	private URL defaultPropertiesLocation = Settings.class.getClassLoader()
 			.getResource("eai-portal-administration.properties");
 	private URL propertiesLocation = Settings.class.getClassLoader()
@@ -181,7 +193,7 @@ public class Settings {
 				try {
 					props.load(defaultPropertiesLocation.openStream());
 					props.load(propertiesLocation.openStream());
-					
+
 				} catch (IOException e) {
 					throw new TechnicalCrudPortletException(
 							"Error reading properties file", e);
@@ -274,6 +286,22 @@ public class Settings {
 		default:
 			break;
 		}
+	}
+
+	public boolean isRequestLogEnabled() {
+		return isRequestLogEnabled;
+	}
+
+	public int getRequestLogMinimalDurationMillis() {
+		return requestLogMinimalDurationMillis;
+	}
+
+	public String getRequestLogCleanupCronExpression() {
+		return requestLogCleanupCronExpression;
+	}
+
+	public Integer getRequestLogCleanupMaxAgeDays() {
+		return requestLogCleanupMaxAgeDays;
 	}
 
 }

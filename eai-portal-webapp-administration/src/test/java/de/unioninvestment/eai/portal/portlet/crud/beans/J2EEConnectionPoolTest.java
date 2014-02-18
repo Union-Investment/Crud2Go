@@ -63,10 +63,16 @@ public class J2EEConnectionPoolTest {
 	}
 
 	@Test
-	public void testGenerateJndiName() {
+	public void shouldGenerateJndiNameFromShortNameAndPattern() {
 		assertEquals("jdbc/myDs", pool.getJndiName());
 	}
 
+	@Test
+	public void shouldGenerateUseShortNameAsJndiNameIfStartingWithJava() {
+		pool = new J2EEConnectionPool("jdbc/{0}Ds", "java:/jdbc/myDs");
+		assertEquals("java:/jdbc/myDs", pool.getJndiName());
+	}
+	
 	@Test
 	public void testLookupDataSource() throws NamingException {
 		when(InitialContextFactoryMock.getMock().lookup("jdbc/myDs"))

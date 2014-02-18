@@ -5065,7 +5065,7 @@ body .crud2go.v-app {
 	margin-left: 5px;
 }
 
-.crud2go .v-label-crudPortletId, .crud2go .v-label-crudPortletCommunityId {
+.crud2go .v-label-crudPortletId, .crud2go .v-label-crudPortletCommunityId, .crud2go .v-label-hidden.v-label-hidden {
 	display: none;
 }
 

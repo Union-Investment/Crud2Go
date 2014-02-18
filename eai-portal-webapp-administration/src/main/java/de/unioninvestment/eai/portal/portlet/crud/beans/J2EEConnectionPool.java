@@ -61,7 +61,11 @@ public class J2EEConnectionPool extends AbstractConnectionPool {
 		Assert.state(pattern != null, "Please provide a pattern!");
 		Assert.state(shortName != null, "Please provide a shortName!");
 
-		this.jndiName = MessageFormat.format(pattern, shortName);
+		if (shortName.startsWith("java:")) {
+			this.jndiName = shortName;
+		} else {
+			this.jndiName = MessageFormat.format(pattern, shortName);
+		}
 	}
 
 	/**

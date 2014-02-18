@@ -54,7 +54,7 @@ public class RequestProcessingInfoIntegrationTest {
 		measureForDB(15L);
 		measureForDB(15L);
 		long duration = info.getMeasuredTime("db");
-		
+
 		assertThat(duration >= 25, is(true));
 		assertThat(duration < 35, is(true));
 	}
@@ -82,6 +82,37 @@ public class RequestProcessingInfoIntegrationTest {
 		info.startMeasuring("db");
 		Thread.sleep(millis);
 		info.stopMeasuring("db");
+	}
+
+	@Test
+	public void shouldRememberSqlStatements() throws InterruptedException {
+		info.addSqlStatement("select * from TEST");
+
+		assertThat(info.getSqlStatements(), is("select * from TEST"));
+	}
+
+	@Test
+	public void shoulSeparateRememberedSqlStatementsByMinusRows()
+			throws InterruptedException {
+		info.addSqlStatement("select * from TEST");
+		info.addSqlStatement("select * from TEST");
+		
+		assertThat(info.getSqlStatements(),
+				is("select * from TEST\n----\nselect * from TEST"));
+	}
+	
+	@Test
+	public void shouldCountRememberedSqlStatements()
+			throws InterruptedException {
+
+		info.addSqlStatement("select * from TEST");
+		assertThat(info.getCountOfSqlStatements(), is(1));
+
+		info.addSqlStatement("select * from TEST");
+		assertThat(info.getCountOfSqlStatements(), is(2));
+		
+		info.addSqlStatement("select * from TEST");
+		assertThat(info.getCountOfSqlStatements(), is(3));
 	}
 
 }

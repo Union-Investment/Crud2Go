@@ -36,6 +36,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.xml.sax.SAXException;
 
 import com.cybercom.vaadin.spring.UIScope;
@@ -97,6 +99,14 @@ public class SpringApplicationFactory {
 	@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = "session")
 	public ScriptBuilder scriptBuilder() {
 		return new ScriptBuilder();
+	}
+
+	@Bean
+	public TaskScheduler scheduler() {
+		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+		scheduler.setPoolSize(1);
+		scheduler.afterPropertiesSet();
+		return scheduler;
 	}
 
 	/**
@@ -165,7 +175,8 @@ public class SpringApplicationFactory {
 
 	private ClassPathResource cacheConfigLocation() {
 		ClassPathResource configLocation = new ClassPathResource(
-				"eai/ehcache.xml", SpringApplicationFactory.class.getClassLoader());
+				"eai/ehcache.xml",
+				SpringApplicationFactory.class.getClassLoader());
 		if (!configLocation.exists()) {
 			configLocation = new ClassPathResource("ehcache.xml",
 					SpringApplicationFactory.class.getClassLoader());
@@ -173,13 +184,16 @@ public class SpringApplicationFactory {
 		return configLocation;
 	}
 
-	@Bean @Qualifier("portletCache")
+	@Bean
+	@Qualifier("portletCache")
 	public Ehcache portletCache() throws IOException {
 		return cacheManager().getEhcache("portletCache");
 	}
 
-	@Bean @Qualifier("optionListCache")
-	public Ehcache optionListCache(CacheManager cacheManager) throws IOException {
+	@Bean
+	@Qualifier("optionListCache")
+	public Ehcache optionListCache(CacheManager cacheManager)
+			throws IOException {
 		return cacheManager().getEhcache("optionListCache");
 	}
 
