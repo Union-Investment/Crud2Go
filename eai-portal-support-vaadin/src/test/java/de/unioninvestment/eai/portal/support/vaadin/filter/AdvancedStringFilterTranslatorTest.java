@@ -30,6 +30,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
+
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 
 public class AdvancedStringFilterTranslatorTest {
 
@@ -41,6 +44,8 @@ public class AdvancedStringFilterTranslatorTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+		QueryBuilder.setStringDecorator(DatabaseDialect.ORACLE
+				.getStringDecorator());
 	}
 
 	@Test

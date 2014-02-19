@@ -33,6 +33,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
+
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 
 public class SQLFilterTranslatorTest {
 
@@ -47,6 +50,8 @@ public class SQLFilterTranslatorTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+		QueryBuilder.setStringDecorator(DatabaseDialect.ORACLE
+				.getStringDecorator());
 	}
 
 	@Test
@@ -75,8 +80,7 @@ public class SQLFilterTranslatorTest {
 	@Test
 	public void shouldGetWhereStringForFilterWithoutColumn() {
 
-		when(sqlFilter.getWhereString()).thenReturn(
-				"A = ?");
+		when(sqlFilter.getWhereString()).thenReturn("A = ?");
 		when(sqlFilter.getColumn()).thenReturn(null);
 		when(sqlFilter.getValues()).thenReturn(
 				Arrays.asList(new Object[] { "TESTPARAM" }));
