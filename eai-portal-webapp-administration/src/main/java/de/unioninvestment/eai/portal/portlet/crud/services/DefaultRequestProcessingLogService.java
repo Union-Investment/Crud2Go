@@ -118,13 +118,12 @@ public class DefaultRequestProcessingLogService implements
 					String url = ui.getPage().getLocation().toString();
 					String svnUrl = ui.getPortletConfig() != null ? ui
 							.getPortletConfig().getFileName() : null;
-					Date dateCreated = new Date(info.getStartTime());
 
 					dao.storeRequestLogEntry(url, //
 							svnUrl, //
 							info.getSqlStatements(), //
 							info.getCountOfSqlStatements(), //
-							dateCreated, //
+							info.getStartDate(), //
 							info.getTimeSinceRequestStart(), //
 							info.getMeasuredTime("db"));
 

@@ -135,7 +135,7 @@ public class DBAccessMeasurementAspect {
 
 	private Object measureAndCallMethod(ProceedingJoinPoint pjp)
 			throws Throwable {
-		if (settings.isDisplayRequestProcessingInfo()) {
+		if (settings.isDisplayRequestProcessingInfo() || settings.isRequestLogEnabled()) {
 			CrudVaadinPortletService service = (CrudVaadinPortletService) VaadinPortletService
 					.getCurrent();
 			if (service != null) {

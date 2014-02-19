@@ -190,7 +190,7 @@ public class DefaultRequestProcessingLogServiceTest {
 		when(infoMock.getSqlStatements()).thenReturn("sqlStatements");
 		when(infoMock.getCountOfSqlStatements()).thenReturn(12);
 
-		when(infoMock.getStartTime()).thenReturn(requestStart.getTime());
+		when(infoMock.getStartDate()).thenReturn(requestStart);
 		when(infoMock.getTimeSinceRequestStart()).thenReturn(5122L);
 		when(infoMock.getMeasuredTime("db")).thenReturn(2121L);
 	}

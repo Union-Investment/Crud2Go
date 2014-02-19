@@ -19,6 +19,7 @@
 
 package de.unioninvestment.eai.portal.support.vaadin;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,11 +37,11 @@ public class RequestProcessingInfo {
 	private int countOfSqlStatements = 0;
 
 	public RequestProcessingInfo() {
-		startTime = System.nanoTime();
+		startTime = System.currentTimeMillis();
 	}
 
 	public long getTimeSinceRequestStart() {
-		return (System.nanoTime() - startTime) / 1000000;
+		return System.currentTimeMillis() - startTime;
 	}
 
 	public void startMeasuring(String category) {
@@ -50,7 +51,7 @@ public class RequestProcessingInfo {
 			categories.put(category, cat);
 		}
 		if (cat.depth++ == 0) {
-			cat.lastStart = System.nanoTime();
+			cat.lastStart = System.currentTimeMillis();
 		}
 	}
 
@@ -62,13 +63,13 @@ public class RequestProcessingInfo {
 	public void stopMeasuring(String category) {
 		Category cat = categories.get(category);
 		if (--cat.depth == 0) {
-			cat.duration += (System.nanoTime() - cat.lastStart);
+			cat.duration += (System.currentTimeMillis() - cat.lastStart);
 		}
 	}
 
 	public long getMeasuredTime(String category) {
 		Category cat = categories.get(category);
-		return cat == null ? 0 : cat.duration / 1000000;
+		return cat == null ? 0 : cat.duration;
 	}
 
 	public void addSqlStatement(String newStatement) {
@@ -88,8 +89,8 @@ public class RequestProcessingInfo {
 		return countOfSqlStatements ;
 	}
 
-	public long getStartTime() {
-		return startTime;
+	public Date getStartDate() {
+		return new Date(startTime);
 	}
 
 }
