@@ -52,8 +52,11 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 
 public class DefaultQueryOptionListRepositoryTest {
 
@@ -86,6 +89,7 @@ public class DefaultQueryOptionListRepositoryTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+		QueryBuilder.setStringDecorator(DatabaseDialect.ORACLE.getStringDecorator());
 
 		when(connectionPoolFactoryMock.getPool("ds")).thenReturn(
 				connectionPoolMock);
@@ -202,7 +206,7 @@ public class DefaultQueryOptionListRepositoryTest {
 		assertThat(
 				DefaultQueryOptionListRepository
 						.nullSafeQuery("select a as key, b as title from table"),
-				is("select key, title from (select a as key, b as title from table) where key is not null and title is not null"));
+				is("select \"KEY\",\"TITLE\" from (select a as key, b as title from table) opt where \"KEY\" is not null and \"TITLE\" is not null"));
 	}
 
 	@Test
