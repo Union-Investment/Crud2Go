@@ -499,6 +499,13 @@
 					<element name="details" type="tns:CompoundSearchDetailsConfig"
 						minOccurs="0" />
 				</sequence>
+				<attribute name="id" type="ID">
+					<annotation>
+						<documentation>
+							Die im XML eindeutige ID.
+						</documentation>
+					</annotation>
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>

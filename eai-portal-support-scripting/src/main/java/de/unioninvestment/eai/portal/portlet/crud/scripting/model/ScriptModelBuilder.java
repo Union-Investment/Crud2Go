@@ -308,6 +308,8 @@ public class ScriptModelBuilder {
 
 	private ScriptCompoundSearch buildScriptCompoundSearch(CompoundSearch compoundSearch) {
 		ScriptCompoundSearch scriptCompoundSearch = factory.getScriptCompoundSearch(compoundSearch);
+		scriptPortlet.addElementById(compoundSearch.getId(), scriptCompoundSearch);
+
 		for (Component re : compoundSearch.getElements()) {
 			scriptCompoundSearch.addElement(buildScriptComponent(re));
 		}

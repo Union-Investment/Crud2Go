@@ -96,6 +96,10 @@ public class CompoundSearch extends Panel {
 				: new CompoundSearchDetailsConfig();
 	}
 
+	public String getId() {
+		return config.getId(); 
+	}
+	
 	/**
 	 * @return all field names that can be used inside lucene queries
 	 */

@@ -231,7 +231,7 @@ public class ModelBuilder {
 
 	private Panel buildPanel(PanelConfig panelConfig) {
 		Panel panel = createPanelInstance(panelConfig);
-        panel.setPortlet(portlet);
+		panel.setPortlet(portlet);
 		buildComponentsInPanel(panelConfig, panel);
 		return panel;
 	}
@@ -251,7 +251,12 @@ public class ModelBuilder {
 				CompoundSearch.Permission.BUILD, true)) {
 			CompoundSearch search = factory
 					.getCompoundSearch(compoundSearchConfig);
-            search.setPortlet(portlet);
+			search.setPortlet(portlet);
+
+			String id = compoundSearchConfig.getId();
+			if (StringUtils.isNotEmpty(id)) {
+				portlet.addElementById(id, search);
+			}
 			mappings.put(search, compoundSearchConfig);
 
 			return search;
