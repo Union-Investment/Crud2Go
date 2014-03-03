@@ -19,13 +19,21 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
+import java.util.Collection;
+
 import org.apache.lucene.search.Query;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.CompoundSearchView;
 
+/**
+ * Presenter für {@link CompoundSearchView}.
+ * 
+ * @author cmj
+ */
 @SuppressWarnings("serial")
 public class CompoundSearchPresenter extends PanelContentPresenter implements
 		CompoundSearchView.Presenter, CompoundQueryChangedEventHandler {
@@ -66,4 +74,8 @@ public class CompoundSearchPresenter extends PanelContentPresenter implements
 		}
 	}
 
+	@Override
+	public Collection<TableColumn> getSearchableColumns() {
+		return getModel().getSearchableColumns().values();
+	}
 }

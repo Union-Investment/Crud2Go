@@ -278,11 +278,15 @@
       text-decoration: none;
       font-weight: bold;
       padding-left: 12px;
-      background: transparent url(../../themes/base/common/img/sprites.png) no-repeat 2px -36px;
+      background: transparent url(../../themes/base/common/img/sprites.png) no-repeat 2px -39px;
     }
 
-  .compsearchbar .detailswitch.open .v-button-caption {
-      background-position: -9px -8px;
-    }
+	.compsearchbar .detailswitch.open .v-button-caption {
+		background-position: -9px -11px;
+	}
+    
+	.compsearchinfo .v-table-row-defaultfield {
+		font-weight: bold;
+	}
 }
 

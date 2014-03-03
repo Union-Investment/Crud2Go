@@ -23,12 +23,20 @@ import java.util.Collection;
 
 import org.apache.lucene.search.Query;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
+
+/**
+ * View-Interface für die Compound-Suche.
+ * 
+ * @author cmj
+ */
 public interface CompoundSearchView extends PanelContentView {
 
 	public interface Presenter {
 
 		void search(Query query);
 
+		Collection<TableColumn> getSearchableColumns();
 	}
 
 	void setPresenter(CompoundSearchView.Presenter compoundSearchPresenter);

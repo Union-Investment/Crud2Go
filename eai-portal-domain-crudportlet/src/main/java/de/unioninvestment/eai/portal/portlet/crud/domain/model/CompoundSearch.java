@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -57,6 +59,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchDetailsCo
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
@@ -74,6 +77,12 @@ import de.unioninvestment.eai.portal.support.vaadin.date.GermanDateFormats;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 import de.unioninvestment.eai.portal.support.vaadin.support.NumberFormatter;
 
+/**
+ * Repräsentation der Compound-Suche. Konvertiert eine Suche in Lucene-Syntax in
+ * Vaadin-Containerfilter.
+ * 
+ * @author cmj
+ */
 @SuppressWarnings("serial")
 public class CompoundSearch extends Panel {
 
@@ -82,7 +91,7 @@ public class CompoundSearch extends Panel {
 	private CompoundSearchConfig config;
 
 	private GermanDateFormats dateFormats = new GermanDateFormats();
-	
+
 	protected EventRouter<CompoundQueryChangedEventHandler, CompoundQueryChangedEvent> eventRouter = new EventRouter<CompoundQueryChangedEventHandler, CompoundQueryChangedEvent>();
 
 	public CompoundSearch(CompoundSearchConfig config) {
@@ -97,9 +106,27 @@ public class CompoundSearch extends Panel {
 	}
 
 	public String getId() {
-		return config.getId(); 
+		return config.getId();
 	}
-	
+
+	/**
+	 * @return searchable Columns sorted by name
+	 */
+	public Map<String, TableColumn> getSearchableColumns() {
+		TreeMap<String, TableColumn> searchableColumns = new TreeMap<String, TableColumn>();
+		for (Table table : getTables()) {
+			if (table.getColumns() != null) {
+				for (TableColumn column : table.getColumns()) {
+					if (column.getSearchable() == Searchable.DEFAULT
+							|| !searchableColumns.containsKey(column.getName())) {
+						searchableColumns.put(column.getName(), column);
+					}
+				}
+			}
+		}
+		return searchableColumns;
+	}
+
 	/**
 	 * @return all field names that can be used inside lucene queries
 	 */
@@ -326,7 +353,8 @@ public class CompoundSearch extends Panel {
 			} else if (clause.getOccur() == Occur.SHOULD) {
 				hasShouldClause = true;
 			} else {
-				throw new UnsupportedOperationException("Unknown:" + clause.getOccur());
+				throw new UnsupportedOperationException("Unknown:"
+						+ clause.getOccur());
 			}
 		}
 		return hasMustClause && hasShouldClause;
@@ -404,29 +432,34 @@ public class CompoundSearch extends Panel {
 
 	public void search(String queryString) {
 		Collection<String> defaultFields = getDefaultFields();
-		String[] defaultFieldsArray = defaultFields.toArray(new String[defaultFields.size()]);
-		
+		String[] defaultFieldsArray = defaultFields
+				.toArray(new String[defaultFields.size()]);
+
 		Analyzer analyzer = new WhitespaceAnalyzer(Version.LUCENE_46);
-		QueryParser luceneParser = new MultiFieldQueryParser(
-				Version.LUCENE_46, defaultFieldsArray, analyzer);
+		QueryParser luceneParser = new MultiFieldQueryParser(Version.LUCENE_46,
+				defaultFieldsArray, analyzer);
 		try {
 			Query query = luceneParser.parse(queryString);
 			search(query);
 			fireQueryChangedEvent(queryString);
 
 		} catch (org.apache.lucene.queryparser.classic.ParseException e) {
-			throw new BusinessException("portlet.crud.error.compoundsearch.invalidQuery", queryString);
+			throw new BusinessException(
+					"portlet.crud.error.compoundsearch.invalidQuery",
+					queryString);
 		}
 	}
 
-	public void addQueryChangedEventHandler(CompoundQueryChangedEventHandler handler) {
+	public void addQueryChangedEventHandler(
+			CompoundQueryChangedEventHandler handler) {
 		eventRouter.addHandler(handler);
 	}
-	
-	public void removeQueryChangedEventHandler(CompoundQueryChangedEventHandler handler) {
+
+	public void removeQueryChangedEventHandler(
+			CompoundQueryChangedEventHandler handler) {
 		eventRouter.removeHandler(handler);
 	}
-	
+
 	void fireQueryChangedEvent(String queryString) {
 		eventRouter.fireEvent(new CompoundQueryChangedEvent(this, queryString));
 	}
