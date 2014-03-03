@@ -19,8 +19,12 @@
 package de.unioninvestment.eai.portal.portlet.crud;
 
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -31,6 +35,7 @@ import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import javax.portlet.PortletSession;
 import javax.portlet.ReadOnlyException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -39,6 +44,7 @@ import javax.portlet.ResourceResponse;
 import javax.portlet.ValidatorException;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -111,12 +117,16 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationExcepti
 public class CrudUI extends LiferayUI implements PortletListener,
 		ShowPopupEventHandler, InitializingUI {
 
+
 	private static final long serialVersionUID = 1L;
 
-	public static final String ROLE_ADMIN = "portlet-crud-adm";
+	private static final String LIFECYCLE_DATEFORMAT = "dd.MM.yyyy HH:mm:ss.SSS";
+	private static final Logger LIFECYCLE_LOGGER = LoggerFactory
+			.getLogger(CrudUI.class.getPackage().getName() + ".lifecycle");
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CrudUI.class);
 
-	private static final org.slf4j.Logger LOG = LoggerFactory
-			.getLogger(CrudUI.class);
+	public static final String ROLE_ADMIN = "portlet-crud-adm";
 
 	private Portlet portletDomain;
 	private PortletPresenter portletGui;
@@ -168,12 +178,22 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 	private TimingPortletListener timingPortletListener;
 
+	public enum LifecycleEvent {
+		CRUD2GO_INIT,
+		CRUD2GO_UI_INIT,
+		CRUD2GO_UI_DETACH,
+		CRUD2GO_SHUTDOWN
+	}
+	
 	/**
 	 * Initialisierung des PortletPresenter.
 	 * 
 	 */
 	@Override
 	public void doInit(VaadinRequest request) {
+		setId(UUID.randomUUID().toString());
+		logLifecycleEvent(LifecycleEvent.CRUD2GO_UI_INIT);
+
 		autowireUiDependencies(request);
 
 		VaadinSession.getCurrent().setErrorHandler(new CrudErrorHandler());
@@ -190,6 +210,30 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		refreshViews();
 
 		getPortletSession().addPortletListener(this);
+	}
+
+	public static void logLifecycleEvent(LifecycleEvent event) {
+		String now = new SimpleDateFormat(LIFECYCLE_DATEFORMAT)
+				.format(new Date());
+		
+		String uiId = "";
+		String url = "";
+		UI ui = UI.getCurrent();
+		if (ui != null) {
+			url = ui.getPage().getLocation().toString();
+			uiId = ui.getId();
+		}
+		
+		String sessionId = "";
+		PortletRequest portletRequest = VaadinPortletService
+				.getCurrentPortletRequest();
+		if (portletRequest != null) {
+			PortletSession session = portletRequest.getPortletSession(false);
+			sessionId = session == null ? portletRequest.getRequestedSessionId() : session.getId();
+		}
+		
+		LIFECYCLE_LOGGER.info(MessageFormat.format("{0};{1};{2};{3};{4}", now,
+				uiId, url, sessionId, event.name()));
 	}
 
 	private void autowireUiDependencies(VaadinRequest request) {
@@ -535,6 +579,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	public void detach() {
 		getPortletSession().removePortletListener(this);
 		removeTimingPortletListener();
+		logLifecycleEvent(LifecycleEvent.CRUD2GO_UI_DETACH);
+		super.detach();
 	}
 
 	private VaadinPortletSession getPortletSession() {

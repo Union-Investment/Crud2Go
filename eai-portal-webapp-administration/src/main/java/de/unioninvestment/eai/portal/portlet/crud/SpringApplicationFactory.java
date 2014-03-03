@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
@@ -42,6 +44,7 @@ import org.xml.sax.SAXException;
 
 import com.cybercom.vaadin.spring.UIScope;
 
+import de.unioninvestment.eai.portal.portlet.crud.CrudUI.LifecycleEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.DefaultConfigurationDao;
@@ -77,6 +80,16 @@ public class SpringApplicationFactory {
 		return new UIScope();
 	}
 
+	@PostConstruct
+	public void initialize() {
+		CrudUI.logLifecycleEvent(LifecycleEvent.CRUD2GO_INIT);
+	}
+	
+	@PreDestroy
+	public void shutdown() {
+		CrudUI.logLifecycleEvent(LifecycleEvent.CRUD2GO_SHUTDOWN);
+	}
+	
 	/**
 	 * Erzeugt eine Instanz der Klasse EventBus.
 	 * 
