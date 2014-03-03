@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Scope;
 
 import de.unioninvestment.eai.portal.portlet.crud.GuiBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
@@ -131,10 +132,10 @@ public class PresenterFactory {
 	 * @return TextAreaPresenter
 	 */
 	public TextAreaPresenter textAreaPresenter(TextArea textarea) {
-		return new TextAreaPresenter(viewFactory.textAreaView(textarea.getWidth(),
-				textarea.getHeight()), textarea);
+		return new TextAreaPresenter(viewFactory.textAreaView(
+				textarea.getWidth(), textarea.getHeight()), textarea);
 	}
-	
+
 	/**
 	 * Liefert eine {@link DialogPresenter} zurück.
 	 * 
@@ -281,5 +282,11 @@ public class PresenterFactory {
 		return new CustomComponentPresenter(viewFactory.customComponentView(
 				customComponent.getWidth(), customComponent.getHeight()),
 				customComponent);
+	}
+
+	public CompoundSearchPresenter compoundSearchPresenter(
+			CompoundSearch compoundSearch) {
+		return new CompoundSearchPresenter(viewFactory.compoundSearchView(),
+				compoundSearch);
 	}
 }

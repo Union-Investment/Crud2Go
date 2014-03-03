@@ -32,6 +32,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.EndsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
@@ -594,5 +595,13 @@ public class ScriptFilterFactory {
 		String modifiers = arg(namedArguments, "modifiers", null);
 		boolean durable = durable(namedArguments);
 		filters.add(new RegExpFilter(columnName, pattern, modifiers, durable));
+	}
+
+	public void isNull(String columnName) {
+		filters.add(new IsNull(columnName));
+	}
+	
+	public void isNull(Map<String, Object> namedArguments, String columnName) {
+		filters.add(new IsNull(columnName, durable(namedArguments)));
 	}
 }

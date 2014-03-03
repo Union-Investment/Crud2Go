@@ -200,4 +200,8 @@ public class ViewFactory implements Serializable {
 			String height) {
 		return new DefaultCollapsibleRegionView(width, height);
 	}
+
+	public CompoundSearchView compoundSearchView() {
+		return new DefaultCompoundSearchView();
+	}
 }

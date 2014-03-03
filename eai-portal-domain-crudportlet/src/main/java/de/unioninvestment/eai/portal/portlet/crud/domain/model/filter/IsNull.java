@@ -19,15 +19,16 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.filter;
 
 /**
- * Filterklasse für ein EndsWith-Operator.
+ * Filterklasse für ein SQL Gleichoperator.
+ * 
+ * @author markus.bonsch
  * 
  */
-public class EndsWith extends Filter {
-	private static final long serialVersionUID = 1L;
-	private final String column;
-	private final String value;
+public final class IsNull extends Filter {
 
-	private final boolean caseSensitive;
+	private static final long serialVersionUID = 1L;
+
+	private final String column;
 
 	/**
 	 * Konstruktor.
@@ -37,8 +38,8 @@ public class EndsWith extends Filter {
 	 * @param value
 	 *            - Vergleichswert
 	 */
-	public EndsWith(String column, String value, boolean caseSensitive) {
-		this(column, value, caseSensitive, false);
+	public IsNull(String column) {
+		this(column, false);
 	}
 
 	/**
@@ -51,44 +52,29 @@ public class EndsWith extends Filter {
 	 * @param durable
 	 *            Ob der Filter permanent gesetzt sein soll
 	 */
-	public EndsWith(String column, String value, boolean caseSensitive,
-			boolean durable) {
+	public IsNull(String column, boolean durable) {
 		super(durable);
 		this.column = column;
-		this.value = value;
-		this.caseSensitive = caseSensitive;
 	}
 
 	public String getColumn() {
 		return column;
 	}
 
-	public String getValue() {
-		return value;
-	}
-
-	public boolean isCaseSensitive() {
-		return caseSensitive;
-	}
-
 	@Override
 	public String toString() {
-		return "EndsWith [column=" + column + ", value=" + value + "]";
+		return "IsNull [column=" + column + ", durable=" + durable + "]";
 	}
 
 	@Override
-	@SuppressWarnings("all")
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + (caseSensitive ? 1231 : 1237);
 		result = prime * result + ((column == null) ? 0 : column.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
 
 	@Override
-	@SuppressWarnings("all")
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -96,20 +82,14 @@ public class EndsWith extends Filter {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		EndsWith other = (EndsWith) obj;
-		if (caseSensitive != other.caseSensitive)
-			return false;
+		IsNull other = (IsNull) obj;
 		if (column == null) {
 			if (other.column != null)
 				return false;
 		} else if (!column.equals(other.column))
 			return false;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
 		return true;
 	}
 
+	
 }

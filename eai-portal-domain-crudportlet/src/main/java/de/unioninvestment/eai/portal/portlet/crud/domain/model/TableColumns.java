@@ -20,15 +20,20 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.vaadin.tokenfield.TokenField;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
 
 /**
  * Aggregations-Objekt für Tabellenspalteninformationen, bietet
@@ -179,15 +184,40 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 	}
 
 	/**
-	 * Prüft, ob das Property ein Dropdownfeld ist.
+	 * Prüft, ob das Dropdown eine Selektion darstellt.
+	 * 
+	 * @param columnName
+	 * @return
+	 */
+	public boolean isSelection(String columnName) {
+		TableColumn column = get(columnName);
+		return column instanceof SelectionTableColumn;
+	}
+
+	/**
+	 * Prüft, ob das Property eine Dropdown-Selektion darstellt.
 	 * 
 	 * @param columnName
 	 *            Name
-	 * @return isDropdown
+	 * @return <code>true</code>, falls es eine Auswahl als Dropdown darstellt
 	 */
 	public boolean isComboBox(String columnName) {
 		TableColumn column = get(columnName);
-		return (column instanceof SelectionTableColumn) && ((SelectionTableColumn)column).isComboBox();
+		return (column instanceof SelectionTableColumn)
+				&& ((SelectionTableColumn) column).isComboBox();
+	}
+
+	/**
+	 * Prüft, ob das Property eine TokenField-Selektion darstellt.
+	 * 
+	 * @param columnName
+	 *            Name
+	 * @return <code>true</code>, falls es eine Auswahl als {@link TokenField} darstellt
+	 */
+	public boolean isTokenfield(String columnName) {
+		TableColumn column = get(columnName);
+		return (column instanceof SelectionTableColumn)
+				&& ((SelectionTableColumn) column).isTokenfield();
 	}
 
 	/**
@@ -245,7 +275,9 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 	public Map<String, String> getFormatPattern() {
 		Map<String, String> result = new HashMap<String, String>();
 		for (TableColumn column : columnsList) {
-			result.put(column.getName(), column.getDisplayFormat());
+			if (column.getDisplayFormat() != null) {
+				result.put(column.getName(), column.getDisplayFormat());
+			}
 		}
 
 		return result;
@@ -267,8 +299,24 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 		return columns.containsKey(columnName);
 	}
 
-	public boolean isTokenfield(String columnName) {
-		TableColumn column = get(columnName);
-		return (column instanceof SelectionTableColumn) && ((SelectionTableColumn)column).isTokenfield();
+	public Collection<String> getSearchableColumnNames() {
+		List<String> searchable = new LinkedList<String>();
+		for (TableColumn column : columnsList) {
+			if (column.getSearchable() != Searchable.FALSE) {
+				searchable.add(column.getName());
+			}
+		}
+		return searchable;
 	}
+
+	public Collection<String> getDefaultSearchableColumnNames() {
+		List<String> defaultFields = new LinkedList<String>();
+		for (TableColumn column : columnsList) {
+			if (column.getSearchable() == Searchable.DEFAULT) {
+				defaultFields.add(column.getName());
+			}
+		}
+		return defaultFields;
+	}
+
 }

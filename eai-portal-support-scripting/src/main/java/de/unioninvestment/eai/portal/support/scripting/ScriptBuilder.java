@@ -18,10 +18,6 @@
  */
 package de.unioninvestment.eai.portal.support.scripting;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import groovy.lang.Binding;
 import groovy.lang.Closure;
 import groovy.lang.Script;

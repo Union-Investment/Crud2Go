@@ -47,6 +47,7 @@ import com.vaadin.data.Container.Ordered;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.Like;
 import com.vaadin.data.util.filter.Or;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
@@ -75,10 +76,12 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.EndsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Wildcard;
 import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
@@ -488,9 +491,9 @@ public abstract class AbstractDataContainer implements DataContainer,
 
 	@Override
 	public DataStream getStream() {
-		return new VaadinContainerDataStream((Ordered)getVaadinContainer());
+		return new VaadinContainerDataStream((Ordered) getVaadinContainer());
 	}
-	
+
 	@Override
 	public void eachRow(final EachRowCallback eachRowCallback) {
 		withTransaction(new TransactionCallback<Object>() {
@@ -598,11 +601,27 @@ public abstract class AbstractDataContainer implements DataContainer,
 		} else if (filter instanceof Contains) {
 			return buildContainsFilter(filter);
 
+		} else if (filter instanceof Wildcard) {
+			return buildWildcardFilter(filter);
+			
+		} else if (filter instanceof IsNull) {
+			return buildIsNullFilter(filter);
+
 		} else if (filter instanceof Nothing) {
 			return buildNothingFilter(filter);
 		}
 		throw new IllegalArgumentException("Not supported Filtertype: "
 				+ filter.getClass().getName());
+	}
+
+	/**
+	 * @param filter
+	 *            Container-Filter
+	 * @return Vaadin-Filter
+	 */
+	protected com.vaadin.data.Container.Filter buildIsNullFilter(Filter filter) {
+		IsNull isNull = (IsNull) filter;
+		return new com.vaadin.data.util.filter.IsNull(isNull.getColumn());
 	}
 
 	/**
@@ -625,6 +644,14 @@ public abstract class AbstractDataContainer implements DataContainer,
 				(String) containerFilter.getValue(),
 				!containerFilter.isCaseSensitive(), false, false);
 	}
+	
+	private com.vaadin.data.Container.Filter buildWildcardFilter(Filter filter) {
+		Wildcard wildcard = (Wildcard) filter;
+		String searchTerm = wildcard.getValue().replace('?', '_').replace('*', '%');
+		return new Like(wildcard.getColumn(), searchTerm, false);
+	}
+
+
 
 	/**
 	 * @param filter

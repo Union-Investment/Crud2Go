@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import de.unioninvestment.crud2go.spi.security.CryptorFactory;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
@@ -285,6 +286,10 @@ public class ModelFactory {
 			SelectConfig config, String datasource) {
 		return new QueryOptionList(config, eventBus, queryOptionListRepository,
 				datasource, prefetchExecutor, useOptionListCacheByDefault);
+	}
+
+	public CompoundSearch getCompoundSearch(CompoundSearchConfig config) {
+		return new CompoundSearch(config);
 	}
 
 }

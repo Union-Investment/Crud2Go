@@ -26,6 +26,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
@@ -38,6 +39,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TextArea;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.ComponentPresenter;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.CompoundSearchPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.CustomComponentPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.DialogPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.FormPresenter;
@@ -145,9 +147,8 @@ public class GuiBuilder implements Serializable {
 		}
 	}
 
-	private void buildRowEditingFormDialogPresenter(
-			Table table, Panel parentPanel,
-			Map<String, DialogPresenter> dialogPresenterMap,
+	private void buildRowEditingFormDialogPresenter(Table table,
+			Panel parentPanel, Map<String, DialogPresenter> dialogPresenterMap,
 			TablePresenter tablePresenter) {
 
 		RowEditingFormDialog rowEditingFormDialog = new RowEditingFormDialog(
@@ -190,6 +191,16 @@ public class GuiBuilder implements Serializable {
 		return regionPresenter;
 	}
 
+	private CompoundSearchPresenter buildCompoundSearchPresenter(
+			CompoundSearch compoundSearch,
+			Map<String, DialogPresenter> dialogPresenterMap) {
+		CompoundSearchPresenter compoundSearchPresenter = this.factory
+				.compoundSearchPresenter(compoundSearch);
+		this.addChildComponentPresenter(compoundSearch, dialogPresenterMap,
+				compoundSearchPresenter);
+		return compoundSearchPresenter;
+	}
+
 	private ComponentPresenter buildComponentPresenter(Component element,
 			Map<String, DialogPresenter> dialogPresenterMap) {
 		if (element instanceof Form) {
@@ -204,8 +215,11 @@ public class GuiBuilder implements Serializable {
 			return buildTabsPresenter((Tabs) element, dialogPresenterMap);
 		} else if (element instanceof Region) {
 			return buildRegionPresenter((Region) element, dialogPresenterMap);
+		} else if (element instanceof CompoundSearch) {
+			return buildCompoundSearchPresenter((CompoundSearch) element,
+					dialogPresenterMap);
 		}
-		return null;
+		throw new UnsupportedOperationException("Unknown Component: " + element.getClass().getName());
 	}
 
 	private ComponentPresenter buildTextAreaPresenter(TextArea element) {

@@ -374,6 +374,7 @@
 						<element name="table" type="tns:TableConfig" />
 						<element name="tabs" type="tns:TabsConfig" />
 						<element name="component" type="tns:ScriptComponentConfig" />
+						<element name="compound-search" type="tns:CompoundSearchConfig" />
 						<element name="region" type="tns:RegionConfig" />
 					</choice>
 				</sequence>
@@ -477,6 +478,43 @@
 							regardless of
 							the
 							defined value.
+						</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="CompoundSearchConfig">
+		<annotation>
+			<documentation>
+				Ein kombiniertes Suchfeld für Tabellenfelder
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ComponentConfig">
+				<sequence>
+					<element name="tables" type="tns:SearchTablesConfig"
+						minOccurs="0" />
+					<element name="details" type="tns:CompoundSearchDetailsConfig"
+						minOccurs="0" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="CompoundSearchDetailsConfig">
+		<annotation>
+			<documentation>
+				Detailbereich der Compoundsuche
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:PanelConfig">
+				<attribute name="id" type="ID">
+					<annotation>
+						<documentation>
+							Die im XML eindeutige ID.
 						</documentation>
 					</annotation>
 				</attribute>
@@ -966,6 +1004,38 @@
 				<annotation>
 					<documentation>
 						CSV Export
+					</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="ColumnSearchableType">
+		<annotation>
+			<documentation>
+				Compound-Sucheinstellungen fuer Tabellenspalten
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="default">
+				<annotation>
+					<documentation>
+						In dieser Spalte wird per Default gesucht
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="true">
+				<annotation>
+					<documentation>
+						Nach dieser Spalte kann mit expliziter Spaltenangabe
+						gesucht weren
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="false">
+				<annotation>
+					<documentation>
+						Nach dieser Spalte kann nicht gesucht werden
 					</documentation>
 				</annotation>
 			</enumeration>
@@ -2422,7 +2492,8 @@
 					<annotation>
 						<documentation>
 							Kommaseparierte Liste von Validierungsregeln. Im Fehlerfall wird
-							die im Attribut validation-message angegebene Meldung ausgegeben.
+							die im Attribut validation-message angegebene Meldung
+							ausgegeben.
 							Folgende Regeln werden unterstuetzt:
 							<table>
 								<tr>
@@ -2498,6 +2569,13 @@
 					<annotation>
 						<documentation>
 							Anzeigeformat für den Export in Excel-Syntax.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="searchable" type="tns:ColumnSearchableType">
+					<annotation>
+						<documentation>
+							Compound-Sucheinstellung
 						</documentation>
 					</annotation>
 				</attribute>

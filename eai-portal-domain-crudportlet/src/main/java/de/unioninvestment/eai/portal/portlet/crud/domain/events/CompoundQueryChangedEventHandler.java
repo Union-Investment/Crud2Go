@@ -16,33 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package de.unioninvestment.eai.portal.portlet.crud.domain.events;
 
-package de.unioninvestment.eai.portal.portlet.crud.export.streaming;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventHandler;
 
 /**
- * Inteface for export item information.
+ * Schnittstelle für die Behandlung von {@link CompoundQueryChangedEvent}s.
  * 
- * @author cmj
+ * @author carsten.mjartan
  */
-public interface ItemInfo {
+public interface CompoundQueryChangedEventHandler extends EventHandler {
 
 	/**
-	 * @param columnName
-	 * @return the value for the given column
+	 * 
+	 * Methode die den CompoundQueryChangedEvent verarbeitet.
+	 * 
+	 * @param event
+	 *            CompoundQueryChangedEvent
 	 */
-	Object getValue(String columnName);
-
-	/**
-	 * @param columnName
-	 * @return <code>true</code>, if this item is a selection option and
-	 *         {@link #getTitle(String)} may return the value to export.
-	 */
-	boolean isOption(String columnName);
-
-	/**
-	 * @param columnName
-	 * @return the dropdown display title for the given column
-	 */
-	String getTitle(String columnName);
+	void onQueryChange(CompoundQueryChangedEvent event);
 
 }

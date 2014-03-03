@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.support.vaadin.date;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -143,6 +144,19 @@ public class DateUtils {
 			return input;
 		}
 		return calendar.getTime();
+	}
+
+	public static Date adjustDateType(Date date, Class<?> targetType) {
+		if (targetType == Date.class) {
+			return date;
+		} else if (targetType == java.sql.Date.class) {
+			return new java.sql.Date(date.getTime());
+		} else if (targetType == Timestamp.class) {
+			return new Timestamp(date.getTime());
+		} else {
+			throw new IllegalArgumentException("Unsupported column type: "
+					+ targetType);
+		}
 	}
 
 }

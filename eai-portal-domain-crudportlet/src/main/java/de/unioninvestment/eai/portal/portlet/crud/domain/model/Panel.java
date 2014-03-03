@@ -276,4 +276,5 @@ public class Panel extends Component implements Serializable {
 	public void detachDialog() {
 		this.presenter.detachDialog();
 	}
+
 }

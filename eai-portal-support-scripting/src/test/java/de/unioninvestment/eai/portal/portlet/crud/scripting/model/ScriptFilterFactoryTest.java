@@ -50,6 +50,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.EndsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
@@ -425,10 +426,20 @@ public class ScriptFilterFactoryTest {
 	}
 
 	@Test
+	public void shouldBuildIsNullFilter() {
+		fac.isNull("myCol1");
+		assertThat(filters, is(filterList(new IsNull("myCol1"))));
+	}
+
+	@Test
+	public void shouldBuildDurableIsNullFilter() {
+		fac.isNull(durableNamedArgument, "myCol1");
+		assertThat(filters, is(filterList(new IsNull("myCol1", true))));
+	}
+	
+	@Test
 	public void shouldBuildDurableNothingFilter() {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("durable", true);
-		fac.nothing(args);
+		fac.nothing(durableNamedArgument);
 		assertThat(filters.size(), is(1));
 		assertThat(filters.iterator().next().isDurable(), is(true));
 	}
@@ -442,5 +453,9 @@ public class ScriptFilterFactoryTest {
 		Script instance = compileScript.newInstance();
 		instance.getBinding().setVariable("container", container);
 		instance.run();
+	}
+	
+	private static List<Filter> filterList(Filter... filters){
+		return asList(filters);
 	}
 }

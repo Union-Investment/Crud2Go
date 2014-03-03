@@ -87,5 +87,5 @@ public class DateUtilsTest {
 		assertThat(DateUtils.getResolution("MM.yyyy"), is(Calendar.MONTH));
 		assertThat(DateUtils.getResolution("yyyy"), is(Calendar.YEAR));
 	}
-
+	
 }

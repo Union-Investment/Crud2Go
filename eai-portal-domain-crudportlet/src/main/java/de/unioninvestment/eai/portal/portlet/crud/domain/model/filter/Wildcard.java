@@ -19,14 +19,15 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.filter;
 
 /**
- * Filterklasse für ein EndsWith-Operator.
+ * 
+ * Filterklasse für den Like-Operator, aber mit den Zeichen '*' und '?' statt
+ * '%' und '_'.
  * 
  */
-public class EndsWith extends Filter {
+public class Wildcard extends Filter {
 	private static final long serialVersionUID = 1L;
 	private final String column;
 	private final String value;
-
 	private final boolean caseSensitive;
 
 	/**
@@ -37,7 +38,7 @@ public class EndsWith extends Filter {
 	 * @param value
 	 *            - Vergleichswert
 	 */
-	public EndsWith(String column, String value, boolean caseSensitive) {
+	public Wildcard(String column, String value, boolean caseSensitive) {
 		this(column, value, caseSensitive, false);
 	}
 
@@ -51,7 +52,7 @@ public class EndsWith extends Filter {
 	 * @param durable
 	 *            Ob der Filter permanent gesetzt sein soll
 	 */
-	public EndsWith(String column, String value, boolean caseSensitive,
+	public Wildcard(String column, String value, boolean caseSensitive,
 			boolean durable) {
 		super(durable);
 		this.column = column;
@@ -73,7 +74,8 @@ public class EndsWith extends Filter {
 
 	@Override
 	public String toString() {
-		return "EndsWith [column=" + column + ", value=" + value + "]";
+		return "Wildcard [column=" + column + ", value=" + value
+				+ ", caseSensitive=" + caseSensitive + "]";
 	}
 
 	@Override
@@ -96,7 +98,7 @@ public class EndsWith extends Filter {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		EndsWith other = (EndsWith) obj;
+		Wildcard other = (Wildcard) obj;
 		if (caseSensitive != other.caseSensitive)
 			return false;
 		if (column == null) {

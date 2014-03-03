@@ -31,8 +31,10 @@ import de.unioninvestment.eai.portal.portlet.crud.config.AbstractActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.BinaryConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.ColumnSearchableType;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ComponentConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseTableConfig;
@@ -70,6 +72,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.Fil
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction.ActionHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Init;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
@@ -132,7 +135,7 @@ public class ModelBuilder {
 	 *            Breite der Selectboxen
 	 * @param config
 	 *            Portlet Konfiguration
-	 * @param separateEditMode
+	 * @param directEditDefault
 	 *            default setting for tables
 	 */
 	public ModelBuilder(EventBus eventBus, ModelFactory factory,
@@ -228,8 +231,32 @@ public class ModelBuilder {
 
 	private Panel buildPanel(PanelConfig panelConfig) {
 		Panel panel = createPanelInstance(panelConfig);
+        panel.setPortlet(portlet);
 		buildComponentsInPanel(panelConfig, panel);
 		return panel;
+	}
+
+	private Component buildCompoundSearchPanel(
+			CompoundSearchConfig compoundSearchConfig) {
+		CompoundSearch search = buildCompoundSearch(compoundSearchConfig);
+		if (search != null && compoundSearchConfig.getDetails() != null) {
+			buildComponentsInPanel(compoundSearchConfig.getDetails(), search);
+		}
+		return search;
+	}
+
+	private CompoundSearch buildCompoundSearch(
+			CompoundSearchConfig compoundSearchConfig) {
+		if (currentUser.hasPermission(compoundSearchConfig,
+				CompoundSearch.Permission.BUILD, true)) {
+			CompoundSearch search = factory
+					.getCompoundSearch(compoundSearchConfig);
+            search.setPortlet(portlet);
+			mappings.put(search, compoundSearchConfig);
+
+			return search;
+		}
+		return null;
 	}
 
 	private void buildComponentsInPanel(PanelConfig panelConfig, Panel panel) {
@@ -256,6 +283,8 @@ public class ModelBuilder {
 				return buildCustomComponent((ScriptComponentConfig) componentConfig);
 			} else if (componentConfig instanceof RegionConfig) {
 				return buildPanel((RegionConfig) componentConfig);
+			} else if (componentConfig instanceof CompoundSearchConfig) {
+				return buildCompoundSearchPanel((CompoundSearchConfig) componentConfig);
 			} else {
 				throw new IllegalArgumentException("Component of type '"
 						+ componentConfig.getClass().getName()
@@ -613,12 +642,6 @@ public class ModelBuilder {
 
 			Integer width = c.getWidth();
 
-			Hidden hs = Hidden.valueOf(c.getHidden().toString());
-			if (!currentUser.hasPermission(c, TableColumn.Permission.DISPLAY,
-					true)) {
-				hs = Hidden.TRUE;
-			}
-
 			// ColumnConfig.getEditable() kann entweder ein closure oder einfach
 			// true/false sein. Boolesche Werte werden hier behandelt, Closures
 			// im ScriptModelBuilder.
@@ -680,7 +703,8 @@ public class ModelBuilder {
 					.name(c.getName()) //
 					.title(c.getTitle()) //
 					.longTitle(c.getLongtitle()) //
-					.hiddenStatus(hs) //
+					.hiddenStatus(getHiddenStatus(c)) //
+					.searchable(getSearchable(c)) //
 					.editableDefault(isEditable) //
 					.primaryKey(c.isPrimaryKey()) //
 					.multiline(c.isMultiline()) //
@@ -699,6 +723,28 @@ public class ModelBuilder {
 			result.add(tableColumn);
 		}
 		return new TableColumns(result);
+	}
+
+	private Searchable getSearchable(ColumnConfig c) {
+		ColumnSearchableType searchableConfig = c.getSearchable();
+		if (searchableConfig == null) {
+			searchableConfig = ColumnSearchableType.TRUE;
+		}
+		Searchable s = Searchable.valueOf(searchableConfig.name());
+		if (s != Searchable.FALSE
+				&& !currentUser.hasPermission(c,
+						TableColumn.Permission.DISPLAY, true)) {
+			s = Searchable.FALSE;
+		}
+		return s;
+	}
+
+	private Hidden getHiddenStatus(ColumnConfig c) {
+		Hidden hs = Hidden.valueOf(c.getHidden().toString());
+		if (!currentUser.hasPermission(c, TableColumn.Permission.DISPLAY, true)) {
+			hs = Hidden.TRUE;
+		}
+		return hs;
 	}
 
 	private Class<?> classOfGeneratedType(ExportTypeConfig generatedType) {

@@ -2,8 +2,55 @@
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
 	title="Beispiel für eine Tabelle auf Basis einer Query">
 	<page>
+		<form columns="1">
+			<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+			<field name="CNUMBER5_22" title="Number 5/2" input-prompt="Eingabe" />
+			<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+				<select>
+					<query datasource="CRUD2GO_MYSQL"><![CDATA[
+						select 
+							CVARCHAR5_NN as `key`, 
+							CVARCHAR5_NN as `title` 
+						from test_crud2
+					]]>
+					</query>
+				</select>
+			</field>
+			<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+				<date display="picker" format="yyyy" />
+			</field>
+			<field name="CNUMBER5_2_NN" title="CNUMBER5">
+				<checkbox checked-value="112" />
+			</field>
+			<field name="CONTAINS" title="TESTDATA CONTAINS"/>
+			<field name="STARTSWITH" title="TESTDATA STARTS-WITH"/>
+			<field name="ENDSWITH" title="TESTDATA ENDS-WITH"/>
+			<field name="REGEXP" title="TESTDATA REGEXP"/>
+			<action title="search" id="id1">
+				<search>
+					<tables>
+						<table id="table" />
+					</tables>
+					<apply-filters>
+						<any>
+							<equals field="CNUMBER5_2" column="CNUMBER5_2" />
+							<equals field="CNUMBER5_22" column="CNUMBER5_2" />
+						</any>
+						<equals field="CVARCHAR5_NN" column="CVARCHAR5_NN" />
+						<equals field="CNUMBER5_2_NN" column="CNUMBER5_2_NN" />
+						<greater-or-equal field="CDATE" column="CTIMESTAMP" />
+						<sql column="CNUMBER5_2"><where>IN (SELECT CNUMBER5_2 FROM test_crud2 WHERE CNUMBER5_2 = $fields.CNUMBER5_2.value)</where></sql>
+						<starts-with column="TESTDATA" field="STARTSWITH"/>
+						<contains column="TESTDATA" field="CONTAINS"/>
+						<ends-with column="TESTDATA" field="ENDSWITH" case-sensitive="true"/>
+						<regexp column="TESTDATA" field="REGEXP" modifiers="mn"/>
+					</apply-filters>
+				</search>
+			</action>
+			<action title="reset" id="id2"><reset/></action>
+		</form>
 		<table id="table" export="xls">
-			<database-query datasource="mysqltest">
+			<database-query datasource="CRUD2GO_MYSQL">
 				<query><![CDATA[
 					SELECT * FROM TEST_CRUD2
 				]]></query>

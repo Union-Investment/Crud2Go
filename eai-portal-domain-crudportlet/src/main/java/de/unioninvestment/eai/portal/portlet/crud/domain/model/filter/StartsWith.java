@@ -26,7 +26,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model.filter;
 public class StartsWith extends Filter {
 	private static final long serialVersionUID = 1L;
 	private final String column;
-	private final Object value;
+	private final String value;
 	private final boolean caseSensitive;
 
 	/**
@@ -37,7 +37,7 @@ public class StartsWith extends Filter {
 	 * @param value
 	 *            - Vergleichswert
 	 */
-	public StartsWith(String column, Object value, boolean caseSensitive) {
+	public StartsWith(String column, String value, boolean caseSensitive) {
 		this(column, value, caseSensitive, false);
 	}
 
@@ -51,7 +51,7 @@ public class StartsWith extends Filter {
 	 * @param durable
 	 *            Ob der Filter permanent gesetzt sein soll
 	 */
-	public StartsWith(String column, Object value, boolean caseSensitive,
+	public StartsWith(String column, String value, boolean caseSensitive,
 			boolean durable) {
 		super(durable);
 		this.column = column;
@@ -63,7 +63,7 @@ public class StartsWith extends Filter {
 		return column;
 	}
 
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 

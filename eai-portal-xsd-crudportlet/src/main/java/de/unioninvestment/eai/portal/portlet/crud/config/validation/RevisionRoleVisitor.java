@@ -22,31 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.AllowConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseTableConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DenyConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DialogConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.JmxContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.PageConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.PermissionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.PermissionsConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RolesConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SecurableConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TextAreaConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
 import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationVisitor;
 
 /**
@@ -66,6 +42,8 @@ public class RevisionRoleVisitor implements ConfigurationVisitor {
 		VALID_ACTIONS.put(PageConfig.class, DO_NOTHING);
 		VALID_ACTIONS.put(DialogConfig.class, DO_NOTHING);
 		VALID_ACTIONS.put(RegionConfig.class, DO_NOTHING);
+        VALID_ACTIONS.put(CompoundSearchConfig.class, DO_NOTHING);
+        VALID_ACTIONS.put(CompoundSearchDetailsConfig.class, DO_NOTHING);
 
 		VALID_ACTIONS.put(TabsConfig.class, DO_NOTHING);
 		VALID_ACTIONS.put(TabConfig.class, DO_NOTHING);

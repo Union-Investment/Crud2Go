@@ -27,7 +27,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model.filter;
 public class Contains extends Filter {
 	private static final long serialVersionUID = 1L;
 	private final String column;
-	private final Object value;
+	private final String value;
 	private final boolean caseSensitive;
 
 	/**
@@ -38,7 +38,7 @@ public class Contains extends Filter {
 	 * @param value
 	 *            - Vergleichswert
 	 */
-	public Contains(String column, Object value, boolean caseSensitive) {
+	public Contains(String column, String value, boolean caseSensitive) {
 		this(column, value, caseSensitive, false);
 	}
 
@@ -52,7 +52,7 @@ public class Contains extends Filter {
 	 * @param durable
 	 *            Ob der Filter permanent gesetzt sein soll
 	 */
-	public Contains(String column, Object value, boolean caseSensitive,
+	public Contains(String column, String value, boolean caseSensitive,
 			boolean durable) {
 		super(durable);
 		this.column = column;
@@ -64,7 +64,7 @@ public class Contains extends Filter {
 		return column;
 	}
 
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 

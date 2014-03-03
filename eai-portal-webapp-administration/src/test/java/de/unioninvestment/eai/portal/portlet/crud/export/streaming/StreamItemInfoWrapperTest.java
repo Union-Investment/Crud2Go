@@ -99,21 +99,21 @@ public class StreamItemInfoWrapperTest {
 
 	@Test
 	public void shouldTellThatColumnIsNoComboBox() {
-		assertThat(info.isComboBox("col1"), is(false));
+		assertThat(info.isOption("col1"), is(false));
 	}
 
 	@Test
 	public void shouldTellThatColumnIsNoComboBoxHavingColumnInformation() {
 		givenTableColumns();
-		assertThat(info.isComboBox("col1"), is(false));
+		assertThat(info.isOption("col1"), is(false));
 	}
 
 	@Test
-	public void shouldTellThatColumnIsAComboBox() {
+	public void shouldTellThatColumnIsASelection() {
 		givenTableColumns();
-		when(columnsMock.isComboBox("col1")).thenReturn(true);
+		when(columnsMock.isSelection("col1")).thenReturn(true);
 
-		assertThat(info.isComboBox("col1"), is(true));
+		assertThat(info.isOption("col1"), is(true));
 	}
 
 	@Test

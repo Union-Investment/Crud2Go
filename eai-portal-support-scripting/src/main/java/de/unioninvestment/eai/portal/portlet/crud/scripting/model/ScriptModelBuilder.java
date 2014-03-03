@@ -52,6 +52,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.AbstractDatabaseContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomColumnGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponent;
@@ -305,6 +306,14 @@ public class ScriptModelBuilder {
 		scriptTab.setOnHide(scriptBuilder.buildClosure(tc.getOnHide()));
 	}
 
+	private ScriptCompoundSearch buildScriptCompoundSearch(CompoundSearch compoundSearch) {
+		ScriptCompoundSearch scriptCompoundSearch = factory.getScriptCompoundSearch(compoundSearch);
+		for (Component re : compoundSearch.getElements()) {
+			scriptCompoundSearch.addElement(buildScriptComponent(re));
+		}
+		return scriptCompoundSearch;
+	}
+
 	private ScriptRegion buildScriptRegion(Region region) {
 		ScriptRegion scriptRegion = factory.getScriptRegion(region);
 		populateRegionClosures(region, scriptRegion);
@@ -344,6 +353,8 @@ public class ScriptModelBuilder {
 			return buildScriptCustomComponent((CustomComponent) component);
 		} else if (component instanceof Region) {
 			return buildScriptRegion((Region) component);
+		} else if (component instanceof CompoundSearch) {
+			return buildScriptCompoundSearch((CompoundSearch) component);
 		} else if (component instanceof TextArea) {
 			return buildScriptTextArea((TextArea) component);
 		} else {

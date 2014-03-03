@@ -67,15 +67,20 @@ public class TableColumn implements Serializable {
 
 	private GeneratedValueGenerator generatedValueGenerator;
 	private Class<?> generatedType;
+	private Searchable searchable;
 
 	/**
 	 * Sichtbarkeitswerte der Spalten.
 	 * 
 	 */
-	public static enum Hidden {
+	public enum Hidden {
 		TRUE, FALSE, IN_TABLE, IN_FORM;
 	}
 
+	public enum Searchable {
+		DEFAULT, TRUE, FALSE
+	}
+	
 	/**
 	 * @param builder
 	 *            Builder-Klasse
@@ -87,6 +92,7 @@ public class TableColumn implements Serializable {
 		this.title = builder.title;
 		this.longTitle = builder.longTitle;
 		this.hiddenStatus = builder.hiddenStatus;
+		this.searchable = builder.searchable;
 		this.editableDefault = builder.editableDefault;
 		this.multiline = builder.multiline;
 		this.rows = builder.rows;
@@ -293,6 +299,7 @@ public class TableColumn implements Serializable {
 		protected String title;
 		protected String longTitle;
 		protected Hidden hiddenStatus = Hidden.FALSE;
+		protected Searchable searchable = Searchable.TRUE;
 		protected boolean editableDefault = false;
 		protected boolean multiline = false;
 		protected Integer rows;
@@ -347,6 +354,15 @@ public class TableColumn implements Serializable {
 			return self();
 		}
 
+		/**
+		 * @param searchable
+		 * @return den builder
+		 */
+		public T searchable(Searchable searchable) {
+			this.searchable = searchable;
+			return self();
+		}
+		
 		/**
 		 * @param editableDefault
 		 * @return den builder
@@ -506,6 +522,10 @@ public class TableColumn implements Serializable {
 	 */
 	public String getExcelFormat() {
 		return excelFormat;
+	}
+
+	public Searchable getSearchable() {
+		return searchable;
 	}
 
 }

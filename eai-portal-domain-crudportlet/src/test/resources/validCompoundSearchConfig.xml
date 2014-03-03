@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Compound Search Beispiel">
+	<page>
+		<compound-search>
+			<tables>
+				<table id="table" />
+			</tables>
+			<details>
+				<form columns="1">
+					<field name="CNUMBER5_2" title="Number 5" input-prompt="Eingabe" />
+					<field name="CNUMBER5_22" title="Number 5/2" input-prompt="Eingabe" />
+					<field name="CVARCHAR5_NN" title="cVarChar5_NN" input-prompt="Eingabe">
+						<select>
+							<query datasource="test"><![CDATA[
+						select 
+							CVARCHAR5_NN as key, 
+							CVARCHAR5_NN as title 
+						from test_crud2
+					]]>
+							</query>
+						</select>
+					</field>
+					<field name="CDATE" title="Datumsfeld" input-prompt="Eingabe">
+						<date display="picker" format="yyyy" />
+					</field>
+					<field name="CNUMBER5_2_NN" title="CNUMBER5">
+						<checkbox checked-value="112" />
+					</field>
+					<field name="CONTAINS" title="TESTDATA CONTAINS" />
+					<field name="STARTSWITH" title="TESTDATA STARTS-WITH" />
+					<field name="ENDSWITH" title="TESTDATA ENDS-WITH" />
+					<field name="REGEXP" title="TESTDATA REGEXP" />
+					<action title="search" id="id1">
+						<search>
+							<tables>
+								<table id="table" />
+							</tables>
+							<apply-filters>
+								<any>
+									<equals field="CNUMBER5_2" column="CNUMBER5_2" />
+									<equals field="CNUMBER5_22" column="CNUMBER5_2" />
+								</any>
+								<equals field="CVARCHAR5_NN" column="CVARCHAR5_NN" />
+								<equals field="CNUMBER5_2_NN" column="CNUMBER5_2_NN" />
+								<greater-or-equal field="CDATE" column="CTIMESTAMP" />
+								<sql column="CNUMBER5_2">
+									<where>IN (SELECT CNUMBER5_2 FROM test_crud2 WHERE CNUMBER5_2 =
+										$fields.CNUMBER5_2.value)</where>
+								</sql>
+								<starts-with column="TESTDATA" field="STARTSWITH" />
+								<contains column="TESTDATA" field="CONTAINS" />
+								<ends-with column="TESTDATA" field="ENDSWITH"
+									case-sensitive="true" />
+								<regexp column="TESTDATA" field="REGEXP" modifiers="mn" />
+							</apply-filters>
+						</search>
+					</action>
+					<action title="reset" id="id2">
+						<reset />
+					</action>
+				</form>
+			</details>
+		</compound-search>
+		<table id="table" sortable="true">
+			<database-query datasource="test">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true" editable="true" />
+				<column name="CNUMBER5_2" title="Zahl" editable="true" searchable="default"/>
+				<column name="CDATE" editable="false" />
+				<column name="CTIMESTAMP" />
+				<column name="CVARCHAR5_NN" editable="true"
+					longtitle="CVARCHAR5 (Pflichtfeld)" />
+				<column name="CNUMBER5_2_NN" editable="true" />
+				<column name="CDATE_NN" editable="true" searchable="false"/>
+				<column name="CTIMESTAMP_NN" hidden="true" />
+				<column name="TESTDATA" editable="true" width="300"
+					validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt" />
+			</columns>
+		</table>
+	</page>
+</portlet>

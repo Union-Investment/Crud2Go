@@ -20,13 +20,13 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
@@ -81,9 +81,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Wildcard;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
@@ -315,6 +317,18 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 	}
 
 	@Test
+	public void shouldAddIsNullFilter() {
+		com.vaadin.data.util.filter.IsNull isNull = shouldAddFilterType(new IsNull("ID"), com.vaadin.data.util.filter.IsNull.class);
+		assertThat(isNull.getPropertyId(), is((Object)"ID"));
+	}
+
+	@Test
+	public void shouldAddWildcardFilter() {
+		Like likeFilter = shouldAddFilterType(new Wildcard("ID", "Te*t", false), Like.class);
+		assertThat(likeFilter.getValue(), is("Te%t"));
+	}
+
+	@Test
 	public void shouldAddAnyFilter() {
 		shouldAddFilterType(
 				new Any(Arrays.asList(new Filter[] {
@@ -322,7 +336,6 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 						new Equal("ID", 1) })), Or.class);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldAddNotFilterWithAllSubfilter() {
 		container.setVaadinContainer(vaadinContainerMock);
@@ -333,7 +346,7 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 
 		verify((Filterable) vaadinContainerMock).replaceContainerFilter(
 				filterCaptor.capture());
-		assertThat(container.getFilterList(), hasItem((Filter) filter));
+		assertThat(container.getFilterList(), hasItems((Filter) filter));
 		assertThat(filterCaptor.getValue(),
 				instanceOf(com.vaadin.data.util.filter.Not.class));
 
@@ -358,7 +371,6 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 		}));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldAddNotFilterWithSingleSubfilter() {
 		container.setVaadinContainer(vaadinContainerMock);
@@ -369,7 +381,7 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 
 		verify((Filterable) vaadinContainerMock).replaceContainerFilter(
 				filterCaptor.capture());
-		assertThat(container.getFilterList(), hasItem((Filter) filter));
+		assertThat(container.getFilterList(), hasItems((Filter) filter));
 		assertThat(filterCaptor.getValue(),
 				instanceOf(com.vaadin.data.util.filter.Not.class));
 
@@ -465,15 +477,18 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 				any(com.vaadin.data.Container.Filter.class));
 	}
 
-	protected void shouldAddFilterType(Filter filter,
-			Class<? extends com.vaadin.data.Container.Filter> vaadinClass) {
+	@SuppressWarnings("unchecked")
+	protected <T extends com.vaadin.data.Container.Filter> T shouldAddFilterType(Filter filter,
+			Class<T> vaadinClass) {
 		container.setVaadinContainer(vaadinContainerMock);
 		container.addFilters(asList(filter));
 
 		verify((Filterable) vaadinContainerMock).replaceContainerFilter(
 				filterCaptor.capture());
-		assertThat(container.getFilterList(), hasItem((Filter) filter));
-		assertThat(filterCaptor.getValue(), instanceOf(vaadinClass));
+		assertThat(container.getFilterList(), hasItems((Filter) filter));
+		com.vaadin.data.Container.Filter vaadinFilter = filterCaptor.getValue();
+		assertThat(vaadinFilter, instanceOf(vaadinClass));
+		return (T) vaadinFilter;
 	}
 
 	public static void returnFollowingColumnType(DataContainer containerMock,

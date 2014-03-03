@@ -1241,7 +1241,8 @@ public class SearchFormActionTest {
 	public void shouldReturnConfiguredTables() {
 		when(tableConfigMock.getId()).thenReturn("table");
 		when(table2ConfigMock.getId()).thenReturn("table2");
-
+		when(formMock.getPanel()).thenReturn(pageMock);
+		when(pageMock.getPortlet()).thenReturn(portletMock);
 		when(portletMock.getElementById("table")).thenReturn(tableMock);
 		when(portletMock.getElementById("table2")).thenReturn(table2Mock);
 

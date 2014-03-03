@@ -33,6 +33,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
@@ -339,5 +340,10 @@ public class ScriptModelFactory {
 				deleteStatement, currentUser, queryDelegate);
 
 		return delegate;
+	}
+
+	public ScriptCompoundSearch getScriptCompoundSearch(
+			CompoundSearch compoundSearch) {
+		return new ScriptCompoundSearch(compoundSearch);
 	}
 }

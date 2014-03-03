@@ -148,7 +148,7 @@ public class ExcelExporter implements Exporter {
 			String columnName = columnNames[col];
 			Class<?> columnType = columnTypes[col];
 			Object value;
-			if (itemInfo.isComboBox(columnName)) {
+			if (itemInfo.isOption(columnName)) {
 				value = itemInfo.getTitle(columnName);
 				columnType = String.class;
 			} else {

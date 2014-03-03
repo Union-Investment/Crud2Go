@@ -20,6 +20,7 @@
 package de.unioninvestment.eai.portal.support.vaadin.junit;
 
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -147,6 +148,12 @@ public class LiferayContext extends TestWatchman {
 				argThat(new NotificationMatcher(caption, description)));
 	}
 
+	public void shouldNotShowNotification(String caption, String description,
+			Type type) {
+		verify(pageMock, never()).showNotification(
+				argThat(new NotificationMatcher(caption, description)));
+	}
+	
 	public LiferayUI getUiMock() {
 		return uiMock;
 	}

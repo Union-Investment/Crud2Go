@@ -99,7 +99,7 @@ public class SystemArchitecture {
 	/**
 	 * innerhalb der Test-Packages.
 	 */
-	@Pointcut("within(de.unioninvestment.eai.portal..*Test)")
+	@Pointcut("within(de.unioninvestment.eai.portal..*Test) || within(de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest.RestTestConfig)")
 	public void inTest() {
 		// pointcut specification
 	}

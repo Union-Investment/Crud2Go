@@ -24,15 +24,22 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
+
 import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
+import de.unioninvestment.eai.portal.portlet.crud.config.SelectDisplayType;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
 
 public class TableColumnsTest {
 
@@ -43,37 +50,87 @@ public class TableColumnsTest {
 	private List<TableColumn> columnsList;
 	private TableColumns tableColumns;
 	private DateTableColumn column5;
+	private CheckBoxTableColumn column6;
+	private OptionList optionList;
+	private SelectionTableColumn column7;
 
 	@Before
 	public void setUp() {
-		column1 = new TableColumn.Builder().name("name1").title("title1")
-				.longTitle("Long Title 1").hiddenStatus(Hidden.FALSE)
-				.editableDefault(false).primaryKey(true).multiline(false)
-				.width(100).inputPrompt("prompt1").build();
-		column2 = new SelectionTableColumn.Builder()
-				.name("name2")
-				.title("title2")
-				.longTitle("Long Title 2")
-				.hiddenStatus(Hidden.IN_TABLE)
-				.editableDefault(true)
-				.primaryKey(false)
-				.multiline(false)
-				.width(100)
-				.inputPrompt("")
-				.optionList(
-						new StaticOptionList(Collections.singletonMap("key1",
-								"value1"))).build();
-		column3 = new TableColumn.Builder().name("name3").title("title3")
-				.longTitle("Long Title 3").hiddenStatus(Hidden.TRUE)
-				.editableDefault(true).primaryKey(false).multiline(true)
-				.width(100).build();
-		column4 = new TableColumn.Builder().name("name4").title("title4")
-				.longTitle("Long Title 4").hiddenStatus(Hidden.IN_FORM)
-				.editableDefault(true).primaryKey(false).multiline(true)
-				.width(100).inputPrompt("prompt1").build();
-		column5 = new DateTableColumn.Builder().name("name5")
-				.dateDisplayType(DateDisplayType.INPUT).build();
-		columnsList = asList(column1, column2, column3, column4, column5);
+		optionList = new StaticOptionList(Collections.singletonMap("key1",
+				"value1"));
+
+		column1 = new TableColumn.Builder() //
+				.name("name1") //
+				.title("title1") //
+				.longTitle("Long Title 1") //
+				.hiddenStatus(Hidden.FALSE) //
+				.editableDefault(false) //
+				.primaryKey(true) //
+				.multiline(false) //
+				.width(100) //
+				.inputPrompt("prompt1") //
+				.searchable(Searchable.DEFAULT) //
+				.build();
+		column2 = new SelectionTableColumn.Builder() //
+				.name("name2") //
+				.title("title2") //
+				.longTitle("Long Title 2") //
+				.hiddenStatus(Hidden.IN_TABLE) //
+				.editableDefault(true) //
+				.primaryKey(false) //
+				.multiline(false) //
+				.width(100) //
+				.inputPrompt("") //
+				.optionList(optionList) //
+				.searchable(Searchable.DEFAULT) //
+				.build();
+		column3 = new TableColumn.Builder() //
+				.name("name3") //
+				.title("title3")//
+				.longTitle("Long Title 3") //
+				.hiddenStatus(Hidden.TRUE) //
+				.editableDefault(true) //
+				.primaryKey(false) //
+				.multiline(true) //
+				.width(100) //
+				.build();
+		column4 = new TableColumn.Builder() //
+				.name("name4") //
+				.title("title4") //
+				.longTitle("Long Title 4") //
+				.hiddenStatus(Hidden.IN_FORM) //
+				.editableDefault(true) //
+				.primaryKey(false) //
+				.multiline(true).width(100) //
+				.inputPrompt("prompt1") //
+				.build();
+		column5 = new DateTableColumn.Builder() //
+				.name("name5") //
+				.dateDisplayType(DateDisplayType.INPUT) //
+				.displayFormat("dd.MM.yyyy") //
+				.build();
+		column6 = new CheckBoxTableColumn.Builder() //
+				.name("name6") //
+				.searchable(Searchable.FALSE) //
+				.checkedValue("1") //
+				.uncheckedValue("0") //
+				.build();
+		column7 = new SelectionTableColumn.Builder() //
+				.name("name7") //
+				.title("title2") //
+				.longTitle("Long Title 2") //
+				.hiddenStatus(Hidden.IN_TABLE) //
+				.editableDefault(true) //
+				.primaryKey(false) //
+				.multiline(false) //
+				.width(100) //
+				.inputPrompt("") //
+				.optionList(optionList) //
+				.displayType(SelectDisplayType.TOKENS) //
+				.searchable(Searchable.FALSE) //
+				.build();
+		columnsList = asList(column1, column2, column3, column4, column5,
+				column6, column7);
 		tableColumns = new TableColumns(columnsList);
 	}
 
@@ -85,6 +142,8 @@ public class TableColumnsTest {
 		assertThat(it.next(), is(column3));
 		assertThat(it.next(), is(column4));
 		assertThat(it.next(), is((TableColumn) column5));
+		assertThat(it.next(), is((TableColumn) column6));
+		assertThat(it.next(), is((TableColumn) column7));
 		assertThat(it.hasNext(), is(false));
 	}
 
@@ -93,10 +152,16 @@ public class TableColumnsTest {
 		assertThat(tableColumns.get("name2"), is(column2));
 	}
 
+	@Test(expected = BusinessException.class)
+	public void shouldFailReturningUnknownColumn() {
+		tableColumns.get("unknown");
+	}
+
 	@Test
 	public void shouldReturnOrderedListOfAllNames() {
-		assertThat(tableColumns.getAllNames(),
-				is(asList("name1", "name2", "name3", "name4", "name5")));
+		assertThat(
+				tableColumns.getAllNames(),
+				is(asList("name1", "name2", "name3", "name4", "name5", "name6", "name7")));
 	}
 
 	@Test
@@ -107,13 +172,13 @@ public class TableColumnsTest {
 	@Test
 	public void shouldReturnVisibleNamesForTable() {
 		assertThat(tableColumns.getVisibleNamesForTable(),
-				is(asList("name1", "name4", "name5")));
+				is(asList("name1", "name4", "name5", "name6")));
 	}
 
 	@Test
 	public void shouldReturnVisibleNamesForForm() {
 		assertThat(tableColumns.getVisibleNamesForForm(),
-				is(asList("name1", "name2", "name5")));
+				is(asList("name1", "name2", "name5", "name6","name7")));
 	}
 
 	@Test
@@ -180,5 +245,74 @@ public class TableColumnsTest {
 	@Test
 	public void shouldReturnFalseForNonDate() {
 		assertThat(tableColumns.isDate("name4"), is(false));
+	}
+
+	@Test
+	public void shouldReturnCheckBoxTableColumn() {
+		assertThat(tableColumns.getCheckBox("name6"), is(column6));
+	}
+
+	@Test
+	public void shouldReturnIfIsCheckBox() {
+		assertThat(tableColumns.isCheckbox("name1"), is(false));
+		assertThat(tableColumns.isCheckbox("name6"), is(true));
+	}
+
+	@Test
+	public void shouldReturnIfIsSelection() {
+		assertThat(tableColumns.isSelection("name1"), is(false));
+		assertThat(tableColumns.isSelection("name2"), is(true));
+		assertThat(tableColumns.isSelection("name7"), is(true));
+	}
+
+	@Test
+	public void shouldReturnIfIsComboBox() {
+		assertThat(tableColumns.isComboBox("name1"), is(false));
+		assertThat(tableColumns.isComboBox("name2"), is(true));
+		assertThat(tableColumns.isComboBox("name7"), is(false));
+	}
+
+	@Test
+	public void shouldTellIfIsTokenField() {
+		assertThat(tableColumns.isTokenfield("name1"), is(false));
+		assertThat(tableColumns.isTokenfield("name2"), is(false));
+		assertThat(tableColumns.isTokenfield("name7"), is(true));
+	}
+
+	@Test
+	public void shouldReturnDateTableColumn() {
+		assertThat(tableColumns.getDateColumn("name5"), is(column5));
+	}
+
+	@Test
+	public void shouldReturnOptionListOfSelectionColumn() {
+		assertThat(tableColumns.getDropdownSelections("name2"), is(optionList));
+	}
+
+	@Test
+	public void shouldReturnDisplayFormats() {
+		Map<String, String> expectedFormats = ImmutableMap
+				.<String, String> builder().put("name5", "dd.MM.yyyy").build();
+		assertThat(tableColumns.getFormatPattern(), is(expectedFormats));
+	}
+
+	@Test
+	public void shouldReturnSearchableColumns() {
+		assertThat(
+				tableColumns.getSearchableColumnNames(),
+				is((Collection<String>) asList("name1", "name2", "name3",
+						"name4", "name5")));
+	}
+
+	@Test
+	public void shouldReturnDefaultSearchableColumns() {
+		assertThat(tableColumns.getDefaultSearchableColumnNames(),
+				is((Collection<String>) asList("name1", "name2")));
+	}
+
+	@Test
+	public void shouldTellIfColumnExists() {
+		assertThat(tableColumns.contains("name1"), is(true));
+		assertThat(tableColumns.contains("unknown"), is(false));
 	}
 }

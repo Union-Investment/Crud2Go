@@ -273,5 +273,16 @@
       text-decoration: line-through;
     }
 
+    .compsearchbar .detailswitch .v-button-caption {
+      color: #222;
+      text-decoration: none;
+      font-weight: bold;
+      padding-left: 12px;
+      background: transparent url(../../themes/base/common/img/sprites.png) no-repeat 2px -36px;
+    }
+
+  .compsearchbar .detailswitch.open .v-button-caption {
+      background-position: -9px -8px;
+    }
 }
 

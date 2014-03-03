@@ -72,8 +72,8 @@ public class StreamItemInfoWrapper implements ItemInfo {
 	}
 
 	@Override
-	public boolean isComboBox(String columnName) {
-		return columns != null && table.getColumns().isComboBox(columnName);
+	public boolean isOption(String columnName) {
+		return columns != null && table.getColumns().isSelection(columnName);
 	}
 
 	@Override

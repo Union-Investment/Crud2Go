@@ -17,32 +17,24 @@
  * under the License.
  */
 
-package de.unioninvestment.eai.portal.portlet.crud.export.streaming;
+package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
-/**
- * Inteface for export item information.
- * 
- * @author cmj
- */
-public interface ItemInfo {
+import java.util.Collection;
 
-	/**
-	 * @param columnName
-	 * @return the value for the given column
-	 */
-	Object getValue(String columnName);
+import org.apache.lucene.search.Query;
 
-	/**
-	 * @param columnName
-	 * @return <code>true</code>, if this item is a selection option and
-	 *         {@link #getTitle(String)} may return the value to export.
-	 */
-	boolean isOption(String columnName);
+public interface CompoundSearchView extends PanelContentView {
 
-	/**
-	 * @param columnName
-	 * @return the dropdown display title for the given column
-	 */
-	String getTitle(String columnName);
+	public interface Presenter {
+
+		void search(Query query);
+
+	}
+
+	void setPresenter(CompoundSearchView.Presenter compoundSearchPresenter);
+
+	void initialize(Collection<String> searchableFields, Collection<String> defaultFields);
+
+	void updateQueryString(String queryString);
 
 }

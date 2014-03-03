@@ -18,7 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.form;
 
-import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,13 +46,10 @@ import de.unioninvestment.eai.portal.portlet.crud.config.NothingFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RegExpFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SQLFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SearchTableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchTablesConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.StartsWithFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxFormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateFormField;
@@ -63,11 +59,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction.Action
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.MultiOptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Panel;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
@@ -84,8 +77,10 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilt
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
+import de.unioninvestment.eai.portal.portlet.crud.domain.search.SearchableTablesFinder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
 import de.unioninvestment.eai.portal.support.vaadin.context.Context;
+import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
 import de.unioninvestment.eai.portal.support.vaadin.support.NumberFormatter;
 
 /**
@@ -310,8 +305,10 @@ public class SearchFormAction implements ActionHandler {
 						&& formField instanceof DateFormField) {
 					DateFormField dateFormField = (DateFormField) formField;
 					addTemporalFilterByConfig(result, config,
-							convert(dateFormField.getBeginDate(), columnType),
-							convert(dateFormField.getEndDate(), columnType),
+							DateUtils.adjustDateType(
+									dateFormField.getBeginDate(), columnType),
+							DateUtils.adjustDateType(
+									dateFormField.getEndDate(), columnType),
 							columnName);
 				} else {
 					throw new IllegalArgumentException("Cannot filter column '"
@@ -374,19 +371,6 @@ public class SearchFormAction implements ActionHandler {
 		return result;
 	}
 
-	private Date convert(Date date, Class<?> columnType) {
-		if (columnType == Date.class) {
-			return date;
-		} else if (columnType == java.sql.Date.class) {
-			return new java.sql.Date(date.getTime());
-		} else if (columnType == Timestamp.class) {
-			return new Timestamp(date.getTime());
-		} else {
-			throw new IllegalArgumentException("Unsupported column type: "
-					+ columnType);
-		}
-	}
-
 	private void addTemporalFilterByConfig(List<Filter> result,
 			FilterConfig config, Date beginDate, Date endDate, String columnName) {
 		if (config instanceof EqualsFilterConfig) {
@@ -426,13 +410,13 @@ public class SearchFormAction implements ActionHandler {
 		} else if (config instanceof LessOrEqualFilterConfig) {
 			result.add(new Less(columnName, fieldValue, true));
 		} else if (config instanceof StartsWithFilterConfig) {
-			result.add(new StartsWith(columnName, fieldValue,
+			result.add(new StartsWith(columnName, (String) fieldValue,
 					((StartsWithFilterConfig) config).isCaseSensitive()));
 		} else if (config instanceof EndsWithFilterConfig) {
-			result.add(new EndsWith(columnName, fieldValue,
+			result.add(new EndsWith(columnName, (String) fieldValue,
 					((EndsWithFilterConfig) config).isCaseSensitive()));
 		} else if (config instanceof ContainsFilterConfig) {
-			result.add(new Contains(columnName, fieldValue,
+			result.add(new Contains(columnName, (String) fieldValue,
 					((ContainsFilterConfig) config).isCaseSensitive()));
 		} else if (config instanceof RegExpFilterConfig) {
 			String valueString = fieldValue == null ? null : fieldValue
@@ -456,39 +440,9 @@ public class SearchFormAction implements ActionHandler {
 	 * @return - eine Liste aller relevanten Tabellen für die Suche.
 	 */
 	List<Table> findSearchableTables(Form form) {
-		List<Table> result = new ArrayList<Table>();
-		if (actionConfig.getSearch() != null
-				&& actionConfig.getSearch().getTables() != null) {
-			findConfiguredTables(result);
-		} else {
-			findSearchableTables(form.getPanel(), form, result);
-		}
-		return result;
-	}
-
-	private void findConfiguredTables(List<Table> result) {
-		SearchTablesConfig tables = actionConfig.getSearch().getTables();
-		for (SearchTableConfig searchTableConfig : tables.getTable()) {
-			TableConfig tableConfig = (TableConfig) searchTableConfig.getId();
-			Table table = (Table) portlet.getElementById(tableConfig.getId());
-			result.add(table);
-		}
-	}
-
-	private void findSearchableTables(Panel panel, Form startingWithForm,
-			List<Table> result) {
-		Component nextElement = panel.findNextElement(Component.class,
-				startingWithForm);
-		while (nextElement != null && !(nextElement instanceof Form)) {
-			if (nextElement instanceof Table) {
-				result.add((Table) nextElement);
-			} else if (nextElement instanceof Tabs) {
-				for (Tab tab : ((Tabs) nextElement).getElements()) {
-					findSearchableTables(tab, null, result);
-				}
-			}
-			nextElement = panel.findNextElement(Component.class, nextElement);
-		}
+		SearchTablesConfig tables = actionConfig.getSearch() == null ? null
+				: actionConfig.getSearch().getTables();
+		return new SearchableTablesFinder().findSearchableTables(form, tables);
 	}
 
 	public void setCustomFilterFactory(CustomFilterFactory filterFactory) {
