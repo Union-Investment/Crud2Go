@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,7 +117,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		public VaadinSession getSession() {
 			return vaadinSession;
 		};
-		
+
 		public Page getPage() {
 			return liferayContext.getPageMock();
 		};
@@ -207,6 +208,8 @@ public class CrudUITest extends SpringPortletContextTest {
 		when(configurationServiceMock.getPortletConfig("4711", 14008))
 				.thenReturn(configMock);
 
+		when(liferayContext.getPageMock().getLocation()).thenReturn(
+				URI.create("http://localhost"));
 		when(
 				liferayContext.getPortletRequestMock().getAttribute(
 						WebKeys.PORTLET_ID)).thenReturn("4711");
@@ -304,37 +307,46 @@ public class CrudUITest extends SpringPortletContextTest {
 
 		app.refreshViews();
 
-		verify(viewPageMock, never()).addComponent(isA(BusinessExceptionMessage.class));
+		verify(viewPageMock, never()).addComponent(
+				isA(BusinessExceptionMessage.class));
 		verify(viewPageMock).addComponent(portletViewMock);
 	}
 
 	@Test
-	public void shouldUpdatePortletTitleInPreferences() throws ReadOnlyException, ValidatorException, IOException {
+	public void shouldUpdatePortletTitleInPreferences()
+			throws ReadOnlyException, ValidatorException, IOException {
 		initializeUI();
 		stubPortletInitialization();
 		when(portletMock.getTitle()).thenReturn("newTitle");
 
 		app.refreshViews();
 
-		verify(viewPageMock, never()).addComponent(isA(BusinessExceptionMessage.class));
-		verify(liferayContext.getPortletPreferencesMock()).setValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, "newTitle");
+		verify(viewPageMock, never()).addComponent(
+				isA(BusinessExceptionMessage.class));
+		verify(liferayContext.getPortletPreferencesMock()).setValue(
+				CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, "newTitle");
 		verify(liferayContext.getPortletPreferencesMock()).store();
 	}
 
 	@Test
-	public void shouldNotUpdateUnchangedPortletTitleInPreferences() throws ReadOnlyException, ValidatorException, IOException {
+	public void shouldNotUpdateUnchangedPortletTitleInPreferences()
+			throws ReadOnlyException, ValidatorException, IOException {
 		initializeUI();
 		stubPortletInitialization();
-		when(liferayContext.getPortletPreferencesMock().getValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null)).thenReturn("sameTitle");
+		when(
+				liferayContext.getPortletPreferencesMock().getValue(
+						CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null))
+				.thenReturn("sameTitle");
 		when(portletMock.getTitle()).thenReturn("sameTitle");
 
 		app.refreshViews();
 
-		verify(viewPageMock, never()).addComponent(isA(BusinessExceptionMessage.class));
-		verify(liferayContext.getPortletPreferencesMock()).getValue(CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null);
+		verify(viewPageMock, never()).addComponent(
+				isA(BusinessExceptionMessage.class));
+		verify(liferayContext.getPortletPreferencesMock()).getValue(
+				CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null);
 		verifyNoMoreInteractions(liferayContext.getPortletPreferencesMock());
 	}
-
 
 	@SuppressWarnings("unchecked")
 	private void stubPortletInitialization() {
@@ -515,7 +527,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		try {
 			app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
 			app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
-			
+
 		} catch (Exception e) {
 			// ignore exceptions
 		}

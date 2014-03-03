@@ -117,9 +117,9 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationExcepti
 public class CrudUI extends LiferayUI implements PortletListener,
 		ShowPopupEventHandler, InitializingUI {
 
-
 	private static final long serialVersionUID = 1L;
 
+	private static final String INSTANCE_ID = UUID.randomUUID().toString();
 	private static final String LIFECYCLE_DATEFORMAT = "dd.MM.yyyy HH:mm:ss.SSS";
 	private static final Logger LIFECYCLE_LOGGER = LoggerFactory
 			.getLogger(CrudUI.class.getPackage().getName() + ".lifecycle");
@@ -232,8 +232,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			sessionId = session == null ? portletRequest.getRequestedSessionId() : session.getId();
 		}
 		
-		LIFECYCLE_LOGGER.info(MessageFormat.format("{0};{1};{2};{3};{4}", now,
-				uiId, url, sessionId, event.name()));
+		LIFECYCLE_LOGGER.info(MessageFormat.format("{0};{1};{2};{3};{4};{5}", now,
+				INSTANCE_ID, uiId, url, sessionId, event.name()));
 	}
 
 	private void autowireUiDependencies(VaadinRequest request) {
