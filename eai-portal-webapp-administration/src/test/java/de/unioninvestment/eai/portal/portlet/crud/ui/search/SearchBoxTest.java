@@ -21,10 +21,10 @@ package de.unioninvestment.eai.portal.portlet.crud.ui.search;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
-import org.apache.lucene.search.Query;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,20 +44,21 @@ public class SearchBoxTest extends SpringPortletContextTest {
 	@Mock
 	private QuerySearchHandler searchHandlerMock;
 	private SearchBox searchBox;
-	
+
 	@Rule
 	public LiferayContext liferayContext = new LiferayContext();
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		searchBox = new SearchBox(new String[] { "A", "B" }, searchHandlerMock);
+		searchBox = new SearchBox(searchHandlerMock);
+		when(searchHandlerMock.isValidQuery(Mockito.anyString())).thenReturn(true);
 	}
 
 	@Test
 	public void shouldTriggerSearchOnValidNewValueChangeByAPI() {
 		searchBox.setValue("myterm");
-		verify(searchHandlerMock).search(Mockito.any(Query.class));
+		verify(searchHandlerMock).search("myterm");
 	}
 
 	@Test
@@ -67,41 +68,57 @@ public class SearchBoxTest extends SpringPortletContextTest {
 				.put("selected", new String[] { "myterm" }) //
 				.build();
 		searchBox.changeVariables(null, variables);
-		verify(searchHandlerMock).search(Mockito.any(Query.class));
+		verify(searchHandlerMock).search("myterm");
 	}
-	
+
 	@Test
 	public void shouldTriggerSearchOnAddingSpaceToFilterString() {
-		searchBox.changeVariables(null, ImmutableMap.<String, Object>of("filter", "myterm", "page", 0));
-		searchBox.changeVariables(null, ImmutableMap.<String, Object>of("filter", "myterm ", "page", 0));
-		verify(searchHandlerMock).search(Mockito.any(Query.class));
+		searchBox
+				.changeVariables(null, ImmutableMap.<String, Object> of(
+						"filter", "myterm", "page", 0));
+		searchBox.changeVariables(null, ImmutableMap.<String, Object> of(
+				"filter", "myterm ", "page", 0));
+		verify(searchHandlerMock).search("myterm");
 	}
 
 	@Test
 	public void shouldTriggerSearchOnAddingSpacePlusAnythingToFilterString() {
-		searchBox.changeVariables(null, ImmutableMap.<String, Object>of("filter", "myterm", "page", 0));
-		searchBox.changeVariables(null, ImmutableMap.<String, Object>of("filter", "myterm s", "page", 0));
-		verify(searchHandlerMock).search(Mockito.any(Query.class));
+		searchBox
+				.changeVariables(null, ImmutableMap.<String, Object> of(
+						"filter", "myterm", "page", 0));
+		searchBox.changeVariables(null, ImmutableMap.<String, Object> of(
+				"filter", "myterm s", "page", 0));
+		verify(searchHandlerMock).search("myterm");
 	}
 
 	@Test
 	public void shouldNotTriggerSearchOnAddingAnyCharacterToFilterString() {
-		searchBox.changeVariables(null, ImmutableMap.<String, Object>of("filter", "myter", "page", 0));
-		searchBox.changeVariables(null, ImmutableMap.<String, Object>of("filter", "myterm", "page", 0));
-		verify(searchHandlerMock, never()).search(Mockito.any(Query.class));
+		searchBox.changeVariables(null,
+				ImmutableMap.<String, Object> of("filter", "myter", "page", 0));
+		searchBox
+				.changeVariables(null, ImmutableMap.<String, Object> of(
+						"filter", "myterm", "page", 0));
+		verify(searchHandlerMock, never()).search(Mockito.anyString());
 	}
 
 	@Test
 	public void shouldJustNotTriggerSearchIfAddingSpaceToFilterStringLeadsToInvalidQuery() {
-		searchBox.changeVariables(null, ImmutableMap.<String, Object>of("filter", "[4711", "page", 0));
-		searchBox.changeVariables(null, ImmutableMap.<String, Object>of("filter", "[4711 ", "page", 0));
-		verify(searchHandlerMock, never()).search(Mockito.any(Query.class));
-		liferayContext.shouldNotShowNotification("Ungültige Abfrage: '[4711'", null, Type.ERROR_MESSAGE);
+		when(searchHandlerMock.isValidQuery("[4711")).thenReturn(false);
+		searchBox.changeVariables(null,
+				ImmutableMap.<String, Object> of("filter", "[4711", "page", 0));
+		searchBox
+				.changeVariables(null, ImmutableMap.<String, Object> of(
+						"filter", "[4711 ", "page", 0));
+		verify(searchHandlerMock, never()).search(Mockito.anyString());
+		liferayContext.shouldNotShowNotification("Ungültige Abfrage: '[4711'",
+				null, Type.ERROR_MESSAGE);
 	}
-	
+
 	@Test
 	public void shouldShowNotificationIfQueryIsInvalid() {
+		when(searchHandlerMock.isValidQuery("*")).thenReturn(false);
 		searchBox.setValue("*");
-		liferayContext.shouldShowNotification("Ungültige Abfrage: '*'", null, Type.ERROR_MESSAGE);
+		liferayContext.shouldShowNotification("Ungültige Abfrage: '*'", null,
+				Type.ERROR_MESSAGE);
 	}
 }

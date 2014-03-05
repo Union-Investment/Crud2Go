@@ -21,10 +21,9 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
 import java.util.Collection;
 
-import org.apache.lucene.search.Query;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.CompoundSearchView;
@@ -43,7 +42,18 @@ public class CompoundSearchPresenter extends PanelContentPresenter implements
 	public CompoundSearchPresenter(CompoundSearchView view, CompoundSearch model) {
 		super(view, model);
 		view.setPresenter(this);
-		view.initialize(model.getSearchableFields(), model.getDefaultFields());
+		
+		Collection<String> searchableFields = model.getSearchableFields();
+		if (searchableFields.size() == 0) {
+			throw new BusinessException("portlet.crud.error.compoundsearch.noSearchableFields");
+		}
+		
+		Collection<String> defaultFields = model.getDefaultFields();
+		if (defaultFields.size() == 0) {
+			throw new BusinessException("portlet.crud.error.compoundsearch.noDefaultFields");
+		}
+		
+		view.initialize(searchableFields);
 		model.addQueryChangedEventHandler(this);
 	}
 
@@ -58,9 +68,14 @@ public class CompoundSearchPresenter extends PanelContentPresenter implements
 	}
 
 	@Override
-	public void search(Query query) {
+	public boolean isValidQuery(String queryString) {
+		return getModel().isValidQuery(queryString);
+	}
+	
+	@Override
+	public void search(String queryString) {
 		if (!externalChange) {
-			getModel().search(query);
+			getModel().search(queryString);
 		}
 	}
 

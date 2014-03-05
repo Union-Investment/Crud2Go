@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 
-import org.apache.lucene.search.Query;
-
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -49,7 +47,8 @@ import de.unioninvestment.eai.portal.portlet.crud.ui.search.SearchBox.QuerySearc
 import de.unioninvestment.eai.portal.portlet.crud.ui.search.SearchOptionsHandler;
 
 /**
- * Darstellung der Compound-Suche. Falls eine Detailsuche konfiguriert ist, kann diese auf- und zugeklappt werden. 
+ * Darstellung der Compound-Suche. Falls eine Detailsuche konfiguriert ist, kann
+ * diese auf- und zugeklappt werden.
  * 
  * @author cmj
  */
@@ -71,11 +70,8 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 	}
 
 	@Override
-	public void initialize(Collection<String> searchableFields,
-			Collection<String> defaultSearchFields) {
-		String[] defaultsArray = defaultSearchFields
-				.toArray(new String[defaultSearchFields.size()]);
-		searchBox = new SearchBox(defaultsArray, this);
+	public void initialize(Collection<String> searchableFields) {
+		searchBox = new SearchBox(this);
 		searchBox.setWidth("100%");
 		searchBox.setOptionHandler(new SearchOptionsHandler(searchableFields));
 		searchBox.focus();
@@ -182,8 +178,13 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 	}
 
 	@Override
-	public void search(Query query) {
-		presenter.search(query);
+	public boolean isValidQuery(String queryString) {
+		return presenter.isValidQuery(queryString);
+	}
+
+	@Override
+	public void search(String queryString) {
+		presenter.search(queryString);
 	}
 
 	@Override
@@ -207,7 +208,8 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 				}
 			});
 			searchBar.addComponent(detailSwitch, 0);
-			searchBar.setComponentAlignment(detailSwitch, Alignment.MIDDLE_RIGHT);
+			searchBar.setComponentAlignment(detailSwitch,
+					Alignment.MIDDLE_RIGHT);
 		}
 	}
 

@@ -31,7 +31,6 @@ import org.apache.lucene.search.Query;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -68,13 +67,13 @@ public class CompoundSearchPresenterTest {
 	@Test
 	public void shouldInitializeView() {
 		verify(viewMock).setPresenter(presenter);
-		verify(viewMock).initialize(searchableFields, defaultFields);
+		verify(viewMock).initialize(searchableFields);
 	}
 
 	@Test
 	public void shouldDelegateSearchToModel() {
-		presenter.search(queryMock);
-		verify(modelMock).search(queryMock);
+		presenter.search("bla");
+		verify(modelMock).search("bla");
 	}
 
 	@Test
@@ -86,14 +85,14 @@ public class CompoundSearchPresenterTest {
 				.onQueryChange(new CompoundQueryChangedEvent(modelMock, "bla"));
 		
 		verify(viewMock).updateQueryString("bla");
-		verify(modelMock, never()).search(Mockito.any(Query.class));
+		verify(modelMock, never()).search("bla");
 	}
 
 	private void expectSearchOnUpdateOfQueryStringInView() {
 		doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
-				presenter.search(queryMock);
+				presenter.search("bla");
 				return null;
 			}
 		}).when(viewMock).updateQueryString("bla");

@@ -21,8 +21,6 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
 import java.util.Collection;
 
-import org.apache.lucene.search.Query;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 
 /**
@@ -34,14 +32,17 @@ public interface CompoundSearchView extends PanelContentView {
 
 	public interface Presenter {
 
-		void search(Query query);
+		boolean isValidQuery(String queryString);
+
+		void search(String queryString);
 
 		Collection<TableColumn> getSearchableColumns();
+
 	}
 
 	void setPresenter(CompoundSearchView.Presenter compoundSearchPresenter);
 
-	void initialize(Collection<String> searchableFields, Collection<String> defaultFields);
+	void initialize(Collection<String> searchableFields);
 
 	void updateQueryString(String queryString);
 

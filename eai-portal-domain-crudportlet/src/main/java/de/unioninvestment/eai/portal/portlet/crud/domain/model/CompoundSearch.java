@@ -20,23 +20,23 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -70,6 +70,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Wildcard;
+import de.unioninvestment.eai.portal.portlet.crud.domain.search.AsIsAnalyzer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.search.SearchableTablesFinder;
 import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
@@ -149,20 +150,6 @@ public class CompoundSearch extends Panel {
 					.getDefaultSearchableColumnNames());
 		}
 		return defaultFields;
-	}
-
-	@SuppressWarnings("unchecked")
-	public void search(Query query) {
-		for (Table table : getTables()) {
-			if (query == null) {
-				table.getContainer().removeAllFilters();
-			} else {
-				Filter filters = getFiltersForTable(table, query);
-				List<Filter> filterList = (List<Filter>) (filters != null ? asList(filters)
-						: emptyList());
-				table.getContainer().replaceFilters(filterList, false);
-			}
-		}
 	}
 
 	Filter getFiltersForTable(Table table, Query query) {
@@ -430,23 +417,26 @@ public class CompoundSearch extends Panel {
 		}
 	}
 
+	/**
+	 * Search according to the query string on all matching tables.
+	 * 
+	 * @param queryString
+	 */
 	public void search(String queryString) {
-		Collection<String> defaultFields = getDefaultFields();
-		String[] defaultFieldsArray = defaultFields
-				.toArray(new String[defaultFields.size()]);
+		Map<Table, Filter> filtersMap = prepareQuery(queryString);
+		applyFiltersToTables(filtersMap);
+		fireQueryChangedEvent(queryString);
+	}
 
-		Analyzer analyzer = new WhitespaceAnalyzer(Version.LUCENE_46);
-		QueryParser luceneParser = new MultiFieldQueryParser(Version.LUCENE_46,
-				defaultFieldsArray, analyzer);
-		try {
-			Query query = luceneParser.parse(queryString);
-			search(query);
-			fireQueryChangedEvent(queryString);
-
-		} catch (org.apache.lucene.queryparser.classic.ParseException e) {
-			throw new BusinessException(
-					"portlet.crud.error.compoundsearch.invalidQuery",
-					queryString);
+	private void applyFiltersToTables(Map<Table, Filter> filtersMap) {
+		for (Entry<Table, Filter> entry : filtersMap.entrySet()) {
+			if (entry.getValue() == null) {
+				entry.getKey().getContainer().removeAllFilters();
+			} else {
+				List<Filter> filters = entry.getValue() != null ? asList(entry
+						.getValue()) : Collections.<Filter> emptyList();
+				entry.getKey().getContainer().replaceFilters(filters, false);
+			}
 		}
 	}
 
@@ -462,5 +452,52 @@ public class CompoundSearch extends Panel {
 
 	void fireQueryChangedEvent(String queryString) {
 		eventRouter.fireEvent(new CompoundQueryChangedEvent(this, queryString));
+	}
+
+	public boolean isValidQuery(String queryString) {
+		try {
+			prepareQuery(queryString);
+			return true;
+
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	private Map<Table, Filter> prepareQuery(String queryString) {
+		Query query = parseQuery(queryString);
+		return createTableFiltersMap(query);
+	}
+
+	private Map<Table, Filter> createTableFiltersMap(Query query) {
+		Map<Table, Filter> results = new HashMap<Table, Filter>();
+		for (Table table : getTables()) {
+			if (query == null) {
+				results.put(table, null);
+			} else {
+				Filter filters = getFiltersForTable(table, query);
+				results.put(table, filters);
+			}
+		}
+		return results;
+	}
+
+	private Query parseQuery(String queryString) {
+		Query query;
+		Collection<String> defaultFields = getDefaultFields();
+		String[] defaultFieldsArray = defaultFields
+				.toArray(new String[defaultFields.size()]);
+
+		QueryParser luceneParser = new MultiFieldQueryParser(Version.LUCENE_46,
+				defaultFieldsArray, new AsIsAnalyzer());
+		try {
+			query = luceneParser.parse(queryString);
+
+		} catch (org.apache.lucene.queryparser.classic.ParseException e) {
+			throw new BusinessException(
+					"portlet.crud.error.compoundsearch.invalidQuery",
+					queryString);
+		}
+		return query;
 	}
 }

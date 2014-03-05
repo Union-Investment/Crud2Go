@@ -24,14 +24,6 @@ import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMe
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
-import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.util.Version;
-
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.filter.SimpleStringFilter;
@@ -39,32 +31,52 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
 
+/**
+ * Search Widget.
+ * 
+ * @author cmj
+ */
 @SuppressWarnings("serial")
 public class SearchBox extends ComboBox {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Handler that delivers autosuggest options.
+	 */
 	public interface OptionHandler {
 		Collection<String> getOptions(String filterString);
 	}
 
+	/**
+	 * Handler that validates and executes queries
+	 */
 	public interface QuerySearchHandler {
-		void search(Query query);
+		/**
+		 * @param expression
+		 *            the search string
+		 * @return true, if the expression is a valid query
+		 */
+		boolean isValidQuery(String expression);
+
+		/**
+		 * @param expression
+		 *            the search string
+		 */
+		void search(String expression);
 	}
 
 	private SearchContainerDataSource container;
 	private String previousFilterString;
 	private String caseSensitiveFilterstring;
 
-	private final String[] masterFields;
 	private QuerySearchHandler searchHandler;
 
 	private Object lastExpression;
 
 	private String lastNewItem;
 
-	public SearchBox(String[] masterFields, QuerySearchHandler searchHandler) {
-		this.masterFields = masterFields;
+	public SearchBox(QuerySearchHandler searchHandler) {
 		this.searchHandler = searchHandler;
 
 		container = new SearchContainerDataSource();
@@ -173,18 +185,14 @@ public class SearchBox extends ComboBox {
 
 	protected void search(String expression, boolean ignoreInvalidQuery) {
 		if (!expression.equals(lastExpression)) {
-			Analyzer analyzer = new WhitespaceAnalyzer(Version.LUCENE_46);
-			QueryParser luceneParser = new MultiFieldQueryParser(
-					Version.LUCENE_46, masterFields, analyzer);
-			try {
-				Query query = luceneParser.parse(expression);
-				searchHandler.search(query);
-				lastExpression = expression;
-
-			} catch (ParseException e) {
+			if (!searchHandler.isValidQuery(expression)) {
 				if (!ignoreInvalidQuery) {
-					Notification.show(getMessage("portlet.crud.error.compoundsearch.invalidQuery", expression));
+					Notification.show(getMessage(
+							"portlet.crud.error.compoundsearch.invalidQuery",
+							expression));
 				}
+			} else {
+				searchHandler.search(expression);
 			}
 		}
 	}
