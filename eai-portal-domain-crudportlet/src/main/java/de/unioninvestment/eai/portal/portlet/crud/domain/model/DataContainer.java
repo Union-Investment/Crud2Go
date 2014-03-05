@@ -193,7 +193,25 @@ public interface DataContainer extends Serializable {
 	 *            die Timeout-Zeit in Sekunden.
 	 */
 	void replaceFilters(List<Filter> newFilters, boolean removeDurable,
-			int timeout);
+			boolean forceReplace, int timeout);
+
+	/**
+	 * Ersetzt die bestehenden Filter durch neue.
+	 * 
+	 * @param newFilters
+	 *            die Liste der neuen Filter.
+	 * @param removeDurable
+	 *            <code>true</code>, wenn auch "durable" Filter ersetzt werden
+	 *            sollen.
+	 * @param timeout
+	 *            die Timeout-Zeit in Sekunden.
+	 * @param forceReplace
+	 *            Ersetzen der Filter auch dann, wenn sich gegenüber der letzten
+	 *            Filterung keine Änderung ergeben hat. Dies führt in jedem Fall
+	 *            zu einem Neuladen der Inhalte.
+	 */
+	void replaceFilters(List<Filter> newFilters, boolean removeDurable,
+			boolean forceReplace);
 
 	/**
 	 * Fügt den bestehenden Filtern neue hinzu.

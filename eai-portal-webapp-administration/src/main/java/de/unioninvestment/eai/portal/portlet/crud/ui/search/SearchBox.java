@@ -72,7 +72,7 @@ public class SearchBox extends ComboBox {
 
 	private QuerySearchHandler searchHandler;
 
-	private Object lastExpression;
+	private Object lastExpression = "";
 
 	private String lastNewItem;
 
@@ -174,26 +174,22 @@ public class SearchBox extends ComboBox {
 		continueEditing();
 
 		String expression = (String) event.getProperty().getValue();
-		if (expression != null) {
-			boolean isItemFromOptions = !expression.equals(lastNewItem);
-			search(expression, isItemFromOptions);
-		} else if (lastExpression != null) {
-			searchHandler.search(null);
-			lastExpression = null;
+		if (expression == null) {
+			expression = "";
 		}
+		boolean isItemFromOptions = !expression.equals(lastNewItem);
+		search(expression, isItemFromOptions);
 	}
 
 	protected void search(String expression, boolean ignoreInvalidQuery) {
-		if (!expression.equals(lastExpression)) {
-			if (!searchHandler.isValidQuery(expression)) {
-				if (!ignoreInvalidQuery) {
-					Notification.show(getMessage(
-							"portlet.crud.error.compoundsearch.invalidQuery",
-							expression));
-				}
-			} else {
-				searchHandler.search(expression);
+		if (!searchHandler.isValidQuery(expression)) {
+			if (!ignoreInvalidQuery) {
+				Notification.show(getMessage(
+						"portlet.crud.error.compoundsearch.invalidQuery",
+						expression));
 			}
+		} else {
+			searchHandler.search(expression);
 		}
 	}
 }

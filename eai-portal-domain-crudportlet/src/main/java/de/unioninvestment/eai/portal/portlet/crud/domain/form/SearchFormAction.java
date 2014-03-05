@@ -183,9 +183,9 @@ public class SearchFormAction implements ActionHandler {
 		List<Filter> filters = createFilters(form, table);
 		DataContainer container = table.getContainer();
 		if (this.timeout > 0) {
-			container.replaceFilters(filters, false, this.timeout);
+			container.replaceFilters(filters, false, true, this.timeout);
 		} else {
-			table.getContainer().replaceFilters(filters, false);
+			table.getContainer().replaceFilters(filters, false, true);
 		}
 	}
 

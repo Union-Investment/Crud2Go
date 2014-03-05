@@ -107,7 +107,7 @@ public class ScriptContainer extends ScriptComponent {
 			List<Filter> filters = new FilterClosureCallable(closure).call();
 
 			int timeout = extractTimeoutValue(namedArgs);
-			container.replaceFilters(filters, false, timeout);
+			container.replaceFilters(filters, false, false, timeout);
 		} finally {
 			closure.setDelegate(oldDelegate);
 		}

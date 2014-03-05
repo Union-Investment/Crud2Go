@@ -22,6 +22,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 
+import com.vaadin.event.Action;
+import com.vaadin.event.Action.Handler;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractComponent;
@@ -34,7 +37,6 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.GridLayout;
@@ -42,10 +44,12 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.LiferayTheme;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxFormField;
@@ -74,9 +78,14 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
  * 
  * @author carsten.mjartan
  */
-public class DefaultFormView extends CustomComponent implements FormView {
+public class DefaultFormView extends Panel implements FormView, Handler {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final Action ACTION_ENTER = new ShortcutAction("Enter",
+			KeyCode.ENTER, null);
+	private static final Action[] FORM_ACTIONS = { ACTION_ENTER };
+
 	private Presenter presenter;
 	private FormAction searchAction;
 
@@ -102,7 +111,9 @@ public class DefaultFormView extends CustomComponent implements FormView {
 		FormActions actions = model.getActions();
 
 		rootLayout = new VerticalLayout();
-		setCompositionRoot(rootLayout);
+		setStyleName(LiferayTheme.PANEL_LIGHT);
+		setContent(rootLayout);
+		addActionHandler(this);
 
 		if (columns > 1) {
 			fieldLayout = layoutAsGrid(columns, fields.count());
@@ -314,42 +325,27 @@ public class DefaultFormView extends CustomComponent implements FormView {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private void createFooterAndPopulateActions(FormActions actions) {
 		CssLayout buttons = new CssLayout();
 		buttons.setStyleName("actions");
 
 		boolean allHidden = true;
-		boolean first = true;
 		for (final FormAction action : actions) {
-			Button button;
-			if (action.getActionHandler() instanceof SearchFormAction) {
-				searchAction = action;
-				button = new Button(action.getTitle());
-				if (first) {
-					button.setClickShortcut(KeyCode.ENTER);
-					first = false;
+			Button button = new Button(action.getTitle());
+			button.addClickListener(new ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					presenter.executeAction(action);
 				}
-				// button.setErrorHandler(new IgnoreErrorHandler());
-				button.addClickListener(new ClickListener() {
-					private static final long serialVersionUID = 1L;
+			});
 
-					@Override
-					public void buttonClick(ClickEvent event) {
-						presenter.executeAction(action);
-					}
-				});
-			} else {
-				button = new Button(action.getTitle());
-				button.addClickListener(new ClickListener() {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void buttonClick(ClickEvent event) {
-						presenter.executeAction(action);
-					}
-				});
+			if (action.getActionHandler() instanceof SearchFormAction) {
+				if (searchAction == null) {
+					searchAction = action;
+					// button.setClickShortcut(KeyCode.ENTER);
+				}
 			}
-
 			if (action.isHidden()) {
 				button.setVisible(false);
 			} else {
@@ -378,6 +374,21 @@ public class DefaultFormView extends CustomComponent implements FormView {
 	@Override
 	public FormAction getSearchAction() {
 		return searchAction;
+	}
+
+	@Override
+	public Action[] getActions(Object target, Object sender) {
+		if (searchAction != null && sender == this) {
+			return FORM_ACTIONS;
+		}
+		return null;
+	}
+
+	@Override
+	public void handleAction(Action action, Object sender, Object target) {
+		if (action == ACTION_ENTER) {
+			presenter.executeAction(searchAction);
+		}
 	}
 
 }

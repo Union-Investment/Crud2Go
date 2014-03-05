@@ -284,7 +284,7 @@ public class SearchFormActionTest {
 		verify(dbContainerMock)
 				.replaceFilters(
 						asList((Filter) new StartsWith("field1",
-								"filterValue1", false)), false);
+								"filterValue1", false)), false, true);
 	}
 
 	@Test
@@ -305,7 +305,7 @@ public class SearchFormActionTest {
 				.replaceFilters(
 						asList((Filter) new StartsWith("field1",
 								"filterValue1", false), new StartsWith(
-								"field2", "filterValue2", false)), false);
+								"field2", "filterValue2", false)), false, true);
 	}
 
 	private void stubContainerColumnType(String columnName, final Class<?> type) {
@@ -329,7 +329,7 @@ public class SearchFormActionTest {
 
 		searchAction.execute(formMock);
 
-		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false);
+		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false, true);
 	}
 
 	@Test
@@ -345,7 +345,7 @@ public class SearchFormActionTest {
 		searchAction.execute(formMock);
 
 		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false,
-				42);
+				true, 42);
 	}
 
 	@Test(expected = BusinessException.class)
@@ -360,11 +360,11 @@ public class SearchFormActionTest {
 		when(formMock.getFields()).thenReturn(formFields);
 		doThrow(new TimeoutException("portlet.crud.warn.searchQueryTimeout"))
 				.when(dbContainerMock).replaceFilters(new ArrayList<Filter>(),
-						false, 42);
+						false, true, 42);
 
 		searchAction.execute(formMock);
 		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false,
-				42);
+				true, 42);
 		ArgumentCaptor<List> filterListArgumentCaptor = ArgumentCaptor
 				.forClass(List.class);
 		verify(dbContainerMock).replaceFilters(
@@ -387,7 +387,7 @@ public class SearchFormActionTest {
 
 		searchAction.execute(formMock);
 
-		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false);
+		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false, true);
 	}
 
 	@Test
@@ -401,7 +401,7 @@ public class SearchFormActionTest {
 
 		searchAction.execute(formMock);
 
-		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false);
+		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false, true);
 	}
 
 	@Test
@@ -417,7 +417,7 @@ public class SearchFormActionTest {
 		searchAction.execute(formMock);
 
 		verify(dbContainerMock).replaceFilters(
-				asList((Filter) new Equal("field1", "filterValue1")), false);
+				asList((Filter) new Equal("field1", "filterValue1")), false, true);
 	}
 
 	@Test
@@ -436,7 +436,7 @@ public class SearchFormActionTest {
 		Less endDateFilter = new Less("field1", timestamp(2011, 4, 21), false);
 		verify(dbContainerMock).replaceFilters(
 				asList((Filter) new All(Arrays.asList((Filter) beginDateFilter,
-						endDateFilter))), false);
+						endDateFilter))), false, true);
 	}
 
 	private Timestamp timestamp(int i, int j, int k) {
@@ -495,7 +495,7 @@ public class SearchFormActionTest {
 		searchAction.execute(formMock);
 
 		verify(dbContainerMock).replaceFilters(
-				asList((Filter) new Equal("field1", "filterValue1")), false);
+				asList((Filter) new Equal("field1", "filterValue1")), false, true);
 	}
 
 	@Test
@@ -513,7 +513,7 @@ public class SearchFormActionTest {
 
 		verify(dbContainerMock).replaceFilters(
 				asList((Filter) new Equal("field1", new BigDecimal("1"))),
-				false);
+				false, true);
 	}
 
 	@Test
@@ -664,7 +664,7 @@ public class SearchFormActionTest {
 		searchAction.execute(formMock);
 
 		verify(dbContainerMock).replaceFilters(asList((Filter) expectedFilter),
-				false);
+				false, true);
 	}
 
 	private void verifyDateFilterByConfiguration(FilterConfig filterConfig,
@@ -683,7 +683,7 @@ public class SearchFormActionTest {
 		searchAction.execute(formMock);
 
 		verify(dbContainerMock).replaceFilters(asList((Filter) expectedFilter),
-				false);
+				false, true);
 	}
 
 	@Test
@@ -701,7 +701,7 @@ public class SearchFormActionTest {
 		verify(dbContainerMock).replaceFilters(
 				asList((Filter) new Any(Arrays.asList((Filter) new StartsWith(
 						"column1", "filterValue1", true), new EndsWith(
-						"column1", "filterValue1", true)))), false);
+						"column1", "filterValue1", true)))), false, true);
 	}
 
 	@Test
@@ -716,7 +716,7 @@ public class SearchFormActionTest {
 
 		searchAction.execute(formMock);
 
-		verify(dbContainerMock).replaceFilters(new LinkedList<Filter>(), false);
+		verify(dbContainerMock).replaceFilters(new LinkedList<Filter>(), false, true);
 	}
 
 	@Test
@@ -731,7 +731,7 @@ public class SearchFormActionTest {
 
 		searchAction.execute(formMock);
 
-		verify(dbContainerMock).replaceFilters(new LinkedList<Filter>(), false);
+		verify(dbContainerMock).replaceFilters(new LinkedList<Filter>(), false, true);
 	}
 
 	@Test
@@ -756,7 +756,7 @@ public class SearchFormActionTest {
 
 		searchAction.execute(formMock);
 
-		verify(dbContainerMock).replaceFilters(asList((Filter) filter), false);
+		verify(dbContainerMock).replaceFilters(asList((Filter) filter), false, true);
 	}
 
 	@Test
@@ -774,7 +774,7 @@ public class SearchFormActionTest {
 		verify(dbContainerMock).replaceFilters(
 				asList((Filter) new Not(Arrays.asList((Filter) new StartsWith(
 						"column1", "filterValue1", true), new EndsWith(
-						"column1", "filterValue1", true)))), false);
+						"column1", "filterValue1", true)))), false, true);
 	}
 
 	@Test
@@ -789,7 +789,7 @@ public class SearchFormActionTest {
 
 		searchAction.execute(formMock);
 
-		verify(dbContainerMock).replaceFilters(new LinkedList<Filter>(), false);
+		verify(dbContainerMock).replaceFilters(new LinkedList<Filter>(), false, true);
 	}
 
 	@Test
@@ -807,7 +807,7 @@ public class SearchFormActionTest {
 		verify(dbContainerMock).replaceFilters(
 				asList((Filter) new All(Arrays.asList((Filter) new StartsWith(
 						"column1", "filterValue1", true), new EndsWith(
-						"column1", "filterValue1", true)))), false);
+						"column1", "filterValue1", true)))), false, true);
 	}
 
 	@Test(expected = BusinessException.class)
@@ -831,7 +831,7 @@ public class SearchFormActionTest {
 		searchAction.execute(formMock);
 
 		verify(dbContainerMock).replaceFilters(anyListOf(Filter.class),
-				anyBoolean());
+				anyBoolean(), anyBoolean());
 	}
 
 	@Test
@@ -846,7 +846,7 @@ public class SearchFormActionTest {
 		searchAction.execute(formMock);
 
 		verify(dbContainerMock).replaceFilters(anyListOf(Filter.class),
-				anyBoolean());
+				anyBoolean(), anyBoolean());
 	}
 
 	private FilterConfig createAnyFilter(FilterConfig... subfilters) {
@@ -913,7 +913,7 @@ public class SearchFormActionTest {
 
 		searchAction.execute(formMock);
 
-		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false);
+		verify(dbContainerMock).replaceFilters(new ArrayList<Filter>(), false, true);
 	}
 
 	private void createExplicitFilterConfiguration() {
@@ -1041,7 +1041,7 @@ public class SearchFormActionTest {
 		ArrayList<Filter> filters = new ArrayList<Filter>();
 		filters.add(new Equal("column1", "filterValue1"));
 		verify(dbContainerMock2, times(1)).replaceFilters(
-				asList((Filter) new All(filters)), false);
+				asList((Filter) new All(filters)), false, true);
 	}
 
 	private void mockPageWith2FormsAnd2Tables() {
@@ -1144,7 +1144,7 @@ public class SearchFormActionTest {
 		verify(dbContainerMock).replaceFilters(
 				asList((Filter) new Any(asList((Filter) new Equal("column1",
 						"b"), new Equal("column1", "c"), new Equal("column1",
-						"a")))), false);
+						"a")))), false, true);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -125,7 +126,25 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new Any(asList(
 				(Filter) new StartsWith("MASTER", "myterm", false),
 				new StartsWith("SECOND", "myterm", false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
+	}
+
+	private void verifyReplaceFilters(List<Filter> filters) {
+		verify(containerMock).replaceFilters(filters, false, true);
+	}
+
+	@Test
+	public void shouldConvertEmptyQueryStringToRemoveAllFilters()
+			throws ParseException {
+		search.search("");
+		verifyRemoveAllFilters();
+	}
+
+	@Test
+	public void shouldConvertNullQueryStringToRemoveAllFilters()
+			throws ParseException {
+		search.search(null);
+		verifyRemoveAllFilters();
 	}
 
 	@Test
@@ -134,7 +153,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new Any(asList(
 				(Filter) new StartsWith("MASTER", "myterm", false),
 				new StartsWith("SECOND", "myterm", false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -143,7 +162,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new All(asList(
 				(Filter) new StartsWith("MASTER", "myterm", false),
 				new StartsWith("SECOND", "myterm", false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -164,7 +183,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new All(asList((Filter) new Not(
 				asList((Filter) new StartsWith("MASTER", "myterm", false))),
 				new StartsWith("SECOND", "myterm", false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -173,7 +192,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new Any(asList((Filter) new Not(
 				asList((Filter) new StartsWith("MASTER", "myterm", false))),
 				new StartsWith("SECOND", "myterm", false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -185,7 +204,7 @@ public class CompoundSearchTest {
 				false);
 		List<Filter> filters = asList((Filter) new Any(asList(allFilter,
 				new StartsWith("THIRD", "myterm", false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -193,7 +212,7 @@ public class CompoundSearchTest {
 		search.search("THIRD:\"my long  phrase\"");
 		List<Filter> filters = asList((Filter) new StartsWith("THIRD",
 				"my long  phrase", false));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -202,48 +221,52 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new Not(asList((Filter) new Any(
 				asList((Filter) new StartsWith("MASTER", "myterm", false),
 						new StartsWith("SECOND", "myterm", false))))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
 	public void shouldIgnoreNonMatchingField() throws ParseException {
 		search.search("NOTINTABLE:4711");
-		verify(containerMock).removeAllFilters();
+		verifyRemoveAllFilters();
 	}
 
 	@Test
 	public void shouldIgnoreNonMatchingFieldInRangeQuery()
 			throws ParseException {
 		search.search("NOTINTABLE:[4711 TO 5822]");
-		verify(containerMock).removeAllFilters();
+		verifyRemoveAllFilters();
 	}
 
 	@Test
 	public void shouldIgnoreNonMatchingFieldInMatchAllQuery()
 			throws ParseException {
 		search.search("NOTINTABLE:\"*\"");
-		verify(containerMock).removeAllFilters();
+		verifyRemoveAllFilters();
 	}
 
 	@Test
 	public void shouldIgnoreNonMatchingFieldInPrefixQuery()
 			throws ParseException {
 		search.search("NOTINTABLE:hello*");
-		verify(containerMock).removeAllFilters();
+		verifyRemoveAllFilters();
 	}
 
 	@Test
 	public void shouldIgnoreNonMatchingFieldInWildcardQuery()
 			throws ParseException {
 		search.search("NOTINTABLE:hell*o");
-		verify(containerMock).removeAllFilters();
+		verifyRemoveAllFilters();
 	}
 
 	@Test
 	public void shouldIgnoreNonMatchingFieldInPhraseQuery()
 			throws ParseException {
 		search.search("NOTINTABLE:\"a b c\"");
-		verify(containerMock).removeAllFilters();
+		verifyRemoveAllFilters();
+	}
+
+	private void verifyRemoveAllFilters() {
+		verifyReplaceFilters(Collections.<Filter> emptyList());
 	}
 
 	@Test
@@ -251,7 +274,7 @@ public class CompoundSearchTest {
 		search.search("(MASTER:1315 OR NOTINTABLE:4711)");
 		List<Filter> filters = asList((Filter) new StartsWith("MASTER", "1315",
 				false));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -259,7 +282,7 @@ public class CompoundSearchTest {
 		search.search("(MASTER:1315 AND NOTINTABLE:4711)");
 		List<Filter> filters = asList((Filter) new StartsWith("MASTER", "1315",
 				false));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -267,7 +290,7 @@ public class CompoundSearchTest {
 		search.search("-THIRD:myter");
 		List<Filter> filters = asList((Filter) new Not(
 				asList((Filter) new StartsWith("THIRD", "myter", false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -275,7 +298,7 @@ public class CompoundSearchTest {
 		search.search("THIRD:\"*\"");
 		List<Filter> filters = asList((Filter) new Not(
 				asList((Filter) new IsNull("THIRD"))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -283,7 +306,7 @@ public class CompoundSearchTest {
 		search.search("THIRD:myter*");
 		List<Filter> filters = asList((Filter) new StartsWith("THIRD", "myter",
 				false));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -292,7 +315,7 @@ public class CompoundSearchTest {
 		search.search("THIRD:\"*myter*\"");
 		List<Filter> filters = asList((Filter) new Wildcard("THIRD", "*myter*",
 				false));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -301,7 +324,7 @@ public class CompoundSearchTest {
 		search.search("THIRD:my*ter");
 		List<Filter> filters = asList((Filter) new Wildcard("THIRD", "my*ter",
 				false));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	/* Numeric fields */
@@ -311,7 +334,7 @@ public class CompoundSearchTest {
 		search.search("NUMERIC:4711");
 		List<Filter> filters = asList((Filter) new Equal("NUMERIC",
 				new BigDecimal("4711")));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -323,7 +346,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new All(asList(
 				(Filter) new Greater("TIMESTAMP", startDate, true), new Less(
 						"TIMESTAMP", endDate, false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -332,7 +355,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new All(asList(
 				(Filter) new Greater("MASTER", "4711", true), new Less(
 						"MASTER", "5228", true))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -342,7 +365,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new All(asList(
 				(Filter) new Greater("MASTER", "4711", false), new Less(
 						"MASTER", "5228", false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -351,7 +374,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new All(asList(
 				(Filter) new Greater("NUMERIC", new BigDecimal(4711), true),
 				new Less("NUMERIC", new BigDecimal("5228"), true))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -361,7 +384,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new All(asList(
 				(Filter) new Greater("NUMERIC", new BigDecimal(4711), false),
 				new Less("NUMERIC", new BigDecimal("5228"), false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -373,7 +396,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new All(asList(
 				(Filter) new Greater("TIMESTAMP", startDate, true), new Less(
 						"TIMESTAMP", endDate, false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -385,7 +408,7 @@ public class CompoundSearchTest {
 		List<Filter> filters = asList((Filter) new All(asList(
 				(Filter) new Greater("TIMESTAMP", startDate, true), new Less(
 						"TIMESTAMP", endDate, false))));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test
@@ -422,7 +445,7 @@ public class CompoundSearchTest {
 		search.search("MASTER:myterm");
 		List<Filter> filters = asList((Filter) (Filter) new StartsWith(
 				"MASTER", "myterm", false));
-		verify(containerMock).replaceFilters(filters, false);
+		verifyReplaceFilters(filters);
 	}
 
 	@Test

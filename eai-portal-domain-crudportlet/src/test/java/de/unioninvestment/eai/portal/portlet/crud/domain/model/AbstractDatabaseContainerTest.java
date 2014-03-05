@@ -693,7 +693,7 @@ public abstract class AbstractDatabaseContainerTest<T extends AbstractDatabaseCo
 
 		when(this.testContainer.queryDelegate.getQueryTimeout()).thenReturn(42);
 
-		this.testContainer.replaceFilters(new ArrayList<Filter>(), false, 9);
+		this.testContainer.replaceFilters(new ArrayList<Filter>(), false, false, 9);
 
 		verify(this.testContainer.queryDelegate).setQueryTimeout(9);
 

@@ -6,7 +6,7 @@
 	<context-param>
 		<description>Vaadin production mode</description>
 		<param-name>productionMode</param-name>
-		<param-value>true</param-value>
+		<param-value>${vaadin.productionMode}</param-value>
 	</context-param>
 
 	<context-param>

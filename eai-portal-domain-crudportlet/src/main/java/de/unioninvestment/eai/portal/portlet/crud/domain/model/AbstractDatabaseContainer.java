@@ -64,11 +64,11 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 
 	@Override
 	public void replaceFilters(List<Filter> newFilters, boolean removeDurable,
-			int timeout) {
+			boolean forceReplace, int timeout) {
 		int previousTimeout = this.queryDelegate.getQueryTimeout();
 		this.queryDelegate.setQueryTimeout(timeout);
 		try {
-			this.replaceFilters(newFilters, removeDurable);
+			this.replaceFilters(newFilters, removeDurable, forceReplace);
 		} finally {
 			this.queryDelegate.setQueryTimeout(previousTimeout);
 		}

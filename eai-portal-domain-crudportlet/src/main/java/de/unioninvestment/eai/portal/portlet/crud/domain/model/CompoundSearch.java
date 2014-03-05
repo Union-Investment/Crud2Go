@@ -52,6 +52,7 @@ import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.Version;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.vaadin.data.util.converter.Converter.ConversionException;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
@@ -430,13 +431,9 @@ public class CompoundSearch extends Panel {
 
 	private void applyFiltersToTables(Map<Table, Filter> filtersMap) {
 		for (Entry<Table, Filter> entry : filtersMap.entrySet()) {
-			if (entry.getValue() == null) {
-				entry.getKey().getContainer().removeAllFilters();
-			} else {
-				List<Filter> filters = entry.getValue() != null ? asList(entry
-						.getValue()) : Collections.<Filter> emptyList();
-				entry.getKey().getContainer().replaceFilters(filters, false);
-			}
+			List<Filter> filters = entry.getValue() != null ? asList(entry
+					.getValue()) : Collections.<Filter> emptyList();
+			entry.getKey().getContainer().replaceFilters(filters, false, true);
 		}
 	}
 
@@ -483,7 +480,10 @@ public class CompoundSearch extends Panel {
 	}
 
 	private Query parseQuery(String queryString) {
-		Query query;
+		if (Strings.isNullOrEmpty(queryString)) {
+			return null;
+		}
+
 		Collection<String> defaultFields = getDefaultFields();
 		String[] defaultFieldsArray = defaultFields
 				.toArray(new String[defaultFields.size()]);
@@ -491,13 +491,12 @@ public class CompoundSearch extends Panel {
 		QueryParser luceneParser = new MultiFieldQueryParser(Version.LUCENE_46,
 				defaultFieldsArray, new AsIsAnalyzer());
 		try {
-			query = luceneParser.parse(queryString);
+			return luceneParser.parse(queryString);
 
 		} catch (org.apache.lucene.queryparser.classic.ParseException e) {
 			throw new BusinessException(
 					"portlet.crud.error.compoundsearch.invalidQuery",
 					queryString);
 		}
-		return query;
 	}
 }

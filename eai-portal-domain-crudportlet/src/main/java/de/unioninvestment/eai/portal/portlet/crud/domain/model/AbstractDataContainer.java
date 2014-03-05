@@ -293,7 +293,7 @@ public abstract class AbstractDataContainer implements DataContainer,
 		replaceFilters(newFilters, removeDurable, false);
 	}
 
-	private void replaceFilters(List<Filter> newFilters, boolean removeDurable,
+	public void replaceFilters(List<Filter> newFilters, boolean removeDurable,
 			boolean forceReplace) {
 		List<Filter> replacementFilters = newFilters;
 		if (!removeDurable) {
@@ -327,7 +327,7 @@ public abstract class AbstractDataContainer implements DataContainer,
 
 	@Override
 	public void replaceFilters(List<Filter> newFilters, boolean removeDurable,
-			int timeout) {
+			boolean forceReplace, int timeout) {
 		throw new UnsupportedOperationException("Timeout not supported!");
 	}
 
@@ -603,7 +603,7 @@ public abstract class AbstractDataContainer implements DataContainer,
 
 		} else if (filter instanceof Wildcard) {
 			return buildWildcardFilter(filter);
-			
+
 		} else if (filter instanceof IsNull) {
 			return buildIsNullFilter(filter);
 
@@ -644,14 +644,13 @@ public abstract class AbstractDataContainer implements DataContainer,
 				(String) containerFilter.getValue(),
 				!containerFilter.isCaseSensitive(), false, false);
 	}
-	
+
 	private com.vaadin.data.Container.Filter buildWildcardFilter(Filter filter) {
 		Wildcard wildcard = (Wildcard) filter;
-		String searchTerm = wildcard.getValue().replace('?', '_').replace('*', '%');
+		String searchTerm = wildcard.getValue().replace('?', '_')
+				.replace('*', '%');
 		return new Like(wildcard.getColumn(), searchTerm, false);
 	}
-
-
 
 	/**
 	 * @param filter

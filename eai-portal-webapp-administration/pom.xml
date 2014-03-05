@@ -26,6 +26,7 @@
 		<storage.dialect>ORACLE</storage.dialect>
 		<portlet.title>Crud2Go</portlet.title>
 		<portlet.shortTitle>Crud2Go</portlet.shortTitle>
+		<vaadin.productionMode>false</vaadin.productionMode>
 	</properties>
 
 	<dependencies>
@@ -454,6 +455,7 @@
 			</activation>
 			<properties>
 				<session.timeout>480</session.timeout>
+				<vaadin.productionMode>true</vaadin.productionMode>
 			</properties>
 		</profile>
 		<profile>
