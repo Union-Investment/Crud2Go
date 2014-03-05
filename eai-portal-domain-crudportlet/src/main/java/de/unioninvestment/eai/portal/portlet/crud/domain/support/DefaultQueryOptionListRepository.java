@@ -22,6 +22,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.support;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
@@ -85,13 +87,15 @@ public class DefaultQueryOptionListRepository implements
 			String query) {
 		String key = createKey(dataSource, query);
 		Element element = underlyingCache.get(key);
-		return element == null ? null : (Map<String, String>) element.getObjectValue();
+		return element == null ? null : (Map<String, String>) element
+				.getObjectValue();
 	}
 
 	private Map<String, String> getOptionsWithCaching(String dataSource,
 			String query) {
 		Serializable key = createKey(dataSource, query);
-		Element element = cache.get(key); // creates a lock if the element does not exist 
+		Element element = cache.get(key); // creates a lock if the element does
+											// not exist
 		Map<String, String> options = null;
 
 		if (element == null) {
@@ -122,19 +126,18 @@ public class DefaultQueryOptionListRepository implements
 		return options;
 	}
 
-
 	static String createKey(String dataSource, String query) {
-        String normalizedQuery = normalizeQuery(query);
-        return dataSource + "|" + normalizedQuery;
+		String normalizedQuery = normalizeQuery(query);
+		return dataSource + "|" + normalizedQuery;
 	}
 
-    private static String normalizeQuery(String query) {
-        Iterable<String> lines = Splitter.on('\n').trimResults()
-                .omitEmptyStrings().split(query);
-        return Joiner.on(' ').join(lines);
-    }
+	private static String normalizeQuery(String query) {
+		Iterable<String> lines = Splitter.on('\n').trimResults()
+				.omitEmptyStrings().split(query);
+		return Joiner.on(' ').join(lines);
+	}
 
-    private Map<String, String> getOptionsFromDatabase(String dataSource,
+	private Map<String, String> getOptionsFromDatabase(String dataSource,
 			String query) {
 		ConnectionPool pool = connectionPoolFactory.getPool(dataSource);
 
@@ -159,11 +162,10 @@ public class DefaultQueryOptionListRepository implements
 	 * @return NULL-Sichere-Abfrage
 	 */
 	static String nullSafeQuery(String query) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("select key, title from (");
-		sb.append(query);
-		sb.append(") where key is not null and title is not null");
-		return sb.toString();
+		return MessageFormat
+				.format("select {0},{1} from ({2}) opt where {0} is not null and {1} is not null",
+						QueryBuilder.quote("KEY"), QueryBuilder.quote("TITLE"),
+						query);
 	}
 
 	@Override
@@ -181,33 +183,35 @@ public class DefaultQueryOptionListRepository implements
 		return removed;
 	}
 
-    public int removeAll(String dataSource, Pattern pattern) {
-        List<Object> keysToRemove = findAllMatchingKeys(dataSource, pattern);
-        int count = 0;
-        for (Object cacheKey : keysToRemove) {
-            boolean removed = cache.remove(cacheKey);
-            if (removed) {
-            	count++;
-                CACHE_LOGGER.debug("Removed option list from cache [{}]", cacheKey);
-            }
-        }
-        return count;
-    }
+	public int removeAll(String dataSource, Pattern pattern) {
+		List<Object> keysToRemove = findAllMatchingKeys(dataSource, pattern);
+		int count = 0;
+		for (Object cacheKey : keysToRemove) {
+			boolean removed = cache.remove(cacheKey);
+			if (removed) {
+				count++;
+				CACHE_LOGGER.debug("Removed option list from cache [{}]",
+						cacheKey);
+			}
+		}
+		return count;
+	}
 
-    List<Object> findAllMatchingKeys(String dataSource, Pattern pattern) {
-        List<Object> cacheKeys = cache.getKeys();
-        List<Object> keysToRemove = new LinkedList<Object>();
-        for(Object cacheKey : cacheKeys) {
-            Iterator<String> spliterator = Splitter.on('|').split((String) cacheKey).iterator();
-            String ds = spliterator.next();
-            if (ds.equals(dataSource)) {
-                String query = spliterator.next();
-                Matcher matcher = pattern.matcher(query);
-                if (matcher.find()) {
-                    keysToRemove.add(cacheKey);
-                }
-            }
-        }
-        return keysToRemove;
-    }
+	List<Object> findAllMatchingKeys(String dataSource, Pattern pattern) {
+		List<Object> cacheKeys = cache.getKeys();
+		List<Object> keysToRemove = new LinkedList<Object>();
+		for (Object cacheKey : cacheKeys) {
+			Iterator<String> spliterator = Splitter.on('|')
+					.split((String) cacheKey).iterator();
+			String ds = spliterator.next();
+			if (ds.equals(dataSource)) {
+				String query = spliterator.next();
+				Matcher matcher = pattern.matcher(query);
+				if (matcher.find()) {
+					keysToRemove.add(cacheKey);
+				}
+			}
+		}
+		return keysToRemove;
+	}
 }
