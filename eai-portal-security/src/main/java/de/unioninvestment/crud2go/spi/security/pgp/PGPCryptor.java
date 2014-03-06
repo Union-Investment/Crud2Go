@@ -18,23 +18,18 @@
  */
 package de.unioninvestment.crud2go.spi.security.pgp;
 
+import java.io.File;
 import java.io.FileInputStream;
-
-import javax.annotation.PostConstruct;
 
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import de.unioninvestment.crud2go.spi.security.Cryptor;
 import de.unioninvestment.crud2go.spi.security.DecryptionException;
 import de.unioninvestment.crud2go.spi.security.EncryptionException;
 
-@Component
 public class PGPCryptor implements Cryptor {
 
 	private static final org.slf4j.Logger LOGGER = LoggerFactory
@@ -44,22 +39,24 @@ public class PGPCryptor implements Cryptor {
 
 	private PGPSecretKeyRingCollection secretKeys;
 
-	@Value("${portlet.crud.authentication.pgp.secretkeyfile}")
 	private String secretKeyFileName;
 
 	private PGPPublicKey publicKey;
 
-	@PostConstruct
+	public PGPCryptor(String secretKeyFileName) {
+		this.secretKeyFileName = secretKeyFileName;
+		initialize();
+	}
+
 	public void initialize() {
-		if (StringUtils.hasText(secretKeyFileName)) {
+		if (secretKeyFileName != null && new File(secretKeyFileName).exists()) {
 			try {
 				// TODO handle non-existing file (degraded mode)
 				FileInputStream stream = new FileInputStream(secretKeyFileName);
 				byte[] keyFileBytes = Utils.read(stream).toByteArray();
 				secretKeys = new PGPKeyContainer(keyFileBytes)
 						.getSecretKeyRingCollection();
-				publicKey = new PGPKeyContainer(keyFileBytes)
-						.getPublicKey();
+				publicKey = new PGPKeyContainer(keyFileBytes).getPublicKey();
 				return;
 
 			} catch (Exception e) {
@@ -68,7 +65,7 @@ public class PGPCryptor implements Cryptor {
 						e);
 			}
 		} else {
-			LOGGER.warn("Error initializing PGP decryption - feature not supported (key file not configured)");
+			LOGGER.warn("Error initializing PGP decryption - feature not supported (key file not configured or does not exist)");
 		}
 
 	}

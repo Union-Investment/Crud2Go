@@ -18,13 +18,11 @@
  */
 package de.unioninvestment.crud2go.spi.security;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import de.unioninvestment.crud2go.spi.security.pgp.PGPCryptor;
 
@@ -32,28 +30,19 @@ public class CryptorFactoryTest {
 
 	private CryptorFactory factory;
 
-	@Mock
-	private PGPCryptor pgpCryptorMock;
-	@Mock
-	private NopCryptor nopCryptorMock;
-
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-
 		factory = new CryptorFactory();
-		factory.pgpCryptor = pgpCryptorMock;
-		factory.nopCryptor = nopCryptorMock;
 	}
 
 	@Test
 	public void shouldReturnPGPCryptor() {
-		assertThat(factory.getCryptor("pgp"), is((Cryptor) pgpCryptorMock));
+		assertThat(factory.getCryptor("pgp"), instanceOf(PGPCryptor.class));
 	}
 
 	@Test
 	public void shouldReturnNopCryptorOnNull() {
-		assertThat(factory.getCryptor(null), is((Cryptor) nopCryptorMock));
+		assertThat(factory.getCryptor(null), instanceOf(NopCryptor.class));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

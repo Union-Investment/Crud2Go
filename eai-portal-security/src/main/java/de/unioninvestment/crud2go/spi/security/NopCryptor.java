@@ -18,7 +18,6 @@
  */
 package de.unioninvestment.crud2go.spi.security;
 
-import org.springframework.stereotype.Component;
 
 /**
  * {@link Cryptor} implementation that does not encrypt but returns the original
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Component;
  * 
  * @author carsten.mjartan
  */
-@Component
 public class NopCryptor implements Cryptor {
 
 	@Override
