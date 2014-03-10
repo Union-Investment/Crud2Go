@@ -166,6 +166,17 @@ public class CompoundSearchTest extends AbstractSpringPortletContextTest {
 		verifyReplaceFilters(filters);
 	}
 
+	@Test
+	public void shouldFailWithFirstMessageIfAllPartsOfORQueryAreInvalid() throws ParseException {
+		try {
+			search.search("TIMESTAMP:invalidTimestamp OR NUMERIC:invalidNumber");
+			fail();
+		} catch (BusinessException e) {
+			assertThat(e.getCode(),
+					is("portlet.crud.error.compoundsearch.dateConversionFailed"));
+		}
+	}
+	
 	private List<Filter> filterList(Filter... filterArray) {
 		return asList(filterArray);
 	}

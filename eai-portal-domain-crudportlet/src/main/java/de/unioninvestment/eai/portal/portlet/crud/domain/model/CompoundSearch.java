@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -391,9 +392,10 @@ public class CompoundSearch extends Panel {
 	}
 
 	private List<Filter> convertBooleanClauses(Table table,
-			BooleanQuery booleanQuery, boolean ignoreErrors) {
+			BooleanQuery booleanQuery, boolean ignorePartialErrors) {
 		List<Filter> subList = new ArrayList<Filter>(
 				booleanQuery.getClauses().length);
+		List<RuntimeException> errors = new LinkedList<RuntimeException>();
 		for (BooleanClause clause : booleanQuery.clauses()) {
 			try {
 				Filter subFilter = getFiltersForTable(table, clause.getQuery());
@@ -404,12 +406,20 @@ public class CompoundSearch extends Panel {
 					subList.add(subFilter);
 				}
 			} catch (RuntimeException e) {
-				if (ignoreErrors) {
-					LOGGER.info("Ignoring error in 'OR' clause", e.getMessage());
-				} else {
-					throw e;
-				}
+				errors.add(e);
 			}
+		}
+		if (ignorePartialErrors) {
+			if (errors.size() < booleanQuery.clauses().size()) {
+				for (RuntimeException e : errors) {
+					LOGGER.info("Ignoring error in 'OR' clause: "
+							+ e.getMessage());
+				}
+				return subList;
+			}
+		}
+		if (errors.size() > 0) {
+			throw errors.get(0);
 		}
 		return subList;
 	}
