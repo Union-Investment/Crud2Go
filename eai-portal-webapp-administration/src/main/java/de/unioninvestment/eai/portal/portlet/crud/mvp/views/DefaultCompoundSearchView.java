@@ -75,6 +75,7 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 		searchBox.setWidth("100%");
 		searchBox.setOptionHandler(new SearchOptionsHandler(searchableFields));
 		searchBox.focus();
+		searchBox.setInputPrompt(getMessage("portlet.crud.compoundsearch.inputPrompt"));
 
 		PopupView infoButton = new PopupView(new Content() {
 			@Override
