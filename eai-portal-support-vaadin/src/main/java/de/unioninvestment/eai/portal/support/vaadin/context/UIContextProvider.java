@@ -76,6 +76,9 @@ public class UIContextProvider implements ContextProvider {
 	 *             falls die Bean im Spring-Kontext nicht gefunden werden kann
 	 * @throws BeansException
 	 *             falls keine eindeutige Zuordnung getroffen werden kann
+	 * @throws IllegalStateException
+	 *             falls kein PortletRequest gefunden wird, an dem der Spring
+	 *             Context hängt
 	 */
 	@Override
 	public <T> T getBean(Class<T> requiredType) {

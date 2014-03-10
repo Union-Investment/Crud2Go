@@ -50,6 +50,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -87,6 +89,9 @@ import de.unioninvestment.eai.portal.support.vaadin.support.NumberFormatter;
  */
 @SuppressWarnings("serial")
 public class CompoundSearch extends Panel {
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(CompoundSearch.class);
 
 	SearchableTablesFinder searchableTablesFinder = new SearchableTablesFinder();
 
@@ -309,7 +314,8 @@ public class CompoundSearch extends Panel {
 					"portlet.crud.error.compoundsearch.mixedBooleansProhibited",
 					booleanQuery);
 		} else if (isBooleanAND(booleanQuery)) {
-			List<Filter> subList = convertBooleanClauses(table, booleanQuery);
+			List<Filter> subList = convertBooleanClauses(table, booleanQuery,
+					false);
 			if (subList.size() == 0) {
 				return null;
 			} else if (subList.size() == 1) {
@@ -318,7 +324,8 @@ public class CompoundSearch extends Panel {
 				return new All(subList);
 			}
 		} else {
-			List<Filter> subList = convertBooleanClauses(table, booleanQuery);
+			List<Filter> subList = convertBooleanClauses(table, booleanQuery,
+					true);
 			if (subList.size() == 0) {
 				return null;
 			} else if (subList.size() == 1) {
@@ -384,16 +391,24 @@ public class CompoundSearch extends Panel {
 	}
 
 	private List<Filter> convertBooleanClauses(Table table,
-			BooleanQuery booleanQuery) {
+			BooleanQuery booleanQuery, boolean ignoreErrors) {
 		List<Filter> subList = new ArrayList<Filter>(
 				booleanQuery.getClauses().length);
 		for (BooleanClause clause : booleanQuery.clauses()) {
-			Filter subFilter = getFiltersForTable(table, clause.getQuery());
-			if (subFilter != null) {
-				if (clause.isProhibited()) {
-					subFilter = new Not(asList(subFilter));
+			try {
+				Filter subFilter = getFiltersForTable(table, clause.getQuery());
+				if (subFilter != null) {
+					if (clause.isProhibited()) {
+						subFilter = new Not(asList(subFilter));
+					}
+					subList.add(subFilter);
 				}
-				subList.add(subFilter);
+			} catch (RuntimeException e) {
+				if (ignoreErrors) {
+					LOGGER.info("Ignoring error in 'OR' clause", e.getMessage());
+				} else {
+					throw e;
+				}
 			}
 		}
 		return subList;

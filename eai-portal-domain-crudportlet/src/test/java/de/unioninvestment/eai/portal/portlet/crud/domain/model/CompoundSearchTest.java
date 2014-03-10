@@ -44,6 +44,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.vaadin.ui.UI;
 
@@ -62,9 +63,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Wildcard;
 import de.unioninvestment.eai.portal.portlet.crud.domain.search.SearchableTablesFinder;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
-public class CompoundSearchTest {
+@ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
+public class CompoundSearchTest extends AbstractSpringPortletContextTest {
 
 	private CompoundSearch search;
 
@@ -81,7 +84,7 @@ public class CompoundSearchTest {
 
 	@Rule
 	public LiferayContext context = new LiferayContext();
-
+	
 	@Captor
 	private ArgumentCaptor<CompoundQueryChangedEvent> eventCaptor;
 
@@ -154,6 +157,17 @@ public class CompoundSearchTest {
 				(Filter) new StartsWith("MASTER", "myterm", false),
 				new StartsWith("SECOND", "myterm", false))));
 		verifyReplaceFilters(filters);
+	}
+
+	@Test
+	public void shouldIgnoreInvalidPartsOfORQuery() throws ParseException {
+		search.search("MASTER:myterm OR NUMERIC:invalidNumber");
+		List<Filter> filters = filterList(new StartsWith("MASTER", "myterm", false));
+		verifyReplaceFilters(filters);
+	}
+
+	private List<Filter> filterList(Filter... filterArray) {
+		return asList(filterArray);
 	}
 
 	@Test
