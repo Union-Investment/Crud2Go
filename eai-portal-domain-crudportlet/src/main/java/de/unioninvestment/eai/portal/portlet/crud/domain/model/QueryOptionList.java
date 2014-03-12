@@ -98,7 +98,7 @@ public class QueryOptionList extends VolatileOptionList {
 		this.lazy = initialize.equals(InitializeTypeConfig.LAZY)
 				|| initialize.equals(InitializeTypeConfig.ASYNC);
 		this.prefetched = initialize.equals(InitializeTypeConfig.ASYNC);
-		
+
 		if (useCache) {
 			options = repository.getOptionsFromCache(dataSource, query);
 		}
@@ -205,17 +205,6 @@ public class QueryOptionList extends VolatileOptionList {
 		LOGGER.debug("Finished loading option list {} ({}ms)", logId(),
 				duration);
 		return newOptions;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getTitle(String key, SelectionContext context) {
-		if (getOptions(context) != null) {
-			return getOptions(context).get(key);
-		}
-		return null;
 	}
 
 	/**

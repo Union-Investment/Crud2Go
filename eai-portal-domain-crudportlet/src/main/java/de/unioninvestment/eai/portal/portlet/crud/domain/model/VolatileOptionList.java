@@ -1,5 +1,8 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
@@ -55,4 +58,27 @@ public abstract class VolatileOptionList implements OptionList,
 	}
 	
 	public abstract void refresh(RefreshPolicy policy);
+	
+	@Override
+	public String getTitle(String key, SelectionContext context) {
+		Map<String, String> options = getOptions(context);
+		if (options != null) {
+			return options.get(key);
+		}
+		return null;
+	}
+
+	@Override
+	public String getKey(String title, SelectionContext context) {
+		Map<String, String> options = getOptions(context);
+		if (options != null) {
+			for (Entry<String, String> entry : options.entrySet()) {
+				if (entry.getValue().equals(title)) {
+					return entry.getKey();
+				}
+			}
+		}
+		return null;
+	}
+
 }

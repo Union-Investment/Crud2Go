@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.OptionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
@@ -82,6 +83,19 @@ public class StaticOptionList implements OptionList {
 		}
 		return null;
 	}
+
+	@Override
+	public String getKey(String title, SelectionContext context) {
+		if (options != null) {
+			for (Entry<String, String> entry : options.entrySet()) {
+				if (entry.getValue().equals(title)) {
+					return entry.getKey();
+				}
+			}
+		}
+		return null;
+	}
+
 
 	@Override
 	public void addChangeListener(OptionListChangeEventHandler handler) {

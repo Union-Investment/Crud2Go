@@ -72,8 +72,6 @@ public class SearchBox extends ComboBox {
 
 	private QuerySearchHandler searchHandler;
 
-	private Object lastExpression = "";
-
 	private String lastNewItem;
 
 	public SearchBox(QuerySearchHandler searchHandler) {
@@ -121,12 +119,11 @@ public class SearchBox extends ComboBox {
 
 	@Override
 	public void changeVariables(Object source, Map<String, Object> variables) {
-		handleChangedFilterString(variables);
+		handleChangedFilterString((String) variables.get("filter"));
 		super.changeVariables(source, variables);
 	}
 
-	private void handleChangedFilterString(Map<String, Object> variables) {
-		String newFilterString = (String) variables.get("filter");
+	private void handleChangedFilterString(String newFilterString) {
 		if (newFilterString != null) {
 			previousFilterString = caseSensitiveFilterstring;
 			caseSensitiveFilterstring = newFilterString;
@@ -171,12 +168,13 @@ public class SearchBox extends ComboBox {
 
 	private void handleValueChange(
 			com.vaadin.data.Property.ValueChangeEvent event) {
-		continueEditing();
 
 		String expression = (String) event.getProperty().getValue();
 		if (expression == null) {
 			expression = "";
 		}
+		continueEditing();
+
 		boolean isItemFromOptions = !expression.equals(lastNewItem);
 		search(expression, isItemFromOptions);
 	}

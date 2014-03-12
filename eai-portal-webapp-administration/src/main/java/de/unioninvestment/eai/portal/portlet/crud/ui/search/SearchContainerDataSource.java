@@ -105,7 +105,7 @@ class SearchContainerDataSource extends
 		updateOptions(((SimpleStringFilter) filter).getFilterString());
 	}
 
-	private void updateOptions(String filterString) {
+	public void updateOptions(String filterString) {
 		Collection<String> newOptions = handler.getOptions(filterString);
 		if (!options.equals(newOptions)) {
 			options = newOptions;

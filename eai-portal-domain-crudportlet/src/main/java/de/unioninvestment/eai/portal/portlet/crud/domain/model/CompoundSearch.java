@@ -20,6 +20,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.sort;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -27,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,8 +37,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -44,7 +44,6 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -54,7 +53,6 @@ import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.vaadin.data.util.converter.Converter.ConversionException;
 
@@ -102,6 +100,8 @@ public class CompoundSearch extends Panel {
 
 	protected EventRouter<CompoundQueryChangedEventHandler, CompoundQueryChangedEvent> eventRouter = new EventRouter<CompoundQueryChangedEventHandler, CompoundQueryChangedEvent>();
 
+	private TableColumns searchableColumns;
+
 	public CompoundSearch(CompoundSearchConfig config) {
 		super(notNullDetails(config));
 		this.config = config;
@@ -120,43 +120,36 @@ public class CompoundSearch extends Panel {
 	/**
 	 * @return searchable Columns sorted by name
 	 */
-	public Map<String, TableColumn> getSearchableColumns() {
-		TreeMap<String, TableColumn> searchableColumns = new TreeMap<String, TableColumn>();
-		for (Table table : getTables()) {
-			if (table.getColumns() != null) {
-				for (TableColumn column : table.getColumns()) {
-					if (column.getSearchable() == Searchable.DEFAULT
-							|| !searchableColumns.containsKey(column.getName())) {
-						searchableColumns.put(column.getName(), column);
+	public TableColumns getSearchableColumns() {
+		if (searchableColumns == null) {
+			final HashMap<String, TableColumn> unorderedColumns = new HashMap<String, TableColumn>();
+			for (Table table : getTables()) {
+				if (table.getColumns() != null) {
+					for (TableColumn column : table.getColumns()) {
+						if (column.getSearchable() == Searchable.DEFAULT
+								|| !unorderedColumns.containsKey(column
+										.getName())) {
+							unorderedColumns.put(column.getName(), column);
+						}
 					}
 				}
 			}
+			ArrayList<TableColumn> listOfColumns = new ArrayList<TableColumn>(
+					unorderedColumns.values());
+			sort(listOfColumns, new Comparator<TableColumn>() {
+				@Override
+				public int compare(TableColumn o1, TableColumn o2) {
+					if (!o1.getSearchable().equals(o2.getSearchable())) {
+						return o1.getSearchable().equals(Searchable.DEFAULT) ? -1
+								: 1;
+					} else {
+						return o1.getName().compareTo(o2.getName());
+					}
+				}
+			});
+			searchableColumns = new TableColumns(listOfColumns);
 		}
 		return searchableColumns;
-	}
-
-	/**
-	 * @return all field names that can be used inside lucene queries
-	 */
-	public Collection<String> getSearchableFields() {
-		TreeSet<String> searchableFields = new TreeSet<String>();
-		for (Table table : getTables()) {
-			searchableFields.addAll(table.getColumns()
-					.getSearchableColumnNames());
-		}
-		return searchableFields;
-	}
-
-	/**
-	 * @return field names that are searched by default if not named explicitly
-	 */
-	public Collection<String> getDefaultFields() {
-		TreeSet<String> defaultFields = new TreeSet<String>();
-		for (Table table : getTables()) {
-			defaultFields.addAll(table.getColumns()
-					.getDefaultSearchableColumnNames());
-		}
-		return defaultFields;
 	}
 
 	Filter getFiltersForTable(Table table, Query query) {
@@ -166,11 +159,8 @@ public class CompoundSearch extends Panel {
 			return convertTermQuery(table, (TermQuery) query);
 		} else if (query instanceof PrefixQuery) {
 			return convertPrefixQuery(table, (PrefixQuery) query);
-
 		} else if (query instanceof WildcardQuery) {
 			return convertWildcardQuery(table, (WildcardQuery) query);
-		} else if (query instanceof PhraseQuery) {
-			return convertPhraseQuery(table, (PhraseQuery) query);
 		} else if (query instanceof TermRangeQuery) {
 			return convertTermRangeQuery(table, (TermRangeQuery) query);
 		}
@@ -266,6 +256,15 @@ public class CompoundSearch extends Panel {
 			return null;
 		}
 		String text = term.text();
+		boolean selection = getSearchableColumns().isSelection(columnName);
+		if (selection) {
+			text = getFieldOptionKey(columnName, text);
+			if (text == null) {
+				throw new BusinessException(
+						"portlet.crud.error.compoundsearch.invalidSelection",
+						columnName, term.text());
+			}
+		}
 		if (Number.class.isAssignableFrom(columnType)) {
 			Number numberValue = convertTextToNumber(table, columnName,
 					columnType, text);
@@ -281,6 +280,9 @@ public class CompoundSearch extends Panel {
 					upperDate, columnType), false);
 			return new All(asList(lowerFilter, upperFilter));
 		} else {
+			if (selection) {
+				return new Equal(columnName, text);
+			}
 			if (text.equals("*")) {
 				return new Not(asList((Filter) new IsNull(columnName)));
 			} else if (hasWildcards(text)) {
@@ -289,6 +291,11 @@ public class CompoundSearch extends Panel {
 				return new StartsWith(columnName, text, false);
 			}
 		}
+	}
+
+	private String getFieldOptionKey(String columnName, String title) {
+		return getSearchableColumns().getDropdownSelections(columnName).getKey(
+				title, null);
 	}
 
 	private Number convertTextToNumber(Table table, String columnName,
@@ -369,22 +376,6 @@ public class CompoundSearch extends Panel {
 			}
 		}
 		return true;
-	}
-
-	private Filter convertPhraseQuery(Table table, PhraseQuery query) {
-		PhraseQuery phraseQuery = (PhraseQuery) query;
-		Term[] terms = phraseQuery.getTerms();
-		String columnName = terms[0].field();
-		if (table.getContainer().getType(columnName) == null) {
-			return null;
-		}
-		String[] parts = new String[terms.length];
-		int[] positions = phraseQuery.getPositions();
-		for (int i = 0; i < terms.length; i++) {
-			parts[positions[i]] = terms[i].text();
-		}
-		String phrase = Joiner.on(' ').join(parts);
-		return new StartsWith(columnName, phrase, false);
 	}
 
 	private boolean hasWildcards(String text) {
@@ -509,7 +500,8 @@ public class CompoundSearch extends Panel {
 			return null;
 		}
 
-		Collection<String> defaultFields = getDefaultFields();
+		Collection<String> defaultFields = getSearchableColumns()
+				.getDefaultSearchableColumnNames();
 		String[] defaultFieldsArray = defaultFields
 				.toArray(new String[defaultFields.size()]);
 
@@ -524,4 +516,10 @@ public class CompoundSearch extends Panel {
 					queryString);
 		}
 	}
+
+	public boolean isDefault(String name) {
+		TableColumn column = getSearchableColumns().get(name);
+		return column != null && column.getSearchable() == Searchable.DEFAULT;
+	}
+
 }

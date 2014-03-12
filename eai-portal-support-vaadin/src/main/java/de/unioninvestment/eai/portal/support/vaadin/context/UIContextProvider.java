@@ -54,13 +54,23 @@ public class UIContextProvider implements ContextProvider {
 	 * @return die Übersetzung gemäß der aktuellen Locale-Konfiguration
 	 */
 	public String getMessage(String key, Object... args) {
-		MessageSource messageSource = getBean(MessageSource.class);
-		if (messageSource != null) {
-			return messageSource.getMessage(key, args, getLocale());
-		} else {
-			return "#" + key
-					+ (args == null || args.length == 0 ? "" : asList(args));
+		try {
+
+			MessageSource messageSource = getBean(MessageSource.class);
+			if (messageSource != null) {
+				return messageSource.getMessage(key, args, getLocale());
+			} else {
+				return rawMessage(key, args);
+			}
+		} catch (IllegalStateException e) {
+			return rawMessage(key, args);
 		}
+	}
+
+	private String rawMessage(String key, Object... args) {
+		return "#"
+				+ key
+				+ (args == null || args.length == 0 ? "" : asList(args));
 	}
 
 	@Override

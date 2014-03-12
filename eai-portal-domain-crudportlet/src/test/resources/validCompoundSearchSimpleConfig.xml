@@ -2,7 +2,7 @@
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
 	title="Compound Search Beispiel">
 	<page>
-		<compound-search id="cs"/>
+		<compound-search id="cs" />
 		<table id="table" sortable="true">
 			<database-query datasource="test">
 				<query><![CDATA[
@@ -15,14 +15,26 @@
 				<column name="CDATE" editable="false" />
 				<column name="CTIMESTAMP" />
 				<column name="CVARCHAR5_NN" editable="true"
-					longtitle="CVARCHAR5 (Pflichtfeld)" searchable="default" />
+					longtitle="CVARCHAR5 (Pflichtfeld)" searchable="default">
+					<select>
+						<query><![CDATA[
+							select distinct CVARCHAR5_NN as key,CVARCHAR5_NN as title from TEST_CRUD2
+						]]></query>
+					</select>
+				</column>
 				<column name="CNUMBER5_2_NN" editable="true" />
 				<column name="CDATE_NN" editable="true" />
 				<column name="CTIMESTAMP_NN" hidden="true" />
 				<column name="TESTDATA" editable="true" width="300"
-					validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt" />
+					validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt">
+					<select>
+						<query><![CDATA[
+							select distinct TESTDATA as key,TESTDATA as title from TEST_CRUD2
+						]]></query>
+					</select>
+				</column>
 			</columns>
-			<action title="ChangeSearchTerm" onExecution="portlet.elements.cs.search('Te3')"/>
+			<action title="ChangeSearchTerm" onExecution="portlet.elements.cs.search('Te3')" />
 		</table>
 	</page>
 </portlet>

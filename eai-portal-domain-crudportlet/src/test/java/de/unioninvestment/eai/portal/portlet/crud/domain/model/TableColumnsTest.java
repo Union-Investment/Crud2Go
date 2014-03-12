@@ -19,19 +19,24 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -54,10 +59,18 @@ public class TableColumnsTest {
 	private OptionList optionList;
 	private SelectionTableColumn column7;
 
+	@Mock
+	private Table tableMock;
+	@Mock
+	private DataContainer containerMock;
+	private Map<String, String> options;
+
 	@Before
 	public void setUp() {
-		optionList = new StaticOptionList(Collections.singletonMap("key1",
-				"value1"));
+		MockitoAnnotations.initMocks(this);
+		options = ImmutableMap.of("key1",
+				"value1", "key2", "value2");
+		optionList = new StaticOptionList(options);
 
 		column1 = new TableColumn.Builder() //
 				.name("name1") //
@@ -132,6 +145,8 @@ public class TableColumnsTest {
 		columnsList = asList(column1, column2, column3, column4, column5,
 				column6, column7);
 		tableColumns = new TableColumns(columnsList);
+
+		when(tableMock.getContainer()).thenReturn(containerMock);
 	}
 
 	@Test
@@ -314,5 +329,41 @@ public class TableColumnsTest {
 	public void shouldTellIfColumnExists() {
 		assertThat(tableColumns.contains("name1"), is(true));
 		assertThat(tableColumns.contains("unknown"), is(false));
+	}
+	
+	@Test
+	public void shouldSetTableOnColumns() {
+		tableColumns.setTable(tableMock);
+		assertThat(column1.getTable(), is(tableMock));
+	}
+	
+	@Test
+	public void shouldReturnSize() {
+		assertThat(tableColumns.size(), is(7));
+	}
+	
+	@Test
+	public void shouldReturnColumnTypeByName() {
+		tableColumns.setTable(tableMock);
+		doReturn(String.class).when(containerMock).getType("name1");
+		assertThat(tableColumns.getType("name1"), equalTo((Class)String.class));
+	}
+	
+	@Test
+	public void shouldReturnFilteredDropdownSelectionsByPrefix() {
+		assertThat(tableColumns.getDropdownSelections("name2", "va", 100), 
+				equalTo(options));
+	}
+	
+	@Test
+	public void shouldReturnFilteredDropdownSelectionsBelowLimit() {
+		assertThat(tableColumns.getDropdownSelections("name2", null, 1), 
+				equalTo(singletonMap("key1", "value1")));
+	}
+	
+	@Test
+	public void shouldReturnFilteredDropdownSelection() {
+		assertThat(tableColumns.getDropdownSelections("name2", "value2", 0), 
+				equalTo(singletonMap("key2", "value2")));
 	}
 }

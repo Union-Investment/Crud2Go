@@ -20,12 +20,12 @@
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
 import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
-import static java.util.Collections.sort;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedList;
 
+import com.google.gwt.thirdparty.guava.common.base.Joiner;
+import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -40,8 +40,12 @@ import com.vaadin.ui.Table.CellStyleGenerator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxTableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateTableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.ui.search.SearchBox;
 import de.unioninvestment.eai.portal.portlet.crud.ui.search.SearchBox.QuerySearchHandler;
 import de.unioninvestment.eai.portal.portlet.crud.ui.search.SearchOptionsHandler;
@@ -63,6 +67,7 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 	private Button detailSwitch;
 
 	private boolean collapsed = true;
+	private TableColumns fields;
 
 	@Override
 	public void setPresenter(CompoundSearchView.Presenter presenter) {
@@ -70,12 +75,14 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 	}
 
 	@Override
-	public void initialize(Collection<String> searchableFields) {
+	public void initialize(TableColumns fields) {
+		this.fields = fields;
 		searchBox = new SearchBox(this);
 		searchBox.setWidth("100%");
-		searchBox.setOptionHandler(new SearchOptionsHandler(searchableFields));
+		searchBox.setOptionHandler(new SearchOptionsHandler(fields));
 		searchBox.focus();
-		searchBox.setInputPrompt(getMessage("portlet.crud.compoundsearch.inputPrompt"));
+		searchBox
+				.setInputPrompt(getMessage("portlet.crud.compoundsearch.inputPrompt"));
 
 		PopupView infoButton = new PopupView(new Content() {
 			@Override
@@ -101,8 +108,7 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 	}
 
 	protected Component createSearchInfo() {
-		ArrayList<TableColumn> columns = getOrderedColumnInfo();
-		Table table = createColumnInfoTable(columns);
+		Table table = createColumnInfoTable();
 
 		Label syntaxReference = new Label(
 				getMessage("portlet.crud.compoundsearch.syntaxReference"),
@@ -110,25 +116,26 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 
 		VerticalLayout boxLayout = new VerticalLayout(table, syntaxReference);
 		boxLayout.addStyleName("compsearchinfo");
-		boxLayout.setWidth("300px");
+		boxLayout.setWidth("350px");
 		boxLayout.setSpacing(true);
 
 		return boxLayout;
 	}
 
-	private Table createColumnInfoTable(ArrayList<TableColumn> columns) {
+	private Table createColumnInfoTable() {
 		Table table = new Table();
 		table.setWidth("100%");
 		table.setSortEnabled(false);
 		table.addContainerProperty("field", String.class, null);
 		table.addContainerProperty("title", String.class, null);
+		table.addContainerProperty("description", String.class, null);
 		table.addContainerProperty("default", Boolean.class, null);
 		table.setColumnHeader("field",
 				getMessage("portlet.crud.compoundsearch.field"));
 		table.setColumnHeader("title",
 				getMessage("portlet.crud.compoundsearch.title"));
 
-		table.setPageLength(columns.size() < 20 ? columns.size() : PAGE_SIZE);
+		table.setPageLength(fields.size() < 20 ? fields.size() : PAGE_SIZE);
 		table.setCellStyleGenerator(new CellStyleGenerator() {
 			@Override
 			public String getStyle(Table source, Object itemId,
@@ -143,34 +150,38 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 			}
 		});
 
-		for (TableColumn column : columns) {
+		for (TableColumn column : fields) {
 			table.addItem(new Object[] { //
 					column.getName(), //
 							column.getTitle(), //
+							createColumnDescription(column), //
 							column.getSearchable() == Searchable.DEFAULT }, //
 					column.getName());
 		}
 
-		table.setVisibleColumns("field", "title");
+		table.setVisibleColumns("field", "title", "description");
 		return table;
 	}
 
-	private ArrayList<TableColumn> getOrderedColumnInfo() {
-		Collection<TableColumn> searchableColumns = presenter
-				.getSearchableColumns();
-		ArrayList<TableColumn> list = new ArrayList<TableColumn>(
-				searchableColumns);
-		sort(list, new Comparator<TableColumn>() {
-			@Override
-			public int compare(TableColumn o1, TableColumn o2) {
-				if (o1.getSearchable() != o2.getSearchable()) {
-					return o1.getSearchable() == Searchable.DEFAULT ? -1 : 1;
-				} else {
-					return o1.getName().compareTo(o2.getName());
-				}
-			}
-		});
-		return list;
+	private String createColumnDescription(TableColumn column) {
+		LinkedList<String> results = Lists.newLinkedList();
+		if (column instanceof SelectionTableColumn) {
+			results.add(getMessage("portlet.crud.compoundsearch.selection"));
+		} else if (column instanceof CheckBoxTableColumn) {
+			CheckBoxTableColumn checkbox = (CheckBoxTableColumn) column;
+			results.add(checkbox.getCheckedValue() + "/"
+					+ checkbox.getUncheckedValue());
+		} else if (column instanceof DateTableColumn) {
+			results.add(getMessage("portlet.crud.compoundsearch.date"));
+		} else if (Number.class.isAssignableFrom(column.getType())) {
+			results.add(getMessage("portlet.crud.compoundsearch.numeric"));
+		} else if (Date.class.isAssignableFrom(column.getType())) {
+			results.add(getMessage("portlet.crud.compoundsearch.date"));
+		}
+		if (column.getSearchable() == Searchable.DEFAULT) {
+			results.add(getMessage("portlet.crud.compoundsearch.default"));
+		}
+		return Joiner.on(", ").join(results);
 	}
 
 	@Override
