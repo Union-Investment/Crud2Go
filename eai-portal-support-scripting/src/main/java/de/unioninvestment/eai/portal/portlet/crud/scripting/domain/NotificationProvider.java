@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.domain;
 
 import groovy.lang.Closure;
 
+import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
 
 /**
@@ -90,8 +91,10 @@ public class NotificationProvider extends Closure<String> {
 			Notification.show(Type.WARNING.value, description,
 					Notification.Type.WARNING_MESSAGE);
 		} else {
-			Notification.show(Type.INFO.value, description,
+			Notification notification = new Notification(Type.INFO.value, description,
 					Notification.Type.HUMANIZED_MESSAGE);
+			notification.setDelayMsec(1500);
+			notification.show(Page.getCurrent());
 		}
 	}
 }

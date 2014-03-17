@@ -116,7 +116,7 @@ Sichtbarkeit der Spalte im Edit-Modus
 	dann wird die Spalte 'NAME' nicht angezeigt
 
 
-Breite einer Spalten
+Breite einer Spalte
 	[Tags]  EAI_13  
 
 	Es existieren 2 Zeilen Testdaten
@@ -127,7 +127,7 @@ Breite einer Spalten
 	und dann hat die Spalte '3' die Breite 'width: 224px;'
 
 
-14. Höhe einer Spalten
+Hoehe einer Spalte
 	[Tags]  EAI_13
 
 	Es existieren 2 Zeilen Testdaten

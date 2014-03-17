@@ -1,0 +1,53 @@
+*** Settings ***
+Documentation   Story EAI-725: Als Entwickler möchte ich eine Default-Sortierung für Tabellen konfigurieren können, 
+...				die durch den Anwender dann geändert werden kann.
+
+*** Test Case ***
+
+Tabelle laden und Reihenfolge der Zeilen gemäss Default-Sortierung prüfen
+	[Tags]  EAI-725  
+	[Documentation]  Testen ob die Reihenfolge von aus einer Tabelle geladene Zeilen der Default-Sortierung entsprechen. 
+	...				 Die Tabelle in der Beispiel-Konfiguration sortiert zuerst nach der Spalte Zahl (absteigend), dann 
+	...				 nach der Spalte CVARCHAR5_NN (aufsteigend).
+	
+	Es existieren Testdaten für die Default-Sortierung in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'DEFAULT_ORDER.xml'
+	
+	dann steht in der '1'. Zeile und '1'. Spalte der Wert '11'
+	dann steht in der '1'. Zeile und '2'. Spalte der Wert '15'
+	dann steht in der '1'. Zeile und '5'. Spalte der Wert 'A'
+	
+	dann steht in der '2'. Zeile und '1'. Spalte der Wert '13'
+	dann steht in der '2'. Zeile und '2'. Spalte der Wert '15'
+	dann steht in der '2'. Zeile und '5'. Spalte der Wert 'B'
+	
+	dann steht in der '3'. Zeile und '1'. Spalte der Wert '12'
+	dann steht in der '3'. Zeile und '2'. Spalte der Wert '15'
+	dann steht in der '3'. Zeile und '5'. Spalte der Wert 'C'
+	
+	dann steht in der '4'. Zeile und '1'. Spalte der Wert '14'
+	dann steht in der '4'. Zeile und '2'. Spalte der Wert '14'
+	dann steht in der '4'. Zeile und '5'. Spalte der Wert 'TEST'
+
+Tabelle mit GenericBackend laden und Reihenfolge der Zeilen gemäss Default-Sortierung prüfen
+	[Tags]  EAI-725  
+	[Documentation]  Testet ob die Default-Reihenfolge bei einem generischen Backend korrekt ist.
+
+	Es existieren Testdaten für die Default-Sortierung in TEST_CRUD2
+	und außerdem ein Portlet mit der XML-Konfiguration 'DEFAULT_ORDER_GENERIC_CONTAINER.xml'
+	
+	dann steht in der '1'. Zeile und '2'. Spalte der Wert '5'
+	dann steht in der '1'. Zeile und '5'. Spalte der Wert 'Testdata 1'
+	
+	dann steht in der '2'. Zeile und '2'. Spalte der Wert '5'
+	dann steht in der '2'. Zeile und '5'. Spalte der Wert 'Testdata 2'
+	
+	dann steht in der '3'. Zeile und '2'. Spalte der Wert '4'
+	dann steht in der '3'. Zeile und '5'. Spalte der Wert 'Testdata 1'
+	
+	dann steht in der '4'. Zeile und '2'. Spalte der Wert '4'
+	dann steht in der '4'. Zeile und '5'. Spalte der Wert 'Testdata 2'
+	
+*** Settings ***
+Force Tags      autor-bsp  default-sortierung
+Resource        ${RESOURCES}/import/CrudPortlet.txt

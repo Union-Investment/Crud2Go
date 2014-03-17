@@ -21,7 +21,7 @@ Infomeldung anzeigen
 	Es existiert ein Portlet mit der XML-Konfiguration 'NOTIFICATION_SUPPORT.xml'
 	
 	Wenn der Button 'Info' geklickt wird	
-	dann wird eine Tray-Benachrichtigung mit dem Text 'Dies ist eine Info!' angezeigt
+	dann wird eine Info mit dem Text 'Dies ist eine Info!' angezeigt
 	
 *** Settings ***
 Resource        ${RESOURCES}/import/CrudPortlet.txt

@@ -145,10 +145,12 @@ Tabelle auf ${USERNAME} und ${WERT} filtert
 	Click Element   css=div.v-app-CrudPortletApplication  don't wait
 	
 die Tabelle auf ${WERT} filtert
+	Wait for AJAX calls to complete	
 	Input Text  css=input.v-textfield  ${WERT}
 	auf suchen klickt
 
 die Tabelle ohne Suchbutton auf ${WERT} filtert
+	Wait for AJAX calls to complete	
 	Button 'search' is nicht vorhanden
 	Input Text  css=input.v-textfield  ${WERT}
 	Vaadin Press Enter
@@ -242,7 +244,7 @@ wird die ${zeile}. Zeile der Tabelle im Formularmodus angezeigt
 	Vaadin Double Click  css=tr:nth-child(${trNum}) td:nth-child(1)
 	
 mit der Maus im Formular auf den Titel des Feldes '${feld}' gefahren wird 
-	Call Selenium Api  mouseOver  xpath=//tr//td[contains(.,"${feld}")]//div//span
+	Call Selenium Api  mouseOver  xpath=//div[contains(@class, 'v-caption')]//span[contains(text(),"${feld}")]
 	Sleep  2s
 
 	
@@ -310,7 +312,7 @@ Button '${TEXT}' is nicht vorhanden
 	Page Should Not Contain  ${TEXT}
 	
 ist der Button '${TEXT}' vorhanden
-	Page Should Contain Element  xpath=//span[@class="v-button-caption" and text() = "${TEXT}"]
+	Wait until page contains element  xpath=//span[@class="v-button-caption" and text() = "${TEXT}"]
 
 ist der Button '${TEXT}' nicht vorhanden
 	Page Should Not Contain Element  xpath=//span[@class="v-button-caption" and text() = "${TEXT}"]
@@ -332,16 +334,16 @@ wird der Text '${TEXT}' angezeigt
 	Wait Until Page Contains  ${TEXT}
 	
 wird eine Fehlermeldung mit dem Text '${TEXT}' angezeigt
-	${var}  Get Text  xpath=//div[@class="v-Notification error v-Notification-error"]//p
-	Should Be True  '${var}'=='${TEXT}'
+	Wait for element containing text  xpath=//div[contains(@class,"v-Notification-error")]//p  ${TEXT}
 
 wird eine Warnung mit dem Text '${TEXT}' angezeigt
-	${var}  Get Text  xpath=//div[@class="v-Notification warning v-Notification-warning"]//p
-	Should Be True  '${var}'=='${TEXT}'
+	Wait for element containing text  xpath=//div[contains(@class,"v-Notification-warning")]//p  ${TEXT}
+	
+wird eine Info mit dem Text '${TEXT}' angezeigt
+	Wait for element containing text  xpath=//div[contains(@class,"v-Notification")]//p  ${TEXT}
 	
 wird eine Tray-Benachrichtigung mit dem Text '${TEXT}' angezeigt
-	${var}  Get Text  xpath=//div[@class="v-Notification tray v-Notification-tray"]//p
-	Should Be True  '${var}'=='${TEXT}'
+	Wait for element containing text  xpath=//div[contains(@class,"v-Notification-tray")]//p  ${TEXT}
 		
 wird der Text '${TEXT}' nicht angezeigt
 	Wait Until Keyword Succeeds  10s  1s  Page Should Not Contain  ${TEXT}
@@ -350,8 +352,7 @@ wird die Spalte '${TEXT}' angezeigt
 	Wait until page contains  ${TEXT}  10s
 	
 Spalte '${SPALTE}' den Wert '${TEXT}'
-	${var} =  Get Text  css=div.v-table-crudViewMode table tr td:nth-child(${SPALTE})
-	Should Be True  '${var}'=='${TEXT}'
+	Wait for element containing text  css=div.v-table-crudViewMode table tr td:nth-child(${SPALTE})  ${TEXT}
 	
 hat die Spalte '${SPALTE}' in der Zeile '${ZEILE}' den Wert '${TEXT}'
 	Wait for AJAX calls to complete	
@@ -373,16 +374,14 @@ hat in der Formedit-Tabelle mit dem HTMLelement '${HTML}' und der Methode Text d
 	Should Be True  '${var}'=='${WERT}'
 	
 hat die Spalte '${SPALTE}' die Breite '${WERT}'
-	${var}  Get Element Attribute  xpath=//table[@class="v-table-table"]//tr[1]//td[${SPALTE}]@style
-	Should Be True  '${var}'=='${WERT}'
+	Wait until page contains element  xpath=//table[@class="v-table-table"]//tr[1]//td[${SPALTE}]//div[contains(@class,'v-table-cell-wrapper') and contains(@style,'${WERT}')]
 
 hat die Tabellenzeile die Höhe ${WERT} Pixel
-	JavaScript Attribute should have value  xpath=//table[@class="v-table-table"]//tr//td[1]  offsetHeight  ${WERT}
+	Wait until page contains element  xpath=//table[contains(@class,"v-table-table")]//tr//td[1]
+	JavaScript Attribute should have value  xpath=//table[contains(@class,"v-table-table")]//tr//td[1]  offsetHeight  ${WERT}
 
 hat die Spalte '${SPALTE}' den Titel '${WERT}'
-	Page Should Contain Element  xpath=//div[@class="v-table-header"]//table//tr[1]//td[${SPALTE}]
-	${var} =  Get Text  xpath=//div[@class="v-table-header"]//table//tr[1]//td[${SPALTE}]
-	Should Be True  '${var}'=='${WERT}'
+	Wait for Element with text  xpath=//div[contains(@class,"v-table-header")]//tr//td[${SPALTE}]  ${WERT}
 
 eine neue Zeile einfügt und den Editieren Modus verlässt
 	eine neue Zeile einfügen aufruft
@@ -404,8 +403,8 @@ in der '${ZEILE}'. Zeile und '${SPALTE}'. Spalte den Wert '${WERT}' auswählt
 	Vaadin Click  xpath=//td[contains(@class,"gwt-MenuItem") and contains(.,"${WERT}")]
 
 steht in der '${ZEILE}'. Zeile und '${SPALTE}'. Spalte der Wert '${TEXT}'
-	${var} =  Get Text  xpath=//table[contains(@class,"v-table-table")]//tr[${ZEILE}]//td[${SPALTE}]//div
-	Should Be True  '${var}'=='${TEXT}'	
+	Wait for AJAX calls to complete	
+	Element Text Should Be  xpath=//table[contains(@class,"v-table-table")]//tr[${ZEILE}]//td[${SPALTE}]//div  ${TEXT}
 
 steht in der Eingabefeld der '${ZEILE}'. Zeile und '${SPALTE}'. Spalte der Wert '${TEXT}'
 	Call Selenium Api  assertValue  css=table.v-table-table tr:nth-child(${ZEILE}) td:nth-child(${SPALTE}) input  ${TEXT}
@@ -452,16 +451,16 @@ existiert die Spalte '${NAME}' nicht
 	Page Should Not Contain Element  css=div.v-table-header tr td:contains("${NAME}")
 
 erscheint ein Dialog mit Titel '${title}', Meldung '${message}' und den Buttons '${accept}' und '${decline}'
-	Page Should Contain Element  css=div.popupContent div.v-window-header:contains("${title}")
-	Page Should Contain Element  css=div.popupContent div.v-label:contains("${message}")
-	Page Should Contain Element  css=div.popupContent span.v-button-caption:contains("${accept}")
-	Page Should Contain Element  css=div.popupContent span.v-button-caption:contains("${decline}")
+	Wait until page contains element  css=div.popupContent div.v-window-header:contains("${title}")
+	Wait until page contains element  css=div.popupContent div.v-label:contains("${message}")
+	Wait until page contains element  css=div.popupContent span.v-button-caption:contains("${accept}")
+	Wait until page contains element  css=div.popupContent span.v-button-caption:contains("${decline}")
 	
 erscheint ein Dialog mit dem Text '${message}'
-	Page Should Contain Element  css=div.popupContent div.v-label:contains("${message}")
+	Wait until page contains element  css=div.popupContent div.v-label:contains("${message}")
 
 erscheint der Tooltip '${tooltip}'
-	Page Should Contain Element  css=tr:nth-child(1) td:nth-child(${spalte}) span[title="${tooltip}"]
+	Wait until page contains element  css=.v-table-header-cell span[title="${tooltip}"]
 
 erscheint der Vaadin Tooltip '${tooltip}'
 	Element Should Be Visible  xpath=//div[@class="v-tooltip-text" and contains(text(), "${tooltip}")]
