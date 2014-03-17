@@ -36,6 +36,9 @@ Testdaten in TEST_BLOB
 	Initialisiere TEST_BLOB Tabelle
 	Execute SQL  INSERT INTO TEST_BLOB VALUES (1, 'Datei1', RAWTOHEX('Inhalt von Datei1'))
 	
+keine Testdaten in TEST_CRUD2
+	Execute SQL  TRUNCATE TABLE TEST_CRUD2
+
 Testdaten in TEST_CRUD2
 	Initialisiere TEST_CRUD2 Tabelle
 	Execute SQL  INSERT INTO TEST_CRUD2 VALUES (1,1,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'TEST1',15,to_date('01.01.10','DD.MM.RR'),to_timestamp('01.01.10 00:00:00,000000000','DD.MM.RR HH24:MI:SS,FF'),'Dies ist ein sehr langer Text')
@@ -383,10 +386,6 @@ hat die Tabellenzeile die Höhe ${WERT} Pixel
 hat die Spalte '${SPALTE}' den Titel '${WERT}'
 	Wait for Element with text  xpath=//div[contains(@class,"v-table-header")]//tr//td[${SPALTE}]  ${WERT}
 
-eine neue Zeile einfügt und den Editieren Modus verlässt
-	eine neue Zeile einfügen aufruft
-  	den Editier-Modus verlässt
-  
 eine neue Zeile einfügen aufruft  
  	auf editieren klickt
   	auf Neue Zeile klickt
