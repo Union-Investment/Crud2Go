@@ -29,7 +29,7 @@ die Konfigurationansicht öffnet
 ##########################
 
 enthält die Seite den Text '${text}'
-	Page Should Contain  ${text}
+	Wait until page contains  ${text}
 
 
 ##########################

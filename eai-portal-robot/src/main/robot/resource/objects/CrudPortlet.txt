@@ -291,7 +291,7 @@ wird '${INHALT}' angezeigt
 	Wait until page contains  ${INHALT}  10s
 
 wird das Bild '${ADRESSE}' angezeigt
-	Page Should Contain Element  xpath=//img[@src="${ADRESSE}"]
+	Wait until page contains element  xpath=//img[contains(@src,"${ADRESSE}"]
 
 wird die Meldung '${meldung}' angezeigt
 	Wait until page contains  ${meldung}  20s
