@@ -35,6 +35,8 @@ import org.springframework.web.portlet.context.PortletApplicationContextUtils;
 import com.vaadin.server.VaadinPortletService;
 import com.vaadin.ui.UI;
 
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+
 /**
  * Thread-safe {@link ContextProvider} that fetches the ApplicationContext from
  * the current PortletReq.
@@ -68,6 +70,11 @@ public class UIContextProvider implements ContextProvider {
 		return UI.getCurrent().getLocale();
 	}
 
+	@Override
+	public long getLiferayCommunityId() {
+		return LiferayUI.getCurrent().getCommunityId();
+	}
+	
 	/**
 	 * @param requiredType
 	 *            der benötigte Typ eines Beans
