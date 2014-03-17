@@ -46,6 +46,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -57,9 +58,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.OptionListChange
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.QueryOptionListRepository;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
-public class QueryOptionListTest {
+@ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
+public class QueryOptionListTest extends AbstractSpringPortletContextTest {
 
 	private OptionList selection;
 
@@ -117,6 +120,7 @@ public class QueryOptionListTest {
 		assertThat(it.hasNext(), is(false));
 	}
 
+	@SuppressWarnings("serial")
 	private QueryOptionList createDefaultQueryOptionList() {
 		return new QueryOptionList(config, eventBusMock, repositoryMock, "ds",
 				executorMock, false);
@@ -257,7 +261,7 @@ public class QueryOptionListTest {
 	public void shoudRefreshFromDatabaseByDefault() {
 		Map<String, String> options = new HashMap<String, String>();
 		queryConfig.setCached(true);
-		
+
 		QueryOptionList queryOptionList = createDefaultQueryOptionList();
 		queryOptionList.setOptions(options);
 

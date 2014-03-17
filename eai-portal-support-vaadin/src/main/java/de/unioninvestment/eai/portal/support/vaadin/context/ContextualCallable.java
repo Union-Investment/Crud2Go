@@ -16,31 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.eai.portal.support.vaadin.junit;
+package de.unioninvestment.eai.portal.support.vaadin.context;
 
-import java.util.Locale;
+import java.util.concurrent.Callable;
 
-import org.junit.After;
-import org.junit.Before;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+/**
+ * Wrapper für Runnable, der einen Kontext setzt. Dies ist für asynchrone Verarbeitung notwendig.
+ *
+ * @author carsten.mjartan
+ */
+public abstract class ContextualCallable<T> implements Callable<T> {
 
-import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadContextProvider;
-import de.unioninvestment.eai.portal.support.vaadin.context.Context;
+	private ContextProvider provider;
 
-public abstract class AbstractSpringPortletContextTest extends
-		AbstractJUnit4SpringContextTests {
-
-	protected BackgroundThreadContextProvider contextProvider;
-
-	@Before
-	public void configurePortletUtils() {
-		contextProvider = new BackgroundThreadContextProvider(
-				applicationContext, Locale.GERMANY, 0L);
-		Context.setProvider(contextProvider);
+	public ContextualCallable(ContextProvider provider) {
+		this.provider = provider;
 	}
 
-	@After
-	public void resetAppCtx() {
-		Context.setProvider(null);
+	@Override
+	public T call() throws Exception {
+		ContextProvider oldProvider = Context.getProvider();
+		Context.setProvider(provider);
+		try {
+			return callWithContext();
+		} finally {
+			Context.setProvider(oldProvider);
+		}
 	}
+
+	abstract protected T callWithContext();
 }
