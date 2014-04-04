@@ -50,6 +50,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrud
  */
 public class JMXWrapper {
 	private static final String JBOSS_REMOTING_URL = "service:jmx:rmi:///jndi/jmxconnector";
+	private static final String JOLOKIA_REC = "jolokia";
 
 	@SuppressWarnings("rawtypes")
 	private Map connectionArgs;
@@ -119,7 +120,7 @@ public class JMXWrapper {
 	 *            {@code connectionString}. Dieser kann entweder im Format
 	 *            <code>"server:port"</code> oder
 	 *            <code>"service:jmx:rmi:///jndi/rmi://#/jmxconnector"</code>
-	 *            angegeben werden.
+	 *            oder <code>"http://server/jolokia"</code> angegeben werden.
 	 */
 	public void connect(String connectionString) {
 		init(connectionString);
@@ -131,7 +132,8 @@ public class JMXWrapper {
 			url = connectionString;
 			environment = null;
 
-			if (!connectionString.startsWith("service:jmx")) {
+			if (!connectionString.startsWith("service:jmx")
+					&& !connectionString.contains(JOLOKIA_REC)) {
 				url = JBOSS_REMOTING_URL;
 
 				environment = new HashMap<String, String>();
@@ -156,7 +158,9 @@ public class JMXWrapper {
 		if (connection == null) {
 			JMXConnector connector;
 
-			if (connectionArgs != null) {
+			if (url != null && url.contains(JOLOKIA_REC)) {
+				connector = JolokiaJMXConnectorFactory.connect(url);
+			} else if (connectionArgs != null) {
 				JmxBuilder jmxBuilder = new JmxBuilder();
 				connector = (JMXConnector) jmxBuilder.invokeMethod("client",
 						getConnectionArgs());
