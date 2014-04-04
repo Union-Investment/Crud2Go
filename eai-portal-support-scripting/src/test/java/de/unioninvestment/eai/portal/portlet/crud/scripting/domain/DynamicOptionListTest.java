@@ -145,5 +145,14 @@ public class DynamicOptionListTest {
 
 		assertThat(title, is("VALUE"));
 	}
+	
+	@Test
+	public void shouldGetKey() throws Exception {
+		letClosureReturn(Collections.singletonMap("KEY", "VALUE"));
+		
+		String key = selection.getKey("VALUE", context);
+		
+		assertThat(key, is("KEY"));
+	}
 
 }

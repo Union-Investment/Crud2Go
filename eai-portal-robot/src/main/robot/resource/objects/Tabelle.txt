@@ -40,7 +40,15 @@ die erste Tabellenzeile gelöscht wird
 im Editieren-Modus eine neue Zeile eingefügt wird
 	Switch To Table Edit Mode
 	Insert New Table Row
+	Wait for AJAX calls to complete
 
+der Editieren-Modus verlassen wird
+	Switch To Table View Mode
+	Wait for AJAX calls to complete
+
+im ${NTH}. Eingabefeld der Wert '${WERT}' eingetragen wird
+	Input Text  css=table.v-table-table input:nth-child(${NTH})  ${WERT}
+	Wait for AJAX calls to complete
 
 ##########################
 ###  Dann / Und es ... ###

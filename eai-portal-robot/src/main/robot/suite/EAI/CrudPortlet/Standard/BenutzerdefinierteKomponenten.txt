@@ -21,8 +21,8 @@ Benutzerdefinierte Bilder
 	
 	wenn das Portlet mit der XML-Konfiguration 'CUSTOM_COMPONENTS.xml' geladen ist
 	
-	dann wird das Bild 'http://www.google.de/logos/2011/noyce11-hp.jpg' angezeigt
-	und außerdem wird das Bild 'http://l.yimg.com/a/i/ww/met/logo/20100909/yahoo_logo_de.png' angezeigt
+	dann wird das Bild 'sofia/images/svg_link.png' angezeigt
+	und außerdem wird das Bild 'sofia/images/ok.gif' angezeigt
 
 
 Benutzerdefinierte Labels

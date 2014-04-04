@@ -20,6 +20,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -44,13 +46,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ContextConfiguration;
 
+import com.google.common.collect.ImmutableMap;
 import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
@@ -62,9 +67,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Wildcard;
 import de.unioninvestment.eai.portal.portlet.crud.domain.search.SearchableTablesFinder;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
-public class CompoundSearchTest {
+@ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
+public class CompoundSearchTest extends AbstractSpringPortletContextTest {
 
 	private CompoundSearch search;
 
@@ -85,6 +92,9 @@ public class CompoundSearchTest {
 	@Captor
 	private ArgumentCaptor<CompoundQueryChangedEvent> eventCaptor;
 
+	@Mock
+	private OptionList selectOptionsListMock, selectTextOptionsListMock;
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -92,10 +102,44 @@ public class CompoundSearchTest {
 
 		when(tableMock.getColumns()).thenReturn(columnsMock);
 		when(tableMock.getContainer()).thenReturn(containerMock);
+		TableColumn masterColumn = new TableColumn.Builder() //
+				.name("MASTER") //
+				.searchable(Searchable.DEFAULT) //
+				.build();
+		TableColumn secondColumn = new TableColumn.Builder() //
+				.name("SECOND") //
+				.searchable(Searchable.DEFAULT) //
+				.build();
+		TableColumn thirdColumn = new TableColumn.Builder() //
+				.name("THIRD") //
+				.searchable(Searchable.TRUE) //
+				.build();
+		TableColumn numericColumn = new TableColumn.Builder() //
+				.name("NUMERIC") //
+				.searchable(Searchable.TRUE) //
+				.build();
+		DateTableColumn timestampColumn = new DateTableColumn.Builder() //
+				.name("TIMESTAMP") //
+				.searchable(Searchable.TRUE) //
+				.build();
+		SelectionTableColumn selectColumn = new SelectionTableColumn.Builder() //
+				.name("SELECT") //
+				.searchable(Searchable.TRUE) //
+				.optionList(selectOptionsListMock) //
+				.build();
+		SelectionTableColumn selectTextColumn = new SelectionTableColumn.Builder() //
+				.name("SELECTTEXT") //
+				.searchable(Searchable.TRUE) //
+				.optionList(selectTextOptionsListMock) //
+				.build();
+		when(columnsMock.iterator()).thenReturn(
+				asList(masterColumn, secondColumn, thirdColumn, numericColumn,
+						timestampColumn, selectColumn, selectTextColumn)
+						.iterator());
 		doReturn(
 				asList("MASTER", "SECOND", "THIRD", "NUMERIC", "TIMESTAMP",
-						"NOTINTABLE")).when(columnsMock)
-				.getSearchableColumnNames();
+						"SELECT", "SELECTTEXT", "NOTINTABLE"))
+				.when(columnsMock).getSearchableColumnNames();
 		doReturn(asList("MASTER", "SECOND")).when(columnsMock)
 				.getDefaultSearchableColumnNames();
 
@@ -104,6 +148,27 @@ public class CompoundSearchTest {
 		doReturn(String.class).when(containerMock).getType("THIRD");
 		doReturn(BigDecimal.class).when(containerMock).getType("NUMERIC");
 		doReturn(Timestamp.class).when(containerMock).getType("TIMESTAMP");
+		doReturn(Integer.class).when(containerMock).getType("SELECT");
+		doReturn(String.class).when(containerMock).getType("SELECTTEXT");
+
+		when(columnsMock.contains("SELECT")).thenReturn(true);
+		when(columnsMock.isSelection("SELECT")).thenReturn(true);
+		when(columnsMock.getDropdownSelections("SELECT")).thenReturn(
+				selectOptionsListMock);
+		when(selectOptionsListMock.getOptions(null)).thenReturn(
+				ImmutableMap.of("1", "Option 1", "2", "Option 2", "3",
+						"Option 3"));
+		when(selectOptionsListMock.getKey("Option 3", null)).thenReturn("3");
+
+		when(columnsMock.contains("SELECTTEXT")).thenReturn(true);
+		when(columnsMock.isSelection("SELECTTEXT")).thenReturn(true);
+		when(columnsMock.getDropdownSelections("SELECTTEXT")).thenReturn(
+				selectTextOptionsListMock);
+		when(selectTextOptionsListMock.getOptions(null)).thenReturn(
+				ImmutableMap.of("Option 1", "Option 1", "Option 2", "Option 2",
+						"Option 3", "Option 3"));
+		when(selectTextOptionsListMock.getKey("Option 3", null)).thenReturn(
+				"Option 3");
 
 		search = new CompoundSearch(config);
 		search.searchableTablesFinder = searchableTablesFinderMock;
@@ -115,6 +180,14 @@ public class CompoundSearchTest {
 				.thenReturn((tables));
 
 		when(UI.getCurrent().getLocale()).thenReturn(Locale.GERMANY);
+	}
+
+	@Test
+	public void shouldDeliverSearchableColumnsInRightOrder() {
+		assertThat(
+				search.getSearchableColumns().getSearchableColumnNames(),
+				equalTo((Collection<String>)asList("MASTER", "SECOND", "NUMERIC", "SELECT", "SELECTTEXT",
+						"THIRD", "TIMESTAMP")));
 	}
 
 	/* Text fields */
@@ -154,6 +227,31 @@ public class CompoundSearchTest {
 				(Filter) new StartsWith("MASTER", "myterm", false),
 				new StartsWith("SECOND", "myterm", false))));
 		verifyReplaceFilters(filters);
+	}
+
+	@Test
+	public void shouldIgnoreInvalidPartsOfORQuery() throws ParseException {
+		search.search("MASTER:myterm OR NUMERIC:invalidNumber");
+		List<Filter> filters = filterList(new StartsWith("MASTER", "myterm",
+				false));
+		verifyReplaceFilters(filters);
+	}
+
+	@Test
+	public void shouldFailWithFirstMessageIfAllPartsOfORQueryAreInvalid()
+			throws ParseException {
+		try {
+			search.search("TIMESTAMP:invalidTimestamp OR NUMERIC:invalidNumber");
+			fail();
+		} catch (BusinessException e) {
+			assertThat(
+					e.getCode(),
+					is("portlet.crud.error.compoundsearch.dateConversionFailed"));
+		}
+	}
+
+	private List<Filter> filterList(Filter... filterArray) {
+		return asList(filterArray);
 	}
 
 	@Test
@@ -212,6 +310,23 @@ public class CompoundSearchTest {
 		search.search("THIRD:\"my long  phrase\"");
 		List<Filter> filters = asList((Filter) new StartsWith("THIRD",
 				"my long  phrase", false));
+		verifyReplaceFilters(filters);
+	}
+
+	@Test
+	public void shouldConvertMultiwordSelectionToEqualsOnIntegerKey()
+			throws ParseException {
+		search.search("SELECT:\"Option 3\"");
+		List<Filter> filters = asList((Filter) new Equal("SELECT", 3, false));
+		verifyReplaceFilters(filters);
+	}
+
+	@Test
+	public void shouldConvertMultiwordSelectionToEqualsOnTextualKey()
+			throws ParseException {
+		search.search("SELECTTEXT:\"Option 3\"");
+		List<Filter> filters = asList((Filter) new Equal("SELECTTEXT",
+				"Option 3", false));
 		verifyReplaceFilters(filters);
 	}
 

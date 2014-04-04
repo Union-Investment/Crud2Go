@@ -271,10 +271,14 @@ public class Table extends Component implements Component.ExpandableComponent,
 	public Table(TableConfig config, TableColumns tableColumns,
 			boolean editable, boolean directEdit) {
 		this.config = config;
-		this.columns = tableColumns;
 		this.editable = editable;
 		this.directEdit = directEdit;
 		this.mode = directEdit && editable ? Mode.EDIT : Mode.VIEW;
+		
+		this.columns = tableColumns;
+		if (columns != null) {
+			columns.setTable(this);
+		}
 	}
 
 	/**

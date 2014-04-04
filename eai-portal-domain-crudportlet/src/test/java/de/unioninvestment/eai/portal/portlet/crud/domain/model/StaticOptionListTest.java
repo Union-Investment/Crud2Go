@@ -71,6 +71,18 @@ public class StaticOptionListTest {
 		assertThat(selection.getTitle("key3", null), is("value3"));
 	}
 
+	@Test
+	public void shouldFindOptionKey() {
+		addConfigOption("key1", "value1");
+		addConfigOption("key2", "value2");
+		addConfigOption("key3", "value3");
+		addConfigOption("key4", "value4");
+
+		selection = new StaticOptionList(config);
+
+		assertThat(selection.getKey("value3", null), is("key3"));
+	}
+
 	private void addConfigOption(String key, String title) {
 		OptionConfig opt = new OptionConfig();
 		opt.setKey(key);

@@ -121,11 +121,6 @@ public class DynamicOptionList extends VolatileOptionList {
 	}
 
 	@Override
-	public String getTitle(String key, SelectionContext context) {
-		return getOptions(context).get(key);
-	}
-
-	@Override
 	public String getId() {
 		return id;
 	}

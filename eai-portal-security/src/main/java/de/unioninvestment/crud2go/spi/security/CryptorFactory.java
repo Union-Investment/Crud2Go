@@ -18,8 +18,10 @@
  */
 package de.unioninvestment.crud2go.spi.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.util.StringUtils;
 
 import de.unioninvestment.crud2go.spi.security.pgp.PGPCryptor;
@@ -29,14 +31,22 @@ import de.unioninvestment.crud2go.spi.security.pgp.PGPCryptor;
  * 
  * @author carsten.mjartan
  */
-@Component
+@Configuration
+@Lazy
 public class CryptorFactory {
 
-	@Autowired
-	NopCryptor nopCryptor;
+	@Value("${portlet.crud.authentication.pgp.secretkeyfile}")
+	private String secretKeyFileName;
 
-	@Autowired
-	PGPCryptor pgpCryptor;
+	@Bean
+	public NopCryptor nopCryptor() {
+		return new NopCryptor();
+	}
+
+	@Bean
+	public PGPCryptor pgpCryptor() {
+		return new PGPCryptor(secretKeyFileName);
+	}
 
 	/**
 	 * @param name
@@ -47,13 +57,13 @@ public class CryptorFactory {
 	public Cryptor getCryptor(String name) {
 		if (StringUtils.hasText(name)) {
 			if (name.equals("pgp")) {
-				return pgpCryptor;
+				return pgpCryptor();
 			} else {
 				throw new IllegalArgumentException("Decryptor '" + name
 						+ "' unkown");
 			}
 		} else {
-			return nopCryptor;
+			return nopCryptor();
 		}
 	}
 }

@@ -26,10 +26,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.vaadin.tokenfield.TokenField;
+
+import com.google.gwt.thirdparty.guava.common.collect.Maps;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
@@ -45,14 +46,14 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private final SortedMap<String, TableColumn> columns = new TreeMap<String, TableColumn>();
+	private final HashMap<String, TableColumn> columns = new HashMap<String, TableColumn>();
 	private final List<TableColumn> columnsList;
 
 	/**
 	 * @param cols
 	 *            Liste der Tabellenzeilen
 	 */
-	public TableColumns(List<TableColumn> cols) {
+	public TableColumns(Collection<TableColumn> cols) {
 		columnsList = new ArrayList<TableColumn>(cols);
 		for (TableColumn col : cols) {
 			columns.put(col.getName(), col);
@@ -212,7 +213,8 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 	 * 
 	 * @param columnName
 	 *            Name
-	 * @return <code>true</code>, falls es eine Auswahl als {@link TokenField} darstellt
+	 * @return <code>true</code>, falls es eine Auswahl als {@link TokenField}
+	 *         darstellt
 	 */
 	public boolean isTokenfield(String columnName) {
 		TableColumn column = get(columnName);
@@ -317,6 +319,44 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 			}
 		}
 		return defaultFields;
+	}
+
+	public void setTable(Table table) {
+		for (TableColumn column : columnsList) {
+			column.setTable(table);
+		}
+	}
+
+	public int size() {
+		return columnsList.size();
+	}
+
+	public Class<?> getType(String name) {
+		return get(name).getType();
+	}
+
+	public Map<String, String> getDropdownSelections(String columnName,
+			String titleStartingWith, int maximumEntries) {
+		Map<String, String> allOptions = getDropdownSelections(columnName)
+				.getOptions(null);
+		if (allOptions != null) {
+			Map<String, String> results = Maps.newLinkedHashMap();
+			int left = maximumEntries <= 0 ? Integer.MAX_VALUE : maximumEntries;
+			String prefix = titleStartingWith == null ? null : titleStartingWith
+					.toLowerCase();
+			for (Entry<String, String> entry : allOptions.entrySet()) {
+				if (left <= 0) {
+					break;
+				}
+				if (prefix == null
+						|| entry.getValue().toLowerCase().startsWith(prefix)) {
+					results.put(entry.getKey(), entry.getValue());
+					left--;
+				}
+			}
+			return results;
+		}
+		return null;
 	}
 
 }

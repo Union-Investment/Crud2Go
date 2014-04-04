@@ -23,6 +23,7 @@
 		<maven.build.number>${project.version}-${maven.build.timestamp}</maven.build.number>
 		<jboss.module.version>main</jboss.module.version>
 		<session.timeout>30</session.timeout>
+		<database.backend.dialect>ORACLE</database.backend.dialect>
 		<storage.dialect>ORACLE</storage.dialect>
 		<portlet.title>Crud2Go</portlet.title>
 		<portlet.shortTitle>Crud2Go</portlet.shortTitle>
@@ -467,6 +468,7 @@
 			</activation>
 			<properties>
 				<jboss.module.version>mysql</jboss.module.version>
+				<database.backend.dialect>MYSQL</database.backend.dialect>
 				<storage.dialect>MYSQL</storage.dialect>
 				<portlet.title>Crud2Go (MySQL)</portlet.title>
 				<portlet.shortTitle>Crud2Go4MySQL</portlet.shortTitle>

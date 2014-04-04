@@ -54,6 +54,18 @@ public interface OptionList {
 	String getTitle(String key, SelectionContext context);
 
 	/**
+	 * Achtung: Diese Operation ist recht teuer, da über alle Elemente iteriert wird.
+	 * 
+	 * @param title
+	 *            the title of the option
+	 * 
+	 * @param context
+	 *            Selection-Context
+	 * @return Key zum Title
+	 */
+	String getKey(String title, SelectionContext context);
+
+	/**
 	 * @param handler
 	 *            to inform about changes of the options
 	 */

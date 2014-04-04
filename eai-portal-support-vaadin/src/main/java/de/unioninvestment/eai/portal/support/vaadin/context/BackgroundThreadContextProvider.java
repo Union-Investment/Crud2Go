@@ -32,15 +32,16 @@ import org.springframework.context.MessageSource;
  */
 public class BackgroundThreadContextProvider implements ContextProvider {
 
-	private MessageSource messageSource;
-	private Locale locale;
-	private ApplicationContext applicationContext;
+	private final MessageSource messageSource;
+	private final Locale locale;
+	private final ApplicationContext applicationContext;
+	private final long liferayCommunityId;
 
 	/**
 	 * Initialisierung mit Daten aus aktuellem {@link Context}.
 	 */
 	public BackgroundThreadContextProvider() {
-		this(Context.getProvider().getSpringContext(), Context.getLocale());
+		this(Context.getProvider().getSpringContext(), Context.getLocale(), Context.getLiferayCommunityId());
 	}
 
 	/**
@@ -48,12 +49,14 @@ public class BackgroundThreadContextProvider implements ContextProvider {
 	 * 
 	 * @param applicationContext
 	 * @param locale
+	 * @param liferayCommunityId 
 	 */
 	public BackgroundThreadContextProvider(
-			ApplicationContext applicationContext, Locale locale) {
+			ApplicationContext applicationContext, Locale locale, long liferayCommunityId) {
 		this.locale = locale;
 		this.applicationContext = applicationContext;
 		this.messageSource = applicationContext.getBean(MessageSource.class);
+		this.liferayCommunityId = liferayCommunityId;
 	}
 
 	@Override
@@ -79,5 +82,9 @@ public class BackgroundThreadContextProvider implements ContextProvider {
 	@Override
 	public ApplicationContext getSpringContext() {
 		return applicationContext;
+	}
+
+	public long getLiferayCommunityId() {
+		return liferayCommunityId;
 	}
 }

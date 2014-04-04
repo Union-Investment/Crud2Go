@@ -15,11 +15,11 @@
 			builder.verticalLayout(spacing: true) {
 				builder.link(
 					resource: builder.externalResource('http://www.google.de'), 
-					icon: builder.externalResource('http://www.google.de/logos/2011/noyce11-hp.jpg')
+					icon: builder.themeResource(resourceId: 'sofia/images/svg_link.png')
 				)
 				builder.link(
 					resource: builder.externalResource('http://www.yahoo.de'), 
-					icon: builder.externalResource('http://l.yimg.com/a/i/ww/met/logo/20100909/yahoo_logo_de.png')
+					icon: builder.themeResource(resourceId: 'sofia/images/ok.gif')
 				)
 			}
 		}
