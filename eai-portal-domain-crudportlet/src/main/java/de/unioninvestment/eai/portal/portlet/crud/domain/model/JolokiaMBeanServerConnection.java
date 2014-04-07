@@ -20,9 +20,12 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,8 +37,12 @@ import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
 import javax.management.InvalidAttributeValueException;
 import javax.management.ListenerNotFoundException;
+import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanException;
 import javax.management.MBeanInfo;
+import javax.management.MBeanNotificationInfo;
+import javax.management.MBeanOperationInfo;
+import javax.management.MBeanParameterInfo;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServerConnection;
 import javax.management.NotCompliantMBeanException;
@@ -49,9 +56,12 @@ import javax.management.ReflectionException;
 import org.jolokia.client.J4pClient;
 import org.jolokia.client.exception.J4pException;
 import org.jolokia.client.request.J4pExecRequest;
+import org.jolokia.client.request.J4pListRequest;
+import org.jolokia.client.request.J4pListResponse;
 import org.jolokia.client.request.J4pReadRequest;
 import org.jolokia.client.request.J4pSearchRequest;
 import org.jolokia.client.request.J4pSearchResponse;
+import org.jolokia.client.request.J4pWriteRequest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
@@ -96,6 +106,23 @@ public class JolokiaMBeanServerConnection implements MBeanServerConnection {
 		J4pReadRequest j4pReadRequest = new J4pReadRequest(name, attribute);
 		try {
 			return j4pClient.execute(j4pReadRequest).getValue();
+		} catch (J4pException e) {
+			throw new IOException(e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setAttribute(ObjectName name, Attribute attribute)
+			throws InstanceNotFoundException, AttributeNotFoundException,
+			InvalidAttributeValueException, MBeanException,
+			ReflectionException, IOException {
+		J4pWriteRequest j4pWriteRequest = new J4pWriteRequest(name,
+				attribute.getName(), attribute.getValue(), null);
+		try {
+			j4pClient.execute(j4pWriteRequest);
 		} catch (J4pException e) {
 			throw new IOException(e);
 		}
@@ -160,6 +187,93 @@ public class JolokiaMBeanServerConnection implements MBeanServerConnection {
 				objectNames.add(objectName);
 			}
 			return objectNames;
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public MBeanInfo getMBeanInfo(ObjectName name)
+			throws InstanceNotFoundException, IntrospectionException,
+			ReflectionException, IOException {
+		try {
+			J4pListRequest j4pListRequest = new J4pListRequest(name);
+			J4pListResponse j4pListResponse = j4pClient.execute(j4pListRequest);
+			@SuppressWarnings("unchecked")
+			Map<String, Object> value = (Map<String, Object>) j4pListResponse
+					.getValue();
+			@SuppressWarnings("unchecked")
+			Map<String, Map<String, Object>> attrMap = (Map<String, Map<String, Object>>) value
+					.get("attr") == null ? new HashMap<String, Map<String, Object>>()
+					: (Map<String, Map<String, Object>>) value.get("attr");
+			// 1.MBeanAttributeInfo
+			List<MBeanAttributeInfo> aInfos = new ArrayList<MBeanAttributeInfo>();
+			Set<String> attrNameSet = attrMap.keySet();
+			for (String attrName : attrNameSet) {
+				MBeanAttributeInfo info = new MBeanAttributeInfo(attrName,
+						(String) attrMap.get(attrName).get("type"),
+						(String) attrMap.get(attrName).get("desc"),
+						(Boolean) attrMap.get(attrName).get("rw"),
+						(Boolean) attrMap.get(attrName).get("rw"), false);
+				aInfos.add(info);
+			}
+
+			@SuppressWarnings("unchecked")
+			Map<String, Map<String, Object>> opMap = (Map<String, Map<String, Object>>) value
+					.get("op") == null ? new HashMap<String, Map<String, Object>>()
+					: (Map<String, Map<String, Object>>) value.get("op");
+			// 2.MBeanOperationInfo
+			List<MBeanOperationInfo> oInfos = new ArrayList<MBeanOperationInfo>();
+			Set<String> opNameSet = opMap.keySet();
+			for (String opName : opNameSet) {
+				if (opMap.get(opName) instanceof Map) {
+					@SuppressWarnings("unchecked")
+					List<Map<String, String>> paramList = (List<Map<String, String>>) opMap
+							.get(opName).get("args");
+					List<MBeanParameterInfo> params = new ArrayList<MBeanParameterInfo>();
+					for (Map<String, String> paramMap : paramList) {
+						MBeanParameterInfo param = new MBeanParameterInfo(
+								(String) paramMap.get("name"),
+								(String) paramMap.get("type"),
+								(String) paramMap.get("desc"));
+						params.add(param);
+					}
+					MBeanOperationInfo info = new MBeanOperationInfo(
+							opName,
+							(String) opMap.get(opName).get("desc"),
+							params.toArray(new MBeanParameterInfo[params.size()]),
+							(String) opMap.get(opName).get("ret"), 0);
+					oInfos.add(info);
+				}
+			}
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> notMap = (Map<String, Object>) value.get("not") == null ? new HashMap<String, Object>()
+					: (Map<String, Object>) value.get("not");
+			// 3.MBeanNotificationInfo
+			List<MBeanNotificationInfo> nInfos = new ArrayList<MBeanNotificationInfo>();
+
+			if (!notMap.isEmpty()) {
+				@SuppressWarnings("unchecked")
+				MBeanNotificationInfo nInfo = new MBeanNotificationInfo(
+						(String[]) ((List<String>) notMap.get("types") == null ? new ArrayList<String>()
+								: (List<String>) notMap.get("types")).toArray(new String[((List<String>) notMap
+								.get("types")).size()]),
+						(String) notMap.get("name"),
+						(String) notMap.get("desc"));
+				nInfos.add(nInfo);
+			}
+
+			MBeanInfo mBeanInfo = new MBeanInfo(name.toString(),
+					(String) value.get("desc"),
+					aInfos.toArray(new MBeanAttributeInfo[aInfos.size()]),
+					null,
+					oInfos.toArray(new MBeanOperationInfo[oInfos.size()]),
+					nInfos.toArray(new MBeanNotificationInfo[nInfos.size()]));
+			return mBeanInfo;
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
@@ -309,13 +423,6 @@ public class JolokiaMBeanServerConnection implements MBeanServerConnection {
 	}
 
 	@Override
-	public MBeanInfo getMBeanInfo(ObjectName name)
-			throws InstanceNotFoundException, IntrospectionException,
-			ReflectionException, IOException {
-		throw new UnsupportedOperationException("Not implemented yet!");
-	}
-
-	@Override
 	public ObjectInstance getObjectInstance(ObjectName name)
 			throws InstanceNotFoundException, IOException {
 		throw new UnsupportedOperationException("Not implemented yet!");
@@ -360,14 +467,6 @@ public class JolokiaMBeanServerConnection implements MBeanServerConnection {
 			NotificationListener listener, NotificationFilter filter,
 			Object handback) throws InstanceNotFoundException,
 			ListenerNotFoundException, IOException {
-		throw new UnsupportedOperationException("Not implemented yet!");
-	}
-
-	@Override
-	public void setAttribute(ObjectName name, Attribute attribute)
-			throws InstanceNotFoundException, AttributeNotFoundException,
-			InvalidAttributeValueException, MBeanException,
-			ReflectionException, IOException {
 		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 
