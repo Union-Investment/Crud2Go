@@ -78,5 +78,12 @@ public class Context {
 		return getProvider().getBean(requiredType);
 	}
 
+	/**
+	 * @return die aktuelle Liferay-CommunityId
+	 */
+	public static long getLiferayCommunityId() {
+		return getProvider().getLiferayCommunityId();
+	}
+
 	
 }

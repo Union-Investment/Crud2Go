@@ -19,7 +19,6 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -32,6 +31,8 @@ import de.unioninvestment.eai.portal.portlet.crud.config.InitializeTypeConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.QueryOptionListRepository;
+import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadContextProvider;
+import de.unioninvestment.eai.portal.support.vaadin.context.ContextualCallable;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 
 /**
@@ -98,7 +99,7 @@ public class QueryOptionList extends VolatileOptionList {
 		this.lazy = initialize.equals(InitializeTypeConfig.LAZY)
 				|| initialize.equals(InitializeTypeConfig.ASYNC);
 		this.prefetched = initialize.equals(InitializeTypeConfig.ASYNC);
-		
+
 		if (useCache) {
 			options = repository.getOptionsFromCache(dataSource, query);
 		}
@@ -110,9 +111,10 @@ public class QueryOptionList extends VolatileOptionList {
 	private void startPrefetch() {
 		cancelOlderPrefetch();
 		logIfThreadPoolIsFull(prefetchExecutor);
-		future = prefetchExecutor.submit(new Callable<Map<String, String>>() {
+		BackgroundThreadContextProvider provider =  new BackgroundThreadContextProvider();
+		future = prefetchExecutor.submit(new ContextualCallable<Map<String, String>>(provider) {
 			@Override
-			public Map<String, String> call() throws Exception {
+			public Map<String, String> callWithContext() {
 				LOGGER.debug("Prefetching option list {}", logId());
 				synchronized (lock) {
 					options = loadOptions();
@@ -205,17 +207,6 @@ public class QueryOptionList extends VolatileOptionList {
 		LOGGER.debug("Finished loading option list {} ({}ms)", logId(),
 				duration);
 		return newOptions;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getTitle(String key, SelectionContext context) {
-		if (getOptions(context) != null) {
-			return getOptions(context).get(key);
-		}
-		return null;
 	}
 
 	/**

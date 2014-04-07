@@ -55,6 +55,7 @@ Enter Authentication Password
 
 Select Authentication Preferences
 	Select Vaadin Tab  Authentifizierung
+	Wait for AJAX calls to complete	
 	
 	
 ##########################

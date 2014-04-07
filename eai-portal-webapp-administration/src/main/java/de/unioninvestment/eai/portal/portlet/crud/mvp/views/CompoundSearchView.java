@@ -19,9 +19,7 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
-import java.util.Collection;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 
 /**
  * View-Interface für die Compound-Suche.
@@ -31,18 +29,13 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 public interface CompoundSearchView extends PanelContentView {
 
 	public interface Presenter {
-
 		boolean isValidQuery(String queryString);
-
 		void search(String queryString);
-
-		Collection<TableColumn> getSearchableColumns();
-
 	}
 
 	void setPresenter(CompoundSearchView.Presenter compoundSearchPresenter);
 
-	void initialize(Collection<String> searchableFields);
+	void initialize(TableColumns searchableColumns);
 
 	void updateQueryString(String queryString);
 

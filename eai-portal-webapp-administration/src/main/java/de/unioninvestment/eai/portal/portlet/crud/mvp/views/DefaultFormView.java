@@ -112,6 +112,7 @@ public class DefaultFormView extends Panel implements FormView, Handler {
 
 		rootLayout = new VerticalLayout();
 		setStyleName(LiferayTheme.PANEL_LIGHT);
+		addStyleName("c2g-form");
 		setContent(rootLayout);
 		addActionHandler(this);
 

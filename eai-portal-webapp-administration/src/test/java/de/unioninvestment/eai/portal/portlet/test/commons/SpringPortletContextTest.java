@@ -34,7 +34,7 @@ public abstract class SpringPortletContextTest extends
 
 	@Before
 	public void configurePortletUtils() {
-		Context.setProvider(new BackgroundThreadContextProvider(applicationContext, Locale.GERMANY));
+		Context.setProvider(new BackgroundThreadContextProvider(applicationContext, Locale.GERMANY, 0L));
 	}
 
 	@After

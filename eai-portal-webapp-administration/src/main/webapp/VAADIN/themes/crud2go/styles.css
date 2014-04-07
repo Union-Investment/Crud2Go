@@ -5077,6 +5077,14 @@ body .crud2go.v-app {
 	display: none;
 }
 
+.crud2go .v-filterselect {
+	line-height: 11px;
+}
+
+.crud2go .c2g-form .v-panel-content {
+	overflow: hidden;
+}
+
 .crud2go div.crudTable td div.v-table-cell-wrapper {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;

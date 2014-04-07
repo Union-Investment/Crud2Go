@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 /**
  * Fabrik, die zu einem gegebenen Daten-Quelles-Kurznamen ein
@@ -44,13 +44,9 @@ public class J2EEConnectionPoolFactory implements ConnectionPoolFactory {
 
 	private Map<String, J2EEConnectionPool> pools = new HashMap<String, J2EEConnectionPool>();
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public J2EEConnectionPool getPool(String shortName) {
-		long communityId = LiferayUI.getCurrent()
-				.getCommunityId();
+		long communityId = Context.getLiferayCommunityId();
 		String key = shortName + "_" + communityId;
 		synchronized (pools) {
 			J2EEConnectionPool pool = pools.get(key);

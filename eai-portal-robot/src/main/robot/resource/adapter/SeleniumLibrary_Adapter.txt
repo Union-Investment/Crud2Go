@@ -47,6 +47,16 @@ Vaadin MouseDownAndUp  [Arguments]  ${ELEMENT}
 
 Vaadin Press Enter 
 	Press Key Native  10	
+
+Wait for element with text
+	[Arguments]  ${locator}  ${text}
+	Wait Until Page Contains Element  ${locator}
+	Element text should be  ${locator}  ${text}
+	
+Wait for element containing text
+	[Arguments]  ${locator}  ${text}
+	Wait Until Page Contains Element  ${locator}
+	Element should contain  ${locator}  ${text}
 	
 Wait for AJAX calls to complete
 	Wait for condition  var x=false; for (var cl in window.vaadin.clients) x = x || window.vaadin.clients[cl].isActive(); x==false  60s

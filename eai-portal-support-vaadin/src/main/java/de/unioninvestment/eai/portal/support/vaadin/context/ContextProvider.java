@@ -19,6 +19,11 @@ public interface ContextProvider {
 	Locale getLocale();
 	
 	/**
+	 * @return die aktuelle Liferay-CommunityId
+	 */
+	long getLiferayCommunityId();
+	
+	/**
 	 * Übersetzung von UI-Texten.
 	 * 
 	 * @param key

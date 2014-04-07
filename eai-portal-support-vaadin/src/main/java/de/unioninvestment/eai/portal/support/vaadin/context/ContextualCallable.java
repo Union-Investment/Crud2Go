@@ -16,25 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.unioninvestment.crud2go.spi.security;
+package de.unioninvestment.eai.portal.support.vaadin.context;
 
+import java.util.concurrent.Callable;
 
 /**
- * {@link Cryptor} implementation that does not encrypt but returns the original
- * text.
- * 
+ * Wrapper für Runnable, der einen Kontext setzt. Dies ist für asynchrone Verarbeitung notwendig.
+ *
  * @author carsten.mjartan
  */
-public class NopCryptor implements Cryptor {
+public abstract class ContextualCallable<T> implements Callable<T> {
 
-	@Override
-	public String encrypt(String toEncrypt) {
-		return toEncrypt;
+	private ContextProvider provider;
+
+	public ContextualCallable(ContextProvider provider) {
+		this.provider = provider;
 	}
 
 	@Override
-	public String decrypt(String encryptedString) {
-		return encryptedString;
+	public T call() throws Exception {
+		ContextProvider oldProvider = Context.getProvider();
+		Context.setProvider(provider);
+		try {
+			return callWithContext();
+		} finally {
+			Context.setProvider(oldProvider);
+		}
 	}
 
+	abstract protected T callWithContext();
 }

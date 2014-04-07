@@ -31,12 +31,14 @@ import org.apache.lucene.search.Query;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.CompoundSearchView;
 
 public class CompoundSearchPresenterTest {
@@ -51,6 +53,8 @@ public class CompoundSearchPresenterTest {
 	private CompoundSearch modelMock;
 	@Mock
 	private Query queryMock;
+	@Mock
+	private TableColumns searchableColumnsMock;
 
 	@Before
 	public void setUp() {
@@ -58,8 +62,10 @@ public class CompoundSearchPresenterTest {
 
 		searchableFields = asList("A", "B", "C");
 		defaultFields = asList("A", "B");
-		when(modelMock.getSearchableFields()).thenReturn(searchableFields);
-		when(modelMock.getDefaultFields()).thenReturn(defaultFields);
+		when(modelMock.getSearchableColumns()).thenReturn(searchableColumnsMock);
+		when(searchableColumnsMock.size()).thenReturn(3);
+		when(searchableColumnsMock.getSearchableColumnNames()).thenReturn(searchableFields);
+		when(searchableColumnsMock.getDefaultSearchableColumnNames()).thenReturn(defaultFields);
 
 		presenter = new CompoundSearchPresenter(viewMock, modelMock);
 	}
@@ -67,7 +73,7 @@ public class CompoundSearchPresenterTest {
 	@Test
 	public void shouldInitializeView() {
 		verify(viewMock).setPresenter(presenter);
-		verify(viewMock).initialize(searchableFields);
+		verify(viewMock).initialize(Mockito.any(TableColumns.class));
 	}
 
 	@Test
@@ -83,7 +89,7 @@ public class CompoundSearchPresenterTest {
 
 		presenter
 				.onQueryChange(new CompoundQueryChangedEvent(modelMock, "bla"));
-		
+
 		verify(viewMock).updateQueryString("bla");
 		verify(modelMock, never()).search("bla");
 	}

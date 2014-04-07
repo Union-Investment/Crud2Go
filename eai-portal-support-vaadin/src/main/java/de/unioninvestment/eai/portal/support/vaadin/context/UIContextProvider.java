@@ -35,6 +35,8 @@ import org.springframework.web.portlet.context.PortletApplicationContextUtils;
 import com.vaadin.server.VaadinPortletService;
 import com.vaadin.ui.UI;
 
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+
 /**
  * Thread-safe {@link ContextProvider} that fetches the ApplicationContext from
  * the current PortletReq.
@@ -54,13 +56,23 @@ public class UIContextProvider implements ContextProvider {
 	 * @return die Übersetzung gemäß der aktuellen Locale-Konfiguration
 	 */
 	public String getMessage(String key, Object... args) {
-		MessageSource messageSource = getBean(MessageSource.class);
-		if (messageSource != null) {
-			return messageSource.getMessage(key, args, getLocale());
-		} else {
-			return "#" + key
-					+ (args == null || args.length == 0 ? "" : asList(args));
+		try {
+
+			MessageSource messageSource = getBean(MessageSource.class);
+			if (messageSource != null) {
+				return messageSource.getMessage(key, args, getLocale());
+			} else {
+				return rawMessage(key, args);
+			}
+		} catch (IllegalStateException e) {
+			return rawMessage(key, args);
 		}
+	}
+
+	private String rawMessage(String key, Object... args) {
+		return "#"
+				+ key
+				+ (args == null || args.length == 0 ? "" : asList(args));
 	}
 
 	@Override
@@ -68,6 +80,11 @@ public class UIContextProvider implements ContextProvider {
 		return UI.getCurrent().getLocale();
 	}
 
+	@Override
+	public long getLiferayCommunityId() {
+		return LiferayUI.getCurrent().getCommunityId();
+	}
+	
 	/**
 	 * @param requiredType
 	 *            der benötigte Typ eines Beans
@@ -76,6 +93,9 @@ public class UIContextProvider implements ContextProvider {
 	 *             falls die Bean im Spring-Kontext nicht gefunden werden kann
 	 * @throws BeansException
 	 *             falls keine eindeutige Zuordnung getroffen werden kann
+	 * @throws IllegalStateException
+	 *             falls kein PortletRequest gefunden wird, an dem der Spring
+	 *             Context hängt
 	 */
 	@Override
 	public <T> T getBean(Class<T> requiredType) {

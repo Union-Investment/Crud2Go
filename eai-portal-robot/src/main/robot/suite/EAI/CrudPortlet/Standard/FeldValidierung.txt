@@ -1,0 +1,109 @@
+*** Settings ***
+Documentation   Story: Als EAI-Verantwortlicher möchte ich Validierungsregeln konfigurieren können
+
+*** Test Case ***
+Validierung schlägt fehl
+	[Tags]  EAI_74
+	
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'VALIDIERUNG_REQUIRED.xml'
+	
+	wenn im Editieren-Modus eine neue Zeile eingefügt wird
+	und dann der Editieren-Modus verlassen wird
+	
+	dann wird die Validierungsfehlermeldung 'NAME: Bitte geben Sie einen Wert ein!' angezeigt
+
+
+Maximale Länge schlägt fehl
+	[Tags]  EAI_74
+	
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'VALIDIERUNG_MAXLEN.xml'
+	
+	wenn im Editieren-Modus eine neue Zeile eingefügt wird
+	und dann im 1. Eingabefeld der Wert '1234567890-' eingetragen wird
+	und dann der Editieren-Modus verlassen wird
+	
+	dann wird die Spalte '1234567890' angezeigt
+	
+	
+Regulärer Ausdruck ([0-9]+) schlägt fehl
+	[Tags]  EAI_74
+	
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'VALIDIERUNG_REGEXP.xml'
+	
+	wenn im Editieren-Modus eine neue Zeile eingefügt wird
+	und dann im 1. Eingabefeld der Wert '1A' eingetragen wird
+	und dann der Editieren-Modus verlassen wird
+	
+	dann wird die Validierungsfehlermeldung 'NAME: Bitte geben Sie nur Zahlen ein!' angezeigt
+
+
+Escape-ter regulärer Ausdruck ([0-9]+,[0-9]+) schlägt fehl
+	[Tags]  EAI_74
+	
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'VALIDIERUNG_REGEXP_ESCAPE.xml'
+	
+	wenn im Editieren-Modus eine neue Zeile eingefügt wird
+	und dann im 1. Eingabefeld der Wert '1,00A' eingetragen wird
+	und dann der Editieren-Modus verlassen wird
+	
+	dann wird die Validierungsfehlermeldung 'NAME: Bitte geben Sie nur Zahlen (mit Komma) ein!' angezeigt
+
+
+Escape-ter regulärer Ausdruck ([0-9]+,[0-9]+) klappt
+	[Tags]  EAI_74
+	
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'VALIDIERUNG_REGEXP_ESCAPE.xml'
+	
+	wenn im Editieren-Modus eine neue Zeile eingefügt wird
+	und dann im 1. Eingabefeld der Wert '1,0' eingetragen wird
+	und dann der Editieren-Modus verlassen wird
+
+	dann wird die Spalte '1,0' angezeigt
+	
+	
+Mehrere Regeln (required,regexp=[0-9]+) - eine schlägt fehl
+	[Tags]  EAI_74
+	
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'VALIDIERUNG_MULTIPLE.xml'
+	
+	wenn im Editieren-Modus eine neue Zeile eingefügt wird
+	und dann im 1. Eingabefeld der Wert '10-' eingetragen wird
+	und dann der Editieren-Modus verlassen wird
+	
+	dann wird die Validierungsfehlermeldung 'NAME: Der Eingabe ist ungueltig!' angezeigt
+
+
+Mehrere Regeln (required,regexp=[0-9]+) - alle klappen
+	[Tags]  EAI_74
+	
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'VALIDIERUNG_MULTIPLE.xml'
+	
+	wenn im Editieren-Modus eine neue Zeile eingefügt wird
+	und dann im 1. Eingabefeld der Wert '12345' eingetragen wird
+	und dann der Editieren-Modus verlassen wird
+	
+	und dann wird die Spalte '12345' angezeigt	
+
+
+InputPromt Anzeige
+	[Tags]  EAI_74  
+	
+	Es existieren keine Testdaten in TEST_USER
+	und außerdem ein Portlet mit der XML-Konfiguration 'INPUT_PROMT.xml'
+	
+	wenn im Editieren-Modus eine neue Zeile eingefügt wird
+	
+	dann wird der InputPromt 'Name eintragen' in der Spalte '2' angezeigt
+	dann wird der InputPromt 'Wert eintragen' in der Spalte '3' angezeigt
+
+*** Settings ***
+Force Tags      autor-mca
+...				EAI_74
+Resource        ${RESOURCES}/import/CrudPortlet.txt

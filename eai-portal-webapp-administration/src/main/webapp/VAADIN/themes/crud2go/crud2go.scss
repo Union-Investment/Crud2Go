@@ -88,6 +88,16 @@
 		display: none;
 	}
 	
+	/* Forms */
+	
+	.v-filterselect {
+		line-height: $font-size;  /* proper alignment with other boxes in grid */
+	}
+	
+	.c2g-form .v-panel-content {
+		overflow: hidden;
+	}
+	
 	/* Fixed height table cells */
 	
 	div.crudTable td div.v-table-cell-wrapper {

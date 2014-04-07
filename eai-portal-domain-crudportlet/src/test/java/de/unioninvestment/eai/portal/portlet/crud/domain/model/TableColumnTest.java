@@ -18,8 +18,10 @@
 */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,6 +39,12 @@ public class TableColumnTest {
 
 	@Mock
 	private FieldEditableChecker fieldEditableCheckerMock;
+
+	@Mock
+	private Table tableMock;
+
+	@Mock
+	private DataContainer containerMock;
 
 	@Before
 	public void setUp() {
@@ -61,5 +69,14 @@ public class TableColumnTest {
 	@Test
 	public void shouldReturnEditableDefault() {
 		assertThat(tableColumn.isEditable(rowMock), is(true));
+	}
+	
+	@Test
+	public void shouldDelegateGetTypeToContainer() {
+		when(tableMock.getContainer()).thenReturn(containerMock);
+		doReturn(String.class).when(containerMock).getType("name");
+		tableColumn.setTable(tableMock);
+		
+		assertThat(tableColumn.getType(), equalTo((Class)String.class));
 	}
 }

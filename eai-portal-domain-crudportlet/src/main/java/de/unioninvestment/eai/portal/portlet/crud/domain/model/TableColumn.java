@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.springframework.util.Assert;
 
+import com.google.common.base.Preconditions;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.ColumnStyleRenderer;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 
@@ -68,6 +70,7 @@ public class TableColumn implements Serializable {
 	private GeneratedValueGenerator generatedValueGenerator;
 	private Class<?> generatedType;
 	private Searchable searchable;
+	private Table table;
 
 	/**
 	 * Sichtbarkeitswerte der Spalten.
@@ -80,7 +83,7 @@ public class TableColumn implements Serializable {
 	public enum Searchable {
 		DEFAULT, TRUE, FALSE
 	}
-	
+
 	/**
 	 * @param builder
 	 *            Builder-Klasse
@@ -362,7 +365,7 @@ public class TableColumn implements Serializable {
 			this.searchable = searchable;
 			return self();
 		}
-		
+
 		/**
 		 * @param editableDefault
 		 * @return den builder
@@ -528,4 +531,21 @@ public class TableColumn implements Serializable {
 		return searchable;
 	}
 
+	public void setTable(Table table) {
+		if (this.table == null) {
+			this.table = table;
+		} else {
+			throw new IllegalStateException("Table already set");
+		}
+	}
+
+	public Class<?> getType() {
+		Preconditions.checkNotNull(table,
+				"Table required to deliver column type");
+		return table.getContainer().getType(name);
+	}
+
+	public Table getTable() {
+		return table;
+	}
 }

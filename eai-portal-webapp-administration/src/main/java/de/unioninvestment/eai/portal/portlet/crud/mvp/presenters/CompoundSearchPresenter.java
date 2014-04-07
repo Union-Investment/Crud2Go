@@ -25,7 +25,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryCha
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.CompoundSearchView;
 
 /**
@@ -42,18 +42,21 @@ public class CompoundSearchPresenter extends PanelContentPresenter implements
 	public CompoundSearchPresenter(CompoundSearchView view, CompoundSearch model) {
 		super(view, model);
 		view.setPresenter(this);
-		
-		Collection<String> searchableFields = model.getSearchableFields();
-		if (searchableFields.size() == 0) {
-			throw new BusinessException("portlet.crud.error.compoundsearch.noSearchableFields");
+
+		final TableColumns searchableColumns = model.getSearchableColumns();
+		if (searchableColumns.size() == 0) {
+			throw new BusinessException(
+					"portlet.crud.error.compoundsearch.noSearchableFields");
 		}
-		
-		Collection<String> defaultFields = model.getDefaultFields();
+
+		Collection<String> defaultFields = searchableColumns
+				.getDefaultSearchableColumnNames();
 		if (defaultFields.size() == 0) {
-			throw new BusinessException("portlet.crud.error.compoundsearch.noDefaultFields");
+			throw new BusinessException(
+					"portlet.crud.error.compoundsearch.noDefaultFields");
 		}
-		
-		view.initialize(searchableFields);
+
+		view.initialize(searchableColumns);
 		model.addQueryChangedEventHandler(this);
 	}
 
@@ -71,7 +74,7 @@ public class CompoundSearchPresenter extends PanelContentPresenter implements
 	public boolean isValidQuery(String queryString) {
 		return getModel().isValidQuery(queryString);
 	}
-	
+
 	@Override
 	public void search(String queryString) {
 		if (!externalChange) {
@@ -89,8 +92,4 @@ public class CompoundSearchPresenter extends PanelContentPresenter implements
 		}
 	}
 
-	@Override
-	public Collection<TableColumn> getSearchableColumns() {
-		return getModel().getSearchableColumns().values();
-	}
 }
