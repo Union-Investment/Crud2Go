@@ -23,6 +23,7 @@ import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -68,8 +69,7 @@ public class TableColumnsTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		options = ImmutableMap.of("key1",
-				"value1", "key2", "value2");
+		options = ImmutableMap.of("key1", "value1", "key2", "value2");
 		optionList = new StaticOptionList(options);
 
 		column1 = new TableColumn.Builder() //
@@ -176,7 +176,8 @@ public class TableColumnsTest {
 	public void shouldReturnOrderedListOfAllNames() {
 		assertThat(
 				tableColumns.getAllNames(),
-				is(asList("name1", "name2", "name3", "name4", "name5", "name6", "name7")));
+				is(asList("name1", "name2", "name3", "name4", "name5", "name6",
+						"name7")));
 	}
 
 	@Test
@@ -193,7 +194,7 @@ public class TableColumnsTest {
 	@Test
 	public void shouldReturnVisibleNamesForForm() {
 		assertThat(tableColumns.getVisibleNamesForForm(),
-				is(asList("name1", "name2", "name5", "name6","name7")));
+				is(asList("name1", "name2", "name5", "name6", "name7")));
 	}
 
 	@Test
@@ -330,40 +331,65 @@ public class TableColumnsTest {
 		assertThat(tableColumns.contains("name1"), is(true));
 		assertThat(tableColumns.contains("unknown"), is(false));
 	}
-	
+
 	@Test
 	public void shouldSetTableOnColumns() {
 		tableColumns.setTable(tableMock);
 		assertThat(column1.getTable(), is(tableMock));
 	}
-	
+
 	@Test
 	public void shouldReturnSize() {
 		assertThat(tableColumns.size(), is(7));
 	}
-	
+
 	@Test
 	public void shouldReturnColumnTypeByName() {
 		tableColumns.setTable(tableMock);
 		doReturn(String.class).when(containerMock).getType("name1");
-		assertThat(tableColumns.getType("name1"), equalTo((Class)String.class));
+		assertThat(tableColumns.getType("name1"), equalTo((Class) String.class));
 	}
-	
+
 	@Test
 	public void shouldReturnFilteredDropdownSelectionsByPrefix() {
-		assertThat(tableColumns.getDropdownSelections("name2", "va", 100), 
+		assertThat(tableColumns.getDropdownSelections("name2", "va", 100),
 				equalTo(options));
 	}
-	
+
 	@Test
 	public void shouldReturnFilteredDropdownSelectionsBelowLimit() {
-		assertThat(tableColumns.getDropdownSelections("name2", null, 1), 
+		assertThat(tableColumns.getDropdownSelections("name2", null, 1),
 				equalTo(singletonMap("key1", "value1")));
 	}
-	
+
 	@Test
 	public void shouldReturnFilteredDropdownSelection() {
-		assertThat(tableColumns.getDropdownSelections("name2", "value2", 0), 
+		assertThat(tableColumns.getDropdownSelections("name2", "value2", 0),
 				equalTo(singletonMap("key2", "value2")));
+	}
+
+	@Test
+	public void shouldReturnLowerCaseTableNamesMapping() {
+		prepareUppercaseColumns();
+		assertThat(tableColumns.getLowerCaseColumnNamesMapping().size(), is(2));
+		assertThat(tableColumns.getLowerCaseColumnNamesMapping().get("name1"), is("Name1"));
+		assertThat(tableColumns.getLowerCaseColumnNamesMapping().get("name2"), is("NAME2"));
+	}
+
+	@Test
+	public void shouldCacheLowerCaseTableNamesMapping() {
+		prepareUppercaseColumns();
+		assertThat(tableColumns.getLowerCaseColumnNamesMapping(), sameInstance(tableColumns.getLowerCaseColumnNamesMapping()));
+	}
+
+	private void prepareUppercaseColumns() {
+		column1 = new TableColumn.Builder() //
+				.name("Name1") //
+				.build();
+		column2 = new TableColumn.Builder() //
+				.name("NAME2") //
+				.build();
+		columnsList = asList(column1, column2);
+		tableColumns = new TableColumns(columnsList);
 	}
 }

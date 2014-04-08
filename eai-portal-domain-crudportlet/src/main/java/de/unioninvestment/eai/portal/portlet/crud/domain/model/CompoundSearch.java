@@ -171,7 +171,7 @@ public class CompoundSearch extends Panel {
 
 	private Filter convertWildcardQuery(Table table, WildcardQuery query) {
 		Term wildcard = query.getTerm();
-		String columnName = wildcard.field();
+		String columnName = caseCorrectedFieldName(wildcard.field());
 		if (table.getContainer().getType(columnName) == null) {
 			return null;
 		}
@@ -180,7 +180,7 @@ public class CompoundSearch extends Panel {
 
 	private Filter convertPrefixQuery(Table table, PrefixQuery query) {
 		Term prefix = query.getPrefix();
-		String columnName = prefix.field();
+		String columnName = caseCorrectedFieldName(prefix.field());
 		if (table.getContainer().getType(columnName) == null) {
 			return null;
 		}
@@ -189,7 +189,7 @@ public class CompoundSearch extends Panel {
 
 	private Filter convertTermRangeQuery(Table table,
 			TermRangeQuery termRangeQuery) {
-		String columnName = termRangeQuery.getField();
+		String columnName = caseCorrectedFieldName(termRangeQuery.getField());
 		Class<?> columnType = table.getContainer().getType(columnName);
 		if (columnType == null) {
 			return null;
@@ -250,7 +250,7 @@ public class CompoundSearch extends Panel {
 
 	private Filter convertTermQuery(Table table, TermQuery query) {
 		Term term = query.getTerm();
-		String columnName = term.field();
+		String columnName = caseCorrectedFieldName(term.field());
 		Class<?> columnType = table.getContainer().getType(columnName);
 		if (columnType == null) {
 			return null;
@@ -291,6 +291,13 @@ public class CompoundSearch extends Panel {
 				return new StartsWith(columnName, text, false);
 			}
 		}
+	}
+
+	private String caseCorrectedFieldName(String fieldName) {
+		Map<String, String> mapping = getSearchableColumns()
+				.getLowerCaseColumnNamesMapping();
+		String realFieldName = mapping.get(fieldName.toLowerCase());
+		return realFieldName != null ? realFieldName : fieldName;
 	}
 
 	private String getFieldOptionKey(String columnName, String title) {

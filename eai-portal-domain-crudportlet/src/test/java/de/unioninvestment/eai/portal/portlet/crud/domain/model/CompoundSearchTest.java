@@ -340,6 +340,22 @@ public class CompoundSearchTest extends AbstractSpringPortletContextTest {
 	}
 
 	@Test
+	public void shouldConvertBeingCaseInsensitiveForFieldNames() throws ParseException {
+		search.search("third:\"my long phrase\"");
+		List<Filter> filters = asList((Filter) new StartsWith("THIRD",
+				"my long phrase", false));
+		verifyReplaceFilters(filters);
+	}
+
+	@Test
+	public void shouldConvertBeingCaseInsensitiveForFieldNamesInSelects() throws ParseException {
+		search.search("selecttext:\"Option 3\"");
+		List<Filter> filters = asList((Filter) new Equal("SELECTTEXT",
+				"Option 3", false));
+		verifyReplaceFilters(filters);
+	}
+
+	@Test
 	public void shouldIgnoreNonMatchingField() throws ParseException {
 		search.search("NOTINTABLE:4711");
 		verifyRemoveAllFilters();

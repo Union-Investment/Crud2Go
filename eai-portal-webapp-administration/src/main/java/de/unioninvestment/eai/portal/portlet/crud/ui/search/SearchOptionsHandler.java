@@ -126,12 +126,13 @@ public class SearchOptionsHandler implements OptionHandler {
 			return partialFieldName != null && fieldname == null;
 		}
 
-		public String getPartialFieldName() {
-			return partialFieldName;
+		public String getPartialLowercaseFieldName() {
+			return partialFieldName == null ? null : partialFieldName
+					.toLowerCase();
 		}
 
-		public String getFieldname() {
-			return fieldname;
+		public String getLowercaseFieldname() {
+			return fieldname == null ? null : fieldname.toLowerCase();
 		}
 
 		public String getHead() {
@@ -243,8 +244,11 @@ public class SearchOptionsHandler implements OptionHandler {
 
 	private List<String> defaultSelectionFieldNames;
 
+	private Map<String, String> columnNamesMapping;
+
 	public SearchOptionsHandler(TableColumns fields) {
 		this.fields = fields;
+		columnNamesMapping = fields.getLowerCaseColumnNamesMapping();
 		opsAndAttrsWithColon = new TreeSet<String>(keywords);
 		opsAndAttrsWithColon.addAll( //
 				FluentIterable.from(fields.getSearchableColumnNames())
@@ -271,7 +275,7 @@ public class SearchOptionsHandler implements OptionHandler {
 		} else if (filterString.isInRangeAfterTO()) {
 			// empty list
 		} else if (filterString.isInFieldName()) {
-			String lowerTail = filterString.getPartialFieldName().toLowerCase();
+			String lowerTail = filterString.getPartialLowercaseFieldName();
 			options.addAll(FluentIterable.from(opsAndAttrsWithColon)
 					//
 					.filter(new LowerStartsWith(lowerTail))
@@ -284,26 +288,33 @@ public class SearchOptionsHandler implements OptionHandler {
 					.toList());
 		} else if (filterString.isInFieldValue()) {
 			// lastColonIndex >= 0
-			String fieldName = filterString.getFieldname();
-			String partialFieldvalue = filterString.getPartialFieldValue();
-			addFilteredOptionListOptions(options, filterString, fieldName,
-					partialFieldvalue, filterString.getHead() + fieldName + ":");
+			String lowercaseFieldName = filterString.getLowercaseFieldname();
+			String fieldName = columnNamesMapping.get(lowercaseFieldName);
+			if (fieldName != null) {
+				String partialFieldvalue = filterString.getPartialFieldValue();
+				addFilteredOptionListOptions(options, filterString,
+						lowercaseFieldName, partialFieldvalue,
+						filterString.getHead() + fieldName + ":");
+			}
 		}
 		if (filterString.isInDefaultValue()) {
 			for (String defaultName : defaultSelectionFieldNames) {
 				addFilteredOptionListOptions(options, filterString,
-						defaultName, filterString.getPartialDefaultValue(), filterString.getHead());
+						defaultName.toLowerCase(),
+						filterString.getPartialDefaultValue(),
+						filterString.getHead());
 			}
 		}
 		return options;
 	}
 
 	private void addFilteredOptionListOptions(Set<String> options,
-			FilterString filterString, String fieldName,
+			FilterString filterString, String lowercaseFieldName,
 			String partialFieldvalue, String prefix) {
-		if (fields.isSelection(fieldName)) {
+		String fieldname = columnNamesMapping.get(lowercaseFieldName);
+		if (fieldname != null && fields.isSelection(fieldname)) {
 			Map<String, String> fieldOptions = fields.getDropdownSelections(
-					fieldName, partialFieldvalue, maximumFieldOptions);
+					fieldname, partialFieldvalue, maximumFieldOptions);
 			if (fieldOptions != null) {
 				for (String fieldOption : fieldOptions.values()) {
 					options.add(prefix + "\"" + fieldOption + "\" ");

@@ -57,6 +57,9 @@ public class SearchOptionsHandlerTest {
 		when(fieldsMock.getDefaultSearchableColumnNames()).thenReturn(
 				asList("OPTS"));
 		when(fieldsMock.isSelection("OPTS")).thenReturn(true);
+		when(fieldsMock.getLowerCaseColumnNamesMapping()).thenReturn(
+				ImmutableMap.<String, String> of("master", "MASTER", "second",
+						"SECOND", "third", "THIRD", "match", "MATCH", "opts", "OPTS"));
 		handler = new SearchOptionsHandler(fieldsMock);
 	}
 
@@ -192,12 +195,12 @@ public class SearchOptionsHandlerTest {
 		when(fieldsMock.getDropdownSelections("OPTS", "", 100)).thenReturn(
 				ImmutableMap.of("1", "Option 1", "2", "Option 2", "3",
 						"Option 3"));
-		
+
 		assertThat(handler.getOptions(""), hasItems("\"Option 1\" ", //
 				"\"Option 2\" ", //
 				"\"Option 3\" "));
 	}
-	
+
 	@Test
 	public void shouldDeliverTOInIncludingRangeQuery() {
 		assertThat(handler.getOptions("MASTER:[He "),

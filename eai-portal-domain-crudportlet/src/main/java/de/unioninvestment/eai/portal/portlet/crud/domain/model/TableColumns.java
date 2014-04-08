@@ -30,6 +30,8 @@ import java.util.Map.Entry;
 
 import org.vaadin.tokenfield.TokenField;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.gwt.thirdparty.guava.common.collect.Maps;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
@@ -48,6 +50,8 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 
 	private final HashMap<String, TableColumn> columns = new HashMap<String, TableColumn>();
 	private final List<TableColumn> columnsList;
+
+	private ImmutableMap<String, String> lowerCaseColumnNamesMapping;
 
 	/**
 	 * @param cols
@@ -342,8 +346,8 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 		if (allOptions != null) {
 			Map<String, String> results = Maps.newLinkedHashMap();
 			int left = maximumEntries <= 0 ? Integer.MAX_VALUE : maximumEntries;
-			String prefix = titleStartingWith == null ? null : titleStartingWith
-					.toLowerCase();
+			String prefix = titleStartingWith == null ? null
+					: titleStartingWith.toLowerCase();
 			for (Entry<String, String> entry : allOptions.entrySet()) {
 				if (left <= 0) {
 					break;
@@ -359,4 +363,17 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 		return null;
 	}
 
+	public Map<String, String> getLowerCaseColumnNamesMapping() {
+		if (lowerCaseColumnNamesMapping == null) {
+			Builder<String, String> builder = ImmutableMap
+					.<String, String> builder();
+			for (TableColumn column : columnsList) {
+				builder.put(column.getName().toLowerCase(), column.getName());
+			}
+			lowerCaseColumnNamesMapping = builder.build();
+		}
+		return lowerCaseColumnNamesMapping;
+		
+		
+	}
 }
