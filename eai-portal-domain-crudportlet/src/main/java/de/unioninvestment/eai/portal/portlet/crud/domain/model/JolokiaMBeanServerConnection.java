@@ -230,23 +230,19 @@ public class JolokiaMBeanServerConnection implements MBeanServerConnection {
 			Set<String> opNameSet = opMap.keySet();
 			for (String opName : opNameSet) {
 				if (opMap.get(opName) instanceof Map) {
-					@SuppressWarnings("unchecked")
-					List<Map<String, String>> paramList = (List<Map<String, String>>) opMap
-							.get(opName).get("args");
-					List<MBeanParameterInfo> params = new ArrayList<MBeanParameterInfo>();
-					for (Map<String, String> paramMap : paramList) {
-						MBeanParameterInfo param = new MBeanParameterInfo(
-								(String) paramMap.get("name"),
-								(String) paramMap.get("type"),
-								(String) paramMap.get("desc"));
-						params.add(param);
-					}
-					MBeanOperationInfo info = new MBeanOperationInfo(
-							opName,
-							(String) opMap.get(opName).get("desc"),
-							params.toArray(new MBeanParameterInfo[params.size()]),
-							(String) opMap.get(opName).get("ret"), 0);
+					MBeanOperationInfo info = mapMBeanOperationInfo(
+							opMap.get(opName), opName);
 					oInfos.add(info);
+				} else if (opMap.get(opName) instanceof JSONArray) {
+					for (int i = 0; i < ((JSONArray) opMap.get(opName)).size(); i++) {
+						if (((JSONArray) opMap.get(opName)).get(i) instanceof Map) {
+							@SuppressWarnings("unchecked")
+							MBeanOperationInfo info = mapMBeanOperationInfo(
+									(Map<String, Object>) ((JSONArray) opMap.get(opName))
+											.get(i), opName);
+							oInfos.add(info);
+						}
+					}
 				}
 			}
 
@@ -277,6 +273,27 @@ public class JolokiaMBeanServerConnection implements MBeanServerConnection {
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
+
+	}
+
+	private MBeanOperationInfo mapMBeanOperationInfo(
+			Map<String, Object> opItem, String opName) {
+		@SuppressWarnings("unchecked")
+		List<Map<String, String>> paramList = (List<Map<String, String>>) opItem
+				.get("args");
+		List<MBeanParameterInfo> params = new ArrayList<MBeanParameterInfo>();
+		for (Map<String, String> paramMap : paramList) {
+			MBeanParameterInfo param = new MBeanParameterInfo(
+					(String) paramMap.get("name"),
+					(String) paramMap.get("type"),
+					(String) paramMap.get("desc"));
+			params.add(param);
+		}
+		MBeanOperationInfo info = new MBeanOperationInfo(opName,
+				(String) opItem.get("desc"),
+				params.toArray(new MBeanParameterInfo[params.size()]),
+				(String) opItem.get("ret"), 0);
+		return info;
 	}
 
 	/**
