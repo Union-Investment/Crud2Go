@@ -189,6 +189,10 @@ public interface DataContainer extends Serializable {
 	 * @param removeDurable
 	 *            <code>true</code>, wenn auch "durable" Filter ersetzt werden
 	 *            sollen.
+	 * @param forceReplace
+	 *            Ersetzen der Filter auch dann, wenn sich gegenüber der letzten
+	 *            Filterung keine Änderung ergeben hat. Dies führt in jedem Fall
+	 *            zu einem Neuladen der Inhalte.
 	 * @param timeout
 	 *            die Timeout-Zeit in Sekunden.
 	 */

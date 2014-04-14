@@ -372,7 +372,8 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 	private void addCustomButtonsListeners() {
 		if (!actionButtons.isEmpty()) {
-			for (Button button : actionButtons.values()) {
+			for (final Button button : actionButtons.values()) {
+				button.setDisableOnClick(true);
 				final TableAction action = buttonToTableActionMap.get(button);
 				button.addClickListener(new Button.ClickListener() {
 
@@ -380,25 +381,29 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 					@Override
 					public void buttonClick(ClickEvent event) {
-						presenter.callClosure(action);
+						try {
+							presenter.callClosure(action);
 
-						if (action.isExportAction()) {
-							switch (action.getExportType()) {
-							case XLS:
-								exportExcelSheet();
-								break;
-							case CSV:
-								exportCSVSheet();
-								break;
-							default:
-								throw new IllegalArgumentException(
-										"Unknown export type '"
-												+ action.getExportType()
-												+ "' set on action with title '"
-												+ action.getTitle()
-												+ "' and id '" + action.getId()
-												+ "'");
+							if (action.isExportAction()) {
+								switch (action.getExportType()) {
+								case XLS:
+									exportExcelSheet();
+									break;
+								case CSV:
+									exportCSVSheet();
+									break;
+								default:
+									throw new IllegalArgumentException(
+											"Unknown export type '"
+													+ action.getExportType()
+													+ "' set on action with title '"
+													+ action.getTitle()
+													+ "' and id '"
+													+ action.getId() + "'");
+								}
 							}
+						} finally {
+							button.setEnabled(true);
 						}
 					}
 				});

@@ -333,11 +333,16 @@ public class DefaultFormView extends Panel implements FormView, Handler {
 
 		boolean allHidden = true;
 		for (final FormAction action : actions) {
-			Button button = new Button(action.getTitle());
+			final Button button = new Button(action.getTitle());
+			button.setDisableOnClick(true);
 			button.addClickListener(new ClickListener() {
 				@Override
 				public void buttonClick(ClickEvent event) {
-					presenter.executeAction(action);
+					try {
+						presenter.executeAction(action);
+					} finally {
+						button.setEnabled(true);
+					}
 				}
 			});
 
