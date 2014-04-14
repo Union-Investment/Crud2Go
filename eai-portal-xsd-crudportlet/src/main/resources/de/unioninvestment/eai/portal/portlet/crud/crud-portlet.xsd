@@ -50,7 +50,7 @@
 					</annotation>
 				</attribute>
 				<attribute name="refresh-on-page-reload" type="boolean"
-					default="false">
+					default="true">
 					<annotation>
 						<documentation>
 							Sollen bei einem Refresh der Seite oder beim
