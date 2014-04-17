@@ -52,6 +52,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
@@ -418,6 +419,26 @@ public class ScriptFilterFactoryTest {
 						"myVal1")), true)));
 	}
 
+	@Test
+	public void shouldbuildNotFilter() throws InstantiationException,
+	IllegalAccessException {
+		runScript("container.addFilters { not { equal \"myCol1\", \"myVal1\" } }");
+		
+		verify(databaseContainerMock).addFilters(
+				asList((Filter) new Not(asList((Filter) new Equal("myCol1",
+						"myVal1")))));
+	}
+	
+	@Test
+	public void shouldbuildDurableNotFilter() throws InstantiationException,
+	IllegalAccessException {
+		runScript("container.addFilters { not durable:true, { equal \"myCol1\", \"myVal1\" } }");
+		
+		verify(databaseContainerMock).addFilters(
+				asList((Filter) new Not(asList((Filter) new Equal("myCol1",
+						"myVal1")), true)));
+	}
+	
 	@Test
 	public void shouldBuildNothingFilter() {
 		fac.nothing();

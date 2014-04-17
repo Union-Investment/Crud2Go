@@ -34,6 +34,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.RegExpFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
@@ -417,6 +418,30 @@ public class ScriptFilterFactory {
 	 */
 	public void any(Closure<?> closure) {
 		filters.add(new Any(new FilterClosureCallable(closure).call()));
+	}
+
+	/**
+	 * Akzeptiert eine Closure mit Filtern, die nicht zutreffen sollen.
+	 * 
+	 * @param closure
+	 *            eine Closure die wiederum Filter-Kommandos enthalten kann
+	 */
+	public void not(Closure<?> closure) {
+		filters.add(new Not(new FilterClosureCallable(closure).call()));
+	}
+
+	/**
+	 * Akzeptiert eine Closure mit Filtern, die nicht zutreffen sollen.
+	 * 
+	 * @param namedArgs
+	 *            Liste optionaler Named-Parameters (z.B. im Skript
+	 *            'durable:true')
+	 * @param closure
+	 *            eine Closure die wiederum Filter-Kommandos enthalten kann
+	 */
+	public void not(Map<String, Object> namedArgs, Closure<?> closure) {
+		filters.add(new Not(new FilterClosureCallable(closure).call(),
+				durable(namedArgs)));
 	}
 
 	/**
