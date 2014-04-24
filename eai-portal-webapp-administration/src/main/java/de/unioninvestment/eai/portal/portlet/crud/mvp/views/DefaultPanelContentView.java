@@ -94,7 +94,7 @@ public class DefaultPanelContentView extends CustomComponent implements
 		int footerHeight = Context.getBean(Settings.class).getFooterHeight();
 		new LiferayResizeExtension().extend(this, footerHeight) //
 			.useServerSide() //
-			.minimunHeight(minimumHeight);
+			.minimumHeight(minimumHeight);
 
 		getLayoutInternal().setHeight("100%");
 	}
