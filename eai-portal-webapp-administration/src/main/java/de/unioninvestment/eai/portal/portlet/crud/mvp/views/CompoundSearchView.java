@@ -29,8 +29,25 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 public interface CompoundSearchView extends PanelContentView {
 
 	public interface Presenter {
+		/**
+		 * Prüft, ob die übergeben Query syntaktisch ok ist.
+		 * 
+		 * @param queryString der Suchtext
+		 * @return das Prüfergebnis
+		 */
 		boolean isValidQuery(String queryString);
+		
+		/**
+		 * Suche ausführen.
+		 * 
+		 * @param queryString der Suchtext
+		 */
 		void search(String queryString);
+
+		/**
+		 * Suche zurücksetzen.
+		 */
+		void reset();
 	}
 
 	void setPresenter(CompoundSearchView.Presenter compoundSearchPresenter);

@@ -44,6 +44,10 @@ public abstract class Component {
 		this.panel = panel;
 	}
 
+	public abstract String getWidth();
+	
+	public abstract String getHeight();
+	
 	/**
 	 * A component that can be configured to expand in size to take up all
 	 * available space in the layout - that is: space, that is not taken up by

@@ -106,7 +106,7 @@ public class TextArea extends Component implements
 
 	@Override
 	public int getExpandRatio() {
-		return this.config.getExpandRatio();
+		return this.config.getExpandRatio() == null ? 0 : this.config.getExpandRatio();
 	}
 
 	public String getWidth() {

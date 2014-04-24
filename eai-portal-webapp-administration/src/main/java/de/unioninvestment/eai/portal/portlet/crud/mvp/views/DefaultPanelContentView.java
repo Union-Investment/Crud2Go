@@ -29,8 +29,11 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.LiferayTheme;
 
+import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PanelContentPresenter;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
+import de.unioninvestment.portal.liferay.resize.LiferayResizeExtension;
 
 /**
  * Default-Implementierung für {@link PanelContentView}, {@link View} für
@@ -61,19 +64,39 @@ public class DefaultPanelContentView extends CustomComponent implements
 	 *            The desired height of component (@since 1.45). Defaults to
 	 *            undefined when not specified.
 	 */
-	public DefaultPanelContentView(boolean withMargin,
-			boolean useHorizontalLayout, String width, String height) {
-		// will use VerticalLayout by default.
-		super(useHorizontalLayout ? new HorizontalLayout()
-				: new VerticalLayout());
-		AbstractOrderedLayout layout = getLayoutInternal();
+	public DefaultPanelContentView() {
+	}
+
+	@Override
+	public void initialize(boolean useHorizontalLayout) {
+
+		AbstractOrderedLayout layout = useHorizontalLayout ? new HorizontalLayout()
+				: new VerticalLayout();
+		setCompositionRoot(layout);
+
 		layout.setSpacing(true);
-		layout.setMargin(withMargin);
-		layout.setWidth(width != null ? width : "100%");
-		if (height != null) {
-			layout.setHeight(height);
-		}
-		this.setStyleName(LiferayTheme.PANEL_LIGHT);
+		layout.setMargin(true);
+	}
+
+	public void setWidth(String newWidth) {
+		super.setWidth(newWidth);
+		getLayoutInternal().setWidth(newWidth != null ? "100%" : null);
+	};
+
+	@Override
+	public void setHeight(String height) {
+		super.setHeight(height);
+		getLayoutInternal().setHeight(height != null ? "100%" : null);
+	}
+
+	@Override
+	public void setHeightToFitScreen(Integer minimumHeight) {
+		int footerHeight = Context.getBean(Settings.class).getFooterHeight();
+		new LiferayResizeExtension().extend(this, footerHeight) //
+			.useServerSide() //
+			.minimunHeight(minimumHeight);
+
+		getLayoutInternal().setHeight("100%");
 	}
 
 	/**
@@ -123,4 +146,16 @@ public class DefaultPanelContentView extends CustomComponent implements
 		layout.setComponentAlignment(backButton, Alignment.MIDDLE_RIGHT);
 		return backButton;
 	}
+
+	@Override
+	public void setExpandRatio(Component component, float expandRatio) {
+		getLayoutInternal().setExpandRatio(component, expandRatio);
+	}
+
+	@Override
+	public void setHeight(float height, Unit unit) {
+		super.setHeight(height, unit);
+		getLayoutInternal().setHeight(height >= 0 ? "100%" : null);
+	}
+
 }

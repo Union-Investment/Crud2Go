@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<table>
+			<database-table datasource="test" tablename="test_crud2" />
+			<action title="Open dialog" onExecution="openDialog()"/>
+		</table>
+	</page>
+	<script><![CDATA[
+def openDialog() {
+	TextArea textArea = new TextArea('Mööp')
+	Button okButton = new Button('Ok')
+	okButton.addClickListener({ event ->
+		Notification.show('Ok, mach ich')
+	} as Button.ClickListener)
+	
+	FormLayout formLayout = new FormLayout()
+	formLayout.addComponents(textArea, okButton)
+
+	Window dialog = new Window()
+	dialog.setContent(formLayout)
+	dialog.center()
+	dialog.setWidth("70%")
+	
+	UI.current.addWindow(dialog)
+}
+	
+	]]></script>
+</portlet>

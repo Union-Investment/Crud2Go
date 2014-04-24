@@ -45,7 +45,6 @@ public class DefaultRegionView extends DefaultPanelContentView implements
 	 */
 	public DefaultRegionView(boolean withMargin, boolean useHorizontalLayout,
 			String width, String height) {
-		super(withMargin, useHorizontalLayout, width, height);
 		this.addStyleName("crudRegion");
 	}
 

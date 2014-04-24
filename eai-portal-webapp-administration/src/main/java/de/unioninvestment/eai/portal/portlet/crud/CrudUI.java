@@ -76,6 +76,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEventHa
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelPreferences;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
@@ -475,7 +476,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 			LOG.debug("Building domain model");
 			ModelBuilder modelBuilder = modelFactory.getBuilder(eventBus,
-					portletConfig);
+					portletConfig, createModelPreferences());
 			portletDomain = modelBuilder.build();
 
 			LOG.debug("Building scripting model");
@@ -500,6 +501,23 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		}
 
 		this.datasourceInfo.setPortletConfig(portletConfig.getPortletConfig());
+	}
+
+	/**
+	 * @return model preferences taken from portlet instance preferences
+	 */
+	ModelPreferences createModelPreferences() {
+		PortletPreferences prefs = VaadinPortletService.getCurrentPortletRequest().getPreferences();
+		ModelPreferences modelPrefs = new ModelPreferences();
+		
+		String pageHeight = prefs.getValue("portlet.page.height", null);
+		modelPrefs.setPageHeight(pageHeight);
+		
+		String minimumHeight = prefs.getValue("portlet.page.minimum-height", null);
+		if (minimumHeight != null) {
+			modelPrefs.setPageMinimumHeight(Integer.parseInt(minimumHeight));
+		}
+		return modelPrefs;
 	}
 
 	private void provideBackButtonFunctionality(String portletId) {

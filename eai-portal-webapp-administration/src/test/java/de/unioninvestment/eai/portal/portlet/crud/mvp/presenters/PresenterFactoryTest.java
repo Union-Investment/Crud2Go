@@ -130,9 +130,7 @@ public class PresenterFactoryTest {
 	public void shouldInstancePagePresenter() {
 		Panel pageMock = mock(Page.class);
 		PanelContentView pageViewMock = mock(PanelContentView.class);
-		when(
-				viewFactoryMock.panelContentView(anyBoolean(), anyBoolean(),
-						anyString(), anyString())).thenReturn(pageViewMock);
+		when(viewFactoryMock.panelContentView()).thenReturn(pageViewMock);
 
 		PanelContentPresenter pagePresenter = presenterFactory
 				.panelContentPresenter(pageMock);
@@ -144,9 +142,7 @@ public class PresenterFactoryTest {
 	public void shouldRequestPanelViewWithMarginForTab() {
 		Panel tabMock = mock(Tab.class);
 		PanelContentView tabViewMock = mock(PanelContentView.class);
-		when(
-				viewFactoryMock.panelContentView(anyBoolean(), eq(false),
-						anyString(), anyString())).thenReturn(tabViewMock);
+		when(viewFactoryMock.panelContentView()).thenReturn(tabViewMock);
 
 		PanelContentPresenter pagePresenter = presenterFactory
 				.panelContentPresenter(tabMock);
@@ -183,9 +179,7 @@ public class PresenterFactoryTest {
 	@Test
 	public void shouldCreateDialogPresenterWithGivenView() throws Exception {
 		// given
-		when(
-				viewFactoryMock.panelContentView(anyBoolean(), anyBoolean(),
-						anyString(), anyString())).thenReturn(
+		when(viewFactoryMock.panelContentView()).thenReturn(
 				panelContentViewMock);
 
 		// when
@@ -200,9 +194,7 @@ public class PresenterFactoryTest {
 	public void shouldCreatePanelContentPresenterWithGivenView()
 			throws Exception {
 		// given
-		when(
-				viewFactoryMock.panelContentView(anyBoolean(), anyBoolean(),
-						anyString(), anyString())).thenReturn(
+		when(viewFactoryMock.panelContentView()).thenReturn(
 				panelContentViewMock);
 
 		// when
@@ -262,6 +254,6 @@ public class PresenterFactoryTest {
 						tableMock, tablePresenterMock);
 
 		// then
-		assertThat(presenter.getView(), is((View)rowEditingFormViewMock));
+		assertThat(presenter.getView(), is((View) rowEditingFormViewMock));
 	}
 }

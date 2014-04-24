@@ -33,17 +33,22 @@ public class Page extends Panel {
 	/**
 	 * @param config
 	 *            The configuration of this page.
+	 * @param prefs 
 	 * @since 1.45.
 	 */
-	public Page(PageConfig config) {
+	public Page(PageConfig config, ModelPreferences prefs) {
 		super(config);
+		if (prefs.getPageHeight() != null) {
+			setConfiguredHeight(prefs.getPageHeight());
+		}
+		if (prefs.getPageMinimumHeight() != null) {
+			setMinimumHeight(prefs.getPageMinimumHeight());
+		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	protected PageConfig getConfig() {
 		return (PageConfig) super.getConfig();
 	}
+
 }

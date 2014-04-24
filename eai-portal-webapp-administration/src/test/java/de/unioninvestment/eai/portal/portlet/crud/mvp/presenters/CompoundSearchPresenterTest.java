@@ -83,6 +83,12 @@ public class CompoundSearchPresenterTest {
 	}
 
 	@Test
+	public void shouldResetSearch() {
+		presenter.reset();
+		verify(modelMock).search("");
+	}
+
+	@Test
 	public void shouldUpdateViewOnQueryStringChange() {
 		verify(modelMock).addQueryChangedEventHandler(presenter);
 		expectSearchOnUpdateOfQueryStringInView();

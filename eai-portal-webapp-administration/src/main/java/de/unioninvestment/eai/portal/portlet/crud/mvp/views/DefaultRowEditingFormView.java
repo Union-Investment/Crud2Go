@@ -25,6 +25,7 @@ import java.io.OutputStream;
 
 import org.springframework.util.Assert;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -91,24 +92,9 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	private Button switchModeButton = null;
 
 	/**
-	 * Konstruktor.
-	 * 
-	 * @param withMargin
-	 *            ob der Margin gesetzt werden soll. *
-	 * @param useHorizontalLayout
-	 *            when <code>true</code>, components are layed out horizontally.
-	 *            (@since 1.45).
-	 * @param width
-	 *            The desired width of component (@since 1.45). Defaults to
-	 *            "100%" when not specified.
-	 * @param height
-	 *            The desired height of component (@since 1.45). Defaults to
-	 *            "100%" when not specified.
+	 * Leerer Konstruktor.
 	 */
-	public DefaultRowEditingFormView(boolean withMargin,
-			boolean useHorizontalLayout, String width, String height) {
-
-		super(withMargin, useHorizontalLayout, width, height);
+	public DefaultRowEditingFormView() {
 	}
 
 	@Override

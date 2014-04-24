@@ -398,6 +398,16 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="minimum-height" type="int" use="optional">
+					<annotation>
+						<documentation>
+							The minimun height of a page, if the
+							height
+							is set to
+							'fit'.
+						</documentation>
+					</annotation>
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -457,7 +467,7 @@
 						</documentation>
 					</annotation>
 				</attribute>
-				<attribute name="expandRatio" type="int" default="0">
+				<attribute name="expandRatio" type="int">
 					<annotation>
 						<documentation>
 							The expand ratio determines the amount of available
@@ -550,8 +560,11 @@
 					<annotation>
 						<documentation>
 							The desired height of the component, usually given
-							in pixels, for
-							example '150px'.
+							in pixels, for example '150px'.
+
+							Panels also support the value
+							'fit' to adjust the height
+							to fit the browser window.
 						</documentation>
 					</annotation>
 				</attribute>
@@ -577,7 +590,7 @@
 						</documentation>
 					</annotation>
 				</attribute>
-				<attribute name="expandRatio" type="int" default="0">
+				<attribute name="expandRatio" type="int">
 					<annotation>
 						<documentation>
 							The expand ratio determines the amount of available
@@ -754,7 +767,7 @@
 						</documentation>
 					</annotation>
 				</attribute>
-				<attribute name="expandRatio" type="int" default="0">
+				<attribute name="expandRatio" type="int">
 					<annotation>
 						<documentation>
 							The expand ratio determines the amount of available
@@ -829,7 +842,7 @@
 						</documentation>
 					</annotation>
 				</attribute>
-				<attribute name="expandRatio" type="int" default="0">
+				<attribute name="expandRatio" type="int">
 					<annotation>
 						<documentation>
 							The expand ratio determines the amount of available
@@ -1741,7 +1754,7 @@
 						</documentation>
 					</annotation>
 				</attribute>
-				<attribute name="expandRatio" type="int" default="0">
+				<attribute name="expandRatio" type="int">
 					<annotation>
 						<documentation>
 							The expand ratio determines the amount of available

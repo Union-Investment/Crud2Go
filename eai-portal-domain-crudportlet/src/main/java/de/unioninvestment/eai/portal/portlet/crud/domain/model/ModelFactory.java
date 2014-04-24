@@ -132,9 +132,9 @@ public class ModelFactory {
 	 *            Portletkonfiguration
 	 * @return Model-Builder
 	 */
-	public ModelBuilder getBuilder(EventBus eventBus, Config config) {
+	public ModelBuilder getBuilder(EventBus eventBus, Config config, ModelPreferences prefs) {
 		return new ModelBuilder(eventBus, this, userFactory, resetFormAction,
-				fieldValidatorFactory, defaultSelectWidth, config, directEdit);
+				fieldValidatorFactory, defaultSelectWidth, config, prefs, directEdit);
 	}
 
 	public Realm getAuthenticationRealm(AuthenticationRealmConfig config) {

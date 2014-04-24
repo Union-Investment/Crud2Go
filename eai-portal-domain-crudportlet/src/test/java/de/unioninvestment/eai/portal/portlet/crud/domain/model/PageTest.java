@@ -51,10 +51,21 @@ public class PageTest {
 	@Mock
 	private Portlet portletMock;
 
+	private ModelPreferences prefs;
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		page = new Page(configMock);
+		when(configMock.getHeight()).thenReturn("500px");
+		when(configMock.getMinimumHeight()).thenReturn(500);
+		
+		prefs = new ModelPreferences();
+		
+		createPage();
+	}
+
+	private void createPage() {
+		page = new Page(configMock, prefs);
 	}
 
 	@Test
@@ -101,4 +112,29 @@ public class PageTest {
 		when(configMock.isHorizontalLayout()).thenReturn(true);
 		assertThat(page.isHorizontalLayout(), is(true));
 	}
+	
+	@Test
+	public void shouldUsPageHeightFromConfigByDefault() {
+		assertThat(page.getHeight(), is("500px"));
+	}
+
+	@Test
+	public void shouldUsMinimumHeightFromConfigByDefault() {
+		assertThat(page.getMinimumHeight(), is(500));
+	}
+
+	@Test
+	public void shouldUsPageHeightFromPreferences() {
+		prefs.setPageHeight("fit");
+		createPage();
+		assertThat(page.getHeight(), is("fit"));
+	}
+	
+	@Test
+	public void shouldUsMinimumHeightFromPreferences() {
+		prefs.setPageMinimumHeight(200);
+		createPage();
+		assertThat(page.getMinimumHeight(), is(200));
+	}
+	
 }

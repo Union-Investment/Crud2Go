@@ -23,11 +23,6 @@ import static java.util.Collections.unmodifiableList;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vaadin.ui.AbstractOrderedLayout;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.VerticalLayout;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Panel;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.PanelContentView;
@@ -63,6 +58,20 @@ public class PanelContentPresenter extends
 	 */
 	public PanelContentPresenter(PanelContentView view, Panel model) {
 		super(view, model);
+		view.initialize(model.isHorizontalLayout());
+
+		view.setMargin(model instanceof Tab);
+
+		// FIXME ist das hier sinnvoll/notwendig? Falls das Panel als Komponente
+		// eingebunden wird, kommen diese Daten von außen!?
+		String width = model.getWidth();
+		view.setWidth(width == null ? "100%" : width);
+
+		if (model.isHeightFitsScreen()) {
+			view.setHeightToFitScreen(model.getMinimumHeight());
+		} else {
+			view.setHeight(model.getHeight());
+		}
 	}
 
 	public String getTitle() {
@@ -70,34 +79,23 @@ public class PanelContentPresenter extends
 	}
 
 	/**
-	 * @param presenter
+	 * @param componentPresenter
 	 *            Presenter
 	 */
-	public void addComponent(ComponentPresenter presenter) {
-		this.components.add(presenter);
-		View componentToAdd = presenter.getView();
-		getView().addComponent(componentToAdd);
+	public void addComponent(ComponentPresenter componentPresenter) {
+		PanelContentView view = getView();
+		Panel model = getModel();
 
-		// Handle expandRatio (since 1.45)
-		int expandRatio = presenter.getComponentExpandRatio();
+		View componentToAdd = componentPresenter.getView();
+		this.components.add(componentPresenter);
+		view.addComponent(componentToAdd);
+
+		componentPresenter.updateViewWidth();
+		componentPresenter.updateViewHeight(model.isHeightDefined());
+
+		int expandRatio = componentPresenter.getExpandRatio();
 		if (expandRatio > 0) {
-			Component view = getView();
-			if (view instanceof com.vaadin.ui.Panel) {
-				view = ((com.vaadin.ui.Panel) view).getContent();
-			}
-			AbstractOrderedLayout layout = null;
-			if (view instanceof HorizontalLayout) {
-				layout = (HorizontalLayout) view;
-				componentToAdd.setWidth("100%");
-			} else if (view instanceof VerticalLayout) {
-				layout = (VerticalLayout) view;
-				componentToAdd.setHeight("100%");
-			} else if (view instanceof AbstractOrderedLayout) {
-				layout = (AbstractOrderedLayout) view;
-			}
-			if (layout != null) {
-				layout.setExpandRatio(componentToAdd, expandRatio);
-			}
+			getView().setExpandRatio(componentToAdd, expandRatio);
 		}
 	}
 

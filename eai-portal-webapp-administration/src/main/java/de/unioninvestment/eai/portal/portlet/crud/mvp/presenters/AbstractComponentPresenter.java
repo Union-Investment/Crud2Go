@@ -65,15 +65,42 @@ public class AbstractComponentPresenter<C extends Component, V extends View>
 		return this.model;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public int getComponentExpandRatio() {
+	public int getExpandRatio() {
 		if (model instanceof Component.ExpandableComponent) {
 			return ((Component.ExpandableComponent) this.model)
 					.getExpandRatio();
 		}
 		return 0;
+	}
+
+	protected String getConfiguredWidth() {
+		return this.model.getWidth();
+	}
+
+	protected String getConfiguredHeight() {
+		return this.model.getHeight();
+	}
+
+	@Override
+	public void updateViewWidth() {
+		String configuredWidth = getConfiguredWidth();
+		if (configuredWidth != null) {
+			getView().setWidth(configuredWidth);
+		} else {
+			getView().setWidth("100%");
+		}
+	}
+
+	@Override
+	public void updateViewHeight(boolean outerHeightDefined) {
+		String componentHeight = getConfiguredHeight();
+		if (componentHeight != null) {
+			getView().setHeight(componentHeight);
+		} else if (outerHeightDefined) {
+			getView().setHeight("100%");
+		} else {
+			getView().setHeight(null);
+		}
 	}
 }

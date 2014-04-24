@@ -78,6 +78,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelPreferences;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PresenterFactory;
@@ -197,7 +198,7 @@ public class CrudUITest extends SpringPortletContextTest {
 				new MockPortletURL(new MockPortalContext(), "myurl"));
 		when(
 				modelFactoryMock.getBuilder(isA(EventBus.class),
-						isA(Config.class))).thenReturn(modelBuilderMock);
+						isA(Config.class), isA(ModelPreferences.class))).thenReturn(modelBuilderMock);
 		when(modelBuilderMock.build()).thenReturn(portletMock);
 
 		when(presenterFactoryMock.portletConfigurationPresenter()).thenReturn(
@@ -345,7 +346,7 @@ public class CrudUITest extends SpringPortletContextTest {
 				isA(BusinessExceptionMessage.class));
 		verify(liferayContext.getPortletPreferencesMock()).getValue(
 				CrudVaadinPortlet.PORTLET_TITLE_PREF_KEY, null);
-		verifyNoMoreInteractions(liferayContext.getPortletPreferencesMock());
+		verify(liferayContext.getPortletPreferencesMock(), never()).store();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -502,6 +503,17 @@ public class CrudUITest extends SpringPortletContextTest {
 		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
 
 		verify(portletMock, times(1)).handleReload();
+	}
+
+	@Test
+	public void shouldCreateModelPreferencesFromPortletPreferences() {
+		when(liferayContext.getPortletPreferencesMock().getValue("portlet.page.height", null)).thenReturn("fit");
+		when(liferayContext.getPortletPreferencesMock().getValue("portlet.page.minimum-height", null)).thenReturn("333");
+		
+		initializeUI();
+		ModelPreferences prefs = app.createModelPreferences();
+		assertThat(prefs.getPageHeight(), is("fit"));
+		assertThat(prefs.getPageMinimumHeight(), is(333));
 	}
 
 	@Test

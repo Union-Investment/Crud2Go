@@ -45,7 +45,7 @@ public class CollapsibleRegionPresenter extends RegionPresenter implements
 	 */
 	public CollapsibleRegionPresenter(CollapsibleRegionView view, Region model) {
 		super(view, model);
-		view.initialize(this);
+		view.setPresenter(this);
 		view.setTitle(model.getTitle());
 		this.registerEventHandlers();
 		view.setCollapsed(model.isCollapsed());

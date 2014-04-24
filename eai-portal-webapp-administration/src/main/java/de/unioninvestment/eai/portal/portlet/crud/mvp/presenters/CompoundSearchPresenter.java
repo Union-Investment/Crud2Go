@@ -83,6 +83,11 @@ public class CompoundSearchPresenter extends PanelContentPresenter implements
 	}
 
 	@Override
+	public void reset() {
+		getModel().search("");
+	}
+	
+	@Override
 	public void onQueryChange(CompoundQueryChangedEvent event) {
 		try {
 			externalChange = true;

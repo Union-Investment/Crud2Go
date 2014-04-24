@@ -260,6 +260,11 @@
 				<artifactId>tokenfield</artifactId>
 				<version>7.0.1</version>
 			</dependency>
+			<dependency>
+				<groupId>de.unioninvestment</groupId>
+				<artifactId>liferay-resize-addon</artifactId>
+				<version>1.0.0</version>
+			</dependency>
 
 			<dependency>
 				<groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
@@ -402,12 +407,12 @@
 				<artifactId>derby</artifactId>
 				<version>10.7.1.1</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.jolokia</groupId>
 				<artifactId>jolokia-client-java</artifactId>
 				<version>1.1.3</version>
-			</dependency>   
+			</dependency>
 
 		</dependencies>
 	</dependencyManagement>

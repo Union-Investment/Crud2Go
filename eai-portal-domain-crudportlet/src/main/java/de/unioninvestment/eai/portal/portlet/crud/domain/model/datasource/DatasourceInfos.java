@@ -26,14 +26,12 @@ import java.util.List;
 import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
-
 /**
  * Das Modell der Datenquellen-Infoübersicht.
  * 
  * @author Frank Hardy (Codecentric AG)
  */
-public class DatasourceInfos extends Component implements Serializable,
+public class DatasourceInfos implements Serializable,
 		Iterable<DatasourceInfo> {
 
 	private static final long serialVersionUID = 1L;

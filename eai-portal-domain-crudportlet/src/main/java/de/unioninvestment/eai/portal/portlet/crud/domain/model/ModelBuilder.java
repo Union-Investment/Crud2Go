@@ -120,6 +120,8 @@ public class ModelBuilder {
 
 	private boolean directEditDefault;
 
+	private ModelPreferences prefs;
+
 	/**
 	 * Konstruktor mit Parameter.
 	 * 
@@ -141,7 +143,8 @@ public class ModelBuilder {
 	public ModelBuilder(EventBus eventBus, ModelFactory factory,
 			UserFactory userFactory, ResetFormAction resetFormAction,
 			FieldValidatorFactory fieldValidatorFactory,
-			int defaultSelectWidth, Config config, boolean directEditDefault) {
+			int defaultSelectWidth, Config config, ModelPreferences prefs,
+			boolean directEditDefault) {
 		this.eventBus = eventBus;
 		this.factory = factory;
 		this.userFactory = userFactory;
@@ -149,6 +152,7 @@ public class ModelBuilder {
 		this.fieldValidatorFactory = fieldValidatorFactory;
 		this.defaultSelectWidth = defaultSelectWidth;
 		this.config = config;
+		this.prefs = prefs;
 		this.directEditDefault = directEditDefault;
 	}
 
@@ -347,7 +351,7 @@ public class ModelBuilder {
 
 	private Panel createPanelInstance(PanelConfig panelConfig) {
 		if (panelConfig instanceof PageConfig) {
-			return new Page((PageConfig) panelConfig);
+			return new Page((PageConfig) panelConfig, prefs);
 		} else if (panelConfig instanceof TabConfig) {
 			TabConfig tabConfig = (TabConfig) panelConfig;
 			Tab tab = new Tab(tabConfig);

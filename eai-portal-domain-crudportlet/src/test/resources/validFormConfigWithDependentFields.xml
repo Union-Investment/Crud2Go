@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Einfaches Beispiel">
+	<page>
+		<form id="form" columns="1">
+			<field name="first" onValueChange="updateSecondField()">
+				<select>
+					<option key="1">Eins</option>
+					<option key="2">Zwei</option>
+				</select>
+			</field>
+			<field name="second">
+				<select id="secondOptions">
+					<dynamic options="secondOptionsList()"/>
+				</select>
+			</field>
+			<action title="bla" onExecution="0" />
+		</form>
+	</page>
+	<script><![CDATA[
+		def updateSecondField() {
+			portlet.elements.secondOptions.refresh()
+			portlet.elements.form.fields.second.value = ''
+		}
+		
+		def secondOptionsList() {
+			def firstValue = portlet.elements.form.fields.first.value
+			if (firstValue) {
+				["$firstValue": firstValue]
+			} else {
+				[:]
+			}
+		}
+	]]></script>
+</portlet>

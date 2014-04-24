@@ -40,6 +40,7 @@ public class Panel extends Component implements Serializable {
 	private List<Component> elements = new ArrayList<Component>();
 
 	private Presenter presenter;
+	private String configuredHeight;
 
 	/**
 	 * The configuration of this Panel.
@@ -47,6 +48,7 @@ public class Panel extends Component implements Serializable {
 	 * @since 1.45.
 	 */
 	private final PanelConfig config;
+	private Integer minimumHeight;
 
 	/**
 	 * Definiert die Erwartungen des Models an den Presenter.
@@ -88,6 +90,18 @@ public class Panel extends Component implements Serializable {
 	public Panel(PanelConfig config) {
 		Validate.notNull(config);
 		this.config = config;
+		if (config != null) {
+			this.configuredHeight = config.getHeight();
+			this.minimumHeight = config.getMinimumHeight();
+		}
+	}
+
+	void setConfiguredHeight(String configuredHeight) {
+		this.configuredHeight = configuredHeight;
+	}
+
+	void setMinimumHeight(Integer minimumHeight) {
+		this.minimumHeight = minimumHeight;
 	}
 
 	/**
@@ -122,14 +136,43 @@ public class Panel extends Component implements Serializable {
 	 * @since 1.45
 	 */
 	public String getWidth() {
-		return this.config.getWidth();
+		return this.config == null ? null : this.config.getWidth();
 	}
 
 	/**
 	 * @since 1.45
+	 * 
+	 * @return the height, given the {@link #isHeightFitsScreen()} returns
+	 *         <code>false</code>
 	 */
 	public String getHeight() {
-		return this.config.getHeight();
+		if (configuredHeight == null && isHeightDefined()) {
+			return "100%";
+		} else {
+			return configuredHeight;
+		}
+	}
+
+	/**
+	 * @return <code>true</code>, if the view should try to adjust the height to
+	 *         fill the browser window
+	 */
+	public boolean isHeightFitsScreen() {
+		return configuredHeight != null && configuredHeight.equals("fit");
+	}
+
+	public boolean isHeightDefined() {
+		if (configuredHeight != null) {
+			return true;
+		}
+		if (getPanel() != null && getPanel().isHeightDefined()) {
+			if (this instanceof ExpandableComponent) {
+				if (((ExpandableComponent) this).getExpandRatio() != 0) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	protected void setPortlet(Portlet portlet) {
@@ -275,6 +318,10 @@ public class Panel extends Component implements Serializable {
 	 */
 	public void detachDialog() {
 		this.presenter.detachDialog();
+	}
+
+	public Integer getMinimumHeight() {
+		return minimumHeight;
 	}
 
 }

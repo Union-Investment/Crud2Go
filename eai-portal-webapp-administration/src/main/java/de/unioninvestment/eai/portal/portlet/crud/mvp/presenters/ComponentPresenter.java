@@ -41,5 +41,20 @@ public interface ComponentPresenter extends Presenter {
 	 *         expansion.
 	 * @since 1.45
 	 */
-	int getComponentExpandRatio();
+	int getExpandRatio();
+
+	/**
+	 * Update the view width according to the configured width of the component
+	 */
+	void updateViewWidth();
+
+	/**
+	 * Update the view height according to the configured height, respecting the
+	 * height settings of the containing panel
+	 * 
+	 * @param outerHeightDefined
+	 *            <code>true</code>, if the height of the outer panel does not
+	 *            shrink to inner sizes but is fixed
+	 */
+	void updateViewHeight(boolean outerHeightDefined);
 }

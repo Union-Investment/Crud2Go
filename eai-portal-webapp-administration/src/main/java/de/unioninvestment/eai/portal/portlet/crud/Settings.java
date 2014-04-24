@@ -107,6 +107,9 @@ public class Settings {
 	@Value("${portlet.crud.requestLog.cleanup.maxAgeDays}")
 	private Integer requestLogCleanupMaxAgeDays;
 
+	@Value("${portlet.crud.portal.footerHeight}")
+	private int footerHeight;
+
 	private URL defaultPropertiesLocation = Settings.class.getClassLoader()
 			.getResource("eai-portal-administration.properties");
 	private URL propertiesLocation = Settings.class.getClassLoader()
@@ -302,6 +305,10 @@ public class Settings {
 
 	public Integer getRequestLogCleanupMaxAgeDays() {
 		return requestLogCleanupMaxAgeDays;
+	}
+
+	public int getFooterHeight() {
+		return footerHeight;
 	}
 
 }

@@ -43,6 +43,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.Dataso
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.DatasourceInfoView;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.AbstractPresenter;
 
 /**
  * Der Presenter der Datenquellen-Infoübersicht.
@@ -51,7 +52,7 @@ import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
  */
 @Configurable
 public class DatasourceInfoPresenter extends
-		AbstractComponentPresenter<DatasourceInfos, DatasourceInfoView> {
+		AbstractPresenter<DatasourceInfoView> {
 
 	private static final long serialVersionUID = 2L;
 
@@ -84,12 +85,15 @@ public class DatasourceInfoPresenter extends
 
 	private MBeanServerConnection mbeanServer;
 
+	private DatasourceInfos model;
+
 	/**
 	 * Erzeugt eine neue Instanz dieses Presenters.
 	 */
 	public DatasourceInfoPresenter(DatasourceInfoView view,
 			DatasourceInfos model) {
-		super(view, model);
+		super(view);
+		this.model = model;
 		findJBossMBeanServer();
 	}
 
@@ -134,7 +138,7 @@ public class DatasourceInfoPresenter extends
 
 			this.updateModel(nameCollectingVisitor.getDatasourceNames());
 		} else {
-			this.getModel().clean();
+			model.clean();
 		}
 	}
 
@@ -147,11 +151,9 @@ public class DatasourceInfoPresenter extends
 	}
 
 	void updateModel(Set<String> datasourceNames) {
-		this.getModel().clean();
-
+		model.clean();
 		for (String dsName : datasourceNames) {
-			this.getModel().addInfo(
-					this.getDatasourceInfo(new DatasourceInfo(dsName)));
+			model.addInfo(this.getDatasourceInfo(new DatasourceInfo(dsName)));
 		}
 	}
 
@@ -190,8 +192,7 @@ public class DatasourceInfoPresenter extends
 	}
 
 	private String retrieveJndiName(String datasourceName) {
-		long communityId = LiferayUI.getCurrent()
-				.getCommunityId();
+		long communityId = LiferayUI.getCurrent().getCommunityId();
 		String pattern = settings.getDatasourceInfoPattern(communityId);
 		if (pattern == null) {
 			return datasourceName;

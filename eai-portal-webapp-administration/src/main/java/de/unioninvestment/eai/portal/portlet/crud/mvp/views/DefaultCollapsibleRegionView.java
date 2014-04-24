@@ -24,6 +24,8 @@ import org.vaadin.jouni.animator.AnimatorProxy.AnimationEvent;
 import org.vaadin.jouni.animator.AnimatorProxy.AnimationListener;
 import org.vaadin.jouni.animator.Disclosure;
 
+import com.google.common.base.Preconditions;
+import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
@@ -43,7 +45,7 @@ public class DefaultCollapsibleRegionView extends Disclosure implements
 
 	private static final long serialVersionUID = 1L;
 
-	private final ComponentContainer content = this.createContent();
+	private final AbstractOrderedLayout content = this.createContent();
 
 	private Presenter presenter;
 
@@ -59,8 +61,6 @@ public class DefaultCollapsibleRegionView extends Disclosure implements
 	 */
 	public DefaultCollapsibleRegionView(String width, String height) {
 		super("");
-		setWidth(width != null ? width : "100%");
-		setHeight(height != null ? height : "100%");
 		this.setContent(this.content);
 		this.ap.addListener(new AnimationListener() {
 			@Override
@@ -71,12 +71,22 @@ public class DefaultCollapsibleRegionView extends Disclosure implements
 			}
 		});
 	}
+	
+	@Override
+	public void initialize(boolean useHorizontalLayout) {
+		Preconditions.checkState(!useHorizontalLayout, "Only vertical layout supported");
+	}
 
 	@Override
-	public void initialize(Presenter presenter) {
+	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
 
+	@Override
+	public void setHeightToFitScreen(Integer minimumHeight) {
+		throw new UnsupportedOperationException();
+	}
+	
 	@Override
 	public void setTitle(String title) {
 		this.setDisclosureCaption(title);
@@ -116,7 +126,7 @@ public class DefaultCollapsibleRegionView extends Disclosure implements
 		return this.getDisclosureCaption();
 	}
 
-	private ComponentContainer createContent() {
+	private AbstractOrderedLayout createContent() {
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSizeFull();
 		layout.setSpacing(true);
@@ -136,4 +146,8 @@ public class DefaultCollapsibleRegionView extends Disclosure implements
 				"Regions cannot have a back button");
 	}
 
+	@Override
+	public void setExpandRatio(Component component, float expandRatio) {
+		this.content.setExpandRatio(component, expandRatio);
+	}
 }

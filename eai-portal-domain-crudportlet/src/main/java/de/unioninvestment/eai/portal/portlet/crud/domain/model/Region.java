@@ -118,7 +118,7 @@ public class Region extends Panel implements Component.ExpandableComponent {
 	 */
 	@Override
 	public int getExpandRatio() {
-		return getConfig().getExpandRatio();
+		return getConfig().getExpandRatio() == null ? 0 : getConfig().getExpandRatio();
 	}
 
 	/**

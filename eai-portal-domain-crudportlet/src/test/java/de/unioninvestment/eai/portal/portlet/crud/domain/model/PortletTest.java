@@ -137,15 +137,14 @@ public class PortletTest {
 	}
 
 	@Test
-	public void shouldRefreshOnPageReloadIfConfigured() {
-		config.setRefreshOnPageReload(true);
+	public void shouldRefreshOnPageReloadIfNotConfigured() {
+		config.setRefreshOnPageReload(false);
 		portlet = new Portlet(eventBus, config, contextMock);
 		portlet.addRefreshHandler(portletRefreshHandlerMock);
 
 		portlet.handleReload();
 
-		verify(portletRefreshHandlerMock).onPortletRefresh(
-				new PortletRefreshedEvent(portlet));
+		verifyZeroInteractions(portletRefreshHandlerMock);
 	}
 
 	@Test
@@ -159,12 +158,13 @@ public class PortletTest {
 	}
 
 	@Test
-	public void shouldNotRefreshOnPageReloadByDefault() {
+	public void shouldRefreshOnPageReloadByDefault() {
 		portlet.addRefreshHandler(portletRefreshHandlerMock);
 
 		portlet.handleReload();
 
-		verifyZeroInteractions(portletRefreshHandlerMock);
+		verify(portletRefreshHandlerMock).onPortletRefresh(
+				new PortletRefreshedEvent(portlet));
 	}
 
 	@Test

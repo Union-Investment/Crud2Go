@@ -156,6 +156,11 @@
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>tokenfield</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>de.unioninvestment</groupId>
+			<artifactId>liferay-resize-addon</artifactId>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.slf4j</groupId>

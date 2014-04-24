@@ -47,7 +47,7 @@ public interface CollapsibleRegionView extends RegionView {
 	 * @param presenter
 	 *            der Presenter.
 	 */
-	void initialize(CollapsibleRegionView.Presenter presenter);
+	void setPresenter(CollapsibleRegionView.Presenter presenter);
 
 	/**
 	 * @return <code>true</code> wenn der Bereich zusammengeklappt ist.

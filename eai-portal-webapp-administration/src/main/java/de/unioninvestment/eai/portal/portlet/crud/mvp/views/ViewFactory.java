@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
 import java.io.Serializable;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,9 @@ public class ViewFactory implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Value("${portlet.crud.portal.footerHeight}")
+	private int footerHeight;
+	
 	/**
 	 * Liefert eine {@link PortletView} zurück.
 	 * 
@@ -73,10 +77,8 @@ public class ViewFactory implements Serializable {
 	 *            undefined when not specified.
 	 * @return PanelView
 	 */
-	public PanelContentView panelContentView(boolean withMargin,
-			boolean useHorizontalLayout, String width, String heigth) {
-		return new DefaultPanelContentView(withMargin, useHorizontalLayout,
-				width, heigth);
+	public PanelContentView panelContentView() {
+		return new DefaultPanelContentView();
 	}
 
 	/**
@@ -137,8 +139,7 @@ public class ViewFactory implements Serializable {
 	 */
 	public RowEditingFormView rowEditingFormView(boolean withMargin,
 			boolean useHorizontalLayout, String width, String height) {
-		return new DefaultRowEditingFormView(withMargin, useHorizontalLayout,
-				width, height);
+		return new DefaultRowEditingFormView();
 	}
 
 	/**

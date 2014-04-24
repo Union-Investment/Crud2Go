@@ -118,9 +118,7 @@ public class PresenterFactory {
 	 * @return PanelContentPresenter
 	 */
 	public PanelContentPresenter panelContentPresenter(Panel panel) {
-		return new PanelContentPresenter(viewFactory.panelContentView(
-				panel instanceof Tab, panel.isHorizontalLayout(),
-				panel.getWidth(), panel.getHeight()), panel);
+		return new PanelContentPresenter(viewFactory.panelContentView(), panel);
 	}
 
 	/**
@@ -145,9 +143,7 @@ public class PresenterFactory {
 	 * @return DialogPresenter
 	 */
 	public DialogPresenter dialogPresenter(Dialog dialog) {
-		return new DialogPresenter(viewFactory.panelContentView(false,
-				dialog.isHorizontalLayout(), dialog.getWidth(),
-				dialog.getHeight()), dialog);
+		return new DialogPresenter(viewFactory.panelContentView(), dialog);
 	}
 
 	/**

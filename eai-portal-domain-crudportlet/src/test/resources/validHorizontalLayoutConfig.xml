@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für eine Tabelle auf Basis einer Query">
+	<page height="300px" horizontalLayout="true">
+		<component width="300px" generator="box('#ff0000')"/>
+		<component expandRatio="1" generator="box('#00ff00')"/>
+	</page>
+	<script><![CDATA[
+		import com.vaadin.shared.ui.label.ContentMode
+	
+		def box(color) {
+			def html = """<div style="border: 1px solid black; background-color:$color; width:100%; height:100%">&nbsp;</div>"""
+			log.info html
+			def label = new Label(html, ContentMode.HTML)
+			label.setSizeFull()
+			return label
+		}
+	]]></script>
+</portlet>

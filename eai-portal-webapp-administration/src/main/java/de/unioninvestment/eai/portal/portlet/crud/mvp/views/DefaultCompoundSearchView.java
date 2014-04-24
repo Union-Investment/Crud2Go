@@ -24,11 +24,13 @@ import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMe
 import java.util.Date;
 import java.util.LinkedList;
 
+import com.google.common.base.Preconditions;
 import com.google.gwt.thirdparty.guava.common.base.Joiner;
 import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
@@ -39,6 +41,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.CellStyleGenerator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.LiferayTheme;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxTableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateTableColumn;
@@ -75,6 +78,17 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 	}
 
 	@Override
+	public void initialize(boolean useHorizontalLayout) {
+		Preconditions.checkState(!useHorizontalLayout,
+				"Only vertical layout supported");
+	}
+
+	@Override
+	public void setHeightToFitScreen(Integer minimumHeight) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void initialize(TableColumns fields) {
 		this.fields = fields;
 		searchBox = new SearchBox(this);
@@ -83,6 +97,16 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 		searchBox.focus();
 		searchBox
 				.setInputPrompt(getMessage("portlet.crud.compoundsearch.inputPrompt"));
+
+		Button resetButton = new Button(
+				getMessage("portlet.crud.compoundsearch.reset"));
+		resetButton.setStyleName(LiferayTheme.BUTTON_LINK);
+		resetButton.addClickListener(new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				presenter.reset();
+			}
+		});
 
 		PopupView infoButton = new PopupView(new Content() {
 			@Override
@@ -97,11 +121,12 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 		});
 		infoButton.setHideOnMouseOut(false);
 
-		searchBar = new HorizontalLayout(searchBox, infoButton);
+		searchBar = new HorizontalLayout(searchBox, resetButton, infoButton);
 		searchBar.setWidth("100%");
 		searchBar.addStyleName("compsearchbar");
 		searchBar.setExpandRatio(searchBox, 1);
 		searchBar.setSpacing(true);
+		searchBar.setComponentAlignment(resetButton, Alignment.MIDDLE_CENTER);
 		searchBar.setComponentAlignment(infoButton, Alignment.MIDDLE_CENTER);
 
 		addComponent(searchBar);
@@ -134,6 +159,8 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 				getMessage("portlet.crud.compoundsearch.field"));
 		table.setColumnHeader("title",
 				getMessage("portlet.crud.compoundsearch.title"));
+		table.setColumnHeader("description",
+				getMessage("portlet.crud.compoundsearch.description"));
 
 		table.setPageLength(fields.size() < 20 ? fields.size() : PAGE_SIZE);
 		table.setCellStyleGenerator(new CellStyleGenerator() {
@@ -252,4 +279,5 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 		throw new UnsupportedOperationException(
 				"Regions cannot have a back button");
 	}
+
 }

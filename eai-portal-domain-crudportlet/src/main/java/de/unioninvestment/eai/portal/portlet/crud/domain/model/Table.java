@@ -825,7 +825,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 */
 	@Override
 	public int getExpandRatio() {
-		return config.getExpandRatio();
+		return config.getExpandRatio() == null ? 1 : config.getExpandRatio();
 	}
 
 	/**

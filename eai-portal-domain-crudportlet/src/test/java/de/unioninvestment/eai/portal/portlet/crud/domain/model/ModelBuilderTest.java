@@ -228,7 +228,7 @@ public class ModelBuilderTest {
 
 	private ModelBuilder createTestBuilder(Config config) {
 		return new ModelBuilder(eventBus, factoryMock, userFactoryMock, resetFormActionMock,
-				fieldValidatorFactoryMock, 300, config, true);
+				fieldValidatorFactoryMock, 300, config, new ModelPreferences(), true);
 	}
 
 	@Test

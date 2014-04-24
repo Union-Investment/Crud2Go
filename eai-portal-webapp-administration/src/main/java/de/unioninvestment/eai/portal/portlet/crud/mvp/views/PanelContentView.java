@@ -65,4 +65,35 @@ public interface PanelContentView extends View {
 	 * @param clickListener
 	 */
 	Button addBackButton(String caption, ClickListener clickListener);
+
+	/**
+	 * Set the expand ration of an existing subcomponent
+	 * 
+	 * @param component
+	 *            the subcomponent
+	 * @param expandRatio
+	 *            the expand ratio of the subcomponent
+	 */
+	void setExpandRatio(Component component, float expandRatio);
+
+	/**
+	 * @param useHorizontalLayout
+	 *            <code>true</code>, if the view should arrange subcomponents
+	 *            horizontally
+	 */
+	void initialize(boolean useHorizontalLayout);
+
+	@Override
+	void setWidth(String newWidth);
+
+	@Override
+	void setHeight(String newHeight);
+
+	/**
+	 * Tells the view to update the height to fill the browser window
+	 * 
+	 * @param minimumHeight
+	 *            the minimum height of the view or <code>null</code>
+	 */
+	void setHeightToFitScreen(Integer minimumHeight);
 }

@@ -161,7 +161,7 @@ public class Form extends Component implements Component.ExpandableComponent,
 	 */
 	@Override
 	public int getExpandRatio() {
-		return config.getExpandRatio();
+		return config.getExpandRatio() == null ? 0 : config.getExpandRatio();
 	}
 
 	/**

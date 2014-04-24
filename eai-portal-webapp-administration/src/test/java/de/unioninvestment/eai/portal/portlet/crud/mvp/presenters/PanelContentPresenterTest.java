@@ -91,6 +91,27 @@ public class PanelContentPresenterTest {
 	}
 
 	@Test
+	public void shouldUpdateComponentWidthAndHeight() {
+		when(formPresenterMock.getView()).thenReturn(formViewMock);
+		when(panelMock.isHeightDefined()).thenReturn(true);
+
+		pagePresenter.addComponent(formPresenterMock);
+		
+		verify(formPresenterMock).updateViewWidth();
+		verify(formPresenterMock).updateViewHeight(true);
+	}
+	
+	@Test
+	public void shouldUpdateComponentExpandRatio() {
+		when(formPresenterMock.getView()).thenReturn(formViewMock);
+		when(formPresenterMock.getExpandRatio()).thenReturn(2);
+
+		pagePresenter.addComponent(formPresenterMock);
+		
+		verify(pageViewMock).setExpandRatio(formViewMock, 2);
+	}
+	
+	@Test
 	public void shouldReturnNullAsTitle() {
 		assertNull(pagePresenter.getTitle());
 	}

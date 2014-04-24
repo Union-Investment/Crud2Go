@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.vaadin.ui.HorizontalLayout;
@@ -26,19 +27,27 @@ import com.vaadin.ui.VerticalLayout;
 
 public class DefaultPanelContentViewTest {
 
+	DefaultPanelContentView view = new DefaultPanelContentView();
+
+	@Before
+	public void setup() {
+		view.initialize(false);
+	}
+	
 	@Test
-	public void shouldUseMarginWithVerticalLayout() {
-		DefaultPanelContentView view = new DefaultPanelContentView(true, false,
-				null, null);
+	public void shouldUseMarginByDefault() {
 		Assert.assertTrue(view.getMargin().getBitMask() > 0);
+	}
+
+	@Test
+	public void shouldUseVerticalLayout() {
 		Assert.assertTrue(view.getLayoutInternal() instanceof VerticalLayout);
 	}
 
 	@Test
 	public void shouldUseMarginWithHorizontalLayout() {
-		DefaultPanelContentView view = new DefaultPanelContentView(true, true,
-				null, null);
-		Assert.assertTrue(view.getMargin().getBitMask() > 0);
+		view = new DefaultPanelContentView();
+		view.initialize(true);
 		Assert.assertTrue(view.getLayoutInternal() instanceof HorizontalLayout);
 	}
 }
