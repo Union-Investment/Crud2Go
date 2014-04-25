@@ -22,11 +22,13 @@ import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMe
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,6 +71,7 @@ import de.unioninvestment.eai.portal.portlet.crud.CrudErrorHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
@@ -867,11 +870,9 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			return true;
 
 		} catch (Buffered.SourceException e) {
-			LOG.debug("Committing changes failed: " + e.getMessage(), e);
 			onError(e);
 			return false;
 		} catch (Exception e) {
-			LOG.error("Committing changes failed: " + e.getMessage(), e);
 			onError(e);
 			return false;
 		}
@@ -932,6 +933,13 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			Notification.show(sourceCaption + ": " + message,
 					Notification.Type.ERROR_MESSAGE);
 			return;
+		} else if (throwable instanceof ConcurrentModificationException) {
+			message = getMessage("portlet.crud.error.concurrentModification");
+		} else if (throwable instanceof ContainerException
+				&& throwable.getCause() instanceof SQLException
+				&& throwable.getCause().getMessage()
+						.contains("Removal failed for row")) {
+			message = getMessage("portlet.crud.error.concurrentModification");
 		} else {
 			LOG.error("Error in table operation", throwable);
 		}
