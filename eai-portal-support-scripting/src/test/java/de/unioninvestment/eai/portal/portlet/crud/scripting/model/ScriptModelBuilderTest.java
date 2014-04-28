@@ -467,6 +467,19 @@ public class ScriptModelBuilderTest extends ModelSupport {
 	}
 
 	@Test
+	public void shouldBuildColumnValidator() throws JAXBException {
+
+		prepare("validValidationConfig.xml");
+
+		scriptModelBuilder.build();
+
+		Table table = (Table) portlet.getPage().getElements().get(0);
+
+		assertThat(table.getColumns().get("CNUMBER5_2_NN").getValidators()
+				.get(0), instanceOf(ScriptFieldValidator.class));
+	}
+
+	@Test
 	public void shouldBuildTabs() throws JAXBException {
 
 		prepare("validTabsConfig.xml");

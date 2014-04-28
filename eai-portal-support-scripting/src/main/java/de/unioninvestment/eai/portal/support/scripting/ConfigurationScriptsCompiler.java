@@ -198,6 +198,8 @@ public class ConfigurationScriptsCompiler {
 							location + "/columns/column/editable");
 				}
 
+				compileClosure(column.getValidator(), "value", location
+						+ "/columns/column/validator");
 				compileClosure(column.getGenerator(), "row,builder", location
 						+ "/columns/column/generator");
 				compileClosure(column.getGeneratedValue(), "row", location

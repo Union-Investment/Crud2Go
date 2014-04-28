@@ -159,6 +159,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 				notNullValue());
 		assertThat(getTab(portletConfig).getOnShow().getClazz(), notNullValue());
 		assertThat(getTab(portletConfig).getOnHide().getClazz(), notNullValue());
+
 		assertThat(getTable(portletConfig).getOnModeChange().getClazz(),
 				notNullValue());
 		assertThat(getTable(portletConfig).getOnSelectionChange().getClazz(),
@@ -169,16 +170,27 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 				notNullValue());
 		assertThat(getTable(portletConfig).getRowDeletable().getClazz(),
 				notNullValue());
-		assertThat(getFormAction(portletConfig).getOnExecution().getClazz(),
-				notNullValue());
-		assertThat(getFormField(portletConfig).getOnValueChange().getClazz(),
-				notNullValue());
+
+		assertThat(getTable(portletConfig).getColumns().getColumn().get(2)
+				.getDefault().getClazz(), notNullValue());
+		assertThat(getTable(portletConfig).getColumns().getColumn().get(1)
+				.getValidator().getClazz(), notNullValue());
+		assertThat(getTable(portletConfig).getColumns().getColumn().get(9)
+				.getGenerator().getClazz(), notNullValue());
+		assertThat(getTable(portletConfig).getColumns().getColumn().get(9)
+				.getGeneratedValue().getClazz(), notNullValue());
+
 		assertThat(getTableAction(portletConfig).getOnExecution().getClazz(),
 				notNullValue());
 		assertThat(getTableActions(portletConfig).get(1).getExport()
 				.getFilename().getClazz(), notNullValue());
 		assertThat(getTableActions(portletConfig).get(2).getDownload()
 				.getGenerator().getClazz(), notNullValue());
+
+		assertThat(getFormAction(portletConfig).getOnExecution().getClazz(),
+				notNullValue());
+		assertThat(getFormField(portletConfig).getOnValueChange().getClazz(),
+				notNullValue());
 		assertThat(getDatabaseQuery(portletConfig).getOnCreate().getClazz(),
 				notNullValue());
 		assertThat(getDatabaseQuery(portletConfig).getOnDelete().getClazz(),

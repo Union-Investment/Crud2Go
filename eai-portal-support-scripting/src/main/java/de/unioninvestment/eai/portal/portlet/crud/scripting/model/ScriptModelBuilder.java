@@ -489,10 +489,24 @@ public class ScriptModelBuilder {
 		populateTableRowChangeClosure(table, scriptTable);
 
 		populateDynamicEditableClosures(table);
+		applyValidatorClosures(table);
 
 		scriptPortlet.addElementById(table.getId(), scriptTable);
 
 		return scriptTable;
+	}
+
+
+	private void applyValidatorClosures(Table table) {
+		if (table.getColumns() != null) {
+			for (TableColumn column : table.getColumns()) {
+				ColumnConfig  columnConfig = (ColumnConfig) configs.get(column);
+				if (columnConfig.getValidator() != null) {
+					Closure<Object> closure = scriptBuilder.buildClosure(columnConfig.getValidator());
+					column.addValidator(new ScriptFieldValidator(closure, columnConfig.getValidationMessage()));
+				}
+			}
+		}
 	}
 
 	private void populateDynamicEditableClosures(Table table) {

@@ -2546,6 +2546,14 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="validator" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure zur Validierung des bereits konvertierten Feldwertes:
+							{ value -> ... }
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="style" type="tns:groovy">
 					<annotation>
 						<documentation>

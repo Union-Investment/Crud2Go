@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.util.Assert;
@@ -547,5 +548,12 @@ public class TableColumn implements Serializable {
 
 	public Table getTable() {
 		return table;
+	}
+	
+	public void addValidator(FieldValidator validator) {
+		if (validators == null) {
+			validators = new LinkedList<FieldValidator>();
+		}
+		validators.add(validator);
 	}
 }
