@@ -24,6 +24,9 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
@@ -32,6 +35,7 @@ import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.IndexResolver;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 
@@ -47,6 +51,9 @@ public class SQLContainerEventWrapper extends SQLContainer implements
 		Filterable {
 
 	private static final long serialVersionUID = 42L;
+
+	private static Logger LOGGER = LoggerFactory
+			.getLogger(SQLContainerEventWrapper.class);
 
 	private EventRouter<CreateEventHandler, CreateEvent> onCreateEventRouter;
 
@@ -182,4 +189,20 @@ public class SQLContainerEventWrapper extends SQLContainer implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * More descriptive error message for Mantis 8387 "scrollable error"
+	 * 
+	 * @see com.vaadin.data.util.sqlcontainer.SQLContainer#getItemIds(int, int)
+	 */
+	@Override
+	public List<Object> getItemIds(int startIndex, int numberOfIds) {
+		try {
+			return super.getItemIds(startIndex, numberOfIds);
+		} catch (IndexOutOfBoundsException e) {
+			LOGGER.info("Error getting item ids - database content may have changed", e);
+			throw new BusinessException("portlet.crud.error.scrollingInconsistency");
+		}
+	}
 }
