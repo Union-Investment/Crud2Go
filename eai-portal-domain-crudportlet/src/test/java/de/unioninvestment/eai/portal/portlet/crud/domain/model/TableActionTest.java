@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.times;
@@ -30,6 +31,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import com.google.common.base.Supplier;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ExecutionEvent;
@@ -107,5 +110,23 @@ public class TableActionTest {
 		
 		TableAction action = new TableAction(portletMock, configMock, tableMock, triggers);
 		action.execute();
+	}
+	
+	@Test
+	public void shouldReturnNullForFilenameIfGeneratorNotSet() {
+		TableAction tableAction = new TableAction(portletMock, configMock, tableMock, null);
+		assertThat(tableAction.generateExportFilename(), nullValue());
+	}
+	
+	@Test
+	public void shouldReturnGeneratedFilename() {
+		TableAction tableAction = new TableAction(portletMock, configMock, tableMock, null);
+		tableAction.setExportFilenameGenerator(new Supplier<String>() {
+			@Override
+			public String get() {
+				return "test.xlsx";
+			}
+		});
+		assertThat(tableAction.generateExportFilename(), is("test.xlsx"));
 	}
 }

@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ComponentConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
@@ -133,9 +134,12 @@ public class ConfigurationScriptsCompiler {
 
 		int i = 0;
 		for (ComponentConfig component : panel.getElements()) {
-			if (component instanceof TableConfig) {
-				compileAllClosureScripts((TableConfig) component, location
-						+ "/elements[" + i++ + "]");
+			if (component instanceof CompoundSearchConfig) {
+				compileAllClosureScripts(((CompoundSearchConfig) component).getDetails(), location
+						+ "/elements[" + i++ + "]/details");
+			} else if (component instanceof TableConfig) {
+					compileAllClosureScripts((TableConfig) component, location
+							+ "/elements[" + i++ + "]");
 			} else if (component instanceof FormConfig) {
 				compileAllClosureScripts((FormConfig) component, location
 						+ "/elements[" + i++ + "]");
@@ -229,6 +233,10 @@ public class ConfigurationScriptsCompiler {
 		for (TableActionConfig action : table.getAction()) {
 			compileClosure(action.getOnExecution(), location + "/action[" + i++
 					+ "]/onExecution");
+			if (action.getExport() != null) {
+				compileClosure(action.getExport().getFilename(), "it", location
+						+ "/action[" + i + "]/export/filename");
+			}
 			if (action.getDownload() != null) {
 				// "export" for backwards compatibility (deprecated)
 				compileClosure(action.getDownload().getGenerator(),

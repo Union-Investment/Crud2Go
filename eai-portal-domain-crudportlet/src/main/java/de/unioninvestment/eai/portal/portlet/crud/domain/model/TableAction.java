@@ -18,6 +18,8 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import com.google.common.base.Supplier;
+
 import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableExportType;
 
@@ -33,6 +35,8 @@ public class TableAction extends AbstractAction<TableActionConfig> {
 
 	private Table table;
 
+	private Supplier<String> exportFilenameGenerator;
+	
 	/**
 	 * Konstruktor mit Parametern.
 	 * 
@@ -94,4 +98,16 @@ public class TableAction extends AbstractAction<TableActionConfig> {
 		super.execute();
 	}
 
+	public String generateExportFilename() {
+		return exportFilenameGenerator != null ? exportFilenameGenerator.get() : null;
+	}
+
+	public void setExportFilenameGenerator(Supplier<String> exportFilenameGenerator) {
+		this.exportFilenameGenerator = exportFilenameGenerator;
+	}
+
+	public Boolean hasExportFilenameGenerator() {
+		return exportFilenameGenerator != null;
+	}
+	
 }

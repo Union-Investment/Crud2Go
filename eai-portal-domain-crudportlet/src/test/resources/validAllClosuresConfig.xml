@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
-	title="Einfaches Beispiel"
-	onRefresh="logEvent 'onRefresh',it"
+	title="Einfaches Beispiel" onRefresh="logEvent 'onRefresh',it"
 	onReload="logEvent 'onReload',it">
 	<page>
+		<compound-search>
+			<details>
+				<component generator="bla"/>
+			</details>
+		</compound-search>
 		<form>
 			<field onValueChange="logEvent 'onFormFieldValueChange',it"
 				name="CVARCHAR5_NN"></field>
 			<action onExecution="logEvent 'onExecution',it" title="Suchen"
 				id="id001">
-					<search>
-						<apply-filters>
-							<sql column="test"><where></where></sql>
-							<sql column="test1"><where></where></sql>
-							<sql column="test2"><where></where></sql>
-							<sql column="test3"><where></where></sql>
-							<sql column="test4"><where></where></sql>
-						</apply-filters>
-					</search>
-				</action>
+				<search>
+					<apply-filters>
+						<sql column="test">
+							<where></where>
+						</sql>
+						<sql column="test1">
+							<where></where>
+						</sql>
+						<sql column="test2">
+							<where></where>
+						</sql>
+						<sql column="test3">
+							<where></where>
+						</sql>
+						<sql column="test4">
+							<where></where>
+						</sql>
+					</apply-filters>
+				</search>
+			</action>
 		</form>
 		<tabs onChange="logEvent 'onChange',it">
 			<tab onHide="logEvent 'onHide',it" onShow="logEvent 'onShow',it"
 				id="tab1" title="Tab 1">
-				<table onModeChange="logEvent 'onModeChange',it,mode" onRowChange="logEvent 'rowChange',it,row"
+				<table onModeChange="logEvent 'onModeChange',it,mode"
+					onRowChange="logEvent 'rowChange',it,row"
 					onSelectionChange="logEvent 'onSelectionChange',it,selection.ids.collect{it.asMap()}"
-					row-editable="1==1"
-					row-deletable="1==1">
+					row-editable="1==1" row-deletable="1==1">
 					<database-query datasource="test"
 						onCreate="logEvent 'onCreate',it,row.id.asMap()" onDelete="logEvent 'onDelete',it,row.id.asMap()"
 						onInsert="logEvent 'onInsert',it,row.id.asMap()" onUpdate="logEvent 'onUpdate',it,row.id.asMap()">
@@ -86,6 +100,12 @@
 					</columns>
 					<action onExecution="logEvent 'tableAction.onExecution',it"
 						title="test123" id="id002" />
+					<action id="id003" title="id003">
+						<export target="xls" filename="'test.xlsx'" />
+					</action>
+					<action id="id004" title="id004">
+						<download generator="bla" />
+					</action>
 				</table>
 			</tab>
 			<tab onHide="logEvent 'onHide',it" onShow="logEvent 'onShow',it"

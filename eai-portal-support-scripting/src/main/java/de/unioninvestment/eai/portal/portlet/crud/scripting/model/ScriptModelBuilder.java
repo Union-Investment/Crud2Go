@@ -26,6 +26,8 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Supplier;
+
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
@@ -886,16 +888,41 @@ public class ScriptModelBuilder {
 	private void populateTableActionExecutionClosure(TableAction action,
 			ScriptTableAction scriptTableAction) {
 		TableActionConfig tac = (TableActionConfig) configs.get(action);
-		if (tac.getOnExecution() != null) {
-			Closure<?> onExecution = scriptBuilder.buildClosure(tac
-					.getOnExecution());
-			scriptTableAction.setOnExecution(onExecution);
-		}
+		populateOnExecutionClosure(scriptTableAction, tac);
+		populateExportFilenameGenerator(action, tac);
+		populateDownloadGenerator(scriptTableAction, tac);
+	}
+
+	private void populateDownloadGenerator(ScriptTableAction scriptTableAction,
+			TableActionConfig tac) {
 		if (tac.getDownload() != null
 				&& tac.getDownload().getGenerator() != null) {
 			Closure<?> downloadGenerator = scriptBuilder.buildClosure(tac
 					.getDownload().getGenerator());
 			scriptTableAction.setDownloadGenerator(downloadGenerator);
+		}
+	}
+
+	private void populateOnExecutionClosure(ScriptTableAction scriptTableAction,
+			TableActionConfig tac) {
+		if (tac.getOnExecution() != null) {
+			Closure<?> onExecution = scriptBuilder.buildClosure(tac
+					.getOnExecution());
+			scriptTableAction.setOnExecution(onExecution);
+		}
+	}
+
+	private void populateExportFilenameGenerator(TableAction action, TableActionConfig tac) {
+		if (tac.getExport() != null
+				&& tac.getExport().getFilename() != null) {
+			final Closure<?> filenameGenerator = scriptBuilder.buildClosure(tac
+					.getExport().getFilename());
+			action.setExportFilenameGenerator(new Supplier<String>() {
+				@Override
+				public String get() {
+					return (String) filenameGenerator.call();
+				}
+			});
 		}
 	}
 

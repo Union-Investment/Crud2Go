@@ -53,6 +53,7 @@ import com.vaadin.ui.Button;
 import de.unioninvestment.eai.portal.portlet.crud.config.AnyFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
@@ -113,7 +114,8 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		verify(scriptCompilerMock).compileScript(
 				contains("log.info \"Hello Shared\""), eq("shared.groovy"));
 		verify(scriptCompilerMock).compileScript(
-				contains("log.info \"Hello Main\""), eq("MainPortletScript.groovy"));
+				contains("log.info \"Hello Main\""),
+				eq("MainPortletScript.groovy"));
 	}
 
 	@Test
@@ -173,6 +175,10 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 				notNullValue());
 		assertThat(getTableAction(portletConfig).getOnExecution().getClazz(),
 				notNullValue());
+		assertThat(getTableActions(portletConfig).get(1).getExport()
+				.getFilename().getClazz(), notNullValue());
+		assertThat(getTableActions(portletConfig).get(2).getDownload()
+				.getGenerator().getClazz(), notNullValue());
 		assertThat(getDatabaseQuery(portletConfig).getOnCreate().getClazz(),
 				notNullValue());
 		assertThat(getDatabaseQuery(portletConfig).getOnDelete().getClazz(),
@@ -189,9 +195,19 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		assertThat(getDatabaseQuery(portletConfig).getDelete().getStatement()
 				.getClazz(), notNullValue());
 
+		assertThat(getComponentInCompoundSearch(portletConfig).getGenerator()
+				.getClazz(), notNullValue());
+
 		// TODO add missing closures
-		
+
 		assertScriptExecution(portletConfig);
+	}
+
+	private ScriptComponentConfig getComponentInCompoundSearch(
+			PortletConfig portletConfig) {
+		CompoundSearchConfig search = (CompoundSearchConfig) portletConfig
+				.getPage().getElements().get(0);
+		return (ScriptComponentConfig) search.getDetails().getElements().get(0);
 	}
 
 	@Test
@@ -515,7 +531,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 	}
 
 	private TabsConfig getTabs(PortletConfig portletConfig) {
-		return (TabsConfig) portletConfig.getPage().getElements().get(1);
+		return (TabsConfig) portletConfig.getPage().getElements().get(2);
 	}
 
 	private TabConfig getTab(PortletConfig portletConfig) {
@@ -527,7 +543,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 	}
 
 	private FormConfig getForm(PortletConfig portletConfig) {
-		return (FormConfig) portletConfig.getPage().getElements().get(0);
+		return (FormConfig) portletConfig.getPage().getElements().get(1);
 	}
 
 	private FormActionConfig getFormAction(PortletConfig portletConfig) {
@@ -539,7 +555,11 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 	}
 
 	private TableActionConfig getTableAction(PortletConfig portletConfig) {
-		return getTable(portletConfig).getAction().get(0);
+		return getTableActions(portletConfig).get(0);
+	}
+
+	private List<TableActionConfig> getTableActions(PortletConfig portletConfig) {
+		return getTable(portletConfig).getAction();
 	}
 
 	private DatabaseQueryConfig getDatabaseQuery(PortletConfig portletConfig) {

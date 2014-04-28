@@ -1819,6 +1819,13 @@
 				</documentation>
 			</annotation>
 		</attribute>
+		<attribute name="filename" type="tns:groovy" use="optional">
+			<annotation>
+				<documentation>
+					Groovy Closure to return a filename.
+				</documentation>
+			</annotation>
+		</attribute>
 	</complexType>
 
 	<complexType name="TableDownloadConfig">

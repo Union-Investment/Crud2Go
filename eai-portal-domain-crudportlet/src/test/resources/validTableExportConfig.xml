@@ -1,20 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
 	title="Beispiel Tabellen Export">
-	<page>
-		<tabs>
-			<tab title="Excel-Export" id="tab01">
-				<table export="xls">
-					<database-table datasource="test" tablename="test_crud2" />
-				</table>
-			</tab>
-			<tab title="CSV-Export" id="tab02">
-				<table export="csv">
-					<database-table datasource="test" tablename="test_crud2" />
-				</table>
-			</tab>
-		</tabs>
-	</page>
+	<tabs>
+		<tab title="Excel-Export" id="tab01">
+			<table export="xls">
+				<database-table datasource="test" tablename="test_crud2" />
+			</table>
+		</tab>
+		<tab title="CSV-Export" id="tab02">
+			<table export="csv">
+				<database-table datasource="test" tablename="test_crud2" />
+			</table>
+		</tab>
+		<tab title="New style export" id="tab03">
+			<table>
+				<database-table datasource="test" tablename="test_crud2" />
+				<action title="Excel">
+					<export target="xls" filename="'test.xlsx'" />
+				</action>
+				<action title="CSV">
+					<export target="csv" filename="generateCsvFilename()" />
+				</action>
+			</table>
+		</tab>
+	</tabs>
+	<script><![CDATA[
+		def generateCsvFilename() {
+			"hello" + "world" + ".csv"
+		}
+	]]></script>
 </portlet>
 
 

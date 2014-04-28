@@ -46,6 +46,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponentGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
@@ -54,9 +55,11 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.ColumnStyleRenderer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.RowStyleRenderer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
@@ -405,6 +408,20 @@ public class ScriptModelBuilderTest extends ModelSupport {
 
 		assertThat(table.getActions().get(0),
 				instanceOf(ScriptTableAction.class));
+	}
+
+	@Test
+	public void shouldBuildExportTableAction() throws JAXBException {
+
+		prepare("validTableExportConfig.xml");
+
+		scriptModelBuilder.build();
+
+		Tab tab = portlet.getTabs().getElements().get(2);
+		Table table = (Table) tab.getElements().get(0);
+		TableAction action = table.getActions().get(0);
+
+		assertThat(action.hasExportFilenameGenerator(), is(true));
 	}
 
 	@Test

@@ -23,6 +23,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConf
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ComponentConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DialogConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormConfig;
@@ -38,6 +39,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.TextAreaConfig;
 
 /**
  * 
@@ -161,11 +163,21 @@ public class ConfigurationProcessor {
 			traverseForm((FormConfig) component);
 		} else if (component instanceof TableConfig) {
 			traverseTable((TableConfig) component);
+		} else if (component instanceof CompoundSearchConfig) {
+			traverseCompoundSearch((CompoundSearchConfig) component);
 		} else if (component instanceof PanelConfig) {
 			traversePanel((RegionConfig) component);
 		} else {
 			visitLeaf(component);
 		}
+	}
+
+	private void traverseCompoundSearch(CompoundSearchConfig compoundSearch) {
+		visitor.visit(compoundSearch);
+		if (compoundSearch.getDetails() != null) {
+			traversePanel(compoundSearch.getDetails());
+		}
+		visitor.visitAfter(compoundSearch);
 	}
 
 	/**

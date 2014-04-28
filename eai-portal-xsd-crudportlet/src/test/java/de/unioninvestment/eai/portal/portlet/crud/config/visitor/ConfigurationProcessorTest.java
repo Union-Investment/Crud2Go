@@ -31,6 +31,8 @@ import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchDetailsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseTableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
@@ -60,6 +62,7 @@ public class ConfigurationProcessorTest {
 	private ConfigurationProcessor processor;
 
 	private PortletConfig portletConfig = new PortletConfig();
+	private CompoundSearchConfig compoundSearchConfig = new CompoundSearchConfig();
 	private PageConfig pageConfig = new PageConfig();
 	private TabsConfig tabsConfig = new TabsConfig();
 	private TabConfig tabConfig = new TabConfig();
@@ -221,6 +224,22 @@ public class ConfigurationProcessorTest {
 		verifyVisitsInOrder(tableConfig, tableActionConfig);
 	}
 
+	@Test
+	public void shouldCallVisitorMethodsOnPageAndCompoundSearchConfigs() {
+		pageConfig.getElements().add(compoundSearchConfig);
+		processor.traversePanel(pageConfig);
+		verifyVisitsInOrder(pageConfig, compoundSearchConfig);
+	}
+	
+	@Test
+	public void shouldCallVisitorMethodsOnCompoundSearchAndElementsConfigs() {
+		compoundSearchConfig.setDetails(new CompoundSearchDetailsConfig());
+		compoundSearchConfig.getDetails().getElements().add(tableConfig);
+		
+		processor.traverseComponent(compoundSearchConfig);
+		verifyVisitsInOrder(compoundSearchConfig, tableConfig);
+	}
+	
 	@Test
 	public void shouldCallVisitorMethodsOnTableAndDatabaseQueryConfig() {
 		tableConfig.setDatabaseQuery(databaseQueryConfig);

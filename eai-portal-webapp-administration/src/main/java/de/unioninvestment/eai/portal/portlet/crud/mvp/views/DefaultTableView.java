@@ -357,7 +357,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			excelExportButton.addClickListener(new Button.ClickListener() {
 				@Override
 				public void buttonClick(ClickEvent event) {
-					exportExcelSheet();
+					exportExcelSheet(null);
 				}
 
 			});
@@ -367,7 +367,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			csvExportButton.addClickListener(new Button.ClickListener() {
 				@Override
 				public void buttonClick(ClickEvent event) {
-					exportCSVSheet();
+					exportCSVSheet(null);
 				}
 			});
 		}
@@ -390,10 +390,10 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 							if (action.isExportAction()) {
 								switch (action.getExportType()) {
 								case XLS:
-									exportExcelSheet();
+									exportExcelSheet(action.generateExportFilename());
 									break;
 								case CSV:
-									exportCSVSheet();
+									exportCSVSheet(action.generateExportFilename());
 									break;
 								default:
 									throw new IllegalArgumentException(
@@ -1009,9 +1009,9 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		this.table = table;
 	}
 
-	private void exportCSVSheet() {
+	private void exportCSVSheet(String customFilename) {
 		CsvExporter exporter = new CsvExporter();
-		String filename = "export_" + createFilenameTime() + ".csv";
+		String filename = customFilename != null ? customFilename :"export_" + createFilenameTime() + ".csv";
 		Download download = new StreamingExporterDownload(filename,
 				CsvExporter.CSV_MIMETYPE, tableModel, exporter);
 		DownloadExportTask exportTask = new DownloadExportTask(UI.getCurrent(),
@@ -1019,9 +1019,9 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		executeExport(exportTask);
 	}
 
-	private void exportExcelSheet() {
+	private void exportExcelSheet(String customFilename) {
 		ExcelExporter exporter = new ExcelExporter();
-		String filename = "export_" + createFilenameTime() + ".xlsx";
+		String filename = customFilename != null ? customFilename : "export_" + createFilenameTime() + ".xlsx";
 		Download download = new StreamingExporterDownload(filename,
 				ExcelExporter.EXCEL_XSLX_MIMETYPE, tableModel, exporter);
 		DownloadExportTask exportTask = new DownloadExportTask(UI.getCurrent(),
