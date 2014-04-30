@@ -242,18 +242,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 		setupErrorHandling();
 
-		if (!presenter.isFormEditEnabled()) {
-			container
-					.addBeforeCommitEventHandler(new BeforeCommitEventHandler() {
-						private static final long serialVersionUID = 1L;
-
-						@Override
-						public void beforeCommit(BeforeCommitEvent event) {
-							commitTable();
-						}
-					});
-		}
-
 		setTableStyleRenderer();
 
 		presenter.doInitialize();
@@ -566,6 +554,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		} else {
 			uncommittedItemId = selection.iterator().next();
 		}
+		presenter.updateUncommittedItemId(uncommittedItemId);
 		updateRemoveButtonStatus(selection, uncommittedItemId);
 	}
 
@@ -848,15 +837,14 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		return buttonbar;
 	}
 
-	private void commitTable() {
-
-		Map<String, Object> changedFieldNames = table.getModifiedColumnNames();
-
+	@Override
+	public void commitChangesToContainer() {
 		table.commitFieldValues();
-
-		handleRowChange(changedFieldNames);
-
 		table.commit();
+	}
+
+	public Map<String, Object> getModifiedColumnNames() {
+		return table.getModifiedColumnNames();
 	}
 
 	/**
@@ -875,19 +863,6 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		} catch (Exception e) {
 			onError(e);
 			return false;
-		}
-	}
-
-	/**
-	 * Initiiert das RowChange-Event.
-	 * 
-	 * @param changedValues
-	 *            Alle Tabellenzellen, die verändert wurden
-	 */
-	private void handleRowChange(Map<String, Object> changedValues) {
-		if (!changedValues.isEmpty() && uncommittedItemId != null) {
-			Item item = table.getItem(uncommittedItemId);
-			presenter.rowChange(item, changedValues);
 		}
 	}
 

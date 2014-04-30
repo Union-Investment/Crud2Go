@@ -46,12 +46,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
@@ -85,16 +85,10 @@ public class RowEditingFormPresenterTest {
 	private Table tableMock;
 
 	@Mock
-	private TablePresenter tablePresenterMock;
-
-	@Mock
 	private DataContainer containerMock;
 
 	@Mock
 	private TableColumns tableColumnsMock;
-
-	@Mock
-	private TableDoubleClickEvent tableDoubleClickEventMock;
 
 	@Mock
 	private ContainerRow containerRowMock;
@@ -129,14 +123,14 @@ public class RowEditingFormPresenterTest {
 
 		// default
 		presenter = new RowEditingFormPresenter(viewMock, modelMock,
-				parentPanelMock, "id1", tableMock, tablePresenterMock);
+				parentPanelMock, "id1", tableMock);
+		presenter.currentContainerRow = containerRowMock;
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void shouldFailWithWrongView() {
 		presenter = new RowEditingFormPresenter(panelContentViewMock,
-				modelMock, parentPanelMock, "id1", tableMock,
-				tablePresenterMock);
+				modelMock, parentPanelMock, "id1", tableMock);
 	}
 
 	@Test
@@ -212,23 +206,27 @@ public class RowEditingFormPresenterTest {
 	}
 
 	@Test
+	public void shouldValidateTheCurrentRowOnSave() {
+		doThrow(new InvalidValueException("bla")).when(tableMock).validateIfChanged(containerRowIdMock);
+		presenter.save();
+		verify(viewMock).showFormError("bla");
+	}
+	
+	@Test
 	public void shouldCommitContainerOnSave() {
 		presenter.save();
-
 		verify(containerMock).commit();
 	}
 
 	@Test
 	public void shouldReturnToTableOnSave() {
 		presenter.save();
-
 		verify(tableMock).changeDisplayMode(DisplayMode.TABLE);
 	}
 
 	@Test
 	public void shouldDiscardFormFieldsOnReset() {
 		presenter.resetFields();
-
 		verify(viewMock).discard();
 	}
 

@@ -25,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -92,9 +91,6 @@ public class PresenterFactoryTest {
 
 	@Mock
 	private Table tableMock;
-
-	@Mock
-	private TablePresenter tablePresenterMock;
 
 	@Mock
 	private DefaultRowEditingFormView rowEditingFormViewMock;
@@ -251,7 +247,7 @@ public class PresenterFactoryTest {
 		// when
 		RowEditingFormPresenter presenter = presenterFactory
 				.rowEditingFormPresenter(dialogMock, panelMock, "id1",
-						tableMock, tablePresenterMock);
+						tableMock);
 
 		// then
 		assertThat(presenter.getView(), is((View) rowEditingFormViewMock));

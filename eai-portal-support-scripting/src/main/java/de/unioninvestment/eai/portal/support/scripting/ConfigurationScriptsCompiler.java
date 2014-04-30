@@ -135,11 +135,12 @@ public class ConfigurationScriptsCompiler {
 		int i = 0;
 		for (ComponentConfig component : panel.getElements()) {
 			if (component instanceof CompoundSearchConfig) {
-				compileAllClosureScripts(((CompoundSearchConfig) component).getDetails(), location
-						+ "/elements[" + i++ + "]/details");
+				compileAllClosureScripts(
+						((CompoundSearchConfig) component).getDetails(),
+						location + "/elements[" + i++ + "]/details");
 			} else if (component instanceof TableConfig) {
-					compileAllClosureScripts((TableConfig) component, location
-							+ "/elements[" + i++ + "]");
+				compileAllClosureScripts((TableConfig) component, location
+						+ "/elements[" + i++ + "]");
 			} else if (component instanceof FormConfig) {
 				compileAllClosureScripts((FormConfig) component, location
 						+ "/elements[" + i++ + "]");
@@ -171,8 +172,11 @@ public class ConfigurationScriptsCompiler {
 		compileTableActionScripts(table, location);
 		compileContainerScript(table, location);
 		compileRowStyleScript(table, location);
-		compileColumnScripts(table, location);
 		compileTableOnRowChangeScript(table, location);
+		compileClosure(table.getRowValidator(), "it,row", location
+				+ "/row-validator");
+
+		compileColumnScripts(table, location);
 		compileRowEditableClosure(table, location);
 	}
 
@@ -198,7 +202,7 @@ public class ConfigurationScriptsCompiler {
 							location + "/columns/column/editable");
 				}
 
-				compileClosure(column.getValidator(), "value", location
+				compileClosure(column.getValidator(), "it,value", location
 						+ "/columns/column/validator");
 				compileClosure(column.getGenerator(), "row,builder", location
 						+ "/columns/column/generator");

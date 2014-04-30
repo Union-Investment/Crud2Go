@@ -20,6 +20,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -29,6 +30,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 
 public class TableColumnTest {
 
@@ -45,6 +48,9 @@ public class TableColumnTest {
 
 	@Mock
 	private DataContainer containerMock;
+
+	@Mock
+	private FieldValidator validatorMock, validator2Mock;
 
 	@Before
 	public void setUp() {
@@ -78,5 +84,16 @@ public class TableColumnTest {
 		tableColumn.setTable(tableMock);
 		
 		assertThat(tableColumn.getType(), equalTo((Class)String.class));
+	}
+
+	public void shouldAllowAddingAFirstValidatorByScriptingLayer() {
+		tableColumn.addValidator(validatorMock);
+		assertThat(tableColumn.getValidators().get(0), sameInstance(validatorMock));
+	}
+
+	public void shouldAllowAddingAdditionalValidatorByScriptingLayer() {
+		tableColumn.addValidator(validatorMock);
+		tableColumn.addValidator(validator2Mock);
+		assertThat(tableColumn.getValidators().get(1), sameInstance(validator2Mock));
 	}
 }

@@ -28,8 +28,10 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -38,13 +40,21 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 
+import com.google.common.collect.ImmutableMap;
 import com.vaadin.ui.Table;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DisplayMode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 
 public class TablePresenterTest extends AbstractTablePresenterTest {
+
+	@Captor
+	private ArgumentCaptor<BeforeCommitEventHandler> beforeCommitHandlerCaptor;
 
 	@Before
 	public void setUp() {
@@ -94,9 +104,9 @@ public class TablePresenterTest extends AbstractTablePresenterTest {
 	public void shouldCallRowChange() {
 		Map<String, Object> changedValues = singletonMap("NAME",
 				(Object) "VALUE");
-		presenter.rowChange(itemMock, changedValues);
-
-		verify(modelMock).rowChange(itemMock, changedValues);
+		when(containerMock.convertInternalRowId(4711)).thenReturn(containerRowIdMock);
+		presenter.updateUncommittedItemId(4711);
+		modelMock.rowChange(containerRowIdMock, changedValues);
 	}
 
 	@Test
@@ -235,5 +245,63 @@ public class TablePresenterTest extends AbstractTablePresenterTest {
 	public void shouldDelegateSetTableActionVisibility() {
 		presenter.setTableActionVisibility("ID", false);
 		verify(viewMock).setTableActionVisibility("ID", false);
+	}
+	
+	@Test
+	public void shouldCommitFieldsToContainerBeforeCommit() {
+		presenter.initialize();
+		verify(containerMock).addBeforeCommitEventHandler(beforeCommitHandlerCaptor.capture());
+		updateUncommittedItemId();
+		
+		beforeCommitHandlerCaptor.getValue().beforeCommit(new BeforeCommitEvent(containerMock));
+
+		verify(viewMock).commitChangesToContainer();
+	}
+
+	@Test
+	public void shouldFireRowChangeIfRowChangedBeforeCommit() {
+		presenter.initialize();
+		verify(containerMock).addBeforeCommitEventHandler(beforeCommitHandlerCaptor.capture());
+
+		updateUncommittedItemId();
+		
+		ImmutableMap<String, Object> modifiedColumns = ImmutableMap.<String,Object>of("a", 1);
+		when(viewMock.getModifiedColumnNames()).thenReturn(modifiedColumns);
+		
+		beforeCommitHandlerCaptor.getValue().beforeCommit(new BeforeCommitEvent(containerMock));
+		
+		verify(modelMock).rowChange(containerRowIdMock, modifiedColumns);
+	}
+
+	@Test
+	public void shouldNotFireRowChangeIfNoRowIsSelected() {
+		presenter.initialize();
+		verify(containerMock).addBeforeCommitEventHandler(beforeCommitHandlerCaptor.capture());
+		reset(modelMock);
+		
+		beforeCommitHandlerCaptor.getValue().beforeCommit(new BeforeCommitEvent(containerMock));
+		
+		verifyZeroInteractions(modelMock);
+		// verify(modelMock).rowChange(containerRowIdMock, modifiedColumns);
+	}
+	
+	@Test
+	public void shouldNotFireRowChangeOnUnchangedRowBeforeCommit() {
+		presenter.initialize();
+		verify(containerMock).addBeforeCommitEventHandler(beforeCommitHandlerCaptor.capture());
+		
+		updateUncommittedItemId();
+		
+		ImmutableMap<String, Object> modifiedColumns = ImmutableMap.<String,Object>of("a", 1);
+		when(viewMock.getModifiedColumnNames()).thenReturn(Collections.<String,Object>emptyMap());
+		
+		beforeCommitHandlerCaptor.getValue().beforeCommit(new BeforeCommitEvent(containerMock));
+		
+		verify(modelMock, never()).rowChange(containerRowIdMock, modifiedColumns);
+	}
+	
+	private void updateUncommittedItemId() {
+		when(containerMock.convertInternalRowId(itemIdMock)).thenReturn(containerRowIdMock);
+		presenter.updateUncommittedItemId(itemIdMock);
 	}
 }

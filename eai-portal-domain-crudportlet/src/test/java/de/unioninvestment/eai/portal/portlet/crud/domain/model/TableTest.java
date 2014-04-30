@@ -29,6 +29,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -51,6 +52,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Validator;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.sqlcontainer.RowId;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
@@ -142,6 +145,9 @@ public class TableTest {
 
 	@Mock
 	private DataStream containerStreamMock;
+
+	@Mock
+	private Validator rowValidatorMock;
 
 	@Before
 	public void setUp() {
@@ -425,10 +431,10 @@ public class TableTest {
 		Map<String, Object> changedValues = singletonMap("NAME",
 				(Object) "VALUE");
 
-		when(containerMock.convertItemToRow(itemMock, false, false))
+		when(containerMock.getRow(containerRowIdMock, false, false))
 				.thenReturn(containerRowMock);
 
-		table.rowChange(itemMock, changedValues);
+		table.rowChange(containerRowIdMock, changedValues);
 
 		ArgumentCaptor<RowChangeEvent> eventCaptor = ArgumentCaptor
 				.forClass(RowChangeEvent.class);
@@ -548,5 +554,44 @@ public class TableTest {
 		when(containerMock.getStream()).thenReturn(containerStreamMock);
 		DataStream tableStream = table.getStream();
 		assertThat(tableStream, instanceOf(GeneratedColumnsDataStreamWrapper.class));
+	}
+
+	@Test
+	public void shouldNotValidateTheGivenRowIfItDidntChangeAndAValidatorIsRegistered() {
+		table.setRowValidator(rowValidatorMock);
+		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(containerRowMock);
+		doThrow(new InvalidValueException("Test")).when(rowValidatorMock).validate(containerRowMock);
+
+		table.validateIfChanged(containerRowIdMock);
+		verifyZeroInteractions(rowValidatorMock);
+	}
+
+	@Test
+	public void shouldNotValidateTheGivenRowIfNoAValidatorIsRegistered() {
+		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(containerRowMock);
+		doThrow(new InvalidValueException("Test")).when(rowValidatorMock).validate(containerRowMock);
+		when(containerRowMock.isModified()).thenReturn(true);
+
+		table.validateIfChanged(containerRowIdMock);
+	}
+
+	@Test(expected=InvalidValueException.class)
+	public void shouldValidateTheGivenRowIfItHasChangedAndAValidatorIsRegistered() {
+		table.setRowValidator(rowValidatorMock);
+		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(containerRowMock);
+		doThrow(new InvalidValueException("Test")).when(rowValidatorMock).validate(containerRowMock);
+		when(containerRowMock.isModified()).thenReturn(true);
+
+		table.validateIfChanged(containerRowIdMock);
+	}
+	
+	@Test(expected=InvalidValueException.class)
+	public void shouldValidateTheGivenRowIfItIsNewAndAValidatorIsRegistered() {
+		table.setRowValidator(rowValidatorMock);
+		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(containerRowMock);
+		doThrow(new InvalidValueException("Test")).when(rowValidatorMock).validate(containerRowMock);
+		when(containerRowMock.isNewItem()).thenReturn(true);
+		
+		table.validateIfChanged(containerRowIdMock);
 	}
 }

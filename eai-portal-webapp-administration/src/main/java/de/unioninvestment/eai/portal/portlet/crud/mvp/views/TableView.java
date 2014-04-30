@@ -102,16 +102,6 @@ public interface TableView extends View {
 		void doubleClick(Item item);
 
 		/**
-		 * Wird aufgerufen, wenn eine Zeile verändert wird.
-		 * 
-		 * @param containerRow
-		 *            Zeile
-		 * @param changedValues
-		 *            Map mit geänderten Spaltennamen und alten Werten
-		 */
-		void rowChange(Item containerRow, Map<String, Object> changedValues);
-
-		/**
 		 * Wird aufgerufen, wenn die Tabelle fertig initialiert wurde.
 		 */
 		void doInitialize();
@@ -146,6 +136,11 @@ public interface TableView extends View {
 		public boolean isFormEditEnabled();
 
 		public void openRowEditingForm();
+
+		/**
+		 * @param uncommittedItemId die aktuell in Änderung befindliche Zeile
+		 */
+		void updateUncommittedItemId(Object uncommittedItemId);
 	}
 
 	/**
@@ -298,5 +293,9 @@ public interface TableView extends View {
 	void switchToViewMode();
 
 	void switchToEditMode();
+
+	Map<String, Object> getModifiedColumnNames();
+
+	void commitChangesToContainer();
 
 }

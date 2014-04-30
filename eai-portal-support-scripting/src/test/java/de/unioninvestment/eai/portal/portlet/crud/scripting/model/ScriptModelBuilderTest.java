@@ -480,6 +480,18 @@ public class ScriptModelBuilderTest extends ModelSupport {
 	}
 
 	@Test
+	public void shouldBuildRowValidator() throws JAXBException {
+
+		prepare("validValidationConfig.xml");
+
+		scriptModelBuilder.build();
+
+		Table table = (Table) portlet.getPage().getElements().get(0);
+
+		assertThat(table.hasRowValidator(), is(true));
+	}
+
+	@Test
 	public void shouldBuildTabs() throws JAXBException {
 
 		prepare("validTabsConfig.xml");

@@ -28,8 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Table.ColumnGenerator;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
@@ -53,10 +56,12 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView;
  * 
  * @author carsten.mjartan
  */
+@SuppressWarnings("serial")
 public class TablePresenter extends
 		AbstractComponentPresenter<Table, TableView> implements
 		TableView.Presenter, ShowEventHandler<Tab>, Table.Presenter,
-		SelectionEventHandler, ModeChangeEventHandler<Table, Mode> {
+		SelectionEventHandler, ModeChangeEventHandler<Table, Mode>,
+		BeforeCommitEventHandler {
 
 	private static final long serialVersionUID = 2L;
 
@@ -64,11 +69,13 @@ public class TablePresenter extends
 			.getLogger(TablePresenter.class);
 
 	private DataContainer container;
-	private boolean isInitializeView = false;
+	private boolean isInitialized = false;
 
 	private Set<String> generatedColumIds = new HashSet<String>();
 
 	private boolean ignoreSelectionEvent = false;
+
+	private ContainerRowId uncommittedRowId;
 
 	/**
 	 * @param view
@@ -78,7 +85,6 @@ public class TablePresenter extends
 	 * 
 	 * 
 	 */
-	@SuppressWarnings("serial")
 	public TablePresenter(TableView view, Table model) {
 		super(view, model);
 		container = getModel().getContainer();
@@ -104,10 +110,36 @@ public class TablePresenter extends
 	/**
 	 * Initialisiert die View.
 	 */
-	void initializeView() {
+	void initialize() {
 		getView().initialize(this, container, getModel(),
 				getModel().getPageLength(), getModel().getCacheRate());
-		isInitializeView = true;
+		isInitialized = true;
+
+		if (!isFormEditEnabled()) {
+			container.addBeforeCommitEventHandler(this);
+		}
+
+	}
+
+	@Override
+	public void updateUncommittedItemId(Object uncommittedItemId) {
+		this.uncommittedRowId = uncommittedItemId == null ? null : container
+				.convertInternalRowId(uncommittedItemId);
+	}
+
+	@Override
+	public void beforeCommit(BeforeCommitEvent event) {
+		if (uncommittedRowId != null) {
+			Map<String, Object> changedFieldNames = getView()
+					.getModifiedColumnNames();
+
+			getView().commitChangesToContainer();
+			
+			if (!changedFieldNames.isEmpty()) {
+				getModel().rowChange(uncommittedRowId, changedFieldNames);
+			}
+			getModel().validateIfChanged(uncommittedRowId);
+		}
 	}
 
 	/**
@@ -166,14 +198,13 @@ public class TablePresenter extends
 
 	@Override
 	public void onShow(ShowEvent<Tab> event) {
-		if (!isInitializeView) {
-			initializeView();
+		if (!isInitialized) {
+			initialize();
 		}
 	}
 
 	@Override
 	public void onModeChange(ModeChangeEvent<Table, Mode> event) {
-		// TODO optimize: only change something if in DisplayMode.TABLE
 		if (getModel().getDisplayMode() == DisplayMode.TABLE) {
 			updateViewViewMode(event.getMode());
 		}
@@ -234,12 +265,6 @@ public class TablePresenter extends
 	public void doubleClick(Item item) {
 		ContainerRow row = container.convertItemToRow(item, false, true);
 		getModel().doubleClick(row);
-	}
-
-	@Override
-	public void rowChange(Item containerRow, Map<String, Object> changedValues) {
-		getModel().rowChange(containerRow, changedValues);
-
 	}
 
 	@Override

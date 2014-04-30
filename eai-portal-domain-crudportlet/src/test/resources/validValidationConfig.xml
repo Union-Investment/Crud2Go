@@ -2,7 +2,7 @@
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
 	title="Beispiel für eine Tabelle auf Basis einer Query">
 	<page>
-		<table id="table" row-height="30">
+		<table id="table" row-height="30" row-validator="validateRow(row)" validation-message="Zeile inkorrekt">
 			<database-query datasource="test">
 				<query><![CDATA[
 					SELECT * FROM test_crud2
@@ -66,5 +66,11 @@
 				throw new IllegalArgumentException("Der Text muss mit 'Dies ' anfangen")
 			}
 		}
+		def validateRow(row) {
+			if (row.values.CNUMBER5_2 && row.values.CNUMBER5_2 < row.values.CNUMBER5_2_NN) {
+				throw new IllegalArgumentException("Zahl muss >= CNUMBER5_2_NN sein")
+			}
+		}
+		
 	]]></script>
 </portlet>

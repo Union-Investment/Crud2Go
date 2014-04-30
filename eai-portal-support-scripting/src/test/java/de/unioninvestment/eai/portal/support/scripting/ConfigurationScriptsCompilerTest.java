@@ -170,6 +170,8 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 				notNullValue());
 		assertThat(getTable(portletConfig).getRowDeletable().getClazz(),
 				notNullValue());
+		assertThat(getTable(portletConfig).getRowValidator().getClazz(),
+				notNullValue());
 
 		assertThat(getTable(portletConfig).getColumns().getColumn().get(2)
 				.getDefault().getClazz(), notNullValue());

@@ -414,6 +414,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		assertThat(result, is(fieldMock));
 		verify(fieldMock).setCaption("Test");
 		verify(fieldMock).setWidth(100, Unit.PERCENTAGE);
+		verify(fieldMock).setConversionError("{1}"); // pass through ConversionException message
 		verify(fieldMock).setBuffered(true); // enable buffering
 	}
 

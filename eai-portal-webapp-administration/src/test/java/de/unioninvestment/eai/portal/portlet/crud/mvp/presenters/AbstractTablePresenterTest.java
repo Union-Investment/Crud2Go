@@ -30,6 +30,7 @@ import com.vaadin.data.Item;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Page;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
@@ -70,6 +71,13 @@ public class AbstractTablePresenterTest {
 	Item itemMock;
 
 	@Mock
+	Object itemIdMock;
+
+	
+	@Mock
+	ContainerRowId containerRowIdMock;
+
+	@Mock
 	ContainerRow containerRowMock;
 
 	@Before
@@ -84,5 +92,7 @@ public class AbstractTablePresenterTest {
 		when(modelMock.isSortingEnabled()).thenReturn(true);
 		when(modelMock.getColumns()).thenReturn(tableColumns);
 		when(modelMock.getActions()).thenReturn(tableActionsMock);
+		
+		when(containerRowMock.getId()).thenReturn(containerRowIdMock);
 	}
 }

@@ -198,7 +198,7 @@ public class PresenterFactory {
 			((LazyInitializable) table.getPanel())
 					.addShowEventListener(tablePresenter);
 		} else {
-			tablePresenter.initializeView();
+			tablePresenter.initialize();
 		}
 
 		return tablePresenter;
@@ -249,21 +249,17 @@ public class PresenterFactory {
 	 *            attached wird.
 	 * @param dialogId
 	 *            die Id des Dialogs.
-	 * @param tablePresenter
-	 *            der dazugehörige {@link TablePresenter}
 	 * @return
 	 */
 	public RowEditingFormPresenter rowEditingFormPresenter(Dialog model,
-			Panel parentPanel, String dialogId, Table table,
-			TablePresenter tablePresenter) {
+			Panel parentPanel, String dialogId, Table table) {
 
 		RowEditingFormView rowEditingFormView = viewFactory.rowEditingFormView(
 				parentPanel instanceof Tab, parentPanel.isHorizontalLayout(),
 				parentPanel.getWidth(), parentPanel.getHeight());
 
 		RowEditingFormPresenter rowEditingFormPresenter = new RowEditingFormPresenter(
-				rowEditingFormView, model, parentPanel, dialogId, table,
-				tablePresenter);
+				rowEditingFormView, model, parentPanel, dialogId, table);
 
 		return rowEditingFormPresenter;
 	}

@@ -40,51 +40,53 @@
 				<table onModeChange="logEvent 'onModeChange',it,mode"
 					onRowChange="logEvent 'rowChange',it,row"
 					onSelectionChange="logEvent 'onSelectionChange',it,selection.ids.collect{it.asMap()}"
-					row-editable="1==1" row-deletable="1==1">
+					row-editable="1==1" 
+					row-deletable="1==1"
+					row-validator="true">
 					<database-query datasource="test"
 						onCreate="logEvent 'onCreate',it,row.id.asMap()" onDelete="logEvent 'onDelete',it,row.id.asMap()"
 						onInsert="logEvent 'onInsert',it,row.id.asMap()" onUpdate="logEvent 'onUpdate',it,row.id.asMap()">
 						<query><![CDATA[
-					SELECT * FROM test_crud2
-				]]></query>
+							SELECT * FROM test_crud2
+						]]></query>
 						<insert><![CDATA[
-					INSERT INTO TEST_CRUD2
-					  (
-					    CNUMBER5_2,
-					    CDATE,
-					    CTIMESTAMP,
-					    CVARCHAR5_NN,
-					    CNUMBER5_2_NN,
-					    CDATE_NN,
-					    CTIMESTAMP_NN,
-					    TESTDATA
-					  )
-					  VALUES
-					  (
-					    $row.values.CNUMBER5_2,
-					    $row.values.CDATE,
-					    SYSDATE,
-					    $row.values.CVARCHAR5_NN,
-					    $row.values.CNUMBER5_2_NN,
-					    $row.values.CDATE_NN,
-					    SYSDATE,
-					    $row.values.TESTDATA
-					  )
-				]]></insert>
+							INSERT INTO TEST_CRUD2
+							  (
+							    CNUMBER5_2,
+							    CDATE,
+							    CTIMESTAMP,
+							    CVARCHAR5_NN,
+							    CNUMBER5_2_NN,
+							    CDATE_NN,
+							    CTIMESTAMP_NN,
+							    TESTDATA
+							  )
+							  VALUES
+							  (
+							    $row.values.CNUMBER5_2,
+							    $row.values.CDATE,
+							    SYSDATE,
+							    $row.values.CVARCHAR5_NN,
+							    $row.values.CNUMBER5_2_NN,
+							    $row.values.CDATE_NN,
+							    SYSDATE,
+							    $row.values.TESTDATA
+							  )
+						]]></insert>
 						<update><![CDATA[
-					UPDATE TEST_CRUD2 SET 
-						CNUMBER5_2	  = $row.values.CNUMBER5_2,
-						CDATE	      = $row.values.CDATE,
-						CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
-						CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
-						CDATE_NN	  = $row.values.CDATE_NN,
-						TESTDATA      = $row.values.TESTDATA
-					WHERE ID          = $row.values.ID
-				]]></update>
+							UPDATE TEST_CRUD2 SET 
+								CNUMBER5_2	  = $row.values.CNUMBER5_2,
+								CDATE	      = $row.values.CDATE,
+								CVARCHAR5_NN  = $row.values.CVARCHAR5_NN,
+								CNUMBER5_2_NN = $row.values.CNUMBER5_2_NN,
+								CDATE_NN	  = $row.values.CDATE_NN,
+								TESTDATA      = $row.values.TESTDATA
+							WHERE ID          = $row.values.ID
+						]]></update>
 						<delete><![CDATA[
-					DELETE FROM TEST_CRUD2
-					WHERE ID = $row.values.ID
-				]]></delete>
+							DELETE FROM TEST_CRUD2
+							WHERE ID = $row.values.ID
+						]]></delete>
 					</database-query>
 					<columns>
 						<column name="ID" title="ID" primary-key="true" />

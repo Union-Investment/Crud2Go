@@ -17,11 +17,12 @@ import org.mockito.MockitoAnnotations;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Field;
 
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptFieldValidator.ScriptValidator;
-
 public class ScriptFieldValidatorTest {
 
 	private ScriptFieldValidator validator;
+
+	@Mock
+	private ScriptTable tableMock;
 
 	@Mock
 	private Closure<Object> closureMock;
@@ -34,20 +35,21 @@ public class ScriptFieldValidatorTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+
 	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		validator = new ScriptFieldValidator(closureMock, "Test");
+		validator = new ScriptFieldValidator(tableMock, closureMock, "Test");
 		validator.apply(fieldMock);
 		verify(fieldMock).addValidator(scriptValidatorCaptor.capture());
 	}
 
 	@Test
 	public void shouldAcceptBooleanTrueFromClosure() {
-		when(closureMock.call("Test")).thenReturn(true);
+		when(closureMock.call(tableMock, "Test")).thenReturn(true);
 		scriptValidatorCaptor.getValue().validate("Test");
-		verify(closureMock).call("Test");
+		verify(closureMock).call(tableMock, "Test");
 	}
 
 	@Test
@@ -55,7 +57,7 @@ public class ScriptFieldValidatorTest {
 		thrown.expect(InvalidValueException.class);
 		thrown.expectMessage("Test");
 		
-		when(closureMock.call("Test")).thenReturn(false);
+		when(closureMock.call(tableMock, "Test")).thenReturn(false);
 		scriptValidatorCaptor.getValue().validate("Test");
 		verify(closureMock).call("Test");
 	}
@@ -64,16 +66,16 @@ public class ScriptFieldValidatorTest {
 	@SuppressWarnings("unchecked")
 	public void shouldRejectBooleanFalseFromClosureUsingDefaultMessage() {
 		reset(fieldMock);
-		validator = new ScriptFieldValidator(closureMock, null);
+		validator = new ScriptFieldValidator(tableMock, closureMock, null);
 		validator.apply(fieldMock);
 		verify(fieldMock).addValidator(scriptValidatorCaptor.capture());
 
 		thrown.expect(InvalidValueException.class);
 		thrown.expectMessage("#portlet.crud.error.validation.defaultValidatorMessage");
 		
-		when(closureMock.call("Test")).thenReturn(false);
+		when(closureMock.call(tableMock, "Test")).thenReturn(false);
 		scriptValidatorCaptor.getValue().validate("Test");
-		verify(closureMock).call("Test");
+		verify(closureMock).call(tableMock, "Test");
 	}
 
 	@Test
@@ -81,7 +83,7 @@ public class ScriptFieldValidatorTest {
 		thrown.expect(InvalidValueException.class);
 		thrown.expectMessage("Bla");
 		
-		when(closureMock.call("Test")).thenThrow(new IllegalArgumentException("Bla"));
+		when(closureMock.call(tableMock, "Test")).thenThrow(new IllegalArgumentException("Bla"));
 		scriptValidatorCaptor.getValue().validate("Test");
 	}
 }

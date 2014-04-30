@@ -28,6 +28,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.CheckBox;
@@ -316,6 +317,7 @@ public class DefaultCrudFieldFactory implements TableFieldFactory,
 		setCaptionAndTooltipIfGiven(field, propertyId, target);
 		field.setWidth(HUNDRED, Unit.PERCENTAGE);
 		field.setBuffered(true);
+		passThroughConversionExceptionMessage(field);
 		if (field instanceof TextArea) {
 			TextArea area = (TextArea) field;
 			if (isEditForm()) {
@@ -323,6 +325,13 @@ public class DefaultCrudFieldFactory implements TableFieldFactory,
 			} else {
 				area.setHeight(getRows(propertyId), Unit.EM);
 			}
+		}
+	}
+
+	private void passThroughConversionExceptionMessage(Field<?> field) {
+		if (field instanceof AbstractField<?>) {
+			AbstractField<?> abstractField = (AbstractField<?>) field;
+			abstractField.setConversionError("{1}");
 		}
 	}
 

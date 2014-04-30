@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Validator;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Table.ColumnGenerator;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
@@ -258,6 +260,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	private Table.Presenter presenter;
 
+	private Validator rowValidator = null;
+
 	/**
 	 * Konstruktor mit Parametern.
 	 * 
@@ -274,7 +278,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 		this.editable = editable;
 		this.directEdit = directEdit;
 		this.mode = directEdit && editable ? Mode.EDIT : Mode.VIEW;
-		
+
 		this.columns = tableColumns;
 		if (columns != null) {
 			columns.setTable(this);
@@ -516,18 +520,28 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * Wird durch die Table-UI-Komponente nach Änderung einer Zeile im Container
 	 * aufgerufen.
 	 * 
-	 * @param item
+	 * @param uncommittedRowId
 	 *            die gerade im UI geänderte Zeile
 	 * @param changedValues
 	 *            Geänderten Werte als Map
 	 */
-	public void rowChange(Item item, Map<String, Object> changedValues) {
-		ContainerRow containerRow = container.convertItemToRow(item, false,
+	public void rowChange(ContainerRowId uncommittedRowId,
+			Map<String, Object> changedValues) {
+		ContainerRow containerRow = container.getRow(uncommittedRowId, false,
 				false);
-
 		rowChangeEventRouter.fireEvent(new RowChangeEvent(containerRow,
 				changedValues));
+	}
 
+	public void validateIfChanged(ContainerRowId uncommittedRowId)
+			throws InvalidValueException {
+		if (rowValidator != null) {
+			ContainerRow containerRow = container.getRow(uncommittedRowId,
+					false, true);
+			if (containerRow.isModified() || containerRow.isNewItem()) {
+				rowValidator.validate(containerRow);
+			}
+		}
 	}
 
 	public void doInitialize() {
@@ -845,8 +859,18 @@ public class Table extends Component implements Component.ExpandableComponent,
 	public DataStream getStream() {
 		DataStream stream = container.getStream();
 		if (columns != null) {
-			stream = new GeneratedColumnsDataStreamWrapper(stream, container.getColumns(), columns);
+			stream = new GeneratedColumnsDataStreamWrapper(stream,
+					container.getColumns(), columns);
 		}
 		return stream;
 	}
+
+	public void setRowValidator(Validator rowValidator) {
+		this.rowValidator = rowValidator;
+	}
+
+	public boolean hasRowValidator() {
+		return rowValidator != null;
+	}
+
 }

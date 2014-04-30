@@ -173,7 +173,8 @@ public class GuiBuilderTest extends SpringPortletContextTest {
 				tabsPresenterMock);
 		when(presenterFactoryMock.tablePresenter(tableMock)).thenReturn(
 				tablePresenterMock);
-		when(presenterFactoryMock.panelContentPresenter(tabMock)).thenReturn(tabContentPresenterMock);
+		when(presenterFactoryMock.panelContentPresenter(tabMock)).thenReturn(
+				tabContentPresenterMock);
 
 		when(portletMock.getPage()).thenReturn(null);
 		when(portletMock.getTabs()).thenReturn(tabsMock);
@@ -247,15 +248,13 @@ public class GuiBuilderTest extends SpringPortletContextTest {
 
 		when(
 				presenterFactoryMock.rowEditingFormPresenter(any(Dialog.class),
-						any(Panel.class), any(String.class), any(Table.class),
-						any(TablePresenter.class))).thenReturn(
-				rowEditingFormPresenterMock);
+						any(Panel.class), any(String.class), any(Table.class)))
+				.thenReturn(rowEditingFormPresenterMock);
 
 		new GuiBuilder(presenterFactoryMock).build(portletMock);
 
 		verify(presenterFactoryMock).rowEditingFormPresenter(any(Dialog.class),
-				any(Panel.class), any(String.class), any(Table.class),
-				any(TablePresenter.class));
+				any(Panel.class), any(String.class), any(Table.class));
 	}
 
 	@Test(expected = UnsupportedOperationException.class)

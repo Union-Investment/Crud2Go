@@ -156,8 +156,7 @@ public class GuiBuilder implements Serializable {
 
 		String dialogId = String.valueOf(table.hashCode());
 		RowEditingFormPresenter presenter = factory.rowEditingFormPresenter(
-				rowEditingFormDialog, parentPanel, dialogId, table,
-				tablePresenter);
+				rowEditingFormDialog, parentPanel, dialogId, table);
 
 		dialogPresenterMap.put(dialogId, presenter);
 	}

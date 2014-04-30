@@ -1754,6 +1754,22 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="row-validator" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure zur Validierung der Feldwerte einer
+							neuen/geaenderten Zeile
+							{ row -> ... }
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="validation-message" type="string">
+					<annotation>
+						<documentation>
+							Fehlermeldung bei fehlgeschlagener Validierung
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="expandRatio" type="int">
 					<annotation>
 						<documentation>
@@ -2549,8 +2565,10 @@
 				<attribute name="validator" type="tns:groovy">
 					<annotation>
 						<documentation>
-							Groovy Closure zur Validierung des bereits konvertierten Feldwertes:
-							{ value -> ... }
+							Groovy Closure zur Validierung des eingegebenen
+							(bereits in den Zieldatentyp konvertierten) Feldwertes:
+							{ value ->
+							... }
 						</documentation>
 					</annotation>
 				</attribute>

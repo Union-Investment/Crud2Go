@@ -308,9 +308,12 @@ public class ScriptModelBuilder {
 		scriptTab.setOnHide(scriptBuilder.buildClosure(tc.getOnHide()));
 	}
 
-	private ScriptCompoundSearch buildScriptCompoundSearch(CompoundSearch compoundSearch) {
-		ScriptCompoundSearch scriptCompoundSearch = factory.getScriptCompoundSearch(compoundSearch);
-		scriptPortlet.addElementById(compoundSearch.getId(), scriptCompoundSearch);
+	private ScriptCompoundSearch buildScriptCompoundSearch(
+			CompoundSearch compoundSearch) {
+		ScriptCompoundSearch scriptCompoundSearch = factory
+				.getScriptCompoundSearch(compoundSearch);
+		scriptPortlet.addElementById(compoundSearch.getId(),
+				scriptCompoundSearch);
 
 		for (Component re : compoundSearch.getElements()) {
 			scriptCompoundSearch.addElement(buildScriptComponent(re));
@@ -487,23 +490,35 @@ public class ScriptModelBuilder {
 		populateTableOnDoubleClickClosure(table, scriptTable);
 		populateTableOnInitializeClosure(table, scriptTable);
 		populateTableRowChangeClosure(table, scriptTable);
+		populateTableRowValidator(table, scriptTable);
 
 		populateDynamicEditableClosures(table);
-		applyValidatorClosures(table);
+		applyValidatorClosures(table, scriptTable);
 
 		scriptPortlet.addElementById(table.getId(), scriptTable);
 
 		return scriptTable;
 	}
 
+	private void populateTableRowValidator(Table table, ScriptTable scriptTable) {
+		TableConfig tc = (TableConfig) configs.get(table);
+		if (tc.getRowValidator() != null) {
+			Closure<Object> rowValidatorClosure = scriptBuilder.buildClosure(tc
+					.getRowValidator());
+			// TODO custom row-validator error message
+			table.setRowValidator(new ScriptValidator(scriptTable, rowValidatorClosure, tc.getValidationMessage()));
+		}
+	}
 
-	private void applyValidatorClosures(Table table) {
+	private void applyValidatorClosures(Table table, ScriptTable scriptTable) {
 		if (table.getColumns() != null) {
 			for (TableColumn column : table.getColumns()) {
-				ColumnConfig  columnConfig = (ColumnConfig) configs.get(column);
+				ColumnConfig columnConfig = (ColumnConfig) configs.get(column);
 				if (columnConfig.getValidator() != null) {
-					Closure<Object> closure = scriptBuilder.buildClosure(columnConfig.getValidator());
-					column.addValidator(new ScriptFieldValidator(closure, columnConfig.getValidationMessage()));
+					Closure<Object> closure = scriptBuilder
+							.buildClosure(columnConfig.getValidator());
+					column.addValidator(new ScriptFieldValidator(scriptTable, closure,
+							columnConfig.getValidationMessage()));
 				}
 			}
 		}
@@ -917,8 +932,8 @@ public class ScriptModelBuilder {
 		}
 	}
 
-	private void populateOnExecutionClosure(ScriptTableAction scriptTableAction,
-			TableActionConfig tac) {
+	private void populateOnExecutionClosure(
+			ScriptTableAction scriptTableAction, TableActionConfig tac) {
 		if (tac.getOnExecution() != null) {
 			Closure<?> onExecution = scriptBuilder.buildClosure(tac
 					.getOnExecution());
@@ -926,9 +941,9 @@ public class ScriptModelBuilder {
 		}
 	}
 
-	private void populateExportFilenameGenerator(TableAction action, TableActionConfig tac) {
-		if (tac.getExport() != null
-				&& tac.getExport().getFilename() != null) {
+	private void populateExportFilenameGenerator(TableAction action,
+			TableActionConfig tac) {
+		if (tac.getExport() != null && tac.getExport().getFilename() != null) {
 			final Closure<?> filenameGenerator = scriptBuilder.buildClosure(tac
 					.getExport().getFilename());
 			action.setExportFilenameGenerator(new Supplier<String>() {

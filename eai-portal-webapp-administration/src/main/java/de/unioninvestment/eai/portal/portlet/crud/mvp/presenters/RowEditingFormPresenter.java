@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Item;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -70,9 +71,8 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	private Panel parentPanel;
 	private final String dialogId;
 	private final Table table;
-	private final TablePresenter tablePresenter;
-	private ContainerRow currentContainerRow;
 	private DataContainer container;
+	ContainerRow currentContainerRow;
 
 	/**
 	 * Konstruktor.
@@ -87,18 +87,14 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	 *            Eindeutiger Id des Dialogs
 	 * @param table
 	 *            Tabellenmodel
-	 * @param tablePresenter
-	 *            Presenter der Tabelle
 	 */
 	public RowEditingFormPresenter(PanelContentView view, Dialog model,
-			Panel parentPanel, String dialogId, Table table,
-			TablePresenter tablePresenter) {
+			Panel parentPanel, String dialogId, Table table) {
 
 		super(view, model);
 		this.parentPanel = parentPanel;
 		this.dialogId = dialogId;
 		this.table = table;
-		this.tablePresenter = tablePresenter;
 		this.container = table.getContainer();
 		initialize();
 	}
@@ -263,7 +259,6 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 		}
 	}
 
-
 	@Override
 	public void save() {
 		boolean success = trySave();
@@ -271,7 +266,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 			table.changeDisplayMode(DisplayMode.TABLE);
 		}
 	}
-	
+
 	private boolean trySave() {
 		try {
 			List<String> modifiedFieldNames = getModifiedFieldNames();
@@ -280,6 +275,7 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 			try {
 				fireRowChangeEvent(modifiedColumnNames);
+				validateRow();
 
 				container.commit();
 
@@ -313,10 +309,13 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 
 	}
 
+	private void validateRow() {
+		table.validateIfChanged(currentContainerRow.getId());
+	}
+
 	private void fireRowChangeEvent(Map<String, Object> modifiedColumnNames) {
 		if (modifiedColumnNames.size() > 0) {
-			tablePresenter.rowChange(currentContainerRow.getInternalRow(),
-					modifiedColumnNames);
+			table.rowChange(currentContainerRow.getId(), modifiedColumnNames);
 		}
 	}
 
