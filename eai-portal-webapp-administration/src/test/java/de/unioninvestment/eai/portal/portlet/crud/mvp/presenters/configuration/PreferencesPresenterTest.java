@@ -81,7 +81,7 @@ public class PreferencesPresenterTest extends SpringPortletContextTest {
 		presenter.storePreferencesAndFireConfigChange();
 
 		verify(viewMock).showError(
-				"Einstellungen konnten nicht gespeichert werden");
+				"Einstellungen konnten nicht gespeichert werden.");
 	}
 
 }
