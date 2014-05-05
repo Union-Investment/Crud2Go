@@ -57,6 +57,7 @@ public class ConfirmationDialogProvider extends Closure<String> {
 
 			// Find the buttons and change the order
 			Button ok = d.getOkButton();
+			ok.setDisableOnClick(true);
 			HorizontalLayout buttons = (HorizontalLayout) ok.getParent();
 			buttons.removeComponent(ok);
 			buttons.addComponent(ok, 1);
@@ -64,6 +65,7 @@ public class ConfirmationDialogProvider extends Closure<String> {
 
 			// Change the default
 			Button cancel = d.getCancelButton();
+			cancel.setDisableOnClick(true);
 			cancel.setStyleName(Reindeer.BUTTON_DEFAULT);
 			ok.removeStyleName(Reindeer.BUTTON_DEFAULT);
 			cancel.focus();

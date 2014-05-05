@@ -70,6 +70,18 @@ public class ConfirmationDialogProviderTest {
 		assertThat(dialogCaptor.getValue().getCancelButton().getCaption(), is("Decline"));
 	}
 
+	@Test
+	public void shouldDisableOkButtonOnClick() {
+		createDialog();
+		assertThat(dialogCaptor.getValue().getOkButton().isDisableOnClick(), is(true));
+	}
+
+	@Test
+	public void shouldDisableCancelButtonOnClick() {
+		createDialog();
+		assertThat(dialogCaptor.getValue().getCancelButton().isDisableOnClick(), is(true));
+	}
+	
 	@SuppressWarnings("serial")
 	@Test
 	public void shouldCallClosure() {
