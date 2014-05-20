@@ -18,7 +18,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.View;
 
 public class AbstractComponentPresenterTest {
 
-	static class DummyComponent extends Component {
+	static class DummyComponent extends Component implements ExpandableComponent {
 		@Override
 		public String getWidth() {
 			return null;
@@ -27,6 +27,11 @@ public class AbstractComponentPresenterTest {
 		@Override
 		public String getHeight() {
 			return null;
+		}
+
+		@Override
+		public int getExpandRatio() {
+			return 0;
 		}
 	}
 	
@@ -88,10 +93,18 @@ public class AbstractComponentPresenterTest {
 	}
 	
 	@Test
-	public void shouldUpdateViewWithFullHeightForOuterDefinedHeight() {
+	public void shouldUpdateViewWithFullHeightForOuterDefinedHeightAndExpandRatio() {
 		when(modelMock.getHeight()).thenReturn(null);
+		when(modelMock.getExpandRatio()).thenReturn(1);
 		presenter.updateViewHeight(true);
 		verify(viewMock).setHeight("100%");
+	}
+	
+	@Test
+	public void shouldUpdateViewWithUndefindedHeightForOuterDefinedHeightAndWithoutExpandRatio() {
+		when(modelMock.getHeight()).thenReturn(null);
+		presenter.updateViewHeight(true);
+		verify(viewMock).setHeight(null);
 	}
 	
 	@Test

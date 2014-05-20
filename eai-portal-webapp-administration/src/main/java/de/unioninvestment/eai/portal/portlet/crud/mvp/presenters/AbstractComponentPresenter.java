@@ -97,7 +97,7 @@ public class AbstractComponentPresenter<C extends Component, V extends View>
 		String componentHeight = getConfiguredHeight();
 		if (componentHeight != null) {
 			getView().setHeight(componentHeight);
-		} else if (outerHeightDefined) {
+		} else if (outerHeightDefined && getExpandRatio() > 0) {
 			getView().setHeight("100%");
 		} else {
 			getView().setHeight(null);
