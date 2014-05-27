@@ -32,6 +32,7 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -70,7 +71,6 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	private static final long serialVersionUID = 1L;
 
 	private Presenter presenter;
-	private Upload upload;
 
 	private Button saveButton;
 	private Button resetButton;
@@ -327,6 +327,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		Link downloadLink = new Link();
 		downloadLink.setVisible(false);
 		blobField.addComponent(downloadLink);
+		blobField.setComponentAlignment(downloadLink, Alignment.MIDDLE_LEFT);
 
 		updateDownloadLink(row, containerBlob, metadata, downloadLink);
 
@@ -360,7 +361,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	private Upload buildUpload(final ContainerRow row,
 			final ContainerBlob containerBlob, final FileMetadata metadata,
 			final Link downloadLink) {
-		upload = new Upload();
+		final Upload upload = new Upload();
 		if (metadata.getUploadCaption() != null) {
 			upload.setButtonCaption(metadata.getUploadCaption());
 		} else {
