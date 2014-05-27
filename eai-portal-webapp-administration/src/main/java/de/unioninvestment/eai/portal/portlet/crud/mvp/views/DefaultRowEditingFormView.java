@@ -53,6 +53,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FileMetadata;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.util.MimetypeRegistry;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudFieldFactory;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.DefaultCrudFieldFactory;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFactoryWrapper;
@@ -127,10 +128,11 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		addComponent(footerLayout);
 
 		if (addSwitchModeButton) {
-			switchModeButton = new Button(getMessage("portlet.crud.button.editMode"));
+			switchModeButton = new Button(
+					getMessage("portlet.crud.button.editMode"));
 			switchModeButton.addClickListener(new ClickListener() {
 				private static final long serialVersionUID = 1L;
-				
+
 				@Override
 				public void buttonClick(ClickEvent event) {
 					presenter.changeMode();
@@ -169,7 +171,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 			}
 		});
 
-		previousRowButton = new Button(getMessage("portlet.crud.button.previousRow"));
+		previousRowButton = new Button(
+				getMessage("portlet.crud.button.previousRow"));
 		previousRowButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -189,7 +192,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 			}
 		});
 
-		Button cancelButton = new Button(getMessage("portlet.crud.button.cancel"));
+		Button cancelButton = new Button(
+				getMessage("portlet.crud.button.cancel"));
 		cancelButton.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -205,7 +209,8 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	@Override
 	public void updateButtonsForViewMode() {
 		if (switchModeButton != null) {
-			switchModeButton.setCaption(getMessage("portlet.crud.button.editMode"));
+			switchModeButton
+					.setCaption(getMessage("portlet.crud.button.editMode"));
 		}
 		saveButton.setVisible(false);
 		resetButton.setVisible(false);
@@ -214,11 +219,12 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	@Override
 	public void updateButtonsForEditMode() {
 		if (switchModeButton != null) {
-			switchModeButton.setCaption(getMessage("portlet.crud.button.viewMode"));
+			switchModeButton
+					.setCaption(getMessage("portlet.crud.button.viewMode"));
 		}
 		saveButton.setVisible(true);
 		resetButton.setVisible(true);
-		
+
 	}
 
 	@Override
@@ -248,7 +254,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 				addFieldToLayout(field);
 			}
 		}
-		presenter.addClobFields(item);
+		presenter.addLobFields(item);
 
 		saveButton.setEnabled(editable);
 		resetButton.setEnabled(editable);
@@ -302,7 +308,7 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 	}
 
 	@Override
-	public void addBlobField(TableColumn tableColumn,
+	public void addBlobField(ContainerRow row, TableColumn tableColumn,
 			final ContainerBlob containerBlob, boolean readonly) {
 
 		HorizontalLayout blobField = new HorizontalLayout();
@@ -317,24 +323,43 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 		final FileMetadata metadata = tableColumn.getFileMetadata();
 		Assert.notNull(metadata, "Missing file metadata for field '"
 				+ tableColumn.getName() + "'");
-		if (!containerBlob.isEmpty()) {
-			StreamSource streamSource = containerBlob.getStreamSource();
-			StreamResource resource = new StreamResource(streamSource,
-					metadata.getFileName());
-			resource.setMIMEType(metadata.getMineType());
-			Link link = buildDownloadLink(metadata, resource);
-			blobField.addComponent(link);
-		}
+
+		Link downloadLink = new Link();
+		downloadLink.setVisible(false);
+		blobField.addComponent(downloadLink);
+
+		updateDownloadLink(row, containerBlob, metadata, downloadLink);
 
 		if (!readonly) {
-			Upload upload = buildUpload(containerBlob, metadata);
+			Upload upload = buildUpload(row, containerBlob, metadata,
+					downloadLink);
 			blobField.addComponent(upload);
 		}
 		fieldLayout.addComponent(blobField);
 	}
 
-	private Upload buildUpload(final ContainerBlob containerBlob,
-			final FileMetadata metadata) {
+	private void updateDownloadLink(ContainerRow row,
+			final ContainerBlob containerBlob, final FileMetadata metadata,
+			Link link) {
+
+		if (!containerBlob.isEmpty()) {
+			StreamSource streamSource = containerBlob.getStreamSource();
+			String displayName = metadata.getCurrentDisplayname(row);
+			String fileName = metadata.getCurrentFilename(row);
+			String mimeType = metadata.getCurrentMimetype(row);
+			StreamResource resource = new StreamResource(streamSource, fileName);
+			resource.setMIMEType(mimeType);
+
+			link.setVisible(true);
+			link.setTargetName("_blank");
+			link.setCaption(displayName);
+			link.setResource(resource);
+		}
+	}
+
+	private Upload buildUpload(final ContainerRow row,
+			final ContainerBlob containerBlob, final FileMetadata metadata,
+			final Link downloadLink) {
 		upload = new Upload();
 		if (metadata.getUploadCaption() != null) {
 			upload.setButtonCaption(metadata.getUploadCaption());
@@ -356,6 +381,18 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 						|| receiver.getBaos().size() <= metadata
 								.getMaxFileSize()) {
 					containerBlob.setValue(receiver.getBaos().toByteArray());
+					if (metadata.getFilenameColumn() != null) {
+						row.getValues().put(metadata.getFilenameColumn(),
+								receiver.getFilename());
+
+					}
+					if (metadata.getMimetypeColumn() != null) {
+						row.getValues().put(metadata.getMimetypeColumn(),
+								receiver.getMimetype());
+					}
+					updateDownloadLink(row, containerBlob, metadata,
+							downloadLink);
+
 				} else {
 					Notification.show("Ein Datei darauf nicht größer als "
 							+ metadata.getMaxFileSize() + " Bytes sein.",
@@ -364,19 +401,6 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 			}
 		});
 		return upload;
-	}
-
-	private Link buildDownloadLink(final FileMetadata metadata,
-			StreamResource resource) {
-		Link link = new Link();
-		link.setTargetName("_blank");
-		if (metadata.getDownloadCaption() != null) {
-			link.setCaption(metadata.getDownloadCaption());
-		} else {
-			link.setCaption(metadata.getFileName());
-		}
-		link.setResource(resource);
-		return link;
 	}
 
 	@Override
@@ -418,11 +442,23 @@ public class DefaultRowEditingFormView extends DefaultPanelContentView
 
 		private static final long serialVersionUID = 1L;
 		private ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+		private String filename;
+		private String mimetype;
 
 		@Override
 		public OutputStream receiveUpload(String filename, String mimetype) {
 			baos.reset();
+			this.filename = filename;
+			this.mimetype = mimetype;
 			return baos;
+		}
+
+		public String getFilename() {
+			return filename;
+		}
+
+		public String getMimetype() {
+			return mimetype;
 		}
 
 		public ByteArrayOutputStream getBaos() {

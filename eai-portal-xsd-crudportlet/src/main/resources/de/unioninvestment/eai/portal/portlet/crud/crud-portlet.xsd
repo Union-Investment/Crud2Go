@@ -2945,8 +2945,17 @@
 				Auswahloption
 			</documentation>
 		</annotation>
-		<attribute use="required" name="filename" />
-		<attribute use="required" name="mine-type" />
+		<attribute use="optional" name="filename" />
+		<attribute use="optional" name="filename-column" />
+		<attribute use="optional" name="mine-type">
+			<annotation>
+				<documentation>
+					deprecated -> please use mimetype
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute use="optional" name="mimetype" />
+		<attribute use="optional" name="mimetype-column" />
 		<attribute name="download-caption" />
 		<attribute name="upload-caption" />
 		<attribute name="maxFileSize" default="5242880" type="int">

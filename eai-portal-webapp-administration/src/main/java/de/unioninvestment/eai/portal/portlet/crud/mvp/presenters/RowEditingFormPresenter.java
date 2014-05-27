@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Item;
-import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -187,9 +186,9 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 	}
 
 	@Override
-	public void addClobFields(Item item) {
+	public void addLobFields(Item item) {
 		ContainerRow containerRow = table.getContainer().convertItemToRow(item,
-				false, true);
+				false, false);
 		for (String fieldName : getVisibleFields()) {
 			if (container.isCLob(fieldName)) {
 				boolean isReadOnly = isReadOnly(containerRow, fieldName);
@@ -200,8 +199,8 @@ public class RowEditingFormPresenter extends DialogPresenter implements
 				ContainerBlob blob = container.getBLob(containerRow.getId(),
 						fieldName);
 				boolean isReadOnly = isReadOnly(containerRow, fieldName);
-				getView().addBlobField(table.getColumns().get(fieldName), blob,
-						isReadOnly);
+				getView().addBlobField(containerRow,
+						table.getColumns().get(fieldName), blob, isReadOnly);
 			}
 		}
 	}

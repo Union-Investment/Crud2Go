@@ -58,24 +58,26 @@ public class BLobColumnGenerator implements ColumnGenerator {
 				.get(columnId).getValue();
 
 		if (!containerBlob.isEmpty()) {
-			return buildBlobLink(columnId.toString(), containerBlob);
+			return buildBlobLink(containerRow, columnId.toString(),
+					containerBlob);
 		}
 
 		return null;
 	}
 
-	private Link buildBlobLink(String columnId, ContainerBlob containerBlob) {
+	private Link buildBlobLink(ContainerRow row, String columnId,
+			ContainerBlob containerBlob) {
 		StreamSource streamSource = containerBlob.getStreamSource();
 		FileMetadata metadata = columns.get(columnId).getFileMetadata();
 		StreamResource resource = new StreamResource(streamSource,
 				metadata.getFileName());
-		resource.setMIMEType(metadata.getMineType());
+		
+		String fileName = metadata.getCurrentDisplayname(row);
+		String mimeType = metadata.getCurrentMimetype(row);
+		
+		resource.setMIMEType(mimeType);
 		Link link = new Link();
-		if (metadata.getDownloadCaption() != null) {
-			link.setCaption(metadata.getDownloadCaption());
-		} else {
-			link.setCaption(metadata.getFileName());
-		}
+		link.setCaption(fileName);
 		link.setResource(resource);
 		link.setTargetName("_blank");
 		return link;

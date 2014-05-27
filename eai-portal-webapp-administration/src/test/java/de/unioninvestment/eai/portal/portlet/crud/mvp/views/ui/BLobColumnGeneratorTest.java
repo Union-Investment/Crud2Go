@@ -103,7 +103,7 @@ public class BLobColumnGeneratorTest {
 		when(containerBlobMock.isEmpty()).thenReturn(false);
 		when(columnsMock.get(anyString())).thenReturn(tableColumnMock);
 		when(tableColumnMock.getFileMetadata()).thenReturn(fileMetadataMock);
-		when(fileMetadataMock.getDownloadCaption()).thenReturn("Download");
+		when(fileMetadataMock.getCurrentDisplayname(containerRowMock)).thenReturn("Download");
 
 		Component downloadLink = bLobColumnGenerator.generateCell(tableMock,
 				itemIdMock, "blobField");

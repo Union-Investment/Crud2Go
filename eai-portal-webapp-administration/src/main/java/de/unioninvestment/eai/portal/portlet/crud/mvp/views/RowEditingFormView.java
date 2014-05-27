@@ -93,7 +93,7 @@ public interface RowEditingFormView extends PanelContentView {
 
 		public List<String> getVisibleFields();
 
-		void addClobFields(Item item);
+		void addLobFields(Item item);
 
 		void changeMode();
 	}
@@ -123,7 +123,7 @@ public interface RowEditingFormView extends PanelContentView {
 
 	boolean isFieldModifed(String fieldName);
 
-	public void addBlobField(TableColumn tableColumn,
+	public void addBlobField(ContainerRow row, TableColumn tableColumn,
 			ContainerBlob containerBlob, boolean readonly);
 
 	void discard();

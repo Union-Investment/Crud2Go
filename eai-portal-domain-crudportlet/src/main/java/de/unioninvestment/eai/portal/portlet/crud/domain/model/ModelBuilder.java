@@ -771,9 +771,12 @@ public class ModelBuilder {
 
 	private FileMetadata buildFileMetadata(BinaryConfig binary) {
 		if (binary != null) {
-			return new FileMetadata(binary.getFilename(), binary.getMineType(),
-					binary.getDownloadCaption(), binary.getUploadCaption(),
-					binary.getMaxFileSize());
+			String mimeType = binary.getMimetype() != null ? binary
+					.getMimetype() : binary.getMineType();
+			return new FileMetadata(binary.getFilename(),
+					binary.getFilenameColumn(), mimeType,
+					binary.getMimetypeColumn(), binary.getDownloadCaption(),
+					binary.getUploadCaption(), binary.getMaxFileSize());
 		}
 		return null;
 	}
