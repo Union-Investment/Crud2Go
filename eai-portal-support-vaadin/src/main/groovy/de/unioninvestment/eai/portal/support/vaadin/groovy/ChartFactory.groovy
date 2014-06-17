@@ -27,7 +27,10 @@ import org.vaadin.addon.JFreeChartWrapper;
 import com.vaadin.ui.Component;
 
 class ChartFactory extends AbstractBeanFactory {
-	def ignoredAttributes = ['chart']
+	
+	ChartFactory() {
+		ignoredAttributes = ['chart']
+	}
 	
 	@Override
 	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
