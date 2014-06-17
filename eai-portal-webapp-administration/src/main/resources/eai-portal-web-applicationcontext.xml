@@ -53,6 +53,7 @@
 
 
 	<util:list id="dataTypes">
+		<ref bean="booleanDataType" />
 		<ref bean="numberDataType" />
 		<ref bean="stringDataType" />
 		<ref bean="sqlDateDataType" />
