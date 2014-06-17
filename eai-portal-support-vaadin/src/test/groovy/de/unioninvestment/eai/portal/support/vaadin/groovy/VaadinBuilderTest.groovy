@@ -20,6 +20,10 @@ package de.unioninvestment.eai.portal.support.vaadin.groovy
 
 import static org.mockito.Mockito.*
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart
+import org.jfree.chart.plot.PlotOrientation
+import org.jfree.data.category.DefaultCategoryDataset
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -238,6 +242,14 @@ class VaadinBuilderTest {
 	@Test
 	void shouldCreateChart() {
 		JFreeChartWrapper chart = builder.chart();
+		assert chart != null
+	}
+
+	@Test
+	void shouldCreateFilledChart() {
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+		JFreeChart wrappedChart = ChartFactory.createBarChart("title", "category-axis-label", "value-axis-label", dataset, PlotOrientation.VERTICAL, true, false, false);
+		JFreeChartWrapper chart = builder.chart(chart:wrappedChart);
 		assert chart != null
 	}
 

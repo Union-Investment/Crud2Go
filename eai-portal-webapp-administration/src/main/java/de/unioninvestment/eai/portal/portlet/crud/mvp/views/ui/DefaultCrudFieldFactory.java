@@ -18,7 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui;
 
-import java.awt.Checkbox;
 import java.util.Set;
 
 import org.vaadin.tokenfield.TokenField;
@@ -337,7 +336,7 @@ public class DefaultCrudFieldFactory implements TableFieldFactory,
 
 	private void setCaptionAndTooltipIfGiven(Field<?> field, Object propertyId,
 			Target target) {
-		boolean leaveCaptionEmpty = (field instanceof Checkbox && target == Target.TABLE);
+		boolean leaveCaptionEmpty = (field instanceof CheckBox && target == Target.TABLE);
 		if (modelTable.getColumns() != null) {
 			TableColumn column = modelTable.getColumns().get(
 					propertyId.toString());
