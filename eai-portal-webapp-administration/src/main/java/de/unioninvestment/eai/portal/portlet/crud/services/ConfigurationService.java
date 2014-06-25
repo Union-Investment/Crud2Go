@@ -139,4 +139,12 @@ public interface ConfigurationService {
 	 * @return <code>true</code>, if all required preferences are set
 	 */
 	boolean isConfigured(Config portletConfig, PortletPreferences preferences);
+
+	/**
+	 * Remove the portlet instance data based on the given portletId and communityId
+	 * 
+	 * @param portletId 
+	 * @param communityId
+	 */
+	void removePortletInstanceData(String portletId, long communityId);
 }

@@ -59,7 +59,7 @@ public class DefaultConfigurationDaoTest {
 
 	private static final String testPortletId = "TestID-1";
 	private static final long COMMUNITY_ID = 18005L;
-	
+
 	private static ClassPathXmlApplicationContext ctx;
 
 	@BeforeClass
@@ -87,7 +87,7 @@ public class DefaultConfigurationDaoTest {
 			ctx.close();
 		}
 	}
-	
+
 	@Before
 	public void setUp() throws JAXBException, SAXException {
 		MockitoAnnotations.initMocks(this);
@@ -182,13 +182,14 @@ public class DefaultConfigurationDaoTest {
 		PortletConfig config = new PortletConfig();
 		config.setTitle("testTitel");
 		when(
-				mockJdbcTemplate.queryForObject(any(String.class), any(RowMapper.class),
-						eq(testPortletId), eq(COMMUNITY_ID)))
-				.thenReturn(config);
+				mockJdbcTemplate.queryForObject(any(String.class),
+						any(RowMapper.class), eq(testPortletId),
+						eq(COMMUNITY_ID))).thenReturn(config);
 
 		StreamProcessor<PortletConfig> processor = new StreamProcessor<PortletConfig>() {
 			@Override
-			public PortletConfig process(InputStream stream, ConfigurationMetaData metaData) {
+			public PortletConfig process(InputStream stream,
+					ConfigurationMetaData metaData) {
 				return new PortletConfig();
 			}
 		};
@@ -197,4 +198,21 @@ public class DefaultConfigurationDaoTest {
 		assertEquals("testTitel", result.getTitle());
 	}
 
+	@Test
+	public void shouldRemoveConfiguration() {
+		configurationDao.removeConfiguration("myPortletId", 4711L);
+
+		verify(mockJdbcTemplate)
+				.update("DELETE FROM ADM_CONFIG WHERE PORTLET_ID = ? AND COMMUNITY_ID = ?",
+						"myPortletId", 4711L);
+	}
+
+	@Test
+	public void shouldRemoveExistingRoleResourceIDs() {
+		configurationDao.removeExistingRoleResourceIds("myPortletId", 4711L);
+
+		verify(mockJdbcTemplate).execute(
+				"DELETE FROM RESOURCEID_PRIMKEY WHERE RESOURCEID LIKE '"
+						+ "myPortletId_4711_%' escape '#'");
+	}
 }

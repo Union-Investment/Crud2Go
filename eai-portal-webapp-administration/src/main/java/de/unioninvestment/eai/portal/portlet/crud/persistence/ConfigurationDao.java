@@ -134,4 +134,12 @@ public interface ConfigurationDao {
 	public abstract void removeExistingRoleResourceIds(String portletId,
 			long communityId);
 
+	/**
+	 * Löscht einen bestehenden Konfigurationseintrag.
+	 * 
+	 * @param portletId
+	 * @param communityId
+	 */
+	public abstract void removeConfiguration(String portletId, long communityId);
+
 }

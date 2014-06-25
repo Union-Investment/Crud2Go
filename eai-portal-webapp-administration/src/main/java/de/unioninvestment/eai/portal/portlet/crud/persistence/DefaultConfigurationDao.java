@@ -309,13 +309,14 @@ public class DefaultConfigurationDao implements ConfigurationDao {
 						});
 	}
 
-	/**
-	 * Löscht einen Eintrag aus der Mappingtabelle.
-	 * 
-	 * @param portletId
-	 *            Id des Portlets
-	 * @param communityId
-	 */
+	@Override
+	public void removeConfiguration(String portletId, long communityId) {
+		jdbcTemplate
+				.update("DELETE FROM ADM_CONFIG WHERE PORTLET_ID = ? AND COMMUNITY_ID = ?",
+						portletId, communityId);
+	}
+
+	@Override
 	public void removeExistingRoleResourceIds(String portletId, long communityId) {
 		jdbcTemplate
 				.execute("DELETE FROM RESOURCEID_PRIMKEY WHERE RESOURCEID LIKE '"
