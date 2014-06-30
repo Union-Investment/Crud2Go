@@ -502,6 +502,15 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 				startsWith("{ container,row,connection -> \"\"\""));
 	}
 
+	@Test
+	public void shouldCompileSimpleCompoundSearch() throws JAXBException,
+	InstantiationException, IllegalAccessException {
+		
+		PortletConfig portletConfig = createConfiguration("validCompoundSearchSimpleConfig.xml");
+		
+		compiler.compileAllScripts(portletConfig);
+	}
+	
 	private SelectConfig getDynamicSelect(PortletConfig portletConfig) {
 		ColumnsConfig columns = ((TableConfig) portletConfig.getPage()
 				.getElements().get(0)).getColumns();

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ComponentConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchDetailsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
@@ -135,9 +136,12 @@ public class ConfigurationScriptsCompiler {
 		int i = 0;
 		for (ComponentConfig component : panel.getElements()) {
 			if (component instanceof CompoundSearchConfig) {
-				compileAllClosureScripts(
-						((CompoundSearchConfig) component).getDetails(),
-						location + "/elements[" + i++ + "]/details");
+				CompoundSearchDetailsConfig details = ((CompoundSearchConfig) component).getDetails();
+				if (details != null) {
+					compileAllClosureScripts(
+							details,
+							location + "/elements[" + i++ + "]/details");
+				}
 			} else if (component instanceof TableConfig) {
 				compileAllClosureScripts((TableConfig) component, location
 						+ "/elements[" + i++ + "]");
