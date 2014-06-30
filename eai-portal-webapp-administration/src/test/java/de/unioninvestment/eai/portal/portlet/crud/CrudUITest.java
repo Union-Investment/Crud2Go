@@ -196,6 +196,8 @@ public class CrudUITest extends SpringPortletContextTest {
 	@Mock
 	private VaadinService vaadinServiceMock;
 
+	private PortletConfig portletConfig;
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		MockitoAnnotations.initMocks(this);
@@ -281,6 +283,25 @@ public class CrudUITest extends SpringPortletContextTest {
 		ui.detach();
 		
 		verify(uiHistoryMock).handleDetach(ui);
+	}
+	
+	@Test
+	public void shouldReturnDefaultHistoryLimitFromSettings() {
+		initializeUI();
+		ui.portletConfig = null;		
+		when(settingsMock.getUiHistoryLimit()).thenReturn(3);
+		
+		assertThat(ui.getHistoryLimit(), is(3));
+	}
+	
+	@Test
+	public void shouldReturnSpecificHistoryLimitIfSet() {
+		initializeUI();
+		stubPortletInitialization();
+		when(settingsMock.getUiHistoryLimit()).thenReturn(3);
+		portletConfig.setHistoryLimit(4);
+		
+		assertThat(ui.getHistoryLimit(), is(4));
 	}
 	
 	@Test
@@ -380,7 +401,7 @@ public class CrudUITest extends SpringPortletContextTest {
 
 	@SuppressWarnings("unchecked")
 	private void stubPortletInitialization() {
-		PortletConfig portletConfig = new PortletConfig();
+		portletConfig = new PortletConfig();
 		when(
 				configurationServiceMock.isConfigured(configMock,
 						liferayContext.getPortletPreferencesMock()))

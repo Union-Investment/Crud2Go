@@ -50,7 +50,7 @@ public class UiHistory {
 
 		long getLastHeartbeatTimestamp();
 
-		int getMaxUiHistoryLength();
+		int getHistoryLimit();
 
 		void close();
 
@@ -175,7 +175,7 @@ public class UiHistory {
 	}
 
 	private int getMaxUiHistoryLength(HistoryAware ui) {
-		return ui.getMaxUiHistoryLength();
+		return ui.getHistoryLimit();
 	}
 
 }

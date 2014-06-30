@@ -77,6 +77,9 @@ public class Settings {
 	@Value("${portlet.crud.storage.configcache.checkForUpdates}")
 	private boolean cacheCheckForUpdates;
 
+	@Value("${portlet.crud.uihistory.limit}")
+	private Integer uiHistoryLimit;
+	
 	@Value("${portal.instanceId}")
 	private String portalInstanceId;
 
@@ -309,6 +312,10 @@ public class Settings {
 
 	public int getFooterHeight() {
 		return footerHeight;
+	}
+
+	public Integer getUiHistoryLimit() {
+		return uiHistoryLimit;
 	}
 
 }

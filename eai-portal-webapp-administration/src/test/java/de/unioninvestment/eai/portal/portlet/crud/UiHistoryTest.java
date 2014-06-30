@@ -63,9 +63,9 @@ public class UiHistoryTest {
 		when(page2.getWindowName()).thenReturn("window1");
 		when(page3.getWindowName()).thenReturn("window1");
 
-		when(ui1.getMaxUiHistoryLength()).thenReturn(1);
-		when(ui2.getMaxUiHistoryLength()).thenReturn(1);
-		when(ui3.getMaxUiHistoryLength()).thenReturn(1);
+		when(ui1.getHistoryLimit()).thenReturn(1);
+		when(ui2.getHistoryLimit()).thenReturn(1);
+		when(ui3.getHistoryLimit()).thenReturn(1);
 	}
 
 	private void stubSessionAttributeOperations() {

@@ -71,6 +71,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import de.unioninvestment.eai.portal.portlet.crud.UiHistory.HistoryAware;
+import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEventHandler;
@@ -217,8 +218,16 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		getPortletSession().addPortletListener(this);
 	}
 
-	public int getMaxUiHistoryLength() {
-		return 2;
+	public int getHistoryLimit() {
+		Integer historyLimit = settings.getUiHistoryLimit();
+		if (portletConfig != null) {
+			Integer specificHistoryLimit = portletConfig.getPortletConfig()
+					.getHistoryLimit();
+			if (specificHistoryLimit != null) {
+				historyLimit = specificHistoryLimit;
+			}
+		}
+		return historyLimit;
 	}
 
 	public static void logLifecycleEvent(LifecycleEvent event) {
