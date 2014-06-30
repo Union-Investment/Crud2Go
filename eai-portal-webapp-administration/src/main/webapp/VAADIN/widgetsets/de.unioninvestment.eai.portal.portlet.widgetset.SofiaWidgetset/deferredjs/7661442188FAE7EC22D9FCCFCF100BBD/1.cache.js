@@ -1,0 +1,1 @@
+$wnd.de_unioninvestment_eai_portal_portlet_widgetset_SofiaWidgetset.runAsyncCallback1('w9(881,1,Rsd);_.nc=function a0b(){OQb((!JQb&&(JQb=new PQb),JQb),this.b.e)};Lgd(Vh)(1);\n//# sourceURL=de.unioninvestment.eai.portal.portlet.widgetset.SofiaWidgetset-1.js\n')

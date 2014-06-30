@@ -24,9 +24,9 @@ import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMe
 import java.util.Date;
 import java.util.LinkedList;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.gwt.thirdparty.guava.common.base.Joiner;
-import com.google.gwt.thirdparty.guava.common.collect.Lists;
+import com.google.common.collect.Lists;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;

@@ -27,10 +27,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
@@ -70,7 +70,9 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.ConnectorTracker;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
@@ -97,7 +99,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 public class CrudUITest extends SpringPortletContextTest {
 
 	@InjectMocks
-	private CrudUI app = new CrudUI() {
+	private CrudUI ui = new CrudUI() {
 		@Override
 		public void accessSynchronously(Runnable runnable)
 				throws com.vaadin.ui.UIDetachedException {
@@ -122,8 +124,15 @@ public class CrudUITest extends SpringPortletContextTest {
 		public Page getPage() {
 			return liferayContext.getPageMock();
 		};
+		
+		
 	};
 
+	@Mock
+	private ConnectorTracker connectorTrackerMock;
+	
+	@Mock
+	private UiHistory uiHistoryMock;
 	@Mock
 	private Settings settingsMock;
 	@Mock
@@ -249,11 +258,31 @@ public class CrudUITest extends SpringPortletContextTest {
 
 	@Test
 	public void shouldApplyPreferredBrowserLocale() {
-		app.init(liferayContext.getVaadinPortletRequestMock());
+		ui.init(liferayContext.getVaadinPortletRequestMock());
 
-		assertThat(app.getLocale(), is(Locale.GERMANY));
+		assertThat(ui.getLocale(), is(Locale.GERMANY));
 	}
 
+	@Test
+	public void shouldAddItselfToUiHistory() {
+		ui.init(liferayContext.getVaadinPortletRequestMock());
+		
+		verify(uiHistoryMock).add(ui);
+	}
+	
+	@Test
+	public void shouldRemoveItselfFromUiHistoryOnDetach() throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
+		ui.init(liferayContext.getVaadinPortletRequestMock());
+		
+		Field ctField = UI.class.getDeclaredField("connectorTracker");
+		ctField.setAccessible(true);
+		ctField.set(ui, connectorTrackerMock);
+		
+		ui.detach();
+		
+		verify(uiHistoryMock).handleDetach(ui);
+	}
+	
 	@Test
 	public void shouldRegisterFallbackErrorHandler() {
 		provideUserWithRoles();
@@ -264,7 +293,7 @@ public class CrudUITest extends SpringPortletContextTest {
 	}
 
 	private void initializeUI() {
-		app.init(liferayContext.getVaadinPortletRequestMock());
+		ui.init(liferayContext.getVaadinPortletRequestMock());
 	}
 
 	@Test
@@ -306,7 +335,7 @@ public class CrudUITest extends SpringPortletContextTest {
 
 		stubPortletInitialization();
 
-		app.refreshViews();
+		ui.refreshViews();
 
 		verify(viewPageMock, never()).addComponent(
 				isA(BusinessExceptionMessage.class));
@@ -320,7 +349,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		stubPortletInitialization();
 		when(portletMock.getTitle()).thenReturn("newTitle");
 
-		app.refreshViews();
+		ui.refreshViews();
 
 		verify(viewPageMock, never()).addComponent(
 				isA(BusinessExceptionMessage.class));
@@ -340,7 +369,7 @@ public class CrudUITest extends SpringPortletContextTest {
 				.thenReturn("sameTitle");
 		when(portletMock.getTitle()).thenReturn("sameTitle");
 
-		app.refreshViews();
+		ui.refreshViews();
 
 		verify(viewPageMock, never()).addComponent(
 				isA(BusinessExceptionMessage.class));
@@ -373,9 +402,9 @@ public class CrudUITest extends SpringPortletContextTest {
 	@Test
 	public void testHandleResourceRequest() {
 		initializeUI();
-		expectWindowContentChange(PortletMode.EDIT, app.getEditContent());
-		expectWindowContentChange(PortletMode.VIEW, app.getViewContent());
-		expectWindowContentChange(PortletMode.HELP, app.getHelpContent());
+		expectWindowContentChange(PortletMode.EDIT, ui.getEditContent());
+		expectWindowContentChange(PortletMode.VIEW, ui.getViewContent());
+		expectWindowContentChange(PortletMode.HELP, ui.getHelpContent());
 	}
 
 	private void expectWindowContentChange(PortletMode targetMode,
@@ -383,19 +412,19 @@ public class CrudUITest extends SpringPortletContextTest {
 		when(liferayContext.getPortletRequestMock().getPortletMode())
 				.thenReturn(targetMode);
 		callHandleResourceRequest();
-		assertThat(app.getContent(), is((Component) expectedContent));
+		assertThat(ui.getContent(), is((Component) expectedContent));
 	}
 
 	private void callHandleResourceRequest() {
-		app.handleResourceRequest(
+		ui.handleResourceRequest(
 				(ResourceRequest) liferayContext.getPortletRequestMock(),
-				(ResourceResponse) liferayContext.getPortletResponseMock(), app);
+				(ResourceResponse) liferayContext.getPortletResponseMock(), ui);
 	}
 
 	@Test
 	public void shouldRefreshEditPageBeforeEntering() {
 		initializeUI();
-		app.setPortletDomain(portletMock);
+		ui.setPortletDomain(portletMock);
 
 		when(liferayContext.getPortletRequestMock().getPortletMode())
 				.thenReturn(PortletMode.VIEW);
@@ -411,7 +440,7 @@ public class CrudUITest extends SpringPortletContextTest {
 	@Test
 	public void shouldNotRefreshIfAlreadyOnEditPage() {
 		initializeUI();
-		app.setPortletDomain(portletMock);
+		ui.setPortletDomain(portletMock);
 
 		when(liferayContext.getPortletRequestMock().getPortletMode())
 				.thenReturn(PortletMode.EDIT);
@@ -427,14 +456,14 @@ public class CrudUITest extends SpringPortletContextTest {
 	public void shouldRegisterPopupEventHandler() {
 		initializeUI();
 
-		verify(eventBusMock).addHandler(ShowPopupEvent.class, app);
+		verify(eventBusMock).addHandler(ShowPopupEvent.class, ui);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldProvideInformationIfInitializationIsInProgress() {
 
-		assertThat(app.isInitializing(), is(true));
+		assertThat(ui.isInitializing(), is(true));
 
 		initializeUI();
 
@@ -449,14 +478,14 @@ public class CrudUITest extends SpringPortletContextTest {
 					@Override
 					public PortletConfig answer(InvocationOnMock invocation)
 							throws Throwable {
-						assertThat(app.isInitializing(), is(true));
+						assertThat(ui.isInitializing(), is(true));
 						return portletConfig;
 					}
 				});
 		when(modelBuilderMock.build()).thenAnswer(new Answer<Portlet>() {
 			@Override
 			public Portlet answer(InvocationOnMock invocation) throws Throwable {
-				assertThat(app.isInitializing(), is(true));
+				assertThat(ui.isInitializing(), is(true));
 				return portletMock;
 			}
 		});
@@ -466,7 +495,7 @@ public class CrudUITest extends SpringPortletContextTest {
 					@Override
 					public PortletPresenter answer(InvocationOnMock invocation)
 							throws Throwable {
-						assertThat(app.isInitializing(), is(true));
+						assertThat(ui.isInitializing(), is(true));
 						return portletPresenterMock;
 					}
 
@@ -480,27 +509,27 @@ public class CrudUITest extends SpringPortletContextTest {
 					@Override
 					public ScriptModelBuilder answer(InvocationOnMock invocation)
 							throws Throwable {
-						assertThat(app.isInitializing(), is(true));
+						assertThat(ui.isInitializing(), is(true));
 						return scriptModelBuilderMock;
 					}
 				});
 
-		app.refreshViews();
+		ui.refreshViews();
 
 		verify(viewPageMock).addComponent(portletViewMock);
-		assertThat(app.isInitializing(), is(false));
+		assertThat(ui.isInitializing(), is(false));
 
 	}
 
 	@Test
 	public void shouldInformPortletDomainAboutReloadOnRenderRequest() {
 		initializeUI();
-		app.setPortletDomain(portletMock);
-		app.initializing = false;
+		ui.setPortletDomain(portletMock);
+		ui.initializing = false;
 		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.VIEW);
 		vaadinSession = new VaadinSession(vaadinServiceMock);
 
-		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+		ui.handleRenderRequest(renderRequestMock, renderResponseMock, ui);
 
 		verify(portletMock, times(1)).handleReload();
 	}
@@ -511,7 +540,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		when(liferayContext.getPortletPreferencesMock().getValue("portlet.page.minimum-height", null)).thenReturn("333");
 		
 		initializeUI();
-		ModelPreferences prefs = app.createModelPreferences();
+		ModelPreferences prefs = ui.createModelPreferences();
 		assertThat(prefs.getPageHeight(), is("fit"));
 		assertThat(prefs.getPageMinimumHeight(), is(333));
 	}
@@ -519,12 +548,12 @@ public class CrudUITest extends SpringPortletContextTest {
 	@Test
 	public void shouldIgnoreRenderRequestsWithoutSession() {
 		initializeUI();
-		app.setPortletDomain(portletMock);
-		app.initializing = false;
+		ui.setPortletDomain(portletMock);
+		ui.initializing = false;
 		vaadinSession = null;
 		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.VIEW);
 
-		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+		ui.handleRenderRequest(renderRequestMock, renderResponseMock, ui);
 
 		verify(portletMock, never()).handleReload();
 	}
@@ -532,13 +561,13 @@ public class CrudUITest extends SpringPortletContextTest {
 	@Test
 	public void shouldNotInformPortletDomainAboutReloadIfPortletModeIsNotVIEW() {
 		initializeUI();
-		app.setPortletDomain(portletMock);
-		app.initializing = false;
+		ui.setPortletDomain(portletMock);
+		ui.initializing = false;
 		when(renderRequestMock.getPortletMode()).thenReturn(PortletMode.EDIT);
 		vaadinSession = new VaadinSession(vaadinServiceMock);
 		try {
-			app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
-			app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+			ui.handleRenderRequest(renderRequestMock, renderResponseMock, ui);
+			ui.handleRenderRequest(renderRequestMock, renderResponseMock, ui);
 
 		} catch (Exception e) {
 			// ignore exceptions
@@ -550,7 +579,7 @@ public class CrudUITest extends SpringPortletContextTest {
 	@Test
 	public void shouldNotInformPortletDomainAboutReloadOnInitializingRenderRequest() {
 		vaadinSession = new VaadinSession(vaadinServiceMock);
-		app.handleRenderRequest(renderRequestMock, renderResponseMock, app);
+		ui.handleRenderRequest(renderRequestMock, renderResponseMock, ui);
 		verify(portletMock, never()).handleReload();
 	}
 

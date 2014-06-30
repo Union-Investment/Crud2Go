@@ -70,6 +70,7 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import de.unioninvestment.eai.portal.portlet.crud.UiHistory.HistoryAware;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEventHandler;
@@ -116,7 +117,7 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationExcepti
 @PreserveOnRefresh
 @SuppressWarnings("deprecation")
 public class CrudUI extends LiferayUI implements PortletListener,
-		ShowPopupEventHandler, InitializingUI {
+		ShowPopupEventHandler, InitializingUI, HistoryAware {
 
 	private static final long serialVersionUID = 1L;
 
@@ -124,7 +125,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	private static final String LIFECYCLE_DATEFORMAT = "dd.MM.yyyy HH:mm:ss.SSS";
 	private static final Logger LIFECYCLE_LOGGER = LoggerFactory
 			.getLogger(CrudUI.class.getPackage().getName() + ".lifecycle");
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(CrudUI.class);
 
 	public static final String ROLE_ADMIN = "portlet-crud-adm";
@@ -159,6 +160,9 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	@Autowired
 	private transient GuiBuilder guiBuilder;
 
+	@Autowired
+	private transient UiHistory uiHistory;
+
 	private PortletUriFragmentUtility portletUriFragmentUtility;
 
 	private PortletConfigurationPresenter configurationPresenter;
@@ -180,22 +184,22 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	private TimingPortletListener timingPortletListener;
 
 	public enum LifecycleEvent {
-		CRUD2GO_INIT,
-		CRUD2GO_UI_INIT,
-		CRUD2GO_UI_DETACH,
-		CRUD2GO_SHUTDOWN
+		CRUD2GO_INIT, CRUD2GO_UI_INIT, CRUD2GO_UI_DETACH, CRUD2GO_SHUTDOWN
 	}
-	
+
 	/**
 	 * Initialisierung des PortletPresenter.
 	 * 
 	 */
 	@Override
 	public void doInit(VaadinRequest request) {
+
 		setId(UUID.randomUUID().toString());
 		logLifecycleEvent(LifecycleEvent.CRUD2GO_UI_INIT);
 
 		autowireUiDependencies(request);
+
+		uiHistory.add(this);
 
 		VaadinSession.getCurrent().setErrorHandler(new CrudErrorHandler());
 
@@ -213,10 +217,14 @@ public class CrudUI extends LiferayUI implements PortletListener,
 		getPortletSession().addPortletListener(this);
 	}
 
+	public int getMaxUiHistoryLength() {
+		return 2;
+	}
+
 	public static void logLifecycleEvent(LifecycleEvent event) {
 		String now = new SimpleDateFormat(LIFECYCLE_DATEFORMAT)
 				.format(new Date());
-		
+
 		String uiId = "";
 		String url = "";
 		UI ui = UI.getCurrent();
@@ -224,17 +232,18 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			url = ui.getPage().getLocation().toString();
 			uiId = ui.getId();
 		}
-		
+
 		String sessionId = "";
 		PortletRequest portletRequest = VaadinPortletService
 				.getCurrentPortletRequest();
 		if (portletRequest != null) {
 			PortletSession session = portletRequest.getPortletSession(false);
-			sessionId = session == null ? portletRequest.getRequestedSessionId() : session.getId();
+			sessionId = session == null ? portletRequest
+					.getRequestedSessionId() : session.getId();
 		}
-		
-		LIFECYCLE_LOGGER.info(MessageFormat.format("{0};{1};{2};{3};{4};{5}", now,
-				INSTANCE_ID, uiId, url, sessionId, event.name()));
+
+		LIFECYCLE_LOGGER.info(MessageFormat.format("{0};{1};{2};{3};{4};{5}",
+				now, INSTANCE_ID, uiId, url, sessionId, event.name()));
 	}
 
 	private void autowireUiDependencies(VaadinRequest request) {
@@ -507,13 +516,15 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	 * @return model preferences taken from portlet instance preferences
 	 */
 	ModelPreferences createModelPreferences() {
-		PortletPreferences prefs = VaadinPortletService.getCurrentPortletRequest().getPreferences();
+		PortletPreferences prefs = VaadinPortletService
+				.getCurrentPortletRequest().getPreferences();
 		ModelPreferences modelPrefs = new ModelPreferences();
-		
+
 		String pageHeight = prefs.getValue("portlet.page.height", null);
 		modelPrefs.setPageHeight(pageHeight);
-		
-		String minimumHeight = prefs.getValue("portlet.page.minimum-height", null);
+
+		String minimumHeight = prefs.getValue("portlet.page.minimum-height",
+				null);
 		if (minimumHeight != null) {
 			modelPrefs.setPageMinimumHeight(Integer.parseInt(minimumHeight));
 		}
@@ -597,6 +608,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	public void detach() {
 		getPortletSession().removePortletListener(this);
 		removeTimingPortletListener();
+		uiHistory.handleDetach(this);
 		logLifecycleEvent(LifecycleEvent.CRUD2GO_UI_DETACH);
 		super.detach();
 	}
