@@ -184,6 +184,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 	private TimingPortletListener timingPortletListener;
 
+	private UiHistoryState historyState;
+
 	public enum LifecycleEvent {
 		CRUD2GO_INIT, CRUD2GO_UI_INIT, CRUD2GO_UI_DETACH, CRUD2GO_SHUTDOWN
 	}
@@ -228,6 +230,22 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			}
 		}
 		return historyLimit;
+	}
+
+	@Override
+	public void setHistoryState(UiHistoryState state) {
+		this.historyState = state;
+	}
+	
+	@Override
+	public UiHistoryState getHistoryState() {
+		return historyState;
+	}
+
+	@Override
+	public void setLastHeartbeatTimestamp(long lastHeartbeat) {
+		super.setLastHeartbeatTimestamp(lastHeartbeat);
+		uiHistory.handleHeartbeat(this);
 	}
 
 	public static void logLifecycleEvent(LifecycleEvent event) {
@@ -617,7 +635,6 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	public void detach() {
 		getPortletSession().removePortletListener(this);
 		removeTimingPortletListener();
-		uiHistory.handleDetach(this);
 		logLifecycleEvent(LifecycleEvent.CRUD2GO_UI_DETACH);
 		super.detach();
 	}

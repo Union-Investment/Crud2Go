@@ -30,7 +30,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
@@ -72,7 +71,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.ConnectorTracker;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
@@ -270,19 +268,6 @@ public class CrudUITest extends SpringPortletContextTest {
 		ui.init(liferayContext.getVaadinPortletRequestMock());
 		
 		verify(uiHistoryMock).add(ui);
-	}
-	
-	@Test
-	public void shouldRemoveItselfFromUiHistoryOnDetach() throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
-		ui.init(liferayContext.getVaadinPortletRequestMock());
-		
-		Field ctField = UI.class.getDeclaredField("connectorTracker");
-		ctField.setAccessible(true);
-		ctField.set(ui, connectorTrackerMock);
-		
-		ui.detach();
-		
-		verify(uiHistoryMock).handleDetach(ui);
 	}
 	
 	@Test
