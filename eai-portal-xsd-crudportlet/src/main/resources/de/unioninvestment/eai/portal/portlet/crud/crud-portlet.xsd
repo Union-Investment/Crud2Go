@@ -49,6 +49,16 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="history-limit" type="int">
+					<annotation>
+						<documentation>
+							Speicheroptimierung durch Limitierung der in der
+							Session max. gespeicherten Crud2Go-Instanzen. Bei jeder
+							Neuinstanzierung werden ältere Instanzen aus dem Speicher
+							entfernt.
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="refresh-on-page-reload" type="boolean"
 					default="true">
 					<annotation>

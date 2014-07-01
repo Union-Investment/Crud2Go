@@ -7,7 +7,7 @@
 }
 
 .v-vaadin-version:after {
-	content: "7.1.14";
+	content: "7.2.3";
 }
 
 .v-generated-body {
@@ -271,6 +271,14 @@
 	width: 100%;
 }
 
+.v-debugwindow-selector > span.value {
+	width: 100%;
+}
+
+.v-debugwindow-selector :hover {
+	background: rgba(255, 32, 32, 0.5);
+}
+
 .v-debugwindow-log {
 	font-family: monospace;
 }
@@ -310,6 +318,23 @@
 
 .v-debugwindow-network .v-debugwindow-row > span {
 	display: inline;
+}
+
+@font-face {
+	font-family: "FontAwesome";
+	src: url(../base/fonts/fontawesome-webfont.eot);
+	src: url(../base/fonts/fontawesome-webfont.eot?#iefix) format("embedded-opentype"), url(../base/fonts/fontawesome-webfont.woff) format("woff"), url(../base/fonts/fontawesome-webfont.ttf) format("truetype"), url(../base/fonts/fontawesome-webfont.svg) format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+
+.FontAwesome {
+	font-family: "FontAwesome";
+	font-style: normal;
+	font-weight: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: inline-block;
 }
 
 .crud2go .v-widget {
@@ -1546,10 +1571,6 @@ body .crud2go.v-app .v-app-loading {
 	padding-right: 12px;
 }
 
-.crud2go .v-customcomponent {
-	overflow: hidden;
-}
-
 .crud2go .v-customlayout {
 	overflow: hidden;
 }
@@ -1784,6 +1805,8 @@ body .crud2go.v-app .v-app-loading {
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	position: relative;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .crud2go [draggable=true] {
@@ -2645,6 +2668,8 @@ body .crud2go.v-app .v-app-loading {
 	height: 12px;
 	margin-top: -5px;
 	font-size: 0;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .crud2go .v-slider-vertical {
@@ -2700,6 +2725,8 @@ body .crud2go.v-app .v-app-loading {
 	background: #ddd;
 	cursor: e-resize;
 	cursor: col-resize;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .crud2go .v-disabled .v-splitpanel-hsplitter div {
@@ -2715,6 +2742,8 @@ body .crud2go.v-app .v-app-loading {
 	background: #ddd;
 	cursor: s-resize;
 	cursor: row-resize;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .crud2go .v-disabled .v-splitpanel-vsplitter div {
@@ -3125,6 +3154,14 @@ body .crud2go.v-app .v-app-loading {
 	cursor: default;
 }
 
+.crud2go .v-tabsheet-tabitem-focus .v-captiontext {
+	text-decoration: underline;
+}
+
+.crud2go .v-tabsheet-tabitem-selected.v-tabsheet-tabitem-focus .v-captiontext {
+	text-decoration: inherit;
+}
+
 .crud2go .v-tabsheet-content {
 	border: 1px solid #aaa;
 	border-top: none;
@@ -3412,7 +3449,6 @@ body .crud2go.v-app .v-app-loading {
 }
 
 .crud2go .v-treetable .v-table-row .v-table-cell-content, .crud2go .v-treetable .v-table-row-odd .v-table-cell-content {
-	position: relative;
 	z-index: 10;
 }
 
