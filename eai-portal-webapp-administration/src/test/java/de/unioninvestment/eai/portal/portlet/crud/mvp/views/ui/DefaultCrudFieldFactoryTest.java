@@ -45,6 +45,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.internal.matchers.InstanceOf;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.vaadin.tokenfield.TokenField;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -66,6 +67,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionContext;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
@@ -124,6 +126,11 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 	@Mock
 	private ContainerField containerFieldMock;
 
+	@Mock
+	private SelectionTableColumn selectionTableColumnMock;
+
+	private ColumnProperty property;
+
 	// @Mock
 	// private TableColumn testColumnMock;
 
@@ -139,6 +146,8 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		when(vaadinTableMock.getValue()).thenReturn(set);
 		when(vaadinTableMock.getContainerDataSource())
 				.thenReturn(containerMock);
+		when(vaadinTableMock.isSelectable()).thenReturn(true);
+		when(vaadinTableMock.isMultiSelect()).thenReturn(true);
 
 		when(itemMock.getItemProperty(any())).thenReturn(propertyMock);
 		when(displaySupportMock.supportsDisplaying(String.class)).thenReturn(
@@ -159,13 +168,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 	}
 
 	private void containerShouldReturnDataType(final Class<?> returningClass) {
-		when(containerMock.getType(any())).thenAnswer(new Answer<Class<?>>() {
-			@Override
-			public Class<?> answer(InvocationOnMock invocation)
-					throws Throwable {
-				return returningClass;
-			}
-		});
+		doReturn(returningClass).when(containerMock).getType(any());
 	}
 
 	@Test
@@ -201,22 +204,17 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		set.addAll(Arrays.asList("foo"));
 		when(vaadinTableMock.getValue()).thenReturn(set);
 
-		when(propertyMock.getType()).thenAnswer(new Answer<Object>() {
-			@Override
-			public Object answer(InvocationOnMock invocation) throws Throwable {
-				return String.class;
-			}
-		});
+		doReturn(String.class).when(propertyMock).getType();
 		when(propertyMock.getValue()).thenReturn("foo");
 		when(propertyMock.isReadOnly()).thenReturn(false);
 
 		when(containerMock.getItem(any())).thenReturn(itemMock);
-		
+
 		when(modelTableMock.isEditable()).thenReturn(true);
 		when(modelTableMock.getMode()).thenReturn(Mode.EDIT);
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
-		
+
 		when(tableColumnsMock.isComboBox("test")).thenReturn(true);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
 		when(tableColumnMock.isEditable(rowMock)).thenReturn(true);
@@ -241,6 +239,57 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		assertThat(select.getItemIds().size(), is(2));
 		assertThat(select.getItemCaption("1"), is("value1"));
 		assertThat(select.getItemCaption("2"), is("value2"));
+	}
+
+	@Test
+	public void shouldCreateTokenField() {
+		containerShouldReturnDataType(String.class);
+
+		DisplaySupport displayer = new StringDataType();
+		when(databaseContainerMock.findDisplayer("test")).thenReturn(displayer);
+
+		Set<String> set = new HashSet<String>();
+		set.addAll(Arrays.asList("foo"));
+		when(vaadinTableMock.getValue()).thenReturn(set);
+
+		doReturn(String.class).when(propertyMock).getType();
+		when(propertyMock.getValue()).thenReturn("foo");
+		when(propertyMock.isReadOnly()).thenReturn(false);
+
+		when(containerMock.getItem(any())).thenReturn(itemMock);
+
+		when(modelTableMock.isEditable()).thenReturn(true);
+		when(modelTableMock.getMode()).thenReturn(Mode.EDIT);
+		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
+		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
+
+		when(tableColumnsMock.isTokenfield("test")).thenReturn(true);
+		when(tableColumnsMock.get("test")).thenReturn(selectionTableColumnMock);
+		when(tableColumnMock.isEditable(rowMock)).thenReturn(true);
+		when(selectionTableColumnMock.getSeparator()).thenReturn(";");
+		when(selectionTableColumnMock.isEditable(any(ContainerRow.class)))
+				.thenReturn(true);
+		Map<String, String> options = new HashMap<String, String>();
+		options.put("1", "value1");
+		options.put("2", "value2");
+		when(selectionMock.getOptions(any(SelectionContext.class))).thenReturn(
+				options);
+		when(selectionMock.getTitle(eq("1"), any(SelectionContext.class)))
+				.thenReturn("value1");
+		when(selectionMock.getTitle(eq("2"), any(SelectionContext.class)))
+				.thenReturn("value2");
+		when(tableColumnsMock.getDropdownSelections(anyString())).thenReturn(
+				selectionMock);
+
+		Field<?> result = crudTableFieldFactory.createField(containerMock,
+				"foo", "test", componentMock);
+
+		assertThat(result, new InstanceOf(TokenField.class));
+
+		TokenField select = (TokenField) result;
+		assertThat(select.getTokenIds().size(), is(2));
+		assertThat(select.getTokenCaption("1"), is("value1"));
+		assertThat(select.getTokenCaption("2"), is("value2"));
 	}
 
 	@Test
@@ -362,7 +411,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		when(containerMock.getItem(any())).thenReturn(itemMock);
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
-		
+
 		when(tableColumnsMock.isComboBox("test")).thenReturn(false);
 		when(tableColumnsMock.isCheckbox("test")).thenReturn(true);
 		when(tableColumnsMock.getCheckBox("test"))
@@ -392,17 +441,8 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 	@Test
 	public void shouldCreateInputFieldWithCommonSettingsWhenDisplaySupportIsAvailable() {
-		ColumnProperty property = new ColumnProperty("test", false, false,
-				true, false, "1", String.class);
-		containerShouldReturnDataType(String.class);
+		prepareMocksForTextField();
 
-		when(itemMock.getItemProperty(any())).thenReturn(property);
-
-		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
-		when(tableColumnMock.isEditable(rowMock)).thenReturn(true);
-
-		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
-		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
 		when(tableColumnsMock.isMultiline("test")).thenReturn(true);
 		when(tableColumnsMock.getInputPrompt("test")).thenReturn("testPrompt");
 		doReturn(fieldMock).when(displaySupportMock).createField(String.class,
@@ -414,24 +454,15 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 		assertThat(result, is(fieldMock));
 		verify(fieldMock).setCaption("Test");
 		verify(fieldMock).setWidth(100, Unit.PERCENTAGE);
-		verify(fieldMock).setConversionError("{1}"); // pass through ConversionException message
+		verify(fieldMock).setConversionError("{1}"); // pass through
+														// ConversionException
+														// message
 		verify(fieldMock).setBuffered(true); // enable buffering
 	}
 
 	@Test
 	public void shouldUseFieldNameAsCaptionWhenUnconfigured() {
-		ColumnProperty property = new ColumnProperty("test", true, false, true,
-				false, "1", String.class);
-		when(containerFieldMock.isReadonly()).thenReturn(true);
-
-		containerShouldReturnDataType(String.class);
-
-		when(itemMock.getItemProperty(any())).thenReturn(property);
-
-		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
-
-		doReturn(fieldMock).when(displaySupportMock).createField(String.class,
-				"test", false, null, null);
+		prepareMocksForTextField();
 
 		TextField result = (TextField) crudTableFieldFactory.createField(
 				containerMock, "1", "test", componentMock);
@@ -440,21 +471,7 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 	@Test
 	public void shouldUseConfiguredTitleAsCaption() {
-		ColumnProperty property = new ColumnProperty("test", true, false, true,
-				false, "1", String.class);
-		when(containerFieldMock.isReadonly()).thenReturn(true);
-
-		containerShouldReturnDataType(String.class);
-
-		when(itemMock.getItemProperty(any())).thenReturn(property);
-
-		when(modelTableMock.isRowEditable(rowMock)).thenReturn(true);
-
-		doReturn(fieldMock).when(displaySupportMock).createField(String.class,
-				"test", false, null, null);
-
-		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
-		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
+		prepareMocksForTextField();
 		when(tableColumnMock.getTitle()).thenReturn("myTitle");
 
 		TextField result = (TextField) crudTableFieldFactory.createField(
@@ -464,9 +481,17 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 	@Test
 	public void shouldUseLongTitleAsDescriptionTooltip() {
-		ColumnProperty property = new ColumnProperty("test", true, false, true,
-				false, "1", String.class);
-		when(containerFieldMock.isReadonly()).thenReturn(true);
+		prepareMocksForTextField();
+		when(tableColumnMock.getLongTitle()).thenReturn("myLongTitle");
+
+		TextField result = (TextField) crudTableFieldFactory.createField(
+				containerMock, "1", "test", componentMock);
+		verify(result).setDescription("myLongTitle");
+	}
+
+	private void prepareMocksForTextField() {
+		property = new ColumnProperty("test", true, false, true, false, "1",
+				String.class);
 
 		containerShouldReturnDataType(String.class);
 
@@ -479,11 +504,95 @@ public class DefaultCrudFieldFactoryTest extends SpringPortletContextTest {
 
 		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
 		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
-		when(tableColumnMock.getLongTitle()).thenReturn("myLongTitle");
-
-		TextField result = (TextField) crudTableFieldFactory.createField(
-				containerMock, "1", "test", componentMock);
-		verify(result).setDescription("myLongTitle");
 	}
 
+	@Test
+	public void shouldReturnNullOnReadonlyField() {
+		prepareMocksForTextField();
+		when(fieldMock.isReadOnly()).thenReturn(true);
+
+		assertNull(crudTableFieldFactory.createField(containerMock, "1",
+				"test", componentMock));
+	}
+
+	@Test
+	public void shouldEditableIfAllConditionsAreMet() {
+		prepareMocksForTextField();
+		when(modelTableMock.isEditable()).thenReturn(true);
+		when(modelTableMock.getMode()).thenReturn(Mode.EDIT);
+
+		crudTableFieldFactory.createField(containerMock, "1", "test",
+				componentMock);
+
+		verify(fieldMock).setReadOnly(true);
+	}
+
+	@Test
+	public void shouldBeReadonlyIfTableNotEditable() {
+		prepareMocksForTextField();
+		when(modelTableMock.isEditable()).thenReturn(false);
+
+		crudTableFieldFactory.createField(containerMock, "1", "test",
+				componentMock);
+
+		verify(fieldMock).setReadOnly(true);
+	}
+
+	@Test
+	public void shouldBeReadonlyIfTableInViewMode() {
+		prepareMocksForTextField();
+		when(modelTableMock.isEditable()).thenReturn(true);
+		when(modelTableMock.getMode()).thenReturn(Mode.VIEW);
+
+		crudTableFieldFactory.createField(containerMock, "1",
+				"test", componentMock);
+
+		verify(fieldMock).setReadOnly(true);
+	}
+
+	@Test
+	public void shouldBeReadonlyIfFieldIsReadOnly() {
+		prepareMocksForTextField();
+		when(modelTableMock.isEditable()).thenReturn(true);
+		when(modelTableMock.getMode()).thenReturn(Mode.EDIT);
+		when(containerFieldMock.isReadonly()).thenReturn(true);
+
+		crudTableFieldFactory.createField(containerMock, "1", "test",
+				componentMock);
+
+		verify(fieldMock).setReadOnly(true);
+	}
+	
+	@Test
+	public void shouldBeReadonlyIfRowIsReadOnly() {
+		prepareMocksForTextField();
+		when(modelTableMock.isEditable()).thenReturn(true);
+		when(modelTableMock.getMode()).thenReturn(Mode.EDIT);
+		
+		when(modelTableMock.isRowEditable(rowMock)).thenReturn(false);
+		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
+		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
+		when(tableColumnMock.isEditable(rowMock)).thenReturn(true);
+		
+		crudTableFieldFactory.createField(containerMock, "1", "test",
+				componentMock);
+		
+		verify(fieldMock).setReadOnly(true);
+	}
+	
+	@Test
+	public void shouldBeReadonlyIfCellIsReadOnly() {
+		prepareMocksForTextField();
+		when(modelTableMock.isEditable()).thenReturn(true);
+		when(modelTableMock.getMode()).thenReturn(Mode.EDIT);
+		when(modelTableMock.isRowEditable(rowMock)).thenReturn(false);
+		when(modelTableMock.getColumns()).thenReturn(tableColumnsMock);
+		when(tableColumnsMock.get("test")).thenReturn(tableColumnMock);
+		when(tableColumnMock.isEditable(rowMock)).thenReturn(false);
+		
+		crudTableFieldFactory.createField(containerMock, "1", "test",
+				componentMock);
+		
+		verify(fieldMock).setReadOnly(true);
+	}
 }

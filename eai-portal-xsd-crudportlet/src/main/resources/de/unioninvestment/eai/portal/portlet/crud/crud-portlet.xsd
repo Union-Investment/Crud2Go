@@ -1016,6 +1016,37 @@
 	</complexType>
 
 
+	<simpleType name="SelectionMode">
+		<annotation>
+			<documentation>
+				Selektionsmodus
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="disabled">
+				<annotation>
+					<documentation>
+						selection disabled
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="single">
+				<annotation>
+					<documentation>
+						single selection
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="multiple">
+				<annotation>
+					<documentation>
+						multiple selection
+					</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
 	<simpleType name="TableExportType">
 		<annotation>
 			<documentation>
@@ -1734,6 +1765,13 @@
 					<annotation>
 						<documentation>
 							Closure zum Veraendern der Zeilendarstellung.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="selection-mode" type="tns:SelectionMode" default="multiple">
+					<annotation>
+						<documentation>
+							Erlaubt die Auswahl eines alternativen Selektionsmodus für die Tabelle.
 						</documentation>
 					</annotation>
 				</attribute>

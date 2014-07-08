@@ -29,7 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.vaadin.data.Item;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Table.ColumnGenerator;
@@ -62,6 +64,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 		Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Table.class);
 
 	/**
 	 * Permission Actions.
@@ -234,6 +238,10 @@ public class Table extends Component implements Component.ExpandableComponent,
 		TABLE, FORM
 	}
 
+	public enum SelectionMode {
+		DISABLED, SINGLE, MULTIPLE
+	}
+
 	private final TableConfig config;
 	private final TableColumns columns;
 	private DataContainer container;
@@ -262,6 +270,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	private Validator rowValidator = null;
 
+	private SelectionMode selectionMode;
+
 	/**
 	 * Konstruktor mit Parametern.
 	 * 
@@ -278,11 +288,13 @@ public class Table extends Component implements Component.ExpandableComponent,
 		this.editable = editable;
 		this.directEdit = directEdit;
 		this.mode = directEdit && editable ? Mode.EDIT : Mode.VIEW;
+		this.selectionMode = SelectionMode.valueOf(config.getSelectionMode().name());
 
 		this.columns = tableColumns;
 		if (columns != null) {
 			columns.setTable(this);
 		}
+		
 	}
 
 	/**
@@ -372,6 +384,9 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	void setContainer(DataContainer container) {
 		this.container = container;
+		if (selectionMode == SelectionMode.DISABLED && isEditable()) {
+			LOGGER.warn("Table is editable but selection mode is 'disabled'");
+		}
 	}
 
 	public DataContainer getContainer() {
@@ -871,6 +886,10 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	public boolean hasRowValidator() {
 		return rowValidator != null;
+	}
+
+	public SelectionMode getSelectionMode() {
+		return selectionMode;
 	}
 
 }

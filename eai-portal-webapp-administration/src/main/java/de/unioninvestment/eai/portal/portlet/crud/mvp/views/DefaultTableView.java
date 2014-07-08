@@ -69,13 +69,12 @@ import com.vaadin.ui.VerticalLayout;
 
 import de.unioninvestment.eai.portal.portlet.crud.CrudErrorHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.SelectionMode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
@@ -191,12 +190,18 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		table.setColumnCollapsingAllowed(true);
 		table.setColumnReorderingAllowed(true);
 		table.setSizeFull();
-		table.setSelectable(true);
-		table.setNullSelectionAllowed(false);
 		table.setImmediate(true);
 		table.setEditable(false);
-		table.setMultiSelect(true);
-		table.setMultiSelectMode(MultiSelectMode.DEFAULT);
+
+		if (tableModel.getSelectionMode() == SelectionMode.MULTIPLE) {
+			table.setSelectable(true);
+			table.setNullSelectionAllowed(false);
+			table.setMultiSelect(true);
+			table.setMultiSelectMode(MultiSelectMode.DEFAULT);
+		} else if (tableModel.getSelectionMode() == SelectionMode.SINGLE) {
+			table.setSelectable(true);
+			table.setNullSelectionAllowed(false);
+		}
 
 		if (!tableModel.isSortingEnabled()) {
 			table.setSortEnabled(false);
@@ -378,10 +383,12 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 							if (action.isExportAction()) {
 								switch (action.getExportType()) {
 								case XLS:
-									exportExcelSheet(action.generateExportFilename());
+									exportExcelSheet(action
+											.generateExportFilename());
 									break;
 								case CSV:
-									exportCSVSheet(action.generateExportFilename());
+									exportCSVSheet(action
+											.generateExportFilename());
 									break;
 								default:
 									throw new IllegalArgumentException(
@@ -502,10 +509,9 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	/**
 	 * On Selection.
 	 */
-	@SuppressWarnings("unchecked")
 	public void onSelectionChanged() {
 
-		Set<Object> selection = (Set<Object>) table.getValue();
+		Set<Object> selection = getCurrentSelection();
 
 		if (shouldCommitOnSelectionChange(selection)) {
 			if (!commit()) {
@@ -524,6 +530,16 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 				table.refreshRowCache();
 				table.enableContentRefreshing(true);
 			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Set<Object> getCurrentSelection() {
+		if (table.isMultiSelect()) {
+			return (Set<Object>) table.getValue();
+		} else {
+			Object value = table.getValue();
+			return value != null ? singleton(value) : emptySet();
 		}
 	}
 
@@ -580,15 +596,25 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 	private void rollbackSelection() {
 		if (uncommittedItemId == null) {
-			table.setValue(emptySet());
+			select(emptySet());
 		} else {
-			table.setValue(singleton(uncommittedItemId));
+			select(singleton(uncommittedItemId));
 		}
 	}
 
 	private void applySelection(Set<Object> selection) {
 		updateUncommittedItemId(selection);
-		table.setValue(selection);
+		select(selection);
+	}
+
+	private void select(Set<Object> selection) {
+		if (table.isMultiSelect()) {
+			table.setValue(selection);
+		} else if (selection.isEmpty()) {
+			table.setValue(null);
+		} else {
+			table.setValue(selection.iterator().next());
+		}
 	}
 
 	/**
@@ -622,18 +648,14 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		selectNewRow(newItemId, suppressCommit);
 	}
 
-	private void unselectAll() {
-		table.setValue(null);
-	}
-
 	private void selectNewRow(Object newItemId, boolean suppressCommit) {
 		try {
 			// Der Selection-Change-Listener löst bei unselectAll u. a. implizit
 			// ein Commit aus
 			ignoreSelectionChange = suppressCommit;
-			unselectAll();
+			select(emptySet());
 			updateUncommittedItemId(singleton(newItemId));
-			table.select(newItemId);
+			select(singleton(newItemId));
 			table.setCurrentPageFirstItemId(newItemId);
 			if (presenter.isFormEditEnabled()) {
 				presenter.openRowEditingForm();
@@ -666,7 +688,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			removalInProgress = false;
 		}
 		updateUncommittedItemId(singleton(nextItemId));
-		table.setValue(singleton(nextItemId));
+		select(singleton(nextItemId));
 	}
 
 	private Object getRowToSelectAfterRemoval() {
@@ -679,7 +701,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 	@SuppressWarnings("unchecked")
 	private void removeCurrentSelectionItemsThatAreDeletable() {
-		Set<Object> selection = (Set<Object>) table.getValue();
+		Set<Object> selection = getCurrentSelection();
 		try {
 			removalInProgress = true;
 			int all = selection.size();
@@ -710,7 +732,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 			container.rollback();
 			try {
 				ignoreSelectionChange = true;
-				unselectAll();
+				select(emptySet());
 			} finally {
 				ignoreSelectionChange = false;
 			}
@@ -771,8 +793,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		table.setColumnCollapsingAllowed(false);
 		updateVisibleColumns(true);
 
-		updateRemoveButtonStatus((Set<Object>) table.getValue(),
-				uncommittedItemId);
+		updateRemoveButtonStatus(getCurrentSelection(), uncommittedItemId);
 
 		LOG.debug("Setze den Editiermodus");
 	}
@@ -986,7 +1007,8 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 	private void exportCSVSheet(String customFilename) {
 		CsvExporter exporter = new CsvExporter();
-		String filename = customFilename != null ? customFilename :"export_" + createFilenameTime() + ".csv";
+		String filename = customFilename != null ? customFilename : "export_"
+				+ createFilenameTime() + ".csv";
 		Download download = new StreamingExporterDownload(filename,
 				CsvExporter.CSV_MIMETYPE, tableModel, exporter);
 		DownloadExportTask exportTask = new DownloadExportTask(UI.getCurrent(),
@@ -996,7 +1018,8 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 
 	private void exportExcelSheet(String customFilename) {
 		ExcelExporter exporter = new ExcelExporter();
-		String filename = customFilename != null ? customFilename : "export_" + createFilenameTime() + ".xlsx";
+		String filename = customFilename != null ? customFilename : "export_"
+				+ createFilenameTime() + ".xlsx";
 		Download download = new StreamingExporterDownload(filename,
 				ExcelExporter.EXCEL_XSLX_MIMETYPE, tableModel, exporter);
 		DownloadExportTask exportTask = new DownloadExportTask(UI.getCurrent(),
@@ -1035,7 +1058,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	@Override
 	public void selectionUpdatedExternally(Set<Object> selection) {
 		if (tableModel.isFormEditEnabled()) {
-			table.setValue(selection);
+			select(selection);
 		} else {
 			throw new UnsupportedOperationException(
 					"Currently only implemented to be used from inside form-edit dialog");

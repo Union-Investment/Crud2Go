@@ -197,9 +197,17 @@ public class DefaultCrudFieldFactory implements TableFieldFactory,
 	}
 
 	private boolean isSelectedRow(Object itemId) {
-		if (itemId != null && ((Set<?>) vaadinTable.getValue()).size() == 1) {
-			return itemId.equals(((Set<?>) vaadinTable.getValue()).iterator()
-					.next());
+		if (itemId != null && vaadinTable.isSelectable()) {
+			if (vaadinTable.isMultiSelect()) {
+				Set<?> selection = (Set<?>) vaadinTable.getValue();
+				if (selection.size() == 1) {
+					return itemId.equals(selection.iterator().next());
+				}
+			} else {
+				if (vaadinTable.getValue() != null) {
+					return itemId.equals(vaadinTable.getValue());
+				}
+			}
 		}
 		return false;
 	}
