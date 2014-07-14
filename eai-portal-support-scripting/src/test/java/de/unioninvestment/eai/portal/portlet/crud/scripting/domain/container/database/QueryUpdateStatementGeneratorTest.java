@@ -78,17 +78,20 @@ public class QueryUpdateStatementGeneratorTest {
     public void shouldFailOnMissingTable() {
         when(containerMock.getTablename()).thenReturn(null);
         generator = new QueryUpdateStatementGenerator(tableMock);
+        generator.generateStatement(rowMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailIfNothingUpdateable() {
         when(columnsMock.getUpdateColumnNames()).thenReturn(Collections.<String>emptyList());
         generator = new QueryUpdateStatementGenerator(tableMock);
+        generator.generateStatement(rowMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailOnMissingPrimaryKey() {
         when(columnsMock.getPrimaryKeyNames()).thenReturn(Collections.<String>emptyList());
         generator = new QueryUpdateStatementGenerator(tableMock);
+        generator.generateStatement(rowMock);
     }
 }

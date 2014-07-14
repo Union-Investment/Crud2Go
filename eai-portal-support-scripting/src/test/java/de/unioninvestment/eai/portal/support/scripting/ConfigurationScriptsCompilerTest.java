@@ -498,7 +498,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 		compiler.compileAllScripts(portletConfig);
 
 		verify(scriptCompilerMock).compileScript("");
-		verify(scriptCompilerMock, times(2)).compileScript(
+		verify(scriptCompilerMock, times(3)).compileScript(
 				startsWith("{ container,row,connection -> \"\"\""));
 	}
 

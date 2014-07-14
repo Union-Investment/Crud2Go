@@ -524,15 +524,9 @@ public class ScriptModelBuilder {
 
     private void prepareContainerForDynamicStatements(Table table, ScriptDatabaseQueryContainer scriptContainer) {
         DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
-        if (container.isInsertGenerated()) {
-            scriptContainer.setInsertGenerator(new QueryInsertStatementGenerator(table));
-        }
-        if (container.isUpdateGenerated()) {
-            scriptContainer.setUpdateGenerator(new QueryUpdateStatementGenerator(table));
-        }
-        if (container.isDeleteGenerated()) {
-            scriptContainer.setDeleteGenerator(new QueryDeleteStatementGenerator(table));
-        }
+        scriptContainer.setInsertGenerator(new QueryInsertStatementGenerator(table));
+        scriptContainer.setUpdateGenerator(new QueryUpdateStatementGenerator(table));
+        scriptContainer.setDeleteGenerator(new QueryDeleteStatementGenerator(table));
     }
 
     private void populateTableRowValidator(Table table, ScriptTable scriptTable) {

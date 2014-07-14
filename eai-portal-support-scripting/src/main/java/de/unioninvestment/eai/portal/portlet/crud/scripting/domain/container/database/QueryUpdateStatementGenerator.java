@@ -19,22 +19,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class QueryUpdateStatementGenerator implements QueryStatementGenerator {
 
-    private final String tablename;
+    private final Table table;
+
+    private String tablename;
     private List<String> updateColumns;
     private List<String> idColumns;
 
     public QueryUpdateStatementGenerator(Table table) {
-        DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
-        tablename = container.getTablename();
-        updateColumns = table.getColumns().getUpdateColumnNames();
-        idColumns = table.getColumns().getPrimaryKeyNames();
+        this.table = table;
+    }
 
-        checkArgument(tablename != null, "Cannot generate UPDATE statements - Table name needed");
-        checkArgument(updateColumns.size() >= 1, "Cannot generate UPDATE statements - at least one column must be editable");
-        checkArgument(idColumns.size() >= 1, "Cannot generate UPDATE statements - at least one primary key column must exist");
+    private void updateConfig() {
+        if (tablename == null) {
+            DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
+            tablename = container.getTablename();
+            updateColumns = table.getColumns().getUpdateColumnNames();
+            idColumns = table.getColumns().getPrimaryKeyNames();
+
+            checkArgument(tablename != null, "Cannot generate UPDATE statements - Table name needed");
+            checkArgument(updateColumns.size() >= 1, "Cannot generate UPDATE statements - at least one column must be editable");
+            checkArgument(idColumns.size() >= 1, "Cannot generate UPDATE statements - at least one primary key column must exist");
+        }
     }
 
     public GString generateStatement(ScriptRow row) {
+        updateConfig();
+
         Map<String,Object> columnValues = row.getValues();
         Object[] values = new Object[updateColumns.size() + idColumns.size()];
         ArrayList<String> strings = new ArrayList(values.length + 1);

@@ -357,21 +357,4 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 	public DataStream getStream() {
 		return new QueryCursorDataStream(getVaadinContainer(), connectionPool, getCurrentQuery(true));
 	}
-
-    public boolean isInsertGenerated() {
-        return hasEmptyStatement(config.getInsert());
-    }
-
-    public boolean isUpdateGenerated() {
-        return hasEmptyStatement(config.getUpdate());
-    }
-
-    public boolean isDeleteGenerated() {
-        return hasEmptyStatement(config.getDelete());
-    }
-
-    private boolean hasEmptyStatement(StatementConfig statementConfig) {
-        return statementConfig != null && (statementConfig.getStatement() == null || Strings.isNullOrEmpty(statementConfig.getStatement().getSource()));
-    }
-
 }

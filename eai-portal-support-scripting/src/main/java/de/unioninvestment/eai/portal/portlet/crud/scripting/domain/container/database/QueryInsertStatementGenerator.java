@@ -19,19 +19,29 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class QueryInsertStatementGenerator implements QueryStatementGenerator {
 
-    private final String tablename;
+    private final Table table;
+
+    private String tablename;
     private List<String> insertColumns;
 
     public QueryInsertStatementGenerator(Table table) {
-        DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
-        tablename = container.getTablename();
-        insertColumns = table.getColumns().getInsertColumnNames();
+        this.table = table;
+    }
 
-        checkArgument(tablename != null, "Cannot generate INSERT statements - Table name needed");
-        checkArgument(insertColumns.size() >= 1, "Cannot generate INSERT statements - at least one column must be editable");
+    private void updateConfig() {
+        if (tablename == null) {
+            DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
+            tablename = container.getTablename();
+            checkArgument(tablename != null, "Cannot generate INSERT statements - Table name needed");
+
+            insertColumns = table.getColumns().getInsertColumnNames();
+            checkArgument(insertColumns.size() >= 1, "Cannot generate INSERT statements - at least one column must be editable");
+        }
     }
 
     public GString generateStatement(ScriptRow row) {
+        updateConfig();
+
         Map<String,Object> columnValues = row.getValues();
         Object[] values = new Object[insertColumns.size()];
         ArrayList<String> strings = new ArrayList(values.length + 1);
@@ -54,4 +64,5 @@ public class QueryInsertStatementGenerator implements QueryStatementGenerator {
 
         return new GStringImpl(values, strings.toArray(new String[strings.size()]));
     }
+
 }

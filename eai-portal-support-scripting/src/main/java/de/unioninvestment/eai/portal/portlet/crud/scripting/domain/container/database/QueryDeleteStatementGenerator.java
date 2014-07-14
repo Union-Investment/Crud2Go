@@ -18,19 +18,28 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class QueryDeleteStatementGenerator implements QueryStatementGenerator {
 
-    private final String tablename;
+    private final Table table;
+
+    private String tablename;
     private List<String> idColumns;
 
     public QueryDeleteStatementGenerator(Table table) {
-        DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
-        tablename = container.getTablename();
-        idColumns = table.getColumns().getPrimaryKeyNames();
+        this.table = table;
+    }
+    private void updateConfig() {
+        if (tablename == null) {
+            DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
+            tablename = container.getTablename();
+            idColumns = table.getColumns().getPrimaryKeyNames();
 
-        checkArgument(tablename != null, "Cannot generate DELETE statements - Table name needed");
-        checkArgument(idColumns.size() >= 1, "Cannot generate DELETE statements - at least one primary key column must exist");
+            checkArgument(tablename != null, "Cannot generate DELETE statements - Table name needed");
+            checkArgument(idColumns.size() >= 1, "Cannot generate DELETE statements - at least one primary key column must exist");
+        }
     }
 
     public GString generateStatement(ScriptRow row) {
+        updateConfig();
+
         Map<String,Object> columnValues = row.getValues();
         Object[] values = new Object[idColumns.size()];
         ArrayList<String> strings = new ArrayList(values.length + 1);

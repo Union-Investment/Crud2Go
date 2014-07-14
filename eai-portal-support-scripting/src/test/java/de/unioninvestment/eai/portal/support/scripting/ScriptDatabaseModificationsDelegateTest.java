@@ -26,6 +26,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import groovy.lang.Closure;
 import groovy.lang.MissingPropertyException;
 
@@ -370,7 +372,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 	@Test
 	public void shouldDeleteAnExistingRowWithSql() throws SQLException {
 		when(
-				deleteClosureMock.call(rowCaptor.capture(),
+				deleteClosureMock.call(any(ScriptDatabaseContainer.class),rowCaptor.capture(),
 						any(ExtendedSql.class))).thenReturn(
 				new GStringImpl(new Object[] { 1 }, DELETE_STMT.split("\\?")));
 
@@ -396,7 +398,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 	@Test
 	public void shouldDeleteAnExistingRowWithScript() throws SQLException {
 		when(
-				deleteClosureMock.call(rowCaptor.capture(),
+				deleteClosureMock.call(any(ScriptDatabaseContainer.class),rowCaptor.capture(),
 						any(ExtendedSql.class))).thenReturn(1);
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, null, null, new StatementWrapper(

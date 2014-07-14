@@ -71,11 +71,13 @@ public class QueryDeleteStatementGeneratorTest {
     public void shouldFailOnMissingTable() {
         when(containerMock.getTablename()).thenReturn(null);
         generator = new QueryDeleteStatementGenerator(tableMock);
+        generator.generateStatement(rowMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailOnMissingPrimaryKey() {
         when(columnsMock.getPrimaryKeyNames()).thenReturn(Collections.<String>emptyList());
         generator = new QueryDeleteStatementGenerator(tableMock);
+        generator.generateStatement(rowMock);
     }
 }
