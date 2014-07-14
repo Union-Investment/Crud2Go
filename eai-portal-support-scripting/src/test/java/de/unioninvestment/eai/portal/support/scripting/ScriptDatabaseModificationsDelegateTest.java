@@ -236,7 +236,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, insertStatement, null, null, null,
-				queryDelegateMock);
+				null, queryDelegateMock);
 
 		scriptDatabaseQueryDelegate.storeRow(connectionMock, newRowItem);
 	}
@@ -251,7 +251,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, insertStatement, null, null, null,
-				queryDelegateMock);
+                null, queryDelegateMock);
 
 		scriptDatabaseQueryDelegate.storeRow(connectionMock, newRowItem);
 	}
@@ -266,7 +266,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, insertStatement, null, null, null,
-				queryDelegateMock);
+                null, queryDelegateMock);
 
 		when(connectionMock.prepareStatement(Mockito.anyString())).thenThrow(
 				new SQLException("Invalid SQL"));
@@ -286,7 +286,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, insertStatement, null, null, null,
-				queryDelegateMock);
+                null, queryDelegateMock);
 
 		when(connectionMock.prepareStatement(Mockito.anyString())).thenReturn(
 				statementMock);
@@ -311,7 +311,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, new StatementWrapper(insertClosureMock,
 						StatementConfig.Type.SCRIPT), null, null, null,
-				queryDelegateMock);
+                null, queryDelegateMock);
 
 		int updateCount = scriptDatabaseQueryDelegate.storeRow(connectionMock,
 				newRowItem);
@@ -331,7 +331,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, null, updateStatement, null, null,
-				queryDelegateMock);
+                null, queryDelegateMock);
 
 		when(connectionMock.prepareStatement(Mockito.anyString())).thenReturn(
 				statementMock);
@@ -358,7 +358,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, null, new StatementWrapper(
 						updateClosureMock, StatementConfig.Type.SCRIPT), null,
-				null, queryDelegateMock);
+                null, null, queryDelegateMock);
 
 		int updateCount = scriptDatabaseQueryDelegate.storeRow(connectionMock,
 				existingRowItem);
@@ -376,7 +376,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, null, null, deleteStatement, null,
-				queryDelegateMock);
+                null, queryDelegateMock);
 
 		when(connectionMock.prepareStatement(Mockito.anyString())).thenReturn(
 				statementMock);
@@ -401,7 +401,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, null, null, new StatementWrapper(
 						deleteClosureMock, StatementConfig.Type.SCRIPT), null,
-				queryDelegateMock);
+                null, queryDelegateMock);
 
 		boolean deleted = scriptDatabaseQueryDelegate.removeRow(connectionMock,
 				existingRowItem);

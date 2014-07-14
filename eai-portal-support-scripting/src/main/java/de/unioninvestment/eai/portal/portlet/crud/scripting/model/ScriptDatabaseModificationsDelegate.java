@@ -60,7 +60,9 @@ public class ScriptDatabaseModificationsDelegate implements
 	private static final Logger LOG = LoggerFactory
 			.getLogger(ScriptDatabaseModificationsDelegate.class);
 
-	private DataContainer container;
+    private final ScriptDatabaseContainer scriptContainer;
+
+    private DataContainer container;
 
 	private final StatementWrapper insertStatement;
 
@@ -77,14 +79,12 @@ public class ScriptDatabaseModificationsDelegate implements
 	 * 
 	 * @param container
 	 *            Datenbankcontainer
-	 * @param queryString
-	 *            Der SQL Query String
-	 * @param primaryKeyColumns
-	 *            Liste der Spaltennamen der Primärschlüssel
+	 * @param queryDelegate
+	 *            Datenbankspezifische Klasse für Queries
 	 */
 	public ScriptDatabaseModificationsDelegate(final DataContainer container,
 			DatabaseQueryDelegate queryDelegate) {
-		this(container, null, null, null, null, queryDelegate);
+		this(container, null, null, null, null, null, queryDelegate);
 	}
 
 	/**
@@ -98,18 +98,19 @@ public class ScriptDatabaseModificationsDelegate implements
 	 *            Die Closure für UPDATE Statements
 	 * @param deleteStatement
 	 *            Die Closure für DELETE Statements
-	 * @param primaryKeyColumns
-	 *            Liste der Spaltennamen der Primärschlüssel
 	 * @param queryDelegate
+     *            Datenbankspezifische Klasse für Queries
 	 */
 	public ScriptDatabaseModificationsDelegate(DataContainer container,
 			StatementWrapper insertStatement, StatementWrapper updateStatement,
-			StatementWrapper deleteStatement, CurrentUser currentUser,
+			StatementWrapper deleteStatement, ScriptDatabaseContainer scriptContainer,
+            CurrentUser currentUser,
 			DatabaseQueryDelegate queryDelegate) {
 		this.container = container;
 		this.insertStatement = insertStatement;
 		this.updateStatement = updateStatement;
 		this.deleteStatement = deleteStatement;
+        this.scriptContainer = scriptContainer;
 		this.queryDelegate = queryDelegate;
 		this.auditLogger = new AuditLogger(currentUser);
 	}
@@ -273,7 +274,6 @@ public class ScriptDatabaseModificationsDelegate implements
 		DatabaseContainerRow containerRow = (DatabaseContainerRow) container
 				.convertItemToRow(row, false, true);
 		ScriptRow scriptRow = new ScriptRow(containerRow);
-		ScriptContainer scriptContainer = new ScriptDatabaseContainer(container);
 
 		return callClosureAndHandleExceptions(closure, scriptContainer,
 				scriptRow, sql);

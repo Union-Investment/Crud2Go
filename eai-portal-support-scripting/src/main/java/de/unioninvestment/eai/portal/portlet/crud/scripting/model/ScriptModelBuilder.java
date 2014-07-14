@@ -18,12 +18,20 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
+import com.google.common.base.Strings;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryDeleteStatementGenerator;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryInsertStatementGenerator;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryUpdateStatementGenerator;
+import de.unioninvestment.eai.portal.support.scripting.*;
 import groovy.lang.Closure;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import groovy.lang.GString;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Supplier;
@@ -91,15 +99,6 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ConfirmationD
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.NotificationProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.events.NewRowDefaultsSetterHandler;
-import de.unioninvestment.eai.portal.support.scripting.DynamicColumnStyleRenderer;
-import de.unioninvestment.eai.portal.support.scripting.DynamicRowStyleRenderer;
-import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
-import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
-import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
-import de.unioninvestment.eai.portal.support.scripting.ScriptContainerDelegate;
-import de.unioninvestment.eai.portal.support.scripting.ScriptCustomFilterFactory;
-import de.unioninvestment.eai.portal.support.scripting.ScriptFormSQLWhereFactory;
-import de.unioninvestment.eai.portal.support.scripting.SqlProvider;
 import de.unioninvestment.eai.portal.support.scripting.http.HttpProvider;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
@@ -112,6 +111,8 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
  */
 public class ScriptModelBuilder {
 
+    private Logger LOGGER = LoggerFactory.getLogger(ScriptModelBuilder.class);
+
 	private final ScriptModelFactory factory;
 	private final ConnectionPoolFactory connectionPoolFactory;
 	private final ScriptBuilder scriptBuilder;
@@ -123,6 +124,22 @@ public class ScriptModelBuilder {
 
 	private EventBus eventBus;
 	private AuditLogger auditLogger;
+    private ScriptCompiler scriptCompiler;
+
+    enum Operation {
+        INSERT("generateInsertStatement"),
+        UPDATE("generateUpdateStatement"),
+        DELETE("generateDeleteStatement");
+
+        private final String methodName;
+
+        private Operation(String methodName) {
+            this.methodName = methodName;
+        }
+        public String getMethodName() {
+            return methodName;
+        }
+    }
 
 	/**
 	 * Konstruktor mit Parameter.
@@ -142,13 +159,14 @@ public class ScriptModelBuilder {
 	 */
 	public ScriptModelBuilder(ScriptModelFactory factory, EventBus eventBus,
 			ConnectionPoolFactory connectionPoolFactory,
-			UserFactory userFactory, ScriptBuilder scriptBuilder,
+			UserFactory userFactory, ScriptCompiler scriptCompiler, ScriptBuilder scriptBuilder,
 			Portlet portlet, Map<Object, Object> modelToConfigMapping) {
 		this.factory = factory;
 		this.eventBus = eventBus;
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.userFactory = userFactory;
-		this.scriptBuilder = scriptBuilder;
+        this.scriptCompiler = scriptCompiler;
+        this.scriptBuilder = scriptBuilder;
 
 		this.portlet = portlet;
 		this.configs = modelToConfigMapping;
@@ -473,10 +491,14 @@ public class ScriptModelBuilder {
 
 		ScriptContainer scriptContainer = buildScriptContainer(table
 				.getContainer());
+        if (table.getContainer() instanceof DatabaseQueryContainer) {
+            prepareContainerForDynamicStatements(table, (ScriptDatabaseQueryContainer) scriptContainer);
+        }
+
 		scriptTable.setContainer(scriptContainer);
 
 		populateQueryDelegateOnDomainContainer(table.getColumns(),
-				table.getContainer());
+				table.getContainer(), scriptContainer);
 
 		registerOptionLists(table);
 
@@ -500,7 +522,20 @@ public class ScriptModelBuilder {
 		return scriptTable;
 	}
 
-	private void populateTableRowValidator(Table table, ScriptTable scriptTable) {
+    private void prepareContainerForDynamicStatements(Table table, ScriptDatabaseQueryContainer scriptContainer) {
+        DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
+        if (container.isInsertGenerated()) {
+            scriptContainer.setInsertGenerator(new QueryInsertStatementGenerator(table));
+        }
+        if (container.isUpdateGenerated()) {
+            scriptContainer.setUpdateGenerator(new QueryUpdateStatementGenerator(table));
+        }
+        if (container.isDeleteGenerated()) {
+            scriptContainer.setDeleteGenerator(new QueryDeleteStatementGenerator(table));
+        }
+    }
+
+    private void populateTableRowValidator(Table table, ScriptTable scriptTable) {
 		TableConfig tc = (TableConfig) configs.get(table);
 		if (tc.getRowValidator() != null) {
 			Closure<Object> rowValidatorClosure = scriptBuilder.buildClosure(tc
@@ -601,22 +636,22 @@ public class ScriptModelBuilder {
 	}
 
 	private void populateQueryDelegateOnDomainContainer(TableColumns columns,
-			DataContainer container) {
+            DataContainer container, ScriptContainer scriptContainer) {
 		if (container instanceof DatabaseQueryContainer) {
 			DatabaseQueryContainer databaseQueryContainer = (DatabaseQueryContainer) container;
 			DatabaseQueryConfig config = (DatabaseQueryConfig) configs
 					.get(container);
 
-			StatementWrapper insertStatement = wrapStatement(config.getInsert());
-			StatementWrapper updateStatement = wrapStatement(config.getUpdate());
-			StatementWrapper deleteStatement = wrapStatement(config.getDelete());
+			StatementWrapper insertStatement = wrapStatement(config.getInsert(), Operation.INSERT);
+			StatementWrapper updateStatement = wrapStatement(config.getUpdate(), Operation.UPDATE);
+			StatementWrapper deleteStatement = wrapStatement(config.getDelete(), Operation.DELETE);
 
 			CurrentUser currentUser = userFactory.getCurrentUser(portlet);
 
 			ScriptDatabaseModificationsDelegate delegate = factory
 					.getDatabaseQueryDelegate(databaseQueryContainer,
 							config.getQuery(), insertStatement,
-							updateStatement, deleteStatement,
+							updateStatement, deleteStatement, (ScriptDatabaseQueryContainer) scriptContainer,
 							columns.getPrimaryKeyNames(), currentUser);
 
 			databaseQueryContainer.setDatabaseQueryDelegate(delegate);
@@ -624,16 +659,37 @@ public class ScriptModelBuilder {
 
 	}
 
-	private StatementWrapper wrapStatement(StatementConfig statement) {
+	private StatementWrapper wrapStatement(StatementConfig statement, Operation operation) {
 		if (statement != null) {
-			Closure<?> statementClosure = scriptBuilder.buildClosure(statement
-					.getStatement());
+            Closure<?> statementClosure;
+            if (statement.getStatement() != null && !Strings.isNullOrEmpty(statement.getStatement().getSource())) {
+                statementClosure = scriptBuilder.buildClosure(statement
+                        .getStatement());
+            } else {
+                statementClosure = createGeneratedStatementClosure(statement, operation);
+            }
 			return new StatementWrapper(statementClosure, statement.getType());
 		}
 		return null;
 	}
 
-	private void addNewRowDefaultsSetterHandler(Table table) {
+    private Closure<?> createGeneratedStatementClosure(StatementConfig statement, Operation operation) {
+        String closureString = "{ container, row, connection -> " +
+                "container." + operation.getMethodName() + "(row) }";
+        Closure<?> stmtClosure;
+        try {
+            stmtClosure = (Closure<GString>) scriptCompiler
+                    .compileScript(closureString).newInstance().run();
+            stmtClosure.setDelegate(scriptBuilder.getMainScript());
+            return stmtClosure;
+
+        } catch (Exception e) {
+            LOGGER.error("Error compiling script", e);
+            throw new BusinessException("portlet.crud.error.compilingScript");
+        }
+    }
+
+    private void addNewRowDefaultsSetterHandler(Table table) {
 		DataContainer container = table.getContainer();
 
 		Map<String, Closure<?>> columnsDefaultValuesMap = buildDefaultsMap(table);

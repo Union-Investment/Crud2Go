@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
+import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler;
 import groovy.lang.Closure;
 import groovy.lang.Script;
 
@@ -83,6 +84,7 @@ public class ScriptModelFactory {
 	private final UserFactory userFactory;
 	private Portal portal;
 	private DatabaseDialect databaseDialect;
+    private ScriptCompiler scriptCompiler;
 
 	/**
 	 * @param connectionPoolFactory
@@ -96,11 +98,13 @@ public class ScriptModelFactory {
 			ConnectionPoolFactory connectionPoolFactory,
 			UserFactory userFactory,
 			Portal portal,
+            ScriptCompiler scriptCompiler,
 			@Value("${portlet.crud.databaseBackend.dialect}") DatabaseDialect databaseDialect) {
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.userFactory = userFactory;
 		this.portal = portal;
-		this.databaseDialect = databaseDialect;
+        this.scriptCompiler = scriptCompiler;
+        this.databaseDialect = databaseDialect;
 	}
 
 	/**
@@ -116,7 +120,7 @@ public class ScriptModelFactory {
 	public ScriptModelBuilder getBuilder(EventBus eventBus, Portlet portlet,
 			Map<Object, Object> modelToConfigMapping) {
 		return new ScriptModelBuilder(this, eventBus, connectionPoolFactory,
-				userFactory, getScriptBuilder(), portlet, modelToConfigMapping);
+				userFactory, scriptCompiler, getScriptBuilder(), portlet, modelToConfigMapping);
 	}
 
 	public ScriptBuilder getScriptBuilder() {
@@ -315,10 +319,10 @@ public class ScriptModelFactory {
 	}
 
 	public ScriptDatabaseModificationsDelegate getDatabaseQueryDelegate(
-			DatabaseQueryContainer databaseQueryContainer, String queryString,
-			StatementWrapper insertStatement, StatementWrapper updateStatement,
-			StatementWrapper deleteStatement, List<String> primaryKeyColumns,
-			CurrentUser currentUser) {
+            DatabaseQueryContainer databaseQueryContainer, String queryString,
+            StatementWrapper insertStatement, StatementWrapper updateStatement,
+            StatementWrapper deleteStatement, ScriptDatabaseContainer scriptContainer, List<String> primaryKeyColumns,
+            CurrentUser currentUser) {
 
 		DatabaseQueryDelegate queryDelegate;
 		switch (databaseDialect) {
@@ -337,7 +341,7 @@ public class ScriptModelFactory {
 
 		ScriptDatabaseModificationsDelegate delegate = new ScriptDatabaseModificationsDelegate(
 				databaseQueryContainer, insertStatement, updateStatement,
-				deleteStatement, currentUser, queryDelegate);
+				deleteStatement, scriptContainer, currentUser, queryDelegate);
 
 		return delegate;
 	}

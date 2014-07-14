@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.base.Strings;
+import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.StatementConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -60,8 +63,9 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 			.getLogger(DatabaseQueryContainer.class);
 
 	private final String query;
+    private final DatabaseQueryConfig config;
 
-	private boolean insertable;
+    private boolean insertable;
 	private boolean updateable;
 	private boolean deleteable;
 
@@ -113,7 +117,7 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 	 *            Queries notwendig, die Daten nicht in einer konsistenten
 	 *            Reihenfolge liefern.
 	 */
-	public DatabaseQueryContainer(EventBus eventBus, String datasource,
+	public DatabaseQueryContainer(EventBus eventBus, DatabaseQueryConfig config,
 			String sqlQuery, boolean insertable, boolean updateable,
 			boolean deleteable, List<String> primaryKeys,
 			ConnectionPool connectionPool, String currentUsername,
@@ -130,10 +134,13 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 		this.exportPageLength = exportPageLength;
 		this.sizeValidTimeout = sizeValidTimeout;
 		this.orderByPrimaryKeys = orderByPrimaryKeys;
-		Assert.notNull(datasource, "DataSource is required");
+		Assert.notNull(config.getDatasource(), "DataSource is required");
 		Assert.notNull(sqlQuery, "SQL-Query is required");
 
-		this.datasource = datasource;
+        this.config = config;
+		this.datasource = config.getDatasource();
+        this.tablename = config.getTablename();
+
 		this.query = sqlQuery;
 		this.primaryKeys = primaryKeys;
 		this.connectionPool = connectionPool;
@@ -350,4 +357,21 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 	public DataStream getStream() {
 		return new QueryCursorDataStream(getVaadinContainer(), connectionPool, getCurrentQuery(true));
 	}
+
+    public boolean isInsertGenerated() {
+        return hasEmptyStatement(config.getInsert());
+    }
+
+    public boolean isUpdateGenerated() {
+        return hasEmptyStatement(config.getUpdate());
+    }
+
+    public boolean isDeleteGenerated() {
+        return hasEmptyStatement(config.getDelete());
+    }
+
+    private boolean hasEmptyStatement(StatementConfig statementConfig) {
+        return statementConfig != null && (statementConfig.getStatement() == null || Strings.isNullOrEmpty(statementConfig.getStatement().getSource()));
+    }
+
 }

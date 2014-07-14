@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.support.scripting;
 
+import com.google.common.base.Strings;
 import groovy.lang.Script;
 
 import java.io.File;
@@ -501,7 +502,7 @@ public class ConfigurationScriptsCompiler {
 
 	private boolean compileClosure(GroovyScript groovyScript,
 			String parameterNames, String location, boolean wrapSourceAsGString) {
-		if (groovyScript != null && groovyScript.getSource() != null) {
+		if (groovyScript != null && !Strings.isNullOrEmpty(groovyScript.getSource())) {
 			String source;
 			if (!wrapSourceAsGString) {
 				// { row -> code }

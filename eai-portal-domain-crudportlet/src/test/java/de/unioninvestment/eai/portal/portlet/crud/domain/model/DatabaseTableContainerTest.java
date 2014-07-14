@@ -32,6 +32,7 @@ import java.util.ArrayList;
 
 import javax.naming.NamingException;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseTableConfig;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -61,8 +62,11 @@ public class DatabaseTableContainerTest
 
 	@Override
 	public DatabaseTableContainer createDataContainer() {
-		DatabaseTableContainer databaseTableContainer = new DatabaseTableContainer(
-				eventBus, "eai", "test", connectionPoolMock, true, true, true,
+        DatabaseTableConfig config = new DatabaseTableConfig();
+        config.setDatasource("eai");
+        config.setTablename("test");
+        DatabaseTableContainer databaseTableContainer = new DatabaseTableContainer(
+				eventBus, config, connectionPoolMock, true, true, true,
 				new TestUser("Benutzer"), displayPatternMock,
 				new ArrayList<ContainerOrder>(), null, 100, 1000, 0, DatabaseDialect.ORACLE);
 

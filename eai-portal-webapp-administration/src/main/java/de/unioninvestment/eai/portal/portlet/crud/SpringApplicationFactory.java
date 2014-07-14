@@ -58,8 +58,7 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
 /**
- * Standard-Implementierung der {@link ApplicationFactory}. Delegiert teilweise
- * an PortletUtils.getBean().
+ * Spring ApplicationContext Konfiguration.
  * 
  * @author carsten.mjartan
  */
@@ -155,11 +154,16 @@ public class SpringApplicationFactory {
 	public ConfigurationService configurationService() throws JAXBException,
 			SAXException {
 		return new DefaultConfigurationService(configurationDao,
-				new ConfigurationScriptsCompiler(new ScriptCompiler()),
+				new ConfigurationScriptsCompiler(scriptCompiler()),
 				settings);
 	}
 
-	/**
+    @Bean
+    public ScriptCompiler scriptCompiler() {
+        return new ScriptCompiler();
+    }
+
+    /**
 	 * @return eine Liste datentypspezifischer Hilfsklassen in Reihenfolge der
 	 *         Relevanz
 	 */

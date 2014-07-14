@@ -39,7 +39,8 @@ public class TableColumn implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	/**
+
+    /**
 	 * Permission Actions.
 	 */
 	public enum Permission {
@@ -59,6 +60,8 @@ public class TableColumn implements Serializable {
 	protected String displayFormat;
 	private String excelFormat;
 	private FileMetadata fileMetadata;
+    private Boolean insertColumn;
+    private Boolean updateColumn;
 
 	private List<FieldValidator> validators;
 
@@ -112,6 +115,8 @@ public class TableColumn implements Serializable {
 		this.customColumnGenerator = builder.customColumnGenerator;
 		this.generatedValueGenerator = builder.generatedValueGenerator;
 		this.generatedType = builder.generatedType;
+        this.updateColumn = builder.updateColumn;
+        this.insertColumn = builder.insertColumn;
 	}
 
 	/**
@@ -319,8 +324,10 @@ public class TableColumn implements Serializable {
 		protected CustomColumnGenerator customColumnGenerator;
 		protected GeneratedValueGenerator generatedValueGenerator;
 		protected Class<?> generatedType;
+        protected Boolean updateColumn;
+        protected Boolean insertColumn;
 
-		protected abstract T self();
+        protected abstract T self();
 
 		/**
 		 * @param name
@@ -475,7 +482,25 @@ public class TableColumn implements Serializable {
 			return self();
 		}
 
-		/**
+        /**
+         * @param updateColumn
+         * @return den builder
+         */
+        public T updateColumn(Boolean updateColumn) {
+            this.updateColumn = updateColumn;
+            return self();
+        }
+
+        /**
+         * @param insertColumn
+         * @return den builder
+         */
+        public T insertColumn(Boolean insertColumn) {
+            this.insertColumn = insertColumn;
+            return self();
+        }
+
+        /**
 		 * @param customColumnGenerator
 		 * @return den builder
 		 */
@@ -556,4 +581,28 @@ public class TableColumn implements Serializable {
 		}
 		validators.add(validator);
 	}
+
+    public boolean isUpdateColumn() {
+        if (updateColumn != null) {
+            return updateColumn;
+        } else if (isPrimaryKey()) {
+            return false;
+        } else if (editableChecker != null) {
+            // spalte potentiell editierbar
+            return true;
+        } else {
+            return editableDefault;
+        }
+    }
+
+    public boolean isInsertColumn() {
+        if (insertColumn != null) {
+            return insertColumn;
+        } else if (editableChecker != null) {
+            // spalte potentiell editierbar
+            return true;
+        } else {
+            return editableDefault;
+        }
+    }
 }

@@ -2103,7 +2103,14 @@
 						</documentation>
 					</annotation>
 				</attribute>
-				<attribute name="pagelength" type="int" default="100">
+                <attribute name="tablename" type="string" use="optional">
+                    <annotation>
+                        <documentation>
+                            Angabe des Datenbank-Tabellennamens. Nur notwendig, wenn Statements generiert werden sollen.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="pagelength" type="int" default="100">
 					<annotation>
 						<documentation>
 							Page Size des SQLContainer.
@@ -2538,6 +2545,23 @@
 						</documentation>
 					</annotation>
 				</attribute>
+                <attribute name="insert" type="boolean">
+                    <annotation>
+                        <documentation>
+                            Gibt an, ob die Spalte bei automatisch generierten INSERT Statements berücksichtigt werden
+                            soll. Standardmäßig werden alle definierten editierbaren Spalten geschrieben.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="update" type="boolean">
+                    <annotation>
+                        <documentation>
+                            Gibt an, ob die Spalte bei automatisch generierten UPDATE Statements berücksichtigt werden
+                            soll. Standardmäßig werden alle definierten editierbaren Spalten geschrieben, die nicht Teil
+                            des Primärschlüssels sind.
+                        </documentation>
+                    </annotation>
+                </attribute>
 				<attribute name="title" type="string">
 					<annotation>
 						<documentation>

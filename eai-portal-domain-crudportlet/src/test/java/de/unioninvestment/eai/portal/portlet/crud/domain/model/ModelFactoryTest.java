@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseTableConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -77,8 +78,11 @@ public class ModelFactoryTest {
 		when(connectionPoolFactoryMock.getPool("eai")).thenReturn(
 				connectionPoolMock);
 
-		DatabaseTableContainer container = factory.getDatabaseTableContainer(
-				eventBus, "eai", "test_table", true, true, true, null,
+        DatabaseTableConfig config = new DatabaseTableConfig();
+        config.setDatasource("eai");
+        config.setTablename("test_table");
+        DatabaseTableContainer container = factory.getDatabaseTableContainer(
+				eventBus, config, true, true, true, null,
 				displayPattern, null, null, 0, 0, 0);
 
 		assertThat(container, notNullValue());

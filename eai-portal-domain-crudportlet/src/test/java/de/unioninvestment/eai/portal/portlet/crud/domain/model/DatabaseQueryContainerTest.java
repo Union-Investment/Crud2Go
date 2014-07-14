@@ -45,6 +45,7 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -86,11 +87,15 @@ public class DatabaseQueryContainerTest
 
 	@Mock
 	private EventBus eventBus;
+    private DatabaseQueryConfig config;
 
-	@Override
+    @Override
 	public DatabaseQueryContainer createDataContainer() {
-		DatabaseQueryContainer databaseQueryContainer = new DatabaseQueryContainer(
-				eventBus, "eai", "select * from test", true, true, true,
+        config = new DatabaseQueryConfig();
+        config.setDatasource("eai");
+
+        DatabaseQueryContainer databaseQueryContainer = new DatabaseQueryContainer(
+				eventBus, config, "select * from test", true, true, true,
 				Arrays.asList("test"), connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0, false);
 		databaseQueryContainer.setVaadinContainer(vaadinContainerMock);
@@ -109,7 +114,7 @@ public class DatabaseQueryContainerTest
 	@Test
 	public void shouldAllowOnlyQuerying() {
 		DatabaseQueryContainer container = new DatabaseQueryContainer(eventBus,
-				"eai", "select * from test", false, false, false,
+				config, "select * from test", false, false, false,
 				Arrays.asList("test"), connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0, false);
 		assertFalse(container.isInsertable());
@@ -119,14 +124,14 @@ public class DatabaseQueryContainerTest
 
 	@Test
 	public void shouldAllowEmptyPrimaryKeysIfReadonly() {
-		new DatabaseQueryContainer(eventBus, "eai", "select * from test",
+		new DatabaseQueryContainer(eventBus, config, "select * from test",
 				false, false, false, null, connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0, false);
 	}
 
 	@Test(expected = BusinessException.class)
 	public void shouldRequirePrimaryKeysForEditing() {
-		new DatabaseQueryContainer(eventBus, "eai", "select * from test", true,
+		new DatabaseQueryContainer(eventBus, config, "select * from test", true,
 				false, false, null, connectionPoolMock, "Benutzer",
 				displayPatternMock, orderBys, null, 100, 1000, 0, false);
 	}
@@ -140,7 +145,7 @@ public class DatabaseQueryContainerTest
 
 		try {
 			DatabaseQueryContainer container = new DatabaseQueryContainer(
-					eventBus, "eai", "select * from test", true, true, true,
+					eventBus, config, "select * from test", true, true, true,
 					Arrays.asList("test"), connectionPoolMock, "Benutzer",
 					displayPatternMock, orderBys, null, 100, 1000, 0, false);
 			container.getVaadinContainer();
@@ -161,7 +166,7 @@ public class DatabaseQueryContainerTest
 
 		try {
 			DatabaseQueryContainer container = new DatabaseQueryContainer(
-					eventBus, "eai", "select * from test", true, true, true,
+					eventBus, config, "select * from test", true, true, true,
 					Arrays.asList("test"), connectionPoolMock, "Benutzer",
 					displayPatternMock, orderBys, null, 100, 1000, 0, false);
 			container.getVaadinContainer();

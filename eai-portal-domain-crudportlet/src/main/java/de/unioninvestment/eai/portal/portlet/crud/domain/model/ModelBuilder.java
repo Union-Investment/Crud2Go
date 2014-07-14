@@ -891,7 +891,7 @@ public class ModelBuilder {
 										.getSource() != null);
 		List<ContainerOrder> orderBys = getDefaultOrder(databaseQuery);
 		return factory.getDatabaseQueryContainer(eventBus,
-				databaseQuery.getDatasource(), databaseQuery.getQuery(),
+				databaseQuery, databaseQuery.getQuery(),
 				insertable, updateable, deleteable, primaryKeys,
 				currentUser.getName(), displayPattern, orderBys,
 				extractFilterPolicy(databaseQuery),
@@ -913,7 +913,7 @@ public class ModelBuilder {
 		List<ContainerOrder> orderBys = getDefaultOrder(config);
 
 		return factory.getDatabaseTableContainer(eventBus,
-				config.getDatasource(), config.getTablename(), insertable,
+				config, insertable,
 				updateable, deleteable, currentUser, formatPattern, orderBys,
 				extractFilterPolicy(config), config.getPagelength(),
 				config.getExportPagelength(), config.getSizeValid());

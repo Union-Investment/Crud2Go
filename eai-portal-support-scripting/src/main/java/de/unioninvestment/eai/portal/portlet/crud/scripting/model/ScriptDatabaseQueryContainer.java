@@ -1,6 +1,8 @@
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
 import static java.util.Arrays.asList;
+
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryStatementGenerator;
 import groovy.lang.GString;
 import groovy.sql.Sql;
 
@@ -31,7 +33,9 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryCont
  */
 public class ScriptDatabaseQueryContainer extends ScriptDatabaseContainer {
 
-	/**
+    private QueryStatementGenerator insertGenerator, updateGenerator, deleteGenerator;
+
+    /**
 	 * This class acts as dynamic proxy for a {@link PreparedStatement} and
 	 * collects calls of
 	 * {@link StatementHelper#setParameterValuesToStatement(PreparedStatement)}.
@@ -82,7 +86,19 @@ public class ScriptDatabaseQueryContainer extends ScriptDatabaseContainer {
 		this.databaseQueryContainer = (DatabaseQueryContainer) container;
 	}
 
-	/**
+    void setInsertGenerator(QueryStatementGenerator insertGenerator) {
+        this.insertGenerator = insertGenerator;
+    }
+
+    void setUpdateGenerator(QueryStatementGenerator updateGenerator) {
+        this.updateGenerator = updateGenerator;
+    }
+
+    void setDeleteGenerator(QueryStatementGenerator deleteGenerator) {
+        this.deleteGenerator = deleteGenerator;
+    }
+
+    /**
 	 * Returns the database query that respects the filter criteria and possibly
 	 * a sort order of the current view.
 	 * 
@@ -144,4 +160,18 @@ public class ScriptDatabaseQueryContainer extends ScriptDatabaseContainer {
 		}
 		return result.toArray(new String[result.size()]);
 	}
+
+    public GString generateUpdateStatement(ScriptRow row) {
+        return updateGenerator.generateStatement(row);
+    }
+
+    public GString generateInsertStatement(ScriptRow row) {
+        return insertGenerator.generateStatement(row);
+    }
+
+    public GString generateDeleteStatement(ScriptRow row) {
+        return deleteGenerator.generateStatement(row);
+    }
+
+
 }

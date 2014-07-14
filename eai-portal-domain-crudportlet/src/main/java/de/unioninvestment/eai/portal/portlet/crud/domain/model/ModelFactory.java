@@ -22,15 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import de.unioninvestment.crud2go.spi.security.CryptorFactory;
-import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
@@ -146,10 +144,8 @@ public class ModelFactory {
 	 * 
 	 * @param eventBus
 	 *            der Event-Bus
-	 * @param datasource
-	 *            die DataSource
-	 * @param tablename
-	 *            der Tabellenname
+	 * @param config
+	 *            die Tabellenkonfiguration
 	 * @param deleteable
 	 *            ob delete-Statements erlaubt sind
 	 * @param updateable
@@ -173,13 +169,13 @@ public class ModelFactory {
 	 * @return eine neue Instanz des {@link DatabaseTableContainer}
 	 */
 	public DatabaseTableContainer getDatabaseTableContainer(EventBus eventBus,
-			String datasource, String tablename, boolean insertable,
+			DatabaseTableConfig config, boolean insertable,
 			boolean updateable, boolean deleteable, CurrentUser currentUser,
 			Map<String, String> formatPattern, List<ContainerOrder> orderBys,
 			FilterPolicy filterPolicy, int pagelength, int exportPagelength,
 			int sizeValidTimeout) {
-		ConnectionPool pool = connectionPoolFactory.getPool(datasource);
-		return new DatabaseTableContainer(eventBus, datasource, tablename,
+		ConnectionPool pool = connectionPoolFactory.getPool(config.getDatasource());
+		return new DatabaseTableContainer(eventBus, config,
 				pool, insertable, updateable, deleteable, currentUser,
 				formatPattern, orderBys, filterPolicy, pagelength,
 				exportPagelength, sizeValidTimeout, dialect);
@@ -189,45 +185,44 @@ public class ModelFactory {
 	 * 
 	 * @param eventBus
 	 *            der Event-Bus
-	 * @param datasource
-	 *            die DataSource
-	 * @param query
-	 *            die SQL-Select Abfrage
-	 * @param deleteable
-	 *            ob delete-Statements erlaubt sind
-	 * @param updateable
-	 *            ob update-Statements erlaubt sind
-	 * @param insertable
-	 *            ob insert-Statements erlaubt sind
-	 * @param primaryKeys
-	 *            eine Liste mit den Primärschlüssel der Abfrage
-	 * @param currentUsername
-	 *            Aktueller Benutzer
-	 * @param displayPattern
-	 *            Formatierungen nach Spaltennamen.
-	 * @param orderBys
-	 *            Default-Sortierung
-	 * @param filterPolicy
-	 *            Art des Filterhandlings
-	 * @param sizeValidTimeout
-	 *            Cachttimeout für die Anzahl aller selektierten Einträge
-	 * @param pagelength
-	 *            Anzahl der Einträge pro Seite
-	 * @param exportPagelength
-	 *            Anzahl der Einträge pro Seite beim Export
-	 * @param orderByPrimaryKeys
-	 *            sortiere immer auch nach Primärschlüsseln
-	 * @return DatabaseQueryContainer
+	 * @param config
+     *            die Container-Konfiguration
+     * @param query
+     *            die SQL-Select Abfrage
+     * @param insertable
+*            ob insert-Statements erlaubt sind
+     * @param updateable
+*            ob update-Statements erlaubt sind
+     * @param deleteable
+*            ob delete-Statements erlaubt sind
+     * @param primaryKeys
+*            eine Liste mit den Primärschlüssel der Abfrage
+     * @param currentUsername
+*            Aktueller Benutzer
+     * @param displayPattern
+*            Formatierungen nach Spaltennamen.
+     * @param orderBys
+*            Default-Sortierung
+     * @param filterPolicy
+*            Art des Filterhandlings
+     * @param pagelength
+*            Anzahl der Einträge pro Seite
+     * @param exportPagelength
+*            Anzahl der Einträge pro Seite beim Export
+     * @param sizeValidTimeout
+*            Cachttimeout für die Anzahl aller selektierten Einträge
+     * @param orderByPrimaryKeys
+*            sortiere immer auch nach Primärschlüsseln              @return DatabaseQueryContainer
 	 */
 	public DatabaseQueryContainer getDatabaseQueryContainer(EventBus eventBus,
-			String datasource, String query, boolean insertable,
-			boolean updateable, boolean deleteable, List<String> primaryKeys,
-			String currentUsername, Map<String, String> displayPattern,
-			List<ContainerOrder> orderBys, FilterPolicy filterPolicy,
-			int pagelength, int exportPagelength, Integer sizeValidTimeout,
-			boolean orderByPrimaryKeys) {
-		ConnectionPool pool = connectionPoolFactory.getPool(datasource);
-		return new DatabaseQueryContainer(eventBus, datasource, query,
+            DatabaseQueryConfig config, String query, boolean insertable,
+            boolean updateable, boolean deleteable, List<String> primaryKeys,
+            String currentUsername, Map<String, String> displayPattern,
+            List<ContainerOrder> orderBys, FilterPolicy filterPolicy,
+            int pagelength, int exportPagelength, Integer sizeValidTimeout,
+            boolean orderByPrimaryKeys) {
+		ConnectionPool pool = connectionPoolFactory.getPool(config.getDatasource());
+		return new DatabaseQueryContainer(eventBus, config, query,
 				insertable, updateable, deleteable, primaryKeys, pool,
 				currentUsername, displayPattern, orderBys, filterPolicy,
 				pagelength, exportPagelength, sizeValidTimeout,
