@@ -610,6 +610,8 @@ public class TableColumn implements Serializable {
     public boolean isInsertColumn() {
         if (insertColumn != null) {
             return insertColumn;
+        } else if (sequence != null) {
+            return true;
         } else if (editableChecker != null) {
             // spalte potentiell editierbar
             return true;

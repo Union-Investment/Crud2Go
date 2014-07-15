@@ -153,6 +153,15 @@ public class TableColumnTest {
     }
 
     @Test
+    public void shouldReturnPkColumnWithSequenceAsInsertColumn() {
+        tableColumn = new TableColumn.Builder().name("name")
+                .editableDefault(false)
+                .sequence("MY_SEQ")
+                .build();
+        assertThat(tableColumn.isInsertColumn(), is(true));
+    }
+
+    @Test
     public void shouldReturnEditableColumnAsInsertColumn() {
         tableColumn = new TableColumn.Builder().name("name")
                 .primaryKey(false)
