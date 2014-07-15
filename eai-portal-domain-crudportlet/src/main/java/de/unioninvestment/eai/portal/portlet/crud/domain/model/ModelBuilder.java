@@ -715,6 +715,7 @@ public class ModelBuilder {
 					.hiddenStatus(getHiddenStatus(c)) //
 					.searchable(getSearchable(c)) //
 					.editableDefault(isEditable) //
+                    .sequence(c.getSequence()) //
                     .insertColumn(c.isInsert()) //
                     .updateColumn(c.isUpdate()) //
 					.primaryKey(c.isPrimaryKey()) //

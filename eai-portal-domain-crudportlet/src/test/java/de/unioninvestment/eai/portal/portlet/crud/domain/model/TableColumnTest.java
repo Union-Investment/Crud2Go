@@ -96,4 +96,78 @@ public class TableColumnTest {
 		tableColumn.addValidator(validator2Mock);
 		assertThat(tableColumn.getValidators().get(1), sameInstance(validator2Mock));
 	}
+
+    @Test
+    public void shouldReturnExplicitUpdateSetting() {
+        tableColumn = new TableColumn.Builder().name("name")
+                .editableDefault(false)
+                .updateColumn(true)
+                .build();
+        assertThat(tableColumn.isUpdateColumn(), is(true));
+    }
+
+    @Test
+    public void shouldReturnEditablePrimaryKeysAsNotToUpdate() {
+        tableColumn = new TableColumn.Builder().name("name")
+                .primaryKey(true)
+                .editableDefault(true)
+                .build();
+        assertThat(tableColumn.isUpdateColumn(), is(false));
+    }
+
+    @Test
+    public void shouldReturnEditableColumnAsUpdateColumn() {
+        tableColumn = new TableColumn.Builder().name("name")
+                .primaryKey(false)
+                .editableDefault(true)
+                .build();
+        assertThat(tableColumn.isUpdateColumn(), is(true));
+    }
+
+    @Test
+    public void shouldReturnDynamicallyEditableColumnAsUpdateColumn() {
+        tableColumn = new TableColumn.Builder().name("name")
+                .primaryKey(false)
+                .editableDefault(false)
+                .editableChecker(fieldEditableCheckerMock)
+                .build();
+        assertThat(tableColumn.isUpdateColumn(), is(true));
+    }
+
+    @Test
+    public void shouldReturnReadonlyColumnAsNotToInsert() {
+        tableColumn = new TableColumn.Builder().name("name")
+                .primaryKey(false)
+                .editableDefault(false)
+                .build();
+        assertThat(tableColumn.isInsertColumn(), is(false));
+    }
+
+    @Test
+    public void shouldReturnExplicitInsertSetting() {
+        tableColumn = new TableColumn.Builder().name("name")
+                .editableDefault(false)
+                .insertColumn(true)
+                .build();
+        assertThat(tableColumn.isInsertColumn(), is(true));
+    }
+
+    @Test
+    public void shouldReturnEditableColumnAsInsertColumn() {
+        tableColumn = new TableColumn.Builder().name("name")
+                .primaryKey(false)
+                .editableDefault(true)
+                .build();
+        assertThat(tableColumn.isInsertColumn(), is(true));
+    }
+
+    @Test
+    public void shouldReturnDynamicallyEditableColumnAsInsertColumn() {
+        tableColumn = new TableColumn.Builder().name("name")
+                .primaryKey(false)
+                .editableDefault(false)
+                .editableChecker(fieldEditableCheckerMock)
+                .build();
+        assertThat(tableColumn.isInsertColumn(), is(true));
+    }
 }

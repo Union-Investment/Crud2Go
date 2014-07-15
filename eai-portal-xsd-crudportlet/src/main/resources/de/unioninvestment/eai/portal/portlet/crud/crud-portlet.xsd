@@ -2545,6 +2545,14 @@
 						</documentation>
 					</annotation>
 				</attribute>
+                <attribute name="sequence" type="string">
+                    <annotation>
+                        <documentation>
+                            Gibt einen SEQUENCE-Namen an, der bei INSERTs statt zur Generierung des Feldwertes
+                            verwendet werden soll. Dies wird aktuell nur für Oracle unterstützt.
+                        </documentation>
+                    </annotation>
+                </attribute>
                 <attribute name="insert" type="boolean">
                     <annotation>
                         <documentation>

@@ -52,6 +52,7 @@ public class TableColumn implements Serializable {
 	private String longTitle;
 	private Hidden hiddenStatus;
 	private boolean editableDefault;
+    private String sequence;
 	private boolean multiline;
 	private Integer rows;
 	private boolean primaryKey;
@@ -115,6 +116,7 @@ public class TableColumn implements Serializable {
 		this.customColumnGenerator = builder.customColumnGenerator;
 		this.generatedValueGenerator = builder.generatedValueGenerator;
 		this.generatedType = builder.generatedType;
+        this.sequence = builder.sequence;
         this.updateColumn = builder.updateColumn;
         this.insertColumn = builder.insertColumn;
 	}
@@ -326,6 +328,7 @@ public class TableColumn implements Serializable {
 		protected Class<?> generatedType;
         protected Boolean updateColumn;
         protected Boolean insertColumn;
+        private String sequence;
 
         protected abstract T self();
 
@@ -382,6 +385,11 @@ public class TableColumn implements Serializable {
 			this.editableDefault = editableDefault;
 			return self();
 		}
+
+        public T sequence(String sequence) {
+            this.sequence = sequence;
+            return self();
+        }
 
 		/**
 		 * @param multiline
@@ -582,6 +590,10 @@ public class TableColumn implements Serializable {
 		validators.add(validator);
 	}
 
+    public String getSequence() {
+        return sequence;
+    }
+
     public boolean isUpdateColumn() {
         if (updateColumn != null) {
             return updateColumn;
@@ -604,5 +616,9 @@ public class TableColumn implements Serializable {
         } else {
             return editableDefault;
         }
+    }
+
+    public String toString() {
+        return "TableColumn[name=" + name + "]";
     }
 }

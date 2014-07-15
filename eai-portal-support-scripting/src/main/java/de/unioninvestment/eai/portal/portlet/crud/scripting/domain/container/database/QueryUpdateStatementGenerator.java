@@ -3,6 +3,7 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.da
 import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
 import groovy.lang.GString;
 import org.codehaus.groovy.runtime.GStringImpl;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created by cmj on 13.07.14.
@@ -22,7 +22,7 @@ public class QueryUpdateStatementGenerator implements QueryStatementGenerator {
     private final Table table;
 
     private String tablename;
-    private List<String> updateColumns;
+    private List<TableColumn> updateColumns;
     private List<String> idColumns;
 
     public QueryUpdateStatementGenerator(Table table) {
@@ -33,7 +33,7 @@ public class QueryUpdateStatementGenerator implements QueryStatementGenerator {
         if (tablename == null) {
             DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
             tablename = container.getTablename();
-            updateColumns = table.getColumns().getUpdateColumnNames();
+            updateColumns = table.getColumns().getUpdateColumns();
             idColumns = table.getColumns().getPrimaryKeyNames();
 
             checkArgument(tablename != null, "Cannot generate UPDATE statements - Table name needed");
@@ -47,15 +47,15 @@ public class QueryUpdateStatementGenerator implements QueryStatementGenerator {
 
         Map<String,Object> columnValues = row.getValues();
         Object[] values = new Object[updateColumns.size() + idColumns.size()];
-        ArrayList<String> strings = new ArrayList(values.length + 1);
+        String[] strings = new String[values.length];
+        int valueIdx = 0;
+        int stringIdx = 0;
 
         String head = "UPDATE " + QueryBuilder.quote(tablename) + " SET ";
 
-        int idx = 0;
-        for (String colName : updateColumns) {
-            values[idx++] = columnValues.get(colName);
-
-            strings.add(head + QueryBuilder.quote(colName) + "=");
+        for (TableColumn column : updateColumns) {
+            values[valueIdx++] = columnValues.get(column.getName());
+            strings[stringIdx++] = head + QueryBuilder.quote(column.getName()) + "=";
             head = ", ";
         }
 
@@ -63,12 +63,12 @@ public class QueryUpdateStatementGenerator implements QueryStatementGenerator {
 
         Map<String,Object> idValues = row.getId();
         for (String idName : idColumns) {
-            values[idx++] = idValues.get(idName);
+            values[valueIdx++] = idValues.get(idName);
 
-            strings.add(head + QueryBuilder.quote(idName) + "=");
+            strings[stringIdx++] = head + QueryBuilder.quote(idName) + "=";
             head = " AND ";
         }
 
-        return new GStringImpl(values, strings.toArray(new String[strings.size()]));
+        return new GStringImpl(values, strings);
     }
 }

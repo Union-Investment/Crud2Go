@@ -40,9 +40,8 @@ public class QueryDeleteStatementGenerator implements QueryStatementGenerator {
     public GString generateStatement(ScriptRow row) {
         updateConfig();
 
-        Map<String,Object> columnValues = row.getValues();
         Object[] values = new Object[idColumns.size()];
-        ArrayList<String> strings = new ArrayList(values.length + 1);
+        ArrayList<String> strings = new ArrayList<String>(values.length + 1);
 
         String head = "DELETE FROM " + QueryBuilder.quote(tablename) + " WHERE ";
 

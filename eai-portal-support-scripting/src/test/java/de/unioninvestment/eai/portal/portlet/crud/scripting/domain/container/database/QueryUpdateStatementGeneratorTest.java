@@ -3,6 +3,7 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.da
 import com.google.common.collect.ImmutableMap;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRowId;
@@ -38,6 +39,8 @@ public class QueryUpdateStatementGeneratorTest {
     private DatabaseQueryContainer containerMock;
     @Mock
     private ScriptRowId rowIdMock;
+    @Mock
+    private TableColumn col1Mock, col2Mock;
 
     @Before
     public void setup() {
@@ -46,7 +49,9 @@ public class QueryUpdateStatementGeneratorTest {
         when(tableMock.getColumns()).thenReturn(columnsMock);
         when(tableMock.getContainer()).thenReturn(containerMock);
         when(containerMock.getTablename()).thenReturn("MYTABLE");
-        when(columnsMock.getUpdateColumnNames()).thenReturn(asList("COL1", "COL2"));
+        when(columnsMock.getUpdateColumns()).thenReturn(asList(col1Mock, col2Mock));
+        when(col1Mock.getName()).thenReturn("COL1");
+        when(col2Mock.getName()).thenReturn("COL2");
         when(columnsMock.getPrimaryKeyNames()).thenReturn(asList("ID1","ID2"));
         when(rowMock.getValues()).thenReturn(ImmutableMap.<String,Object>of("COL1", "1", "COL2", 2));
         when(rowMock.getId()).thenReturn(rowIdMock);
@@ -83,7 +88,7 @@ public class QueryUpdateStatementGeneratorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailIfNothingUpdateable() {
-        when(columnsMock.getUpdateColumnNames()).thenReturn(Collections.<String>emptyList());
+        when(columnsMock.getUpdateColumns()).thenReturn(Collections.<TableColumn>emptyList());
         generator = new QueryUpdateStatementGenerator(tableMock);
         generator.generateStatement(rowMock);
     }

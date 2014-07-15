@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -382,7 +383,17 @@ public class TableColumnsTest {
 		assertThat(tableColumns.getLowerCaseColumnNamesMapping(), sameInstance(tableColumns.getLowerCaseColumnNamesMapping()));
 	}
 
-	private void prepareUppercaseColumns() {
+    @Test
+    public void shouldReturnUpdateColumns() {
+        assertThat(tableColumns.getUpdateColumns(), equalTo(asList(column2, column3, column4, column7)));
+    }
+
+    @Test
+    public void shouldReturnInsertColumns() {
+        assertThat(tableColumns.getUpdateColumns(), equalTo(asList(column2, column3, column4, column7)));
+    }
+
+    private void prepareUppercaseColumns() {
 		column1 = new TableColumn.Builder() //
 				.name("Name1") //
 				.build();

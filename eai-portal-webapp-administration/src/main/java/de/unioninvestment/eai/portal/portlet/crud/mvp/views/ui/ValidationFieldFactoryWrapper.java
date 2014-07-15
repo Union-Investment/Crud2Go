@@ -114,7 +114,14 @@ public class ValidationFieldFactoryWrapper implements CrudFieldFactory {
 			if (containerField.isRequired()) {
 
 				if (!field.isReadOnly()) {
-					field.setRequired(true);
+                    boolean required = true;
+                    if (columns != null) {
+                        TableColumn column = columns.get(propertyId.toString());
+                        if (column.getSequence() != null) {
+                            required = false;
+                        }
+                    }
+					field.setRequired(required);
 				}
 
 				if (field instanceof AbstractSelect) {

@@ -2,7 +2,7 @@
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
 	title="Beispiel für eine Tabelle auf Basis einer Query">
 	<page>
-		<table id="table" row-height="30">
+		<table id="table">
 			<database-query datasource="test" tablename="TEST_CRUD2">
 				<query><![CDATA[
 					SELECT * FROM test_crud2
@@ -12,7 +12,7 @@
                 <delete/>
 			</database-query>
 			<columns>
-				<column name="ID" title="ID" primary-key="true" editable="true" update="true"/>
+				<column name="ID" title="ID" primary-key="true" editable="true" sequence="TEST_CRUD2_SEQ" update="true"/>
 				<column name="CNUMBER5_2" title="Zahl" editable="true" />
 				<column name="CDATE" editable="false" />
 				<column name="CTIMESTAMP" />
