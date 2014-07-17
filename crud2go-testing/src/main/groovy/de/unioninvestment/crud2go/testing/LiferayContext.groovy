@@ -14,7 +14,7 @@ import javax.portlet.PortletSession;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
-import org.junit.rules.TestWatchman;
+import org.junit.rules.TestWatcher;
 import org.junit.runners.model.FrameworkMethod;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -37,7 +37,7 @@ import com.vaadin.util.CurrentInstance;
 import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortletService;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 
-class LiferayContext extends TestWatchman {
+class LiferayContext extends TestWatcher {
 
 	private String portletId;
 	private long communityId;
