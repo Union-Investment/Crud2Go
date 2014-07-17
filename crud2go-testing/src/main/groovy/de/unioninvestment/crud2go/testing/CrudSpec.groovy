@@ -74,7 +74,6 @@ public class CrudSpec extends Specification {
 	private static final String TEST_PORTLET_ID = "PortletId"
 	private static final long TEST_COMMUNITY_ID = 17808L
 
-	private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller()
 
 	protected EventBus eventBus
 	protected ConnectionPoolFactory connectionPoolFactory
