@@ -1,18 +1,6 @@
 package de.unioninvestment.crud2go.testing
 
-import groovy.lang.Closure
-import groovy.lang.Script
-
-import java.io.InputStream
-import java.util.Collection
-import java.util.Map
-import java.util.concurrent.ExecutorService
-
-import javax.xml.bind.JAXBException
-
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
-import org.springframework.test.context.TestContextManager
+import de.unioninvestment.crud2go.testing.db.TestConnectionPoolFactory
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -25,31 +13,13 @@ import org.springframework.test.context.TestContextManager
 import org.springframework.test.context.TestExecutionListeners
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener
-
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
-import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config
-import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException
-import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet
-import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler
-import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder
-import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler
 import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadContextProvider
 import de.unioninvestment.eai.portal.support.vaadin.context.Context
-import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus
-import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory
-
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
-import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder

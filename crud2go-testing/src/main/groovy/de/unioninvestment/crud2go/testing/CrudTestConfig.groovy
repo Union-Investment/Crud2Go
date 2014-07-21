@@ -8,11 +8,25 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet
  */
 class CrudTestConfig {
 
-    PortletConfig getConfig() {
+    private PortletConfig config
+    private ScriptPortlet portlet
+    private Script mainScript
 
+    CrudTestConfig(PortletConfig config, ScriptPortlet portlet, Script mainScript) {
+        this.mainScript = mainScript
+        this.portlet = portlet
+        this.config = config
+    }
+
+    PortletConfig getConfig() {
+        config
     }
 
     ScriptPortlet getPortlet() {
+        portlet
+    }
 
+    Script getMainScript() {
+        mainScript
     }
 }
