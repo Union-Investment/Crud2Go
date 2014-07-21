@@ -557,19 +557,9 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	
 	private void validateModelAfterLoading(ModelBuilder modelBuilder, 
 				Portlet portletDomain, ScriptPortlet scriptPortlet){
+
+		new CrudValidator(modelBuilder, portletDomain, scriptPortlet).validate();
 		
-		//TODO: yevtush move to separate class
-		List<Form> forms = modelBuilder.getForms();
-		
-		for(Form aForm:forms){
-			FormActions actions = aForm.getActions();
-			FormAction searchActionWrapper = actions.getSearchAction();
-			if(searchActionWrapper!=null){
-				SearchFormAction searchAction = (SearchFormAction)searchActionWrapper.getActionHandler();
-				new SearchFormActionValidator(searchAction, aForm).validate();
-			}
-			
-		}
 	}
 	
 	
