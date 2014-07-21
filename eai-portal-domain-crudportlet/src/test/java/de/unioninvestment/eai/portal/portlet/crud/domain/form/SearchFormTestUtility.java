@@ -28,7 +28,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.StaticOptionList;
 
-import static de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormTestUtility.*;
+
 
 public class SearchFormTestUtility {
 
