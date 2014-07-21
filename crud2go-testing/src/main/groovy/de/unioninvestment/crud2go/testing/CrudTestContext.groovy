@@ -26,6 +26,8 @@ class CrudTestContext {
 
     private ScriptCompiler scriptCompiler = new ScriptCompiler()
 
+    private Map configCache = [:]
+
     @Autowired
     private ConfigurationScriptsCompiler scriptsCompiler
 
@@ -50,6 +52,8 @@ class CrudTestContext {
     }
 
     CrudTestConfigBuilder configBuilder() {
-        applicationContext.getBean(CrudTestConfigBuilder)
+        def builder = applicationContext.getBean(CrudTestConfigBuilder)
+        builder.configCache = configCache
+        return builder
     }
 }
