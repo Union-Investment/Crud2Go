@@ -23,6 +23,10 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
@@ -75,10 +79,16 @@ import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
+import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormActionValidator;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormActions;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelPreferences;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.datasource.DatasourceInfos;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.events.ConfigurationUpdatedEvent;
@@ -92,8 +102,12 @@ import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BusinessException
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.Popup;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.PortletUriFragmentUtility;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.RequestProcessingLabel;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptForm;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptFormAction;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptSearchFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.crud.services.RequestProcessingLogService;
 import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortlet;
@@ -514,12 +528,15 @@ public class CrudUI extends LiferayUI implements PortletListener,
 					portletConfig, createModelPreferences());
 			portletDomain = modelBuilder.build();
 
+			
 			LOG.debug("Building scripting model");
 			ScriptModelBuilder scriptModelBuilder = scriptModelFactory
 					.getBuilder(eventBus, portletDomain,
 							modelBuilder.getModelToConfigMapping());
 
-			scriptModelBuilder.build();
+			ScriptPortlet scriptPortlet = scriptModelBuilder.build();
+
+			validateModelAfterLoading(modelBuilder, portletDomain, scriptPortlet);
 
 			LOG.debug("Building GUI");
 			portletGui = guiBuilder.build(portletDomain);
@@ -537,6 +554,25 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 		this.datasourceInfo.setPortletConfig(portletConfig.getPortletConfig());
 	}
+	
+	private void validateModelAfterLoading(ModelBuilder modelBuilder, 
+				Portlet portletDomain, ScriptPortlet scriptPortlet){
+		
+		//TODO: yevtush move to separate class
+		List<Form> forms = modelBuilder.getForms();
+		
+		for(Form aForm:forms){
+			FormActions actions = aForm.getActions();
+			FormAction searchActionWrapper = actions.getSearchAction();
+			if(searchActionWrapper!=null){
+				SearchFormAction searchAction = (SearchFormAction)searchActionWrapper.getActionHandler();
+				new SearchFormActionValidator(searchAction, aForm).validate();
+			}
+			
+		}
+	}
+	
+	
 
 	/**
 	 * @return model preferences taken from portlet instance preferences

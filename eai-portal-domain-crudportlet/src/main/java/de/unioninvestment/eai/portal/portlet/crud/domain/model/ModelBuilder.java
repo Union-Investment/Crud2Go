@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -387,7 +388,6 @@ public class ModelBuilder {
 	private FormActions buildFormActions(FormConfig formConfig) {
 		List<FormAction> actionList = new ArrayList<FormAction>();
 		for (FormActionConfig config : formConfig.getAction()) {
-
 			if (currentUser.hasPermission(config, Form.Permission.BUILD, true)) {
 				Triggers triggers = buildTriggers(config);
 
@@ -947,6 +947,10 @@ public class ModelBuilder {
 
 	CurrentUser getCurrentUser() {
 		return currentUser;
+	}
+	
+	public List<Form> getForms(){
+		return Collections.unmodifiableList(forms);
 	}
 
 }
