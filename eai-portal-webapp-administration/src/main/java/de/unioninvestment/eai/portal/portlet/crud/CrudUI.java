@@ -536,7 +536,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 			ScriptPortlet scriptPortlet = scriptModelBuilder.build();
 
-			validateModelAfterLoading(modelBuilder, portletDomain, scriptPortlet);
+			validateModelAfterLoading(modelBuilder, portletDomain, portletConfig);
 
 			LOG.debug("Building GUI");
 			portletGui = guiBuilder.build(portletDomain);
@@ -556,9 +556,9 @@ public class CrudUI extends LiferayUI implements PortletListener,
 	}
 	
 	private void validateModelAfterLoading(ModelBuilder modelBuilder, 
-				Portlet portletDomain, ScriptPortlet scriptPortlet){
+				Portlet portletDomain, Config portletConfig){
 
-		new CrudValidator(modelBuilder, portletDomain, scriptPortlet).validate();
+		new CrudValidator(modelBuilder, portletDomain, portletConfig).validate();
 		
 	}
 	
