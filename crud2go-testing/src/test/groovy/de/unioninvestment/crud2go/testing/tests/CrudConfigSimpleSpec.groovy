@@ -1,14 +1,11 @@
 package de.unioninvestment.crud2go.testing.tests
 
-import de.unioninvestment.crud2go.testing.CrudTestConfigSpec
-import de.unioninvestment.crud2go.testing.LiferayContext
-import org.junit.Rule
-import spock.lang.Specification
+import de.unioninvestment.crud2go.testing.spock.CrudConfigSpec
 
 /**
  * Created by cmj on 17.07.14.
  */
-class CrudTestConfigSimpleSpec extends CrudTestConfigSpec {
+class CrudConfigSimpleSpec extends CrudConfigSpec {
 
     def 'should load a crud2go configuration'() {
         when:
