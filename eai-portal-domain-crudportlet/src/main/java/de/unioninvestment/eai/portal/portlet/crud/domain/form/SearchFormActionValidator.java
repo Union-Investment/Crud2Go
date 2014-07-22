@@ -38,10 +38,7 @@ public class SearchFormActionValidator {
 	public void validate(){
 		List<Table> searchableTables = action.findSearchableTables(aForm);
 		for(Table aTable:searchableTables){
-				//TODO: yevtush - check with Carsten
-				//if (policyAllowsFiltering(aTable)) {
-					checkFiltersForTable(aForm, aTable);
-				//}
+			checkFiltersForTable(aForm, aTable);
 		}
 	}
 	
