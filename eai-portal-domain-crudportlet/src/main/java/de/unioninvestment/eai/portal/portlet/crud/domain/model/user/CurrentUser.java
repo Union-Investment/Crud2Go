@@ -74,7 +74,7 @@ public class CurrentUser extends User {
 		return currentUser() instanceof NamedUser;
 	}
 
-	private User currentUser() {
+	protected User currentUser() {
 		VaadinRequest currentRequest = VaadinService.getCurrentRequest();
 		if (currentRequest != null) {
 			String remoteUser = currentRequest.getRemoteUser();

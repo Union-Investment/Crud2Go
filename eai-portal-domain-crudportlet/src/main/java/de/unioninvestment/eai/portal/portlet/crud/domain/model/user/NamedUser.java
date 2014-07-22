@@ -53,7 +53,7 @@ public class NamedUser extends User {
 	 * @param portletRoles
 	 *            Alle Portalrollen
 	 */
-	NamedUser(String username, Set<Role> portletRoles) {
+	protected NamedUser(String username, Set<Role> portletRoles) {
 		this.name = username;
 		this.portletRoles = portletRoles;
 	}

@@ -39,4 +39,18 @@ class CrudConfigSimpleSpec extends CrudConfigSpec {
         portlet == instance.portlet
     }
 
+    def 'should allow modification of current user'() {
+    	when:
+		load {
+			 fromClasspath(this.class, 'testingSimpleConfig.xml')
+			 .currentUserName('carsten')
+			 currentUserRoles(['admin'])
+		}
+
+		then:
+		currentUser.name == 'carsten'
+		currentUser.roles == ['all', 'admin', 'authenticated'] as Set
+		portlet.elements.adminComponent != null
+    }
+    
 }

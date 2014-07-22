@@ -8,20 +8,31 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelPreferences
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.AnonymousUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.NamedUser
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory
+import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory
 import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus
+
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 
 import static org.mockito.Matchers.any
+import static org.mockito.Matchers.anyLong
+import static org.mockito.Matchers.anyString
+import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.when
+import static org.mockito.Mockito.mock
 
 /**
  * Created by cmj on 17.07.14.
@@ -29,8 +40,10 @@ import static org.mockito.Mockito.when
 class CrudTestConfigBuilder {
     private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller()
 
-    private static final String TEST_PORTLET_ID = "PortletId";
 
+	@Autowired
+	private Portal portalMock
+	
     @Autowired
     ScriptModelFactory scriptModelFactory
 
@@ -50,6 +63,11 @@ class CrudTestConfigBuilder {
     private UserFactory userFactoryMock
 
     Map configCache
+	
+	String currentUserName = null
+	Set currentUserRoles = []
+	Set portalRoles = [] 
+	Map<Long,String> roleId2Name = [:]
 
     private Resource configResource
 
@@ -63,10 +81,6 @@ class CrudTestConfigBuilder {
 
     CrudTestConfigBuilder() {
         eventBus = new EventBus();
-        resourceIds.put(TEST_PORTLET_ID + "_" + CrudTestContext.LIFERAY_COMMUNITY_ID + "_admin",
-                1l);
-        resourceIds.put(
-                TEST_PORTLET_ID + "_" + CrudTestContext.LIFERAY_COMMUNITY_ID + "_benutzer", 1l);
     }
 
     CrudTestConfigBuilder fromClasspath(Class<?> currentSpec, String configFilename) {
@@ -74,6 +88,16 @@ class CrudTestConfigBuilder {
         return this
     }
 
+	CrudTestConfigBuilder currentUserName(String name) {
+		this.currentUserName = name
+		return this
+	}
+	
+	CrudTestConfigBuilder currentUserRoles(Collection roles) {
+		this.currentUserRoles = roles as HashSet
+		return this
+	}
+	
     protected Portlet createModel(PortletConfig configuration) {
         ModelBuilder modelBuilder = createModelBuilder(configuration);
         return modelBuilder.build();
@@ -88,11 +112,18 @@ class CrudTestConfigBuilder {
     synchronized CrudTestConfig build() {
         PortletConfig portletConfig = prepareConfig()
 
-        when(userFactoryMock.getCurrentUser(any(Portlet))).thenReturn(new CurrentUser(['admin', 'user', 'guest']as HashSet))
+		long roleId = 1
+		portletConfig.roles?.role.each { role ->
+			roleId2Name[roleId] = role.name
+			resourceIds.put("${CrudTestContext.TEST_PORTLET_ID}_${CrudTestContext.LIFERAY_COMMUNITY_ID}_${role.name}".toString() , roleId++)
+        }
+		mockCurrentUser()
 
         ModelBuilder modelBuilder = createModelBuilder(portletConfig)
         Portlet portlet = modelBuilder.build()
 
+		// TODO add validation
+		
         Map mapping = modelBuilder.getModelToConfigMapping()
         ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
                 testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
@@ -100,6 +131,20 @@ class CrudTestConfigBuilder {
 
         return new CrudTestConfig(portletConfig, scriptModelBuilder.build(), scriptBuilder.mainScript)
     }
+
+	private mockCurrentUser() {
+		when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
+		when(portalMock.hasPermission(eq(currentUserName), eq("MEMBER"), eq(PortletRole.RESOURCE_KEY), anyString())).thenAnswer(
+                { InvocationOnMock inv ->
+                    long id = Long.parseLong(inv.arguments[3])
+                    currentUserRoles.contains(roleId2Name[id])
+                } as Answer);
+		when(userFactoryMock.getCurrentUser(any(Portlet))).thenAnswer({ InvocationOnMock inv ->
+			def user = currentUserName ? new NamedUser(currentUserName, inv.arguments[0].roles)
+							: new AnonymousUser()
+			return new CurrentTestUser(user)
+		} as Answer<CurrentUser>)
+	}
 
     private PortletConfig prepareConfig() {
         assert configResource: 'No configuration source given'

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
          title="Beispiel für Script-Container">
+    <roles>
+        <role name="admin"/>
+    </roles>
     <page>
         <form>
             <field name="CNUMBER5_2_NN" title="CNUMBER5_2_NN" />
@@ -25,7 +28,12 @@
             <script-container delegate="backend" />
             <action onExecution="it.table.refresh()" title="refresh"></action>
         </table>
-
+		<component id="adminComponent" generator="new Label('test')">
+			<permissions>
+				<allow roles="admin" action="build"/>
+				<deny roles="all" action="build"/>
+			</permissions>
+		</component>
     </page>
     <script><![CDATA[
 
