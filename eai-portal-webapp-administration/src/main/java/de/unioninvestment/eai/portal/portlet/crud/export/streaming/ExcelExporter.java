@@ -28,16 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.PrintSetup;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.DateFormatConverter;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -66,20 +57,6 @@ public class ExcelExporter implements Exporter {
 	protected String sheetName;
 
 	/**
-	 * Flag indicating whether we will add a totals row to the Table. A totals
-	 * row in the Table is typically implemented as a footer and therefore is
-	 * not part of the data source.
-	 */
-	protected boolean displayTotals;
-
-	/**
-	 * Flag indicating whether we should use table.formatPropertyValue() as the
-	 * cell value instead of the property value using the specified data
-	 * formats.
-	 */
-	protected boolean useTableFormatPropertyValue = false;
-
-	/**
 	 * The workbook that contains the sheet containing the report with the table
 	 * contents.
 	 */
@@ -87,7 +64,6 @@ public class ExcelExporter implements Exporter {
 
 	/** The Sheet object that will contain the table contents report. */
 	protected Sheet sheet;
-	protected Sheet hierarchicalTotalsSheet = null;
 
 	/** The POI cell creation helper. */
 	protected CreationHelper createHelper;
@@ -97,22 +73,11 @@ public class ExcelExporter implements Exporter {
 	 * Various styles that are used in report generation. These can be set by
 	 * the user if the default style is not desired to be used.
 	 */
-	protected CellStyle dateCellStyle, doubleCellStyle, columnHeaderCellStyle,
-			titleCellStyle;
+	protected CellStyle dateCellStyle, doubleCellStyle, columnHeaderCellStyle;
 	protected Short dateDataFormat, doubleDataFormat;
 	protected Map<Short, CellStyle> dataFormatCellStylesMap = new HashMap<Short, CellStyle>();
 
-	/**
-	 * The default row header style is null and, if row headers are specified
-	 * with setRowHeaders(true), then the column headers style is used.
-	 * setRowHeaderStyle() allows the user to specify a different row header
-	 * style.
-	 */
-	protected CellStyle rowHeaderCellStyle = null;
-
-	/** The totals row. */
-	protected Row titleRow, headerRow, totalsRow;
-	protected Row hierarchicalTotalsRow;
+	protected Row headerRow;
 	protected Map<Object, String> propertyExcelFormatMap = new HashMap<Object, String>();
 
 	private int currentRow;
@@ -156,14 +121,15 @@ public class ExcelExporter implements Exporter {
 			}
 			Cell sheetCell = sheetRow.createCell(col);
 
-			final CellStyle cs = getCellStyle(currentRow, col);
+			final CellStyle cs = getCellStyle(col);
 			sheetCell.setCellStyle(cs);
 			CellUtil.setAlignment(sheetCell, workbook, CellStyle.ALIGN_LEFT);
 
 			if (null != value) {
 				if (!isNumeric(columnType)) {
 					if (java.util.Date.class.isAssignableFrom(columnType)) {
-						sheetCell.setCellValue((Date) value);
+                        //noinspection ConstantConditions
+                        sheetCell.setCellValue((Date) value);
 					} else {
 						sheetCell.setCellValue(createHelper
 								.createRichTextString(value.toString()));
@@ -187,6 +153,9 @@ public class ExcelExporter implements Exporter {
 
 	@Override
 	public InputStream getInputStream() {
+        evaluateFormulas();
+        autoSizeAllColumns();
+
 		File tempFile = null;
 		FileOutputStream fileOut = null;
 		try {
@@ -202,21 +171,42 @@ public class ExcelExporter implements Exporter {
 
 		} finally {
 			try {
-				fileOut.close();
+                if (fileOut != null) {
+                    fileOut.close();
+                }
 			} catch (final IOException e) {
+                // ignore
 			}
-			tempFile.deleteOnExit();
+            if (tempFile != null) {
+                tempFile.deleteOnExit();
+            }
 		}
 	}
 
-	private void initialSheetSetup() {
+    private void initialSheetSetup() {
 		final PrintSetup printSetup = sheet.getPrintSetup();
 		printSetup.setLandscape(true);
 		sheet.setFitToPage(true);
 		sheet.setHorizontallyCenter(true);
 	}
 
-	private void addHeaderRow() {
+    private void evaluateFormulas() {
+        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+        evaluator.evaluateAll();
+    }
+
+    /**
+     * Final formatting of the sheet upon completion of writing the data. For example, we can only
+     * size the column widths once the data is in the report and the sheet knows how wide the data
+     * is.
+     */
+    protected void autoSizeAllColumns() {
+        for (int col = 0; col < columnNames.length; col++) {
+            sheet.autoSizeColumn(col);
+        }
+    }
+
+    private void addHeaderRow() {
 		headerRow = sheet.createRow(currentRow);
 		Cell headerCell;
 		headerRow.setHeightInPoints(40);
@@ -224,7 +214,7 @@ public class ExcelExporter implements Exporter {
 			headerCell = headerRow.createCell(col);
 			headerCell.setCellValue(createHelper
 					.createRichTextString(columnTitles[col]));
-			headerCell.setCellStyle(getColumnHeaderStyle(currentRow, col));
+			headerCell.setCellStyle(columnHeaderCellStyle);
 			CellUtil.setAlignment(headerCell, workbook, CellStyle.ALIGN_LEFT);
 		}
 	}
@@ -237,17 +227,13 @@ public class ExcelExporter implements Exporter {
 	 * styles, then this method should be overriden. The parameters passed in
 	 * are all potentially relevant items that may be used to determine what
 	 * formatting to return, that are not accessible globally.
-	 * 
-	 * @param rootItemId
-	 *            the root item id
-	 * @param row
-	 *            the row
+	 *
 	 * @param col
 	 *            the col
 	 * 
 	 * @return the data style
 	 */
-	private CellStyle getCellStyle(final int row, final int col) {
+	private CellStyle getCellStyle(final int col) {
 		final String columnName = columnNames[col];
 		// get the basic style for the type of cell (i.e. data, header, total)
 		// set the dataformat, regardless of the other style settings
@@ -273,28 +259,6 @@ public class ExcelExporter implements Exporter {
 		return dataFormatCellStylesMap.get(doubleDataFormat);
 	}
 
-	/**
-	 * This method is called by addTotalsRow() to determine what CellStyle to
-	 * use. By default we just return totalsCellStyle which is either set to the
-	 * default totals style, or can be overriden by the user using
-	 * setTotalsStyle(). However, if the user wants to have different total
-	 * items have different styles, then this method should be overriden. The
-	 * parameters passed in are all potentially relevant items that may be used
-	 * to determine what formatting to return, that are not accessible globally.
-	 * 
-	 * @param row
-	 *            the row
-	 * 
-	 * @param col
-	 *            the current column
-	 * 
-	 * 
-	 * @return the header style
-	 */
-	private CellStyle getColumnHeaderStyle(final int row, final int col) {
-		return columnHeaderCellStyle;
-	}
-
 	private void prepareDefaults() {
 		this.workbook = createWorkbook();
 		this.sheetName = "Table Export";
@@ -302,8 +266,8 @@ public class ExcelExporter implements Exporter {
 		this.sheet = this.workbook.createSheet(this.sheetName);
 		this.createHelper = this.workbook.getCreationHelper();
 		this.dataFormat = this.workbook.createDataFormat();
-		this.dateDataFormat = defaultDateDataFormat(this.workbook);
-		this.doubleDataFormat = defaultDoubleDataFormat(this.workbook);
+		this.dateDataFormat = defaultDateDataFormat();
+		this.doubleDataFormat = defaultDoubleDataFormat();
 
 		this.doubleCellStyle = defaultDataCellStyle(this.workbook);
 		this.doubleCellStyle.setDataFormat(doubleDataFormat);
@@ -315,7 +279,6 @@ public class ExcelExporter implements Exporter {
 				this.dateCellStyle);
 
 		this.columnHeaderCellStyle = defaultHeaderCellStyle(this.workbook);
-		this.titleCellStyle = defaultTitleCellStyle(this.workbook);
 	}
 
 	private Workbook createWorkbook() {
@@ -359,30 +322,6 @@ public class ExcelExporter implements Exporter {
 	}
 
 	/**
-	 * Gets the cell style used for report data..
-	 * 
-	 * 
-	 * @return the cell style
-	 */
-	private CellStyle getDoubleDataStyle() {
-		return this.doubleCellStyle;
-	}
-
-	private CellStyle getDateDataStyle() {
-		return this.dateCellStyle;
-	}
-
-	/**
-	 * Gets the cell style used for the report headers.
-	 * 
-	 * 
-	 * @return the column header style
-	 */
-	private CellStyle getColumnHeaderStyle() {
-		return this.columnHeaderCellStyle;
-	}
-
-	/**
 	 * Returns the default header style. Obtained from:
 	 * http://svn.apache.org/repos/asf/poi
 	 * /trunk/src/examples/src/org/apache/poi/ss/examples/TimesheetDemo.java
@@ -394,38 +333,17 @@ public class ExcelExporter implements Exporter {
 	 */
 	private CellStyle defaultHeaderCellStyle(final Workbook wb) {
 		CellStyle style;
-		final Font monthFont = wb.createFont();
-		monthFont.setFontHeightInPoints((short) 11);
-		monthFont.setColor(IndexedColors.WHITE.getIndex());
+		final Font headerFont = wb.createFont();
+        headerFont.setFontName("Arial");
+		headerFont.setFontHeightInPoints((short) 11);
+		headerFont.setColor(IndexedColors.WHITE.getIndex());
 		style = wb.createCellStyle();
 		style.setAlignment(CellStyle.ALIGN_CENTER);
 		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
 		style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
 		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
-		style.setFont(monthFont);
+		style.setFont(headerFont);
 		style.setWrapText(true);
-		return style;
-	}
-
-	/**
-	 * Returns the default title style. Obtained from:
-	 * http://svn.apache.org/repos/asf/poi
-	 * /trunk/src/examples/src/org/apache/poi/ss/examples/TimesheetDemo.java
-	 * 
-	 * @param wb
-	 *            the wb
-	 * 
-	 * @return the cell style
-	 */
-	private CellStyle defaultTitleCellStyle(final Workbook wb) {
-		CellStyle style;
-		final Font titleFont = wb.createFont();
-		titleFont.setFontHeightInPoints((short) 18);
-		titleFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
-		style = wb.createCellStyle();
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-		style.setFont(titleFont);
 		return style;
 	}
 
@@ -440,6 +358,9 @@ public class ExcelExporter implements Exporter {
 	 * @return the cell style
 	 */
 	private CellStyle defaultDataCellStyle(final Workbook wb) {
+        final Font dataFont = wb.createFont();
+        dataFont.setFontName("Arial");
+        dataFont.setFontHeightInPoints((short) 11);
 		CellStyle style;
 		style = wb.createCellStyle();
 		style.setAlignment(CellStyle.ALIGN_CENTER);
@@ -452,15 +373,16 @@ public class ExcelExporter implements Exporter {
 		style.setTopBorderColor(IndexedColors.BLACK.getIndex());
 		style.setBorderBottom(CellStyle.BORDER_THIN);
 		style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setFont(dataFont);
 		style.setDataFormat(doubleDataFormat);
 		return style;
 	}
 
-	private short defaultDoubleDataFormat(final Workbook wb) {
+	private short defaultDoubleDataFormat() {
 		return createHelper.createDataFormat().getFormat("0.00");
 	}
 
-	private short defaultDateDataFormat(final Workbook wb) {
+	private short defaultDateDataFormat() {
 		return createHelper.createDataFormat().getFormat("mm/dd/yyyy");
 	}
 
