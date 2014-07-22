@@ -40,7 +40,7 @@ public class PortletRole implements Serializable, Role {
 
 	public static final String RESOURCE_KEY = "de.unioninvestment.eai.portal.portlet.crud.domain.model.Role";
 
-	private Portal portal;
+	Portal portal;
 
 	private String name;
 	private final String primKey;
@@ -50,7 +50,7 @@ public class PortletRole implements Serializable, Role {
 	 * 
 	 * @param name
 	 *            Rollenname
-	 * @param porletInstanceId
+	 * @param primKey
 	 *            ID des Portlets
 	 */
 	public PortletRole(String name, long primKey) {

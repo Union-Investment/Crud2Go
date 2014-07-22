@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.*;
+import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -162,6 +163,9 @@ public class ModelBuilderTest {
 
 	@Rule
 	public LiferayContext liferayContext = new LiferayContext();
+
+    @Rule
+    public ContextMock contextMock = new ContextMock();
 
 	@Mock
 	private UserFactory userFactoryMock;

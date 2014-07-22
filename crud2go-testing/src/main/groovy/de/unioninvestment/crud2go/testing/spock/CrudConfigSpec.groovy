@@ -18,12 +18,12 @@ class CrudConfigSpec extends Specification {
 
     void load(String name) {
 		load {
-			fromClasspath this.getClass(), name
+			fromClasspath name
 		}
     }
 	
 	void load(Closure params) {
-		def builder = CrudTestContext.instance.configBuilder()
+		def builder = CrudTestContext.instance.configBuilder(this.getClass())
 		builder.with params
 		_instance = builder.build()
 	}

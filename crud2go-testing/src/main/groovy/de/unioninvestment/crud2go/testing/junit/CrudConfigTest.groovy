@@ -10,15 +10,20 @@ import org.junit.Rule
  */
 class CrudConfigTest {
     @Rule
-    public LiferayContext context = new LiferayContext()
+    public LiferayContext context = new LiferayContext(CrudTestContext.TEST_PORTLET_ID, CrudTestContext.LIFERAY_COMMUNITY_ID)
 
     CrudTestConfig _instance
 
     void load(String name) {
-        _instance = CrudTestContext.instance.configBuilder()
-                .fromClasspath(this.getClass(), name)
-				.validate()
-                .build()
+        load {
+            fromClasspath name
+        }
+    }
+
+    void load(Closure params) {
+        def builder = CrudTestContext.instance.configBuilder(this.getClass())
+        builder.with params
+        _instance = builder.build()
     }
 
     CrudTestConfig getInstance() {

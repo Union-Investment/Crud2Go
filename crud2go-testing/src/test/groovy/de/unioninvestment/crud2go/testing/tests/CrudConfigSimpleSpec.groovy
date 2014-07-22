@@ -42,8 +42,8 @@ class CrudConfigSimpleSpec extends CrudConfigSpec {
     def 'should allow modification of current user'() {
     	when:
 		load {
-			 fromClasspath(this.class, 'testingSimpleConfig.xml')
-			 .currentUserName('carsten')
+			 fromClasspath 'testingSimpleConfig.xml'
+			 currentUserName 'carsten'
 			 currentUserRoles(['admin'])
 		}
 

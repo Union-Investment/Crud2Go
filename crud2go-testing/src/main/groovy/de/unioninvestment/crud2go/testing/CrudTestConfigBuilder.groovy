@@ -40,7 +40,6 @@ import static org.mockito.Mockito.mock
 class CrudTestConfigBuilder {
     private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller()
 
-
 	@Autowired
 	private Portal portalMock
 	
@@ -62,6 +61,7 @@ class CrudTestConfigBuilder {
     @Autowired
     private UserFactory userFactoryMock
 
+    Class<?> testClass
     Map configCache
 	
 	String currentUserName = null
@@ -83,8 +83,8 @@ class CrudTestConfigBuilder {
         eventBus = new EventBus();
     }
 
-    CrudTestConfigBuilder fromClasspath(Class<?> currentSpec, String configFilename) {
-        configResource = new ClassPathResource(configFilename, currentSpec)
+    CrudTestConfigBuilder fromClasspath(String configFilename) {
+        configResource = new ClassPathResource(configFilename, testClass)
         return this
     }
 
@@ -93,7 +93,7 @@ class CrudTestConfigBuilder {
 		return this
 	}
 	
-	CrudTestConfigBuilder currentUserRoles(Collection roles) {
+	CrudTestConfigBuilder currentUserRoles(roles) {
 		this.currentUserRoles = roles as HashSet
 		return this
 	}

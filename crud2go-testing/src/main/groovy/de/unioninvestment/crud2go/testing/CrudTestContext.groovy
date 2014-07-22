@@ -52,9 +52,10 @@ class CrudTestContext {
         applicationContext.stop()
     }
 
-    CrudTestConfigBuilder configBuilder() {
+    CrudTestConfigBuilder configBuilder(Class<?> testClass) {
         def builder = applicationContext.getBean(CrudTestConfigBuilder)
         builder.configCache = configCache
+        builder.testClass = testClass
         return builder
     }
 }
