@@ -58,16 +58,16 @@ public class SearchFormActionValidator {
 			if(!action.filterMatchesTable(table, config)){
 				continue;
 			}
-			/*DBG*/ System.out.println("Got past matching");
+			//*DBG*/ System.out.println("Got past matching");
 			if (config instanceof ComparisonFilterConfig) {
 				ComparisonFilterConfig comparisonFilterConfig = (ComparisonFilterConfig) config;
 
-				/*DBG*/ System.out.println("Got comparison config "+config);
+				//*DBG*/ System.out.println("Got comparison config "+config);
 				
 				FormField formField = form.getFields().get(
 						comparisonFilterConfig.getField());
 
-				/*DBG*/ System.out.println("Got form field "+formField+ " config "+config);
+				//*DBG*/ System.out.println("Got form field "+formField+ " config "+config);
 				
 				if (formField instanceof MultiOptionListFormField) {
 					if (!(config instanceof EqualsFilterConfig)) {
@@ -80,7 +80,7 @@ public class SearchFormActionValidator {
 				String columnName = comparisonFilterConfig.getColumn();
 				Class<?> columnType = container.getType(columnName);
 				
-				/*DBG*/ System.out.println("Got column type " + columnType);
+				//*DBG*/ System.out.println("Got column type " + columnType);
 				
 				if (columnType == null) {
 					continue;

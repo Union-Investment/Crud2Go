@@ -2,18 +2,19 @@ package de.unioninvestment.eai.portal.portlet.crud;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.ComparisonFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SQLFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
-import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationVisitor;
 import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationProcessor;
+import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationVisitor;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormActionValidator;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
@@ -22,8 +23,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormActions;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet;
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 
 public class CrudValidator {
 	
@@ -88,7 +87,7 @@ public class CrudValidator {
 					}
 					
 					public void visitAfter(Object element) {
-						//println "visitAfter: ${element}"
+						//intentionally left empty
 					}
 				};
 
