@@ -122,12 +122,12 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 		/**
 		 * Entfernt eine zuvor per
-		 * {@link #addGeneratedColumn(String, ColumnGenerator)} hinzugefügte
+		 * {@link #addGeneratedColumn(String, String, ColumnGenerator)} hinzugefügte
 		 * Spalte aus der Tabelle.
 		 * 
 		 * @param columnName
 		 *            der Name der Spalte, die bei
-		 *            {@link #addGeneratedColumn(String, ColumnGenerator)}
+		 *            {@link #addGeneratedColumn(String, String, ColumnGenerator)}
 		 *            verwendet wurde
 		 */
 		void removeGeneratedColumn(String columnName);
@@ -147,14 +147,14 @@ public class Table extends Component implements Component.ExpandableComponent,
 		 * @param columnName
 		 *            der Spaltenname
 		 * @return {@code true} wenn die Tabelle eine per
-		 *         {@link #addGeneratedColumn(String, ColumnGenerator)}
+		 *         {@link #addGeneratedColumn(String, String, ColumnGenerator)}
 		 *         hinzugefügte Spalte hat
 		 */
 		public boolean hasGeneratedColumn(String columnName);
 
 		/**
 		 * Entfernt alle per
-		 * {@link #addGeneratedColumn(String, ColumnGenerator)} hinzugefügten
+		 * {@link #addGeneratedColumn(String, String, ColumnGenerator)} hinzugefügten
 		 * Spalten.
 		 */
 		public void clearAllGeneratedColumns();
@@ -177,7 +177,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 		 * 
 		 * @param visibleColumns
 		 *            die Liste der ColumnNames. Für eine per
-		 *            {@link #addGeneratedColumn(String, String, Closure)}
+		 *            {@link #addGeneratedColumn(String, String, com.vaadin.ui.Table.ColumnGenerator)}
 		 *            hinzugefügte Spalten ist das der String, der dabei als
 		 *            Argument {@code columnName} verwendet wurde, für eine
 		 *            deklarierte Spalte das Attribut {@code name}
@@ -213,7 +213,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	/**
 	 * Ein Wrapper für eine Reihe von
-	 * {@link Table.Presenter#addGeneratedColumn(String, com.vaadin.ui.Table.ColumnGenerator)}
+	 * {@link Table.Presenter#addGeneratedColumn(String, String, com.vaadin.ui.Table.ColumnGenerator)}
 	 * and {@link Table.Presenter#removeGeneratedColumn(String)} Anweisungen.
 	 * 
 	 * @author Bastian Krol
@@ -257,7 +257,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	private EventRouter<RowChangeEventHandler, RowChangeEvent> rowChangeEventRouter = new EventRouter<RowChangeEventHandler, RowChangeEvent>();
 	private EventRouter<InitializeEventHandler<Table>, InitializeEvent<Table>> initializeEventRouter = new EventRouter<InitializeEventHandler<Table>, InitializeEvent<Table>>();
 
-	Mode mode;
+	Mode mode = null;
 	DisplayMode displayMode = DisplayMode.TABLE;
 
 	private Set<ContainerRowId> selection = new LinkedHashSet<ContainerRowId>();
@@ -275,27 +275,31 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	/**
 	 * Konstruktor mit Parametern.
-	 * 
-	 * @param config
+	 *  @param config
 	 *            Konfiguration der Tabelle
 	 * @param tableColumns
 	 *            Tabellen-Spalten
-	 * @param editable
-	 *            Ob die Tabelle editierbar ist
-	 */
+     * @param container
+     *          the underlying data container
+     * @param editable
+     *          the editable status of the table itself (not dependent on container)
+     */
 	public Table(TableConfig config, TableColumns tableColumns,
-			boolean editable, boolean directEdit) {
+                 DataContainer container, boolean editable, boolean directEdit) {
 		this.config = config;
 		this.editable = editable;
 		this.directEdit = directEdit;
-		this.mode = directEdit && editable ? Mode.EDIT : Mode.VIEW;
 		this.selectionMode = SelectionMode.valueOf(config.getSelectionMode().name());
 
 		this.columns = tableColumns;
 		if (columns != null) {
 			columns.setTable(this);
 		}
-		
+
+        this.container = container;
+        if (selectionMode == SelectionMode.DISABLED && isEditable()) {
+            LOGGER.warn("Table is editable but selection mode is 'disabled'");
+        }
 	}
 
 	/**
@@ -383,13 +387,6 @@ public class Table extends Component implements Component.ExpandableComponent,
 		return config.isSortable();
 	}
 
-	void setContainer(DataContainer container) {
-		this.container = container;
-		if (selectionMode == SelectionMode.DISABLED && isEditable()) {
-			LOGGER.warn("Table is editable but selection mode is 'disabled'");
-		}
-	}
-
 	public DataContainer getContainer() {
 		return container;
 	}
@@ -428,7 +425,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 */
 	public void doubleClick(ContainerRow row) {
 		if (config.isEditForm()
-				&& (doubleClickEventRouter.getRegisteredHandlerSize() == 0 || mode == Mode.EDIT)) {
+				&& (doubleClickEventRouter.getRegisteredHandlerSize() == 0 || getMode() == Mode.EDIT)) {
 
 			changeDisplayMode(DisplayMode.FORM);
 			changeSelection(singleton(row.getId()));
@@ -443,7 +440,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	}
 
 	public void changeMode() {
-		Mode newMode = mode == Mode.VIEW ? Mode.EDIT : Mode.VIEW;
+		Mode newMode = getMode() == Mode.VIEW ? Mode.EDIT : Mode.VIEW;
 		changeMode(newMode);
 	}
 
@@ -455,7 +452,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 		if (directEdit) {
 			throw new IllegalStateException(
 					"Cannot change mode if direct editing is enabled");
-		} else if (this.mode != mode) {
+		} else if (getMode() != mode) {
 			this.mode = mode;
 			editModeChangeEventRouter
 					.fireEvent(new ModeChangeEvent<Table, Mode>(this, mode));
@@ -469,7 +466,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	}
 
 	/**
-	 * @param mode
+	 * @param newDisplayMode
 	 *            der im View gesetzte Modus
 	 */
 	public void changeDisplayMode(DisplayMode newDisplayMode) {
@@ -546,7 +543,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 		ContainerRow containerRow = container.getRow(uncommittedRowId, false,
 				false);
 		rowChangeEventRouter.fireEvent(new RowChangeEvent(containerRow,
-				changedValues));
+                changedValues));
 	}
 
 	public void validateIfChanged(ContainerRowId uncommittedRowId)
@@ -606,8 +603,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 	/**
 	 * Prüft, ob die aktuelle Zeile gelöscht werden darf.
 	 * 
-	 * @param row
-	 *            die Zeile
+	 * @param rowId
+	 *            die ID der Zeile
 	 * @return ob die aktuelle Zeile gelöscht werden darf
 	 */
 	public boolean isRowDeletable(ContainerRowId rowId) {
@@ -648,7 +645,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	}
 
 	/**
-	 * @return
+	 * @return if the table is exportable
 	 * @deprecated Export should no longer be configured globally, but instead
 	 *             use special export-actions.
 	 * @see TableAction#isExportAction()
@@ -658,7 +655,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	}
 
 	/**
-	 * @return
+	 * @return the export format
 	 * @deprecated Export should no longer be configured globally, but instead
 	 *             use special export-actions.
 	 * @see TableAction#getExportType()
@@ -709,12 +706,12 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	/**
 	 * Entfernt eine zuvor per
-	 * {@link #addGeneratedColumn(String, ColumnGenerator)} hinzugefügte Spalte
+	 * {@link #addGeneratedColumn(String, String, ColumnGenerator)} hinzugefügte Spalte
 	 * aus der Tabelle.
 	 * 
 	 * @param columnId
 	 *            die ID der Spalte, die bei
-	 *            {@link #addGeneratedColumn(String, ColumnGenerator)} verwendet
+	 *            {@link #addGeneratedColumn(String, String, ColumnGenerator)} verwendet
 	 *            wurde
 	 */
 	public void removeGeneratedColumn(String columnId) {
@@ -762,7 +759,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @param columnId
 	 *            die Spalten-ID/Spalten-Überschrift.
 	 * @return {@code true} wenn die Tabelle eine per
-	 *         {@link #addGeneratedColumn(String, ColumnGenerator)} hinzugefügte
+	 *         {@link #addGeneratedColumn(String, String, ColumnGenerator)} hinzugefügte
 	 *         Spalte hat.
 	 */
 	public boolean hasGeneratedColumn(String columnId) {
@@ -770,7 +767,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	}
 
 	/**
-	 * Entfernt alle per {@link #addGeneratedColumn(String, ColumnGenerator)}
+	 * Entfernt alle per {@link #addGeneratedColumn(String, String, ColumnGenerator)}
 	 * hinzugefügten Spalten.
 	 */
 	public void clearAllGeneratedColumns() {
@@ -797,7 +794,7 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * 
 	 * @param visibleColumns
 	 *            die Liste der ColumnNames. Für eine per
-	 *            {@link #addGeneratedColumn(String, String, Closure)}
+	 *            {@link #addGeneratedColumn(String, String, ColumnGenerator)}
 	 *            hinzugefügte Spalten ist das der String, der dabei als
 	 *            Argument {@code columnName} verwendet wurde, für eine
 	 *            deklarierte Spalte das Attribut {@code name}
@@ -862,7 +859,11 @@ public class Table extends Component implements Component.ExpandableComponent,
 	 * @return the current edit mode
 	 */
 	public Mode getMode() {
-		return mode;
+        if (mode == null) {
+            // lazy initialize mode for easier testing
+            mode = directEdit && isEditable() ? Mode.EDIT : Mode.VIEW;
+        }
+        return mode;
 	}
 
 	/**
