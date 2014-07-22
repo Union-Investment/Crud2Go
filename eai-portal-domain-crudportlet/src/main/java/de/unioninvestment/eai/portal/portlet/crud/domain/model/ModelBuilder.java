@@ -425,13 +425,12 @@ public class ModelBuilder {
 		FormField[] fieldList = new FormField[formConfig.getField().size()];
 		int i = 0;
 		for (FormFieldConfig config : formConfig.getField()) {
-			FormField formField = null;
+			FormField formField;
 			if (config.getSelect() != null) {
 				OptionList optionList = buildOptionList(config.getSelect(),
 						null);
 
-				FormSelectConfig formSelectConfig = (FormSelectConfig) config
-						.getSelect();
+				FormSelectConfig formSelectConfig = config.getSelect();
 
 				if (formSelectConfig.isMultiSelect()) {
 					formField = new MultiOptionListFormField(config, optionList);
@@ -503,21 +502,21 @@ public class ModelBuilder {
 			TableColumns tableColumns = buildColumns(tableConfig.getColumns(),
 					dataSource);
 
+			DataContainer container = buildContainer(tableConfig, tableColumns);
+
 			boolean editable = currentUser.hasPermission(tableConfig,
 					Table.Permission.EDIT, tableConfig.isEditable());
 
 			boolean directEdit = calculateDirectEditFlag(directEditDefault,
 					tableConfig.isDirectEdit(), tableConfig.getOnDoubleClick());
 
-			Table table = new Table(tableConfig, tableColumns, editable,
+			Table table = new Table(tableConfig, tableColumns, container, editable,
 					directEdit);
 			mappings.put(table, tableConfig);
 			portlet.addElementById(tableConfig.getId(), table);
 
 			table.setActions(buildTableActions(tableConfig.getAction(), table));
-			DataContainer container = buildContainer(tableConfig, tableColumns);
 
-			table.setContainer(container);
 			return table;
 		}
 
@@ -669,7 +668,7 @@ public class ModelBuilder {
 
 			// Build
 
-			Init<?> builder = null;
+			Init<?> builder;
 
 			if (c.getSelect() != null) {
 				OptionList optionList = null;
@@ -822,13 +821,10 @@ public class ModelBuilder {
 
 		List<ContainerOrder> defaultOrder = getDefaultOrder(restContainer);
 
-		ReSTContainer container = factory
+        // returns container where delegate is unset, will be set in ScriptModelBuilder later
+		return factory
 				.getReSTContainer(eventBus, formatPattern, defaultOrder,
 						extractFilterPolicy(restContainer));
-
-		// delegate is unset, will be set in ScriptModelBuilder later
-
-		return container;
 	}
 
 	private DataContainer buildJmxContainer(JmxContainerConfig config,
@@ -924,8 +920,8 @@ public class ModelBuilder {
 		if (containerConfig.getDefaultOrder() != null) {
 			for (OrderConfig order : containerConfig.getDefaultOrder()
 					.getOrder()) {
-				defaultOrder.add(new ContainerOrder(order.getColumn(), order
-						.getDirection().value().equals("desc") ? false : true));
+				defaultOrder.add(new ContainerOrder(order.getColumn(),
+                        !order.getDirection().value().equals("desc")));
 			}
 		}
 		return defaultOrder;

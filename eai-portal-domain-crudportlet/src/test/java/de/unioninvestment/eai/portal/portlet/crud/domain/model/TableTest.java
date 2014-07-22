@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -26,6 +27,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -155,8 +157,7 @@ public class TableTest {
 
 		config.setRowHeight(20);
 
-		table = new Table(config, tableColumns, true, false);
-		table.setContainer(containerMock);
+		table = new Table(config, tableColumns, containerMock, true, false);
 		table.setPresenter(presenterMock);
 		table.setPanel(panelMock);
 
@@ -176,11 +177,11 @@ public class TableTest {
 			boolean containerInsertable, boolean containerUpdateable,
 			boolean containerDeletable, boolean expectEditable) {
 
-		table = new Table(config, tableColumns, tableEditable, false);
 		when(containerMock.isInsertable()).thenReturn(containerInsertable);
 		when(containerMock.isUpdateable()).thenReturn(containerUpdateable);
 		when(containerMock.isDeleteable()).thenReturn(containerDeletable);
-		table.setContainer(containerMock);
+		table = new Table(config, tableColumns, containerMock, tableEditable, false);
+        assertEquals(expectEditable, table.isEditable());
 	}
 
 	@Test
@@ -203,7 +204,7 @@ public class TableTest {
 		when(containerMock.isUpdateable()).thenReturn(true);
 		assertThat(table.isRowEditable(containerRowMock), is(true));
 
-		table = new Table(config, tableColumns, false, false);
+		table = new Table(config, tableColumns, containerMock, false, false);
 
 		assertThat(table.isRowEditable(containerRowMock), is(false));
 	}
@@ -213,7 +214,7 @@ public class TableTest {
 		when(containerMock.getRow(containerRowIdMock, false, true)).thenReturn(
 				containerRowMock);
 		when(rowDeletableCheckerMock.isDeletable(containerRowMock)).thenReturn(
-				false);
+                false);
 		table.setRowDeletableChecker(rowDeletableCheckerMock);
 
 		boolean result = table.isRowDeletable(containerRowIdMock);
@@ -225,7 +226,7 @@ public class TableTest {
 
 	@Test
 	public void shouldReturnRowIsDeletableAsDefault() {
-		table = new Table(config, tableColumns, false, true);
+		table = new Table(config, tableColumns, containerMock, false, true);
 		assertThat(table.isRowDeletable(containerRowIdMock), is(true));
 	}
 
@@ -257,7 +258,7 @@ public class TableTest {
 				modeChangeEventCaptor.capture());
 
 		assertThat(modeChangeEventCaptor.getValue().getSource(),
-				is((Object) table));
+                is((Object) table));
 		assertThat(modeChangeEventCaptor.getValue().getMode(),
 				is((Object) Mode.EDIT));
 	}
@@ -283,7 +284,7 @@ public class TableTest {
 	@Test
 	public void shouldChangeDisplayModes() {
 		config.setEditForm(true);
-		table = new Table(config, tableColumns, true, false);
+		table = new Table(config, tableColumns, containerMock, true, false);
 
 		assertThat(table.getDisplayMode(), is(DisplayMode.TABLE));
 		table.changeDisplayMode();
@@ -295,7 +296,7 @@ public class TableTest {
 	@Test
 	public void shouldFireEventOnDisplayModeChange() {
 		config.setEditForm(true);
-		table = new Table(config, tableColumns, true, false);
+		table = new Table(config, tableColumns, containerMock, true, false);
 		table.addDisplayModeChangeEventHandler(displayModeChangeEventHandlerMock);
 		table.changeDisplayMode(DisplayMode.FORM);
 		verifyDisplayModeChangeEvent(table, DisplayMode.FORM);
@@ -304,7 +305,7 @@ public class TableTest {
 	@Test(expected = IllegalStateException.class)
 	public void shouldFailChangingDisplayModesIfFormEditIsNotEnabled() {
 		config.setEditForm(false);
-		table = new Table(config, tableColumns, true, false);
+		table = new Table(config, tableColumns, containerMock, true, false);
 		table.changeDisplayMode(DisplayMode.FORM);
 	}
 
@@ -320,7 +321,7 @@ public class TableTest {
 
 		table.addSelectionEventHandler(selectionChangeListenerMock);
 
-		when(rowIdMock.getId()).thenReturn(new Object[] { 1, 2 });
+		when(rowIdMock.getId()).thenReturn(new Object[]{1, 2});
 		selectionRowId.add(new DatabaseContainerRowId(rowIdMock, asList("ID",
 				"INDEX")));
 		table.changeSelection(selectionRowId);
@@ -331,11 +332,11 @@ public class TableTest {
 	private void verifySelectionChangeEvent(Table expectedTable,
 			Set<ContainerRowId> expectedSelection) {
 		verify(selectionChangeListenerMock).onSelectionChange(
-				selectionChangeEventCaptor.capture());
+                selectionChangeEventCaptor.capture());
 		assertThat(selectionChangeEventCaptor.getValue().getSource(),
-				is((Object) expectedTable));
+                is((Object) expectedTable));
 		assertThat(selectionChangeEventCaptor.getValue().getSelection(),
-				equalTo(expectedSelection));
+                equalTo(expectedSelection));
 	}
 
 	@Test
@@ -348,11 +349,11 @@ public class TableTest {
 	private void verifyDoubleClickEvent(Table expectedTable,
 			ContainerRow expectedRow) {
 		verify(doubleClickEventHandler).onDoubleClick(
-				tableDoubleClickEventCaptor.capture());
+                tableDoubleClickEventCaptor.capture());
 		assertThat(tableDoubleClickEventCaptor.getValue().getSource(),
-				is(expectedTable));
+                is(expectedTable));
 		assertThat(tableDoubleClickEventCaptor.getValue().getRow(),
-				is(expectedRow));
+                is(expectedRow));
 	}
 
 	@Test
@@ -366,11 +367,11 @@ public class TableTest {
 		verifySwitchToFormViewAndSelectionChangeOnDoubleClick(Mode.VIEW, false,
 				false, false, false, false);
 		verifySwitchToFormViewAndSelectionChangeOnDoubleClick(Mode.VIEW, true,
-				true, true, false, false);
+                true, true, false, false);
 		verifySwitchToFormViewAndSelectionChangeOnDoubleClick(Mode.VIEW, false,
-				true, false, true, true);
+                true, false, true, true);
 		verifySwitchToFormViewAndSelectionChangeOnDoubleClick(Mode.EDIT, true,
-				true, false, true, false); // selection already changed
+                true, false, true, false); // selection already changed
 	}
 
 	private void verifySwitchToFormViewAndSelectionChangeOnDoubleClick(
@@ -386,7 +387,7 @@ public class TableTest {
 		table.mode = mode;
 		table.displayMode = DisplayMode.TABLE;
 		reset(doubleClickEventHandler, displayModeChangeEventHandlerMock,
-				selectionChangeListenerMock);
+                selectionChangeListenerMock);
 
 		table.doubleClick(containerRowMock);
 
@@ -410,11 +411,11 @@ public class TableTest {
 	private void verifyDisplayModeChangeEvent(Table expectedTable,
 			DisplayMode expectedDisplayMode) {
 		verify(displayModeChangeEventHandlerMock).onModeChange(
-				displayModeChangeEventCaptor.capture());
+                displayModeChangeEventCaptor.capture());
 		assertThat(displayModeChangeEventCaptor.getValue().getSource(),
 				is(expectedTable));
 		assertThat(displayModeChangeEventCaptor.getValue().getMode(),
-				is(expectedDisplayMode));
+                is(expectedDisplayMode));
 	}
 
 	@Test
@@ -505,14 +506,14 @@ public class TableTest {
 
 	@Test
 	public void shouldDelegateSetVisibleColumns() {
-		List<String> visibleColumns = Arrays.asList(new String[] { "1", "2" });
+		List<String> visibleColumns = asList("1", "2");
 		table.setVisibleColumns(visibleColumns);
 		verify(presenterMock).setVisibleColumns(visibleColumns);
 	}
 
 	@Test
 	public void shouldDelegateCreateNewRow() {
-		Map<String, Object> values = Collections.<String, Object> emptyMap();
+		Map<String, Object> values = emptyMap();
 		table.createNewRow(values);
 		verify(presenterMock).createNewRow(values);
 	}
@@ -530,20 +531,29 @@ public class TableTest {
 
 	@Test
 	public void shouldStartInEditModeIfSeparateModeIsDisabled() {
-		table = new Table(config, tableColumns, true, true);
+        when(containerMock.isInsertable()).thenReturn(true);
+		table = new Table(config, tableColumns, containerMock, true, true);
 		assertThat(table.getMode(), is(Mode.EDIT));
 	}
 
-	@Test
+    @Test
+    public void shouldNotStartInEditModeIfSeparateModeIsDisabledButContainerIsReadonly() {
+        when(containerMock.isInsertable()).thenReturn(false);
+        when(containerMock.isUpdateable()).thenReturn(false);
+        when(containerMock.isDeleteable()).thenReturn(false);
+        table = new Table(config, tableColumns, containerMock, true, true);
+        assertThat(table.getMode(), is(Mode.VIEW));
+    }
+
+    @Test
 	public void shouldStartInViewModeIfSeparateModeIsDisabledAndNotEditable() {
-		table = new Table(config, tableColumns, false, true);
+		table = new Table(config, tableColumns, containerMock, false, true);
 		assertThat(table.getMode(), is(Mode.VIEW));
 	}
 	
 	@Test
 	public void shouldPassThroughContainerStreamIfNoGeneratedColumns() {
-		table = new Table(config, null, true, false);
-		table.setContainer(containerMock);
+		table = new Table(config, null, containerMock, true, false);
 
 		when(containerMock.getStream()).thenReturn(containerStreamMock);
 		assertThat(table.getStream(), sameInstance(containerStreamMock));
