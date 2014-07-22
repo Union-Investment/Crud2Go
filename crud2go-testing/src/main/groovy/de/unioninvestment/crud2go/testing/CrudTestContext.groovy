@@ -20,6 +20,7 @@ import groovy.transform.PackageScope
 @Singleton(lazy=true)
 class CrudTestContext {
 
+    static final String TEST_PORTLET_ID = "PortletId"
     static final long LIFERAY_COMMUNITY_ID = 17808L
 
     private ConfigurableApplicationContext applicationContext

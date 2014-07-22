@@ -17,6 +17,7 @@ class CrudConfigTest {
     void load(String name) {
         _instance = CrudTestContext.instance.configBuilder()
                 .fromClasspath(this.getClass(), name)
+				.validate()
                 .build()
     }
 

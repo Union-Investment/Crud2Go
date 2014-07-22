@@ -12,6 +12,6 @@ public class DirectoryWalkerTest {
 			fileList << obj
 		}
 		
-		assert fileList.size() >= 2
+		assert fileList.size() >= 1
 	}
 }
