@@ -70,11 +70,13 @@ class CrudTestConfigBuilder {
     Class<?> testClass
     Map configCache
 	
-	String currentUserName = null
-	Set currentUserRoles = []
-	Set portalRoles = [] 
+	private String currentUserName = null
+    private Set currentUserRoles = []
+    private Set portalRoles = []
 	Map<Long,String> roleId2Name = [:]
-    boolean ignoreCachedEntry = false
+
+    private boolean ignoreCachedEntry = false
+    private boolean validationEnabled = false
 
     private Resource configResource
 
@@ -140,7 +142,9 @@ class CrudTestConfigBuilder {
         ModelBuilder modelBuilder = createModelBuilder(portletConfig)
         Portlet portlet = modelBuilder.build()
 
-		// TODO add validation
+        if (validationEnabled) {
+		    // TODO add validation
+        }
 		
         Map mapping = modelBuilder.getModelToConfigMapping()
         ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
@@ -167,8 +171,14 @@ class CrudTestConfigBuilder {
 		} as Answer<CurrentUser>)
 	}
 
-    void recompile() {
+    CrudTestConfigBuilder recompile() {
         ignoreCachedEntry = true
+        return this
+    }
+
+    CrudTestConfigBuilder validate() {
+        validationEnabled = true
+        return this
     }
 
     private PortletConfig prepareConfig() {

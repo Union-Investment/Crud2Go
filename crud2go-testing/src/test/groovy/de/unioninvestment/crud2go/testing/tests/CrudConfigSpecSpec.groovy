@@ -84,5 +84,20 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         currentUser.authenticated == true
 		portlet.elements.adminComponent != null
     }
-    
+
+    def 'should allow optional additional validation'() {
+        when:
+        load {
+            fromClasspath 'testingSimpleConfig.xml'
+            validate()
+        }
+        ScriptCurrentUser currentUser = instance.mainScript.currentUser
+
+        then:
+        currentUser.name == 'carsten'
+        currentUser.roles == ['all', 'admin', 'authenticated'] as Set
+        currentUser.authenticated == true
+        portlet.elements.adminComponent != null
+    }
+
 }
