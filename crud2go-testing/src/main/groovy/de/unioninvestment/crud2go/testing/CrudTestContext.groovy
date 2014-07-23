@@ -58,4 +58,11 @@ class CrudTestContext {
         builder.testClass = testClass
         return builder
     }
+
+    CrudTestConfig load(Class<?> testClass, Closure params) {
+        def builder = CrudTestContext.instance.configBuilder(testClass)
+        builder.with params
+        return builder.build()
+    }
+
 }

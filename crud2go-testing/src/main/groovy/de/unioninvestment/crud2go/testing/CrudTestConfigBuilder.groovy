@@ -25,6 +25,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 
 import static org.mockito.Matchers.any
@@ -39,6 +40,11 @@ import static org.mockito.Mockito.mock
  */
 class CrudTestConfigBuilder {
     private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller()
+
+    private class CacheEntry {
+        long compileTime
+        PortletConfig config
+    }
 
 	@Autowired
 	private Portal portalMock
@@ -68,6 +74,7 @@ class CrudTestConfigBuilder {
 	Set currentUserRoles = []
 	Set portalRoles = [] 
 	Map<Long,String> roleId2Name = [:]
+    boolean ignoreCachedEntry = false
 
     private Resource configResource
 
@@ -79,6 +86,8 @@ class CrudTestConfigBuilder {
 
     private ModelPreferences preferences = new ModelPreferences()
 
+    private Statistics statistics = new Statistics()
+
     CrudTestConfigBuilder() {
         eventBus = new EventBus();
     }
@@ -88,7 +97,13 @@ class CrudTestConfigBuilder {
         return this
     }
 
-	CrudTestConfigBuilder currentUserName(String name) {
+    CrudTestConfigBuilder fromFile(String configFilename) {
+        configResource = new FileSystemResource(configFilename)
+        return this
+    }
+
+
+    CrudTestConfigBuilder currentUserName(String name) {
 		this.currentUserName = name
 		return this
 	}
@@ -110,8 +125,11 @@ class CrudTestConfigBuilder {
 
 
     synchronized CrudTestConfig build() {
+        long startTime = System.currentTimeMillis()
+
         PortletConfig portletConfig = prepareConfig()
 
+        long postBuildStartTime = System.currentTimeMillis()
 		long roleId = 1
 		portletConfig.roles?.role.each { role ->
 			roleId2Name[roleId] = role.name
@@ -128,8 +146,11 @@ class CrudTestConfigBuilder {
         ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
                 testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
                 portlet, mapping)
+        long endTime = System.currentTimeMillis()
+        statistics.postCompileTime = endTime - postBuildStartTime
+        statistics.buildTime = endTime - startTime
 
-        return new CrudTestConfig(portletConfig, scriptModelBuilder.build(), scriptBuilder.mainScript)
+        return new CrudTestConfig(portletConfig, scriptModelBuilder.build(), scriptBuilder.mainScript, statistics)
     }
 
 	private mockCurrentUser() {
@@ -146,17 +167,24 @@ class CrudTestConfigBuilder {
 		} as Answer<CurrentUser>)
 	}
 
+    void recompile() {
+        ignoreCachedEntry = true
+    }
+
     private PortletConfig prepareConfig() {
         assert configResource: 'No configuration source given'
 
-        def existingConfig = configCache[configResource.URL]
-        if (existingConfig) {
-            return existingConfig
+        CacheEntry existingEntry = configCache[configResource.URL]
+        if (existingEntry && !ignoreCachedEntry) {
+            statistics.compileTime = existingEntry.compileTime
+            return existingEntry.config
         } else {
             assert configResource.exists(): 'Configuration source does not exist'
+            long compileStartTime = System.currentTimeMillis()
             PortletConfig portletConfig = unmarshaller.unmarshal(configResource.inputStream)
             scriptsCompiler.compileAllScripts(portletConfig)
-            configCache[configResource.URL] = portletConfig
+            statistics.compileTime = System.currentTimeMillis() - compileStartTime
+            configCache[configResource.URL] = new CacheEntry(compileTime: statistics.compileTime, config: portletConfig)
             return portletConfig
         }
     }

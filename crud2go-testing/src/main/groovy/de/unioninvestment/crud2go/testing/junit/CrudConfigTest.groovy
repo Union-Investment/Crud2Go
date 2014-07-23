@@ -15,15 +15,13 @@ class CrudConfigTest {
     CrudTestConfig _instance
 
     void load(String name) {
-        load {
+        _instance = CrudTestContext.instance.load(this.class) {
             fromClasspath name
         }
     }
 
     void load(Closure params) {
-        def builder = CrudTestContext.instance.configBuilder(this.getClass())
-        builder.with params
-        _instance = builder.build()
+        _instance = CrudTestContext.instance.load(this.class, params)
     }
 
     CrudTestConfig getInstance() {

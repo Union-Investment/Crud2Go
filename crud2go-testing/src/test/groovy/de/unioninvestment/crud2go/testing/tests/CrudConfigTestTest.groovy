@@ -6,7 +6,7 @@ import org.junit.Test
 /**
  * Created by cmj on 21.07.14.
  */
-class CrudConfigSimpleTest extends CrudConfigTest {
+class CrudConfigTestTest extends CrudConfigTest {
 
     @Test
     void 'should load a crud2go configuration'() {

@@ -11,11 +11,13 @@ class CrudTestConfig {
     private PortletConfig config
     private ScriptPortlet portlet
     private Script mainScript
+    private Statistics statistics
 
-    CrudTestConfig(PortletConfig config, ScriptPortlet portlet, Script mainScript) {
+    CrudTestConfig(PortletConfig config, ScriptPortlet portlet, Script mainScript, Statistics statistics) {
         this.mainScript = mainScript
         this.portlet = portlet
         this.config = config
+        this.statistics = statistics
     }
 
     PortletConfig getConfig() {
@@ -28,5 +30,9 @@ class CrudTestConfig {
 
     Script getMainScript() {
         mainScript
+    }
+
+    Statistics getStatistics() {
+        statistics
     }
 }

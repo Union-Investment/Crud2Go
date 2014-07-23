@@ -197,7 +197,39 @@ public class ScriptContainer extends ScriptComponent {
 		return result;
 	}
 
-	/**
+    /**
+     * Führt das übergebene Closure in einer neuen Transaktion aus.
+     *
+     * @param c
+     *            Closure
+     */
+    public void withTransaction(final Closure<?> c) {
+        container.withTransaction(new DataContainer.TransactionCallback<Object>() {
+            @Override
+            public Object doInTransaction() {
+                c.call();
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Führt das übergebene Closure in einer bestehenden Transaktion aus.
+     *
+     * @param c
+     *            Closure
+     */
+    public void withExistingTransaction(final Closure<?> c) {
+        container.withExistingTransaction(new DataContainer.TransactionCallback<Object>() {
+            @Override
+            public Object doInTransaction() {
+                c.call();
+                return null;
+            }
+        });
+    }
+
+    /**
 	 * @return Closure mit zwei Parametern { ScriptContainer it, ScriptRow row
 	 *         -> ... }, die nach dem Speichern einer neuen Zeile aufgerufen
 	 *         wird

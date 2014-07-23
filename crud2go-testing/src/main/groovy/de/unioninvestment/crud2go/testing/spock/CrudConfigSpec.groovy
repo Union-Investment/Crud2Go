@@ -17,16 +17,14 @@ class CrudConfigSpec extends Specification {
     private CrudTestConfig _instance
 
     void load(String name) {
-		load {
-			fromClasspath name
-		}
+        _instance = CrudTestContext.instance.load(this.class) {
+            fromClasspath name
+        }
     }
-	
-	void load(Closure params) {
-		def builder = CrudTestContext.instance.configBuilder(this.getClass())
-		builder.with params
-		_instance = builder.build()
-	}
+
+    void load(Closure params) {
+        _instance = CrudTestContext.instance.load(this.class, params)
+    }
 
     CrudTestConfig getInstance() {
         assert _instance : 'Configuration not loaded'
