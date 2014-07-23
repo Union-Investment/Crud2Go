@@ -32,6 +32,7 @@ import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyLong
 import static org.mockito.Matchers.anyString
 import static org.mockito.Matchers.eq
+import static org.mockito.Mockito.reset
 import static org.mockito.Mockito.when
 import static org.mockito.Mockito.mock
 
@@ -127,6 +128,8 @@ class CrudTestConfigBuilder {
 
 
     synchronized CrudTestConfig build() {
+        reset(portalMock, userFactoryMock);
+
         long startTime = System.currentTimeMillis()
 
         PortletConfig portletConfig = prepareConfig()
