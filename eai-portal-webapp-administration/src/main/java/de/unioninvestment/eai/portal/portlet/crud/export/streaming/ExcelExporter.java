@@ -80,10 +80,9 @@ public class ExcelExporter implements Exporter {
 	 * Various styles that are used in report generation. These can be set by
 	 * the user if the default style is not desired to be used.
 	 */
-	protected CellStyle dateCellStyle, doubleCellStyle, columnHeaderCellStyle;
-	protected Short dateDataFormat, doubleDataFormat;
-	protected Map<Short, CellStyle> dataFormatCellStylesMap = new HashMap<Short, CellStyle>();
-
+	private CellStyle columnHeaderCellStyle;
+    private CellStyle[] cellStyles;
+    private Short dateDataFormat, doubleDataFormat;
 	protected Row headerRow;
 
 	private int currentRow;
@@ -363,7 +362,7 @@ public class ExcelExporter implements Exporter {
 	}
 
 	private short defaultDoubleDataFormat() {
-		return createHelper.createDataFormat().getFormat("General"); // FIXME: "General"?
+		return createHelper.createDataFormat().getFormat("General");
 	}
 
 	private short defaultDateDataFormat() {

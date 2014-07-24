@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.portlet.PortletSession;
 
+import com.vaadin.server.VaadinPortletSession;
+import com.vaadin.server.VaadinSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.vaadin.server.ClientConnector.DetachEvent;
 import com.vaadin.server.ClientConnector.DetachListener;
 import com.vaadin.server.Page;
-import com.vaadin.server.VaadinPortletService;
 import com.vaadin.ui.UI;
 
 /**
@@ -70,6 +71,8 @@ public class UiHistory implements DetachListener {
 
 		public void addDetachListener(DetachListener listener);
 
+        VaadinSession getSession();
+
 		/**
 		 * This method has to be overridden to additionally call
 		 * {@link UiHistory#handleHeartbeat(HistoryAware)}.
@@ -96,6 +99,7 @@ public class UiHistory implements DetachListener {
 		 *            history state to be stored inside the {@link UI}.
 		 */
 		void setHistoryState(UiHistoryState state);
+
 	}
 
 	private final class WindowNameFilter implements Predicate<HistoryAware> {
@@ -122,25 +126,25 @@ public class UiHistory implements DetachListener {
 	}
 
 	public void add(HistoryAware ui) {
-		PortletSession portletSession = getCurrentSession();
+		PortletSession portletSession = getPortletSession(ui);
 		Object mutex = PortletUtils.getSessionMutex(portletSession);
 		synchronized (mutex) {
 			ui.addDetachListener(this);
 			ui.setHistoryState(new UiHistoryState());
 
-			addUiToSession(ui, portletSession);
+			addUiToSession(portletSession, ui);
 
-			closeOldUIs(ui, portletSession);
+			closeOldUIs(portletSession, ui);
 		}
 	}
 
 	/**
+     * @param portletSession
+     *            the session storing all ui instances including the new one
 	 * @param ui
 	 *            new UI instance
-	 * @param portletSession
-	 *            the session storing all ui instances including the new one
 	 */
-	private void closeOldUIs(HistoryAware ui, PortletSession portletSession) {
+	private void closeOldUIs(PortletSession portletSession, HistoryAware ui) {
 		Collection<HistoryAware> allUIs = getUIsFromSession(portletSession);
 		List<HistoryAware> uiPageHistory = filterRelevantUIs(allUIs, ui
 				.getPage().getWindowName());
@@ -191,16 +195,16 @@ public class UiHistory implements DetachListener {
 
 	@Override
 	public void detach(DetachEvent event) {
-		PortletSession portletSession = getCurrentSession();
+        HistoryAware ui = (HistoryAware) event.getSource();
+        PortletSession portletSession = getPortletSession(ui);
 		Object mutex = PortletUtils.getSessionMutex(portletSession);
 		synchronized (mutex) {
-			removeUiFromSession(portletSession,
-					(HistoryAware) event.getSource());
+			removeUiFromSession(portletSession, ui);
 		}
 	}
 
 	/**
-	 * @param portletSession2
+	 * @param portletSession
 	 * @return the UIs
 	 */
 	@SuppressWarnings("unchecked")
@@ -214,29 +218,27 @@ public class UiHistory implements DetachListener {
 		return uis;
 	}
 
-	private void addUiToSession(HistoryAware newUi,
-			PortletSession portletSession) {
+	private void addUiToSession(PortletSession portletSession, HistoryAware newUi) {
 		List<HistoryAware> uis = getUIsFromSession(portletSession);
 		uis.add(0, newUi);
-		updateUIsInSession(uis);
+		updateUIsInSession(portletSession, uis);
 	}
 
 	private void removeUiFromSession(PortletSession portletSession,
 			HistoryAware removedUi) {
 		List<HistoryAware> uis = getUIsFromSession(portletSession);
 		uis.remove(removedUi);
-		updateUIsInSession(uis);
+		updateUIsInSession(portletSession, uis);
 	}
 
-	private void updateUIsInSession(List<HistoryAware> uis) {
-		getCurrentSession().setAttribute(UIS_SESSION_ATTRIBUTE, uis,
+	private void updateUIsInSession(PortletSession portletSession, List<HistoryAware> uis) {
+		portletSession.setAttribute(UIS_SESSION_ATTRIBUTE, uis,
 				PortletSession.APPLICATION_SCOPE);
 	}
 
-	private PortletSession getCurrentSession() {
-		PortletSession portletSession = VaadinPortletService
-				.getCurrentPortletRequest().getPortletSession();
-		return portletSession;
+    private PortletSession getPortletSession(HistoryAware ui) {
+        VaadinPortletSession vaadinSession = (VaadinPortletSession) ui.getSession();
+        return (PortletSession) vaadinSession.getPortletSession();
 	}
 
 	private int getMaxUiHistoryLength(HistoryAware ui) {
