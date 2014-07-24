@@ -17,7 +17,7 @@ import groovy.transform.PackageScope
 /**
  * Created by cmj on 17.07.14.
  */
-@Singleton(lazy=true)
+@Singleton(lazy=true,strict =false)
 class CrudTestContext {
 
     static final String TEST_PORTLET_ID = "PortletId"

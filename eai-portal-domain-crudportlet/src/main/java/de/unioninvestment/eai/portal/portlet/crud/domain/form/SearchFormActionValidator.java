@@ -87,7 +87,7 @@ public class SearchFormActionValidator {
 					if(isStringBasedFilterConfig(config)){
 						throw new IllegalArgumentException("Filter des Typs '"
 								+ config.getClass().getSimpleName()
-								+ "' kann nicht auf Number-Spalten angewendet werden");
+								+ "' kann nicht auf Number-Spalten (" + columnName + ") angewendet werden");
 					}
 					
 				} else if (Date.class.isAssignableFrom(columnType)

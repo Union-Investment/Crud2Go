@@ -1,5 +1,6 @@
 package de.unioninvestment.crud2go.testing
 
+import org.junit.runner.Description
 
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.never;
@@ -115,7 +116,7 @@ class LiferayContext extends TestWatcher {
 	}
 
 	@Override
-	public void finished(FrameworkMethod method) {
+	public void finished(Description description) {
 		CurrentInstance.clearAll();
 	}
 

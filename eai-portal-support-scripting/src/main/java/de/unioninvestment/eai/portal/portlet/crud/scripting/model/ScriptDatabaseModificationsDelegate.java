@@ -243,7 +243,7 @@ public class ScriptDatabaseModificationsDelegate implements
 		}
 	}
 
-	private ExtendedSql createSingleConnectionSql(Connection conn) {
+	protected ExtendedSql createSingleConnectionSql(Connection conn) {
 		return new ExtendedSql(new SingleConnectionDataSource(conn, true));
 	}
 
