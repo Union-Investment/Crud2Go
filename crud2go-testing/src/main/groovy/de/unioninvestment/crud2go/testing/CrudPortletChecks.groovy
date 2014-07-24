@@ -1,6 +1,10 @@
 package de.unioninvestment.crud2go.testing
 
+import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationVisitor;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig
+
+import org.junit.Assert
+
 import de.unioninvestment.eai.portal.portlet.crud.config.ComparisonFilterConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig
@@ -17,70 +21,17 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptOptionLi
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptTable
 
 import com.vaadin.data.Property;
+
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table
 
+class CrudPortletChecks {
 
-import org.junit.Assert
-
-class ScriptPortletChecks {
-	
 	static boolean CHECK_OPTIONS_SIZE = false
-	
-	static def getOptions(def optionList){
-		if(optionList instanceof QueryOptionList){
-			return optionList.loadOptions()
-		}
-		return optionList.options
-	}
-	
-	private static checkOptionList(String columnName, def optionList, String place = "form") {
-		def options = getOptions(optionList)
-		if(CHECK_OPTIONS_SIZE){
-			Assert.assertTrue("Options should be available for field "+columnName+" on "+place, options.size()>0)
-		}
-		Assert.assertFalse("There should be no empty keys for search filters for field "+columnName+" on "+place,options.containsKey(''))
-	}
 
-	public static void checkOptionsInScriptPortlet(def scriptPortlet){
-		scriptPortlet.elements.each{ k, v ->
-			if(v instanceof ScriptTable){
-
-				if(v.container instanceof ScriptDatabaseQueryContainer){
-					v.container.getCurrentQuery()
-				}
-				v.table.columns.columns.each{name, col ->
-					if(col instanceof SelectionTableColumn){
-						def optionList = col.optionList
-						checkOptionList(name, optionList, 'Table')
-					}
-				}
-			}
-			if(v instanceof ScriptForm ){
-				//println "Found form ${k} of type ${v.class}"
-				v.fields.each{ fk, fv ->
-					if (fv instanceof ScriptOptionListFormField){
-						def optionListFormField = fv.formField
-						//						println "Found optionlist form field ${fk} of type ${fv.class}"
-						//						println optionListFormField.class
-
-						if(optionListFormField instanceof OptionListFormField){
-							//println "CHECKING QUERY"
-							def optionList = optionListFormField.optionList
-							checkOptionList(fk, optionList, 'Form')
-
-						}else{
-							println "NO QEURY CHECK"
-						}
-
-					}
-				}
-			}
-		}
-	}
-	
-	public static void checkSearchColumns(String path, def portletConfig, def expectedMissingSearchColumns){
+	public static void checkSearchColumns(String path, CrudTestConfig instance, def expectedMissingSearchColumns){
 		def searchColumnNames = []
 		Set columnNames = [] as Set
+		def portletConfig = instance.config
 		
 		def visitor = new ConfigurationVisitor(){
 					void visit(element){
@@ -125,11 +76,65 @@ class ScriptPortletChecks {
 			}
 		}
 	}
+
+	static def getOptions(def optionList){
+		if(optionList instanceof QueryOptionList){
+			return optionList.loadOptions()
+		}
+		return optionList.options
+	}
 	
-	public static void checkSearchActions(def path, def scriptPortlet){
+	private static checkOptionList(String columnName, def optionList, String place = "form") {
+		def options = getOptions(optionList)
+		if(CHECK_OPTIONS_SIZE){
+			Assert.assertTrue("Options should be available for field "+columnName+" on "+place, options.size()>0)
+		}
+		Assert.assertFalse("There should be no empty keys for search filters for field "+columnName+" on "+place,options.containsKey(''))
+	}
+
+	public static void checkOptionsInScriptPortlet(CrudTestConfig instance){
+		def scriptPortlet = instance.portlet
+		scriptPortlet.elements.each{ k, v ->
+			if(v instanceof ScriptTable){
+
+				if(v.container instanceof ScriptDatabaseQueryContainer){
+					v.container.getCurrentQuery()
+				}
+				v.table.columns.columns.each{name, col ->
+					if(col instanceof SelectionTableColumn){
+						def optionList = col.optionList
+						checkOptionList(name, optionList, 'Table')
+					}
+				}
+			}
+			if(v instanceof ScriptForm ){
+				//println "Found form ${k} of type ${v.class}"
+				v.fields.each{ fk, fv ->
+					if (fv instanceof ScriptOptionListFormField){
+						def optionListFormField = fv.formField
+						//						println "Found optionlist form field ${fk} of type ${fv.class}"
+						//						println optionListFormField.class
+
+						if(optionListFormField instanceof OptionListFormField){
+							//println "CHECKING QUERY"
+							def optionList = optionListFormField.optionList
+							checkOptionList(fk, optionList, 'Form')
+
+						}else{
+							println "NO QEURY CHECK"
+						}
+
+					}
+				}
+			}
+		}
+	}
+	
+	
+	public static void checkSearchActions(def path, CrudTestConfig instance){
 		def searchFields = []
 		def searchAction = null
-		
+		def scriptPortlet = instance.portlet
 	
 		scriptPortlet.elements.each{ k, v ->
 			if(v instanceof ScriptForm ){
@@ -211,5 +216,5 @@ class ScriptPortletChecks {
 		println "Field ${fieldName} set value ${value}"
 		field.setValue(value)
 	}
-	
+
 }
