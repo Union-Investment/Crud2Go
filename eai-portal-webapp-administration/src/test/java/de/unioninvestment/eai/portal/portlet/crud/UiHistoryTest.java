@@ -4,18 +4,20 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
 
 import javax.portlet.PortletSession;
 
-import com.vaadin.server.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -23,6 +25,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.vaadin.server.ClientConnector.DetachEvent;
+import com.vaadin.server.Page;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
 
 import de.unioninvestment.eai.portal.portlet.crud.UiHistory.HistoryAware;
@@ -30,11 +34,9 @@ import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class UiHistoryTest {
 
-    private VaadinSession vaadinSessionMock;
-
-    static class HistoryAwareUI extends UI implements HistoryAware {
+	static class HistoryAwareUI extends UI implements HistoryAware {
 		private static final long serialVersionUID = 1L;
-
+		
 		private UiHistoryState state;
 
 		@Override
@@ -44,7 +46,7 @@ public class UiHistoryTest {
 
 		@Override
 		protected void init(VaadinRequest request) {
-
+			
 		}
 
 		@Override
@@ -58,7 +60,7 @@ public class UiHistoryTest {
 		}
 
 	}
-
+	
 	@Spy
 	private HistoryAwareUI ui1 = new HistoryAwareUI();
 	@Spy
@@ -71,7 +73,7 @@ public class UiHistoryTest {
 	@Mock
 	private Page page1, page2, page3, page4;
 
-    private UiHistory history = new UiHistory();
+	private UiHistory history = new UiHistory();
 
 	@Rule
 	public LiferayContext context = new LiferayContext();
@@ -83,29 +85,33 @@ public class UiHistoryTest {
 		MockitoAnnotations.initMocks(this);
 		stubSessionAttributeOperations();
 
-        prepareUI(ui1, "1", 1L, page1);
-        prepareUI(ui2, "2", 2L, page2);
-        prepareUI(ui3, "3", 3L, page3);
-        prepareUI(ui4, "4", 4L, page4);
+		when(ui1.isClosing()).thenReturn(false);
+		when(ui2.isClosing()).thenReturn(false);
+		when(ui3.isClosing()).thenReturn(false);
+		when(ui4.isClosing()).thenReturn(false);
+
+		when(ui1.getLastHeartbeatTimestamp()).thenReturn(1L);
+		when(ui2.getLastHeartbeatTimestamp()).thenReturn(2L);
+		when(ui3.getLastHeartbeatTimestamp()).thenReturn(3L);
+		when(ui4.getLastHeartbeatTimestamp()).thenReturn(4L);
+
+		when(ui1.getPage()).thenReturn(page1);
+		when(ui2.getPage()).thenReturn(page2);
+		when(ui3.getPage()).thenReturn(page3);
+		when(ui4.getPage()).thenReturn(page4);
 
 		when(page1.getWindowName()).thenReturn("window1");
 		when(page2.getWindowName()).thenReturn("window1");
 		when(page3.getWindowName()).thenReturn("window1");
 		when(page4.getWindowName()).thenReturn("window1");
+
+		when(ui1.getHistoryLimit()).thenReturn(1);
+		when(ui2.getHistoryLimit()).thenReturn(1);
+		when(ui3.getHistoryLimit()).thenReturn(1);
+		when(ui4.getHistoryLimit()).thenReturn(1);
 	}
 
-    private void prepareUI(HistoryAwareUI ui, String id, long lastHeartbeatTimestamp, Page page) {
-        when(ui.isClosing()).thenReturn(false);
-        when(ui.getLastHeartbeatTimestamp()).thenReturn(lastHeartbeatTimestamp);
-        when(ui.getPage()).thenReturn(page);
-        when(ui.getHistoryLimit()).thenReturn(1);
-        when(ui.getSession()).thenReturn(context.getVaadinSessionMock());
-        doReturn(id).when(ui).getId();
-        doNothing().when(ui).addDetachListener(Matchers.any(ClientConnector.DetachListener.class));
-        doNothing().when(ui).close();
-    }
-
-    private void stubSessionAttributeOperations() {
+	private void stubSessionAttributeOperations() {
 		when(
 				context.getPortletSessionMock().getAttribute(
 						UiHistory.UIS_SESSION_ATTRIBUTE,

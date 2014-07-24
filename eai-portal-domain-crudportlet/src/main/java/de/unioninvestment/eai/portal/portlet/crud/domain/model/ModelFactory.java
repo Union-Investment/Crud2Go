@@ -287,4 +287,13 @@ public class ModelFactory {
 		return new CompoundSearch(config);
 	}
 
+	//TODO: yevtsh - remove after test code refactoring
+	public void setQueryOptionListRepository(
+			QueryOptionListRepository queryOptionListRepository) {
+		this.queryOptionListRepository = queryOptionListRepository;
+	}
+	
+	//TODO: remove later
+	
+
 }

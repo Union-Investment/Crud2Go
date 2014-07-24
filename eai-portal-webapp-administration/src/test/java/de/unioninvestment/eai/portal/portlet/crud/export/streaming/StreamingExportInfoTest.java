@@ -141,16 +141,7 @@ public class StreamingExportInfoTest {
 		assertThat(info.getDisplayFormats(), is(new String[] { null, "#" }));
 	}
 
-    @Test
-    public void shouldReturnMultilineFlags() {
-        givenColumnMocks();
-        when(col2Mock.isMultiline()).thenReturn(true);
-
-        info = new StreamingExportInfo(containerMock, tableMock);
-        assertThat(info.getMultilineFlags(), is(new boolean[] { false, true}));
-    }
-
-    @Test
+	@Test
 	public void shouldReturnNullsAsExcelFormatsByDefault() {
 		info = new StreamingExportInfo(containerMock, tableMock);
 		assertThat(info.getExcelFormats(), is(new String[] { null, null }));
