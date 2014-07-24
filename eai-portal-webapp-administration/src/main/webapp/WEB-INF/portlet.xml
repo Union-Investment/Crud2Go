@@ -5,7 +5,7 @@
 
 	<portlet>
 		<portlet-name>crudportlet</portlet-name>
-		<portlet-class>de.unioninvestment.eai.portal.support.scripting.web.GroovyCategorySpringApplicationPortlet</portlet-class>
+		<portlet-class>de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortlet</portlet-class>
 		<init-param>
 			<name>UI</name>
 			<value>de.unioninvestment.eai.portal.portlet.crud.CrudUI</value>

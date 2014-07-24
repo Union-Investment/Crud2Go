@@ -25,7 +25,7 @@ public class GStringCategory {
 	 * can be used in combination with {@link Sql} to execute nested Statements.
 	 * Sub-GStrings are NOT flattened recursively.
 	 * 
-	 * @param self
+	 * @param root
 	 *            the GString to flatten
 	 * @return the flattened result
 	 */

@@ -139,7 +139,7 @@ class CrudTestConfigBuilder {
 
         long postBuildStartTime = System.currentTimeMillis()
 		long roleId = 1
-		portletConfig.roles?.role.each { role ->
+		portletConfig.roles?.role?.each { role ->
 			roleId2Name[roleId] = role.name
 			resourceIds.put("${CrudTestContext.TEST_PORTLET_ID}_${CrudTestContext.LIFERAY_COMMUNITY_ID}_${role.name}".toString() , roleId++)
         }

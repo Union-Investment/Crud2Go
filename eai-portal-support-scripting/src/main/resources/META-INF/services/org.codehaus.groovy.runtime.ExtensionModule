@@ -1,0 +1,3 @@
+moduleName=crud2go-extension-module
+moduleVersion=1.0
+extensionClasses=de.unioninvestment.eai.portal.portlet.crud.scripting.category.StringCategory,de.unioninvestment.eai.portal.portlet.crud.scripting.category.GStringCategory,de.unioninvestment.eai.portal.portlet.crud.scripting.category.DateCategory,de.unioninvestment.eai.portal.portlet.crud.scripting.category.CollectionsCategory
