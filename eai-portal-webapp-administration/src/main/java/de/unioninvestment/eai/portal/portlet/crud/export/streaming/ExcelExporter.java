@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.base.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.DateFormatConverter;
@@ -50,7 +51,13 @@ public class ExcelExporter implements Exporter {
 
 	public static final String EXCEL_XSLX_MIMETYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-	/**
+    /**
+     * Font that is used for Header and Data.
+     */
+    private final String fontName;
+
+
+    /**
 	 * The name of the sheet in the workbook the table contents will be written
 	 * to.
 	 */
@@ -78,18 +85,25 @@ public class ExcelExporter implements Exporter {
 	protected Map<Short, CellStyle> dataFormatCellStylesMap = new HashMap<Short, CellStyle>();
 
 	protected Row headerRow;
-	protected Map<Object, String> propertyExcelFormatMap = new HashMap<Object, String>();
 
 	private int currentRow;
 
+    private boolean[] multilineFlags;
 	private String[] columnNames;
 	private String[] columnTitles;
 	private Class<?>[] columnTypes;
 	private String[] displayFormats;
 	private String[] excelFormats;
+    private int excelRowAccessWindowSize;
 
-	@Override
+    public ExcelExporter(int excelRowAccessWindowSize, String fontName) {
+        this.excelRowAccessWindowSize = excelRowAccessWindowSize;
+        this.fontName = fontName;
+    }
+
+    @Override
 	public void begin(ExportInfo exportInfo) {
+        this.multilineFlags = exportInfo.getMultilineFlags();
 		this.columnNames = exportInfo.getColumnNames();
 		this.columnTitles = exportInfo.getColumnTitles();
 		this.columnTypes = exportInfo.getColumnTypes();
@@ -153,7 +167,6 @@ public class ExcelExporter implements Exporter {
 
 	@Override
 	public InputStream getInputStream() {
-        evaluateFormulas();
         autoSizeAllColumns();
 
 		File tempFile = null;
@@ -189,11 +202,6 @@ public class ExcelExporter implements Exporter {
 		sheet.setFitToPage(true);
 		sheet.setHorizontallyCenter(true);
 	}
-
-    private void evaluateFormulas() {
-        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-        evaluator.evaluateAll();
-    }
 
     /**
      * Final formatting of the sheet upon completion of writing the data. For example, we can only
@@ -234,29 +242,7 @@ public class ExcelExporter implements Exporter {
 	 * @return the data style
 	 */
 	private CellStyle getCellStyle(final int col) {
-		final String columnName = columnNames[col];
-		// get the basic style for the type of cell (i.e. data, header, total)
-		// set the dataformat, regardless of the other style settings
-		if (this.propertyExcelFormatMap.containsKey(columnName)) {
-			final short df = dataFormat.getFormat(propertyExcelFormatMap
-					.get(columnName));
-			if (dataFormatCellStylesMap.containsKey(df)) {
-				return dataFormatCellStylesMap.get(df);
-			}
-			final CellStyle retStyle = workbook.createCellStyle();
-			retStyle.cloneStyleFrom(dataFormatCellStylesMap
-					.get(doubleDataFormat));
-			retStyle.setDataFormat(df);
-			dataFormatCellStylesMap.put(df, retStyle);
-			return retStyle;
-		}
-		final Class<?> columnType = columnTypes[col];
-		if (isNumeric(columnType)) {
-			return dataFormatCellStylesMap.get(doubleDataFormat);
-		} else if (java.util.Date.class.isAssignableFrom(columnType)) {
-			return dataFormatCellStylesMap.get(dateDataFormat);
-		}
-		return dataFormatCellStylesMap.get(doubleDataFormat);
+        return cellStyles[col];
 	}
 
 	private void prepareDefaults() {
@@ -269,57 +255,52 @@ public class ExcelExporter implements Exporter {
 		this.dateDataFormat = defaultDateDataFormat();
 		this.doubleDataFormat = defaultDoubleDataFormat();
 
-		this.doubleCellStyle = defaultDataCellStyle(this.workbook);
-		this.doubleCellStyle.setDataFormat(doubleDataFormat);
-		this.dataFormatCellStylesMap.put(doubleDataFormat, doubleCellStyle);
-
-		this.dateCellStyle = defaultDataCellStyle(this.workbook);
-		this.dateCellStyle.setDataFormat(this.dateDataFormat);
-		this.dataFormatCellStylesMap.put(this.dateDataFormat,
-				this.dateCellStyle);
-
 		this.columnHeaderCellStyle = defaultHeaderCellStyle(this.workbook);
 	}
 
 	private Workbook createWorkbook() {
-		SXSSFWorkbook workbook = new SXSSFWorkbook(50);
+		SXSSFWorkbook workbook = new SXSSFWorkbook(excelRowAccessWindowSize);
 		workbook.setCompressTempFiles(true);
 		return workbook;
 	}
 
+    private short getDataFormat(int col) {
+        String excelFormat = excelFormats[col];
+        if (excelFormat != null) {
+            return dataFormat.getFormat(excelFormat);
+        }
+        Class<?> columnType = columnTypes[col];
+        if (columnType != null) {
+            if (Date.class.isAssignableFrom(columnType)) {
+                String dateDisplayFormat = displayFormats[col];
+                if (dateDisplayFormat != null) {
+                    excelFormat = DateFormatConverter.convert(
+                            Context.getLocale(), dateDisplayFormat);
+                    return dataFormat.getFormat(excelFormat);
+                }
+                return dateDataFormat;
+            }
+        }
+        return doubleDataFormat;
+    }
+
 	private void applyExcelFormatForColumns() {
-		setDoubleDataFormat("General");
-		setDateDataFormat(DateFormatConverter.convert(Context.getLocale(),
-				"dd.MM.yyyy"));
 
-		for (int col = 0; col < excelFormats.length; col++) {
-			String columnName = columnNames[col];
-			String excelFormat = excelFormats[col];
-			if (excelFormat == null) {
-				Class<?> columnType = columnTypes[col];
-				if (columnType != null) {
-					if (Date.class.isAssignableFrom(columnType)) {
-						String dateDisplayFormat = displayFormats[col];
-						if (dateDisplayFormat != null) {
-							excelFormat = DateFormatConverter.convert(
-									Context.getLocale(), dateDisplayFormat);
-						}
-					}
-				}
-			}
-			if (excelFormat != null) {
-				setExcelFormatOfProperty(columnName, excelFormat);
-			}
-		}
+        cellStyles = new CellStyle[columnNames.length];
+        for (int col = 0; col < columnNames.length; col++) {
+            short dataFormat = getDataFormat(col);
+            cellStyles[col] = createCustomCellStyle(dataFormat, multilineFlags[col]);
+        }
 	}
 
-	private void setExcelFormatOfProperty(final Object propertyId,
-			final String excelFormat) {
-		if (this.propertyExcelFormatMap.containsKey(propertyId)) {
-			this.propertyExcelFormatMap.remove(propertyId);
-		}
-		this.propertyExcelFormatMap.put(propertyId.toString(), excelFormat);
-	}
+    private CellStyle createCustomCellStyle(short dataFormat, boolean multiline) {
+        CellStyle cellStyle = defaultDataCellStyle(workbook);
+        cellStyle.setDataFormat(dataFormat);
+        if (multiline) {
+            cellStyle.setWrapText(true);
+        }
+        return cellStyle;
+    }
 
 	/**
 	 * Returns the default header style. Obtained from:
@@ -334,7 +315,9 @@ public class ExcelExporter implements Exporter {
 	private CellStyle defaultHeaderCellStyle(final Workbook wb) {
 		CellStyle style;
 		final Font headerFont = wb.createFont();
-        headerFont.setFontName("Arial");
+        if (!Strings.isNullOrEmpty(fontName)) {
+            headerFont.setFontName(fontName);
+        }
 		headerFont.setFontHeightInPoints((short) 11);
 		headerFont.setColor(IndexedColors.WHITE.getIndex());
 		style = wb.createCellStyle();
@@ -358,13 +341,9 @@ public class ExcelExporter implements Exporter {
 	 * @return the cell style
 	 */
 	private CellStyle defaultDataCellStyle(final Workbook wb) {
-        final Font dataFont = wb.createFont();
-        dataFont.setFontName("Arial");
-        dataFont.setFontHeightInPoints((short) 11);
 		CellStyle style;
 		style = wb.createCellStyle();
 		style.setAlignment(CellStyle.ALIGN_CENTER);
-		style.setWrapText(true);
 		style.setBorderRight(CellStyle.BORDER_THIN);
 		style.setRightBorderColor(IndexedColors.BLACK.getIndex());
 		style.setBorderLeft(CellStyle.BORDER_THIN);
@@ -373,47 +352,23 @@ public class ExcelExporter implements Exporter {
 		style.setTopBorderColor(IndexedColors.BLACK.getIndex());
 		style.setBorderBottom(CellStyle.BORDER_THIN);
 		style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
-        style.setFont(dataFont);
+        style.setWrapText(false);
 		style.setDataFormat(doubleDataFormat);
+        if (!Strings.isNullOrEmpty(fontName)) {
+            final Font dataFont = wb.createFont();
+            dataFont.setFontName(fontName);
+            style.setFont(dataFont);
+        }
 		return style;
 	}
 
 	private short defaultDoubleDataFormat() {
-		return createHelper.createDataFormat().getFormat("0.00");
+		return createHelper.createDataFormat().getFormat("General"); // FIXME: "General"?
 	}
 
 	private short defaultDateDataFormat() {
-		return createHelper.createDataFormat().getFormat("mm/dd/yyyy");
-	}
-
-	private void setDoubleDataFormat(final String excelDoubleFormat) {
-		CellStyle prevDoubleDataStyle = null;
-		if (dataFormatCellStylesMap.containsKey(doubleDataFormat)) {
-			prevDoubleDataStyle = dataFormatCellStylesMap.get(doubleDataFormat);
-			dataFormatCellStylesMap.remove(doubleDataFormat);
-		}
-		doubleDataFormat = createHelper.createDataFormat().getFormat(
-				excelDoubleFormat);
-		if (null != prevDoubleDataStyle) {
-			doubleCellStyle = prevDoubleDataStyle;
-			doubleCellStyle.setDataFormat(doubleDataFormat);
-			dataFormatCellStylesMap.put(doubleDataFormat, doubleCellStyle);
-		}
-	}
-
-	private void setDateDataFormat(final String excelDateFormat) {
-		CellStyle prevDateDataStyle = null;
-		if (dataFormatCellStylesMap.containsKey(dateDataFormat)) {
-			prevDateDataStyle = dataFormatCellStylesMap.get(dateDataFormat);
-			dataFormatCellStylesMap.remove(dateDataFormat);
-		}
-		dateDataFormat = createHelper.createDataFormat().getFormat(
-				excelDateFormat);
-		if (null != prevDateDataStyle) {
-			dateCellStyle = prevDateDataStyle;
-			dateCellStyle.setDataFormat(dateDataFormat);
-			dataFormatCellStylesMap.put(dateDataFormat, dateCellStyle);
-		}
+		return createHelper.createDataFormat().getFormat(
+                DateFormatConverter.convert(Context.getLocale(), "dd.MM.yyyy"));
 	}
 
 	/**
