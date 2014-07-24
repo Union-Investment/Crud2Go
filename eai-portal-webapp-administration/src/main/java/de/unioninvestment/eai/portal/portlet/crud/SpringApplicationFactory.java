@@ -43,6 +43,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.xml.sax.SAXException;
 
 import com.cybercom.vaadin.spring.UIScope;
+import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 
 import de.unioninvestment.eai.portal.portlet.crud.CrudUI.LifecycleEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
@@ -204,14 +205,18 @@ public class SpringApplicationFactory {
 	@Bean
 	@Qualifier("portletCache")
 	public Ehcache portletCache() throws IOException {
-		return cacheManager().getEhcache("portletCache");
+		Ehcache ehcache = cacheManager().getEhcache("crudPortletCache");
+		Preconditions.checkNotNull(ehcache, "crudPortletCache not configured in ehcache.xml");
+		return ehcache;
 	}
 
 	@Bean
 	@Qualifier("optionListCache")
 	public Ehcache optionListCache(CacheManager cacheManager)
 			throws IOException {
-		return cacheManager().getEhcache("optionListCache");
+		Ehcache ehcache = cacheManager().getEhcache("optionListCache");
+		Preconditions.checkNotNull(ehcache, "optionListCache not configured in ehcache.xml");
+		return ehcache;
 	}
 
 	/**

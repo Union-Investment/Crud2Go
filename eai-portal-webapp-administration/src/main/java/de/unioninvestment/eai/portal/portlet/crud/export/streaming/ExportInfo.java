@@ -51,4 +51,6 @@ public interface ExportInfo {
 	 *         column
 	 */
 	String[] getExcelFormats();
+
+    boolean[] getMultilineFlags();
 }
