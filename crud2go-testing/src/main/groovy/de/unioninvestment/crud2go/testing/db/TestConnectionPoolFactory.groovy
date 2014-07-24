@@ -9,7 +9,11 @@ import org.springframework.stereotype.Component
 @Profile("testing")
 class TestConnectionPoolFactory implements ConnectionPoolFactory {
 
-    DatabaseSchemas schemas
+    DatabaseSchemas schemas = new DatabaseSchemas()
+
+    TestConnectionPoolFactory() {
+        System.setProperty("oracle.jdbc.J2EE13Compliant", "true")
+    }
 
 	ConnectionPool getPool(String name) {
         def dataSource = schemas[name]
