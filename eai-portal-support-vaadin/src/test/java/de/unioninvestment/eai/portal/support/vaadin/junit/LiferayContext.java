@@ -128,6 +128,7 @@ public class LiferayContext extends TestWatchman {
 				portletPreferencesMock);
 		when(vaadinPortletSessionMock.getConverterFactory()).thenReturn(
 				new DefaultConverterFactory());
+        when(vaadinPortletSessionMock.getPortletSession()).thenReturn(portletSessionMock);
 
 		CurrentInstance.set(VaadinSession.class, vaadinPortletSessionMock);
 		CurrentInstance.set(VaadinService.class, vaadinPortletServiceMock);
