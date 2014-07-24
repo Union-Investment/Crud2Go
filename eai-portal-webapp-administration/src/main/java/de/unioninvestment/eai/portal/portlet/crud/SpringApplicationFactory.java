@@ -43,6 +43,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.xml.sax.SAXException;
 
 import com.cybercom.vaadin.spring.UIScope;
+import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 
 import de.unioninvestment.eai.portal.portlet.crud.CrudUI.LifecycleEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
@@ -58,9 +59,8 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 
 /**
- * Standard-Implementierung der {@link ApplicationFactory}. Delegiert teilweise
- * an PortletUtils.getBean().
- * 
+ * Spring ApplicationContext.
+ *
  * @author carsten.mjartan
  */
 @Configuration
@@ -200,14 +200,18 @@ public class SpringApplicationFactory {
 	@Bean
 	@Qualifier("portletCache")
 	public Ehcache portletCache() throws IOException {
-		return cacheManager().getEhcache("portletCache");
+		Ehcache ehcache = cacheManager().getEhcache("crudPortletCache");
+		Preconditions.checkNotNull(ehcache, "crudPortletCache not configured in ehcache.xml");
+		return ehcache;
 	}
 
 	@Bean
 	@Qualifier("optionListCache")
 	public Ehcache optionListCache(CacheManager cacheManager)
 			throws IOException {
-		return cacheManager().getEhcache("optionListCache");
+		Ehcache ehcache = cacheManager().getEhcache("optionListCache");
+		Preconditions.checkNotNull(ehcache, "optionListCache not configured in ehcache.xml");
+		return ehcache;
 	}
 
 	/**
