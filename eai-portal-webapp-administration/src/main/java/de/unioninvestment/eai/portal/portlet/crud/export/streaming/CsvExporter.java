@@ -42,6 +42,10 @@ public class CsvExporter extends ExcelExporter {
 
 	public static final String CSV_MIMETYPE = "text/csv";
 
+    public CsvExporter() {
+        super(50, null);
+    }
+
 	@Override
 	public InputStream getInputStream() {
 		final InputStream fis = super.getInputStream();

@@ -27,6 +27,8 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
+import de.unioninvestment.eai.portal.portlet.crud.export.streaming.CsvExporter;
+import de.unioninvestment.eai.portal.portlet.crud.export.streaming.ExcelExporter;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 
@@ -232,5 +234,10 @@ public class SpringApplicationFactory {
 		}
 		return results;
 	}
+
+    @Bean
+    public ExcelExporter excelExporter() {
+        return new ExcelExporter(settings.getExcelRowAccessWindowSize(), settings.getExcelFontName());
+    }
 
 }

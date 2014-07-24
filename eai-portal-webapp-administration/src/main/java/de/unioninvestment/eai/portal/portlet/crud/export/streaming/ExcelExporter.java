@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.base.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.DateFormatConverter;
@@ -50,7 +51,13 @@ public class ExcelExporter implements Exporter {
 
 	public static final String EXCEL_XSLX_MIMETYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-	/**
+    /**
+     * Font that is used for Header and Data.
+     */
+    private final String fontName;
+
+
+    /**
 	 * The name of the sheet in the workbook the table contents will be written
 	 * to.
 	 */
@@ -86,9 +93,14 @@ public class ExcelExporter implements Exporter {
 	private Class<?>[] columnTypes;
 	private String[] displayFormats;
 	private String[] excelFormats;
+    private int excelRowAccessWindowSize;
 
+    public ExcelExporter(int excelRowAccessWindowSize, String fontName) {
+        this.excelRowAccessWindowSize = excelRowAccessWindowSize;
+        this.fontName = fontName;
+    }
 
-	@Override
+    @Override
 	public void begin(ExportInfo exportInfo) {
         this.multilineFlags = exportInfo.getMultilineFlags();
 		this.columnNames = exportInfo.getColumnNames();
@@ -154,7 +166,6 @@ public class ExcelExporter implements Exporter {
 
 	@Override
 	public InputStream getInputStream() {
-        evaluateFormulas();
         autoSizeAllColumns();
 
 		File tempFile = null;
@@ -190,11 +201,6 @@ public class ExcelExporter implements Exporter {
 		sheet.setFitToPage(true);
 		sheet.setHorizontallyCenter(true);
 	}
-
-    private void evaluateFormulas() {
-        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-        evaluator.evaluateAll();
-    }
 
     /**
      * Final formatting of the sheet upon completion of writing the data. For example, we can only
@@ -253,7 +259,7 @@ public class ExcelExporter implements Exporter {
 	}
 
 	private Workbook createWorkbook() {
-		SXSSFWorkbook workbook = new SXSSFWorkbook(50);
+		SXSSFWorkbook workbook = new SXSSFWorkbook(excelRowAccessWindowSize);
 		workbook.setCompressTempFiles(true);
 		return workbook;
 	}
@@ -309,7 +315,9 @@ public class ExcelExporter implements Exporter {
 	private CellStyle defaultHeaderCellStyle(final Workbook wb) {
 		CellStyle style;
 		final Font headerFont = wb.createFont();
-        headerFont.setFontName("Arial");
+        if (!Strings.isNullOrEmpty(fontName)) {
+            headerFont.setFontName(fontName);
+        }
 		headerFont.setFontHeightInPoints((short) 11);
 		headerFont.setColor(IndexedColors.WHITE.getIndex());
 		style = wb.createCellStyle();
@@ -333,9 +341,6 @@ public class ExcelExporter implements Exporter {
 	 * @return the cell style
 	 */
 	private CellStyle defaultDataCellStyle(final Workbook wb) {
-        final Font dataFont = wb.createFont();
-        dataFont.setFontName("Arial");
-        dataFont.setFontHeightInPoints((short) 11);
 		CellStyle style;
 		style = wb.createCellStyle();
 		style.setAlignment(CellStyle.ALIGN_CENTER);
@@ -347,14 +352,18 @@ public class ExcelExporter implements Exporter {
 		style.setTopBorderColor(IndexedColors.BLACK.getIndex());
 		style.setBorderBottom(CellStyle.BORDER_THIN);
 		style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
-        style.setFont(dataFont);
         style.setWrapText(false);
 		style.setDataFormat(doubleDataFormat);
+        if (!Strings.isNullOrEmpty(fontName)) {
+            final Font dataFont = wb.createFont();
+            dataFont.setFontName(fontName);
+            style.setFont(dataFont);
+        }
 		return style;
 	}
 
 	private short defaultDoubleDataFormat() {
-		return createHelper.createDataFormat().getFormat("General"); // FIXME: "General"?
+		return createHelper.createDataFormat().getFormat("General");
 	}
 
 	private short defaultDateDataFormat() {
