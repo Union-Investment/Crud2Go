@@ -2,10 +2,12 @@ package de.unioninvestment.crud2go.testing
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet
+import groovy.transform.CompileStatic
 
 /**
  * Created by cmj on 17.07.14.
  */
+@CompileStatic
 class CrudTestConfig {
 
     private PortletConfig config

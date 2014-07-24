@@ -1,10 +1,12 @@
-package de.unioninvestment.crud2go.testing;
+package de.unioninvestment.crud2go.testing
 
+import groovy.transform.CompileStatic;
 import org.mockito.ArgumentMatcher;
 
 import com.google.common.base.Objects;
 import com.vaadin.ui.Notification;
 
+@CompileStatic
 public class NotificationMatcher extends ArgumentMatcher<Notification> {
 
 	private String caption;

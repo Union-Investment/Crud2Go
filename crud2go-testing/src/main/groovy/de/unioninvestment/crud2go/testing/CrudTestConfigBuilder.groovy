@@ -20,7 +20,8 @@ import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompi
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus
-
+import groovy.transform.CompileStatic
+import groovy.transform.TupleConstructor
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired
@@ -39,9 +40,11 @@ import static org.mockito.Mockito.mock
 /**
  * Created by cmj on 17.07.14.
  */
+@CompileStatic
 class CrudTestConfigBuilder {
     private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller()
 
+    @TupleConstructor
     private class CacheEntry {
         long compileTime
         PortletConfig config
@@ -69,7 +72,7 @@ class CrudTestConfigBuilder {
     private UserFactory userFactoryMock
 
     Class<?> testClass
-    Map configCache
+    Map<URL, CacheEntry> configCache
 	
 	private String currentUserName = null
     private Set currentUserRoles = []
@@ -164,11 +167,11 @@ class CrudTestConfigBuilder {
 		when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
 		when(portalMock.hasPermission(eq(currentUserName), eq("MEMBER"), eq(PortletRole.RESOURCE_KEY), anyString())).thenAnswer(
                 { InvocationOnMock inv ->
-                    long id = Long.parseLong(inv.arguments[3])
+                    long id = Long.parseLong((String)inv.arguments[3])
                     currentUserRoles.contains(roleId2Name[id])
                 } as Answer);
 		when(userFactoryMock.getCurrentUser(any(Portlet))).thenAnswer({ InvocationOnMock inv ->
-			def user = currentUserName ? new NamedUser(currentUserName, inv.arguments[0].roles)
+			def user = currentUserName ? new NamedUser(currentUserName, ((Portlet)inv.arguments[0]).roles)
 							: new AnonymousUser()
 			return new CurrentTestUser(user)
 		} as Answer<CurrentUser>)
@@ -197,7 +200,7 @@ class CrudTestConfigBuilder {
             PortletConfig portletConfig = unmarshaller.unmarshal(configResource.inputStream)
             scriptsCompiler.compileAllScripts(portletConfig)
             statistics.compileTime = System.currentTimeMillis() - compileStartTime
-            configCache[configResource.URL] = new CacheEntry(compileTime: statistics.compileTime, config: portletConfig)
+            configCache[configResource.URL] = new CacheEntry(statistics.compileTime, portletConfig)
             return portletConfig
         }
     }

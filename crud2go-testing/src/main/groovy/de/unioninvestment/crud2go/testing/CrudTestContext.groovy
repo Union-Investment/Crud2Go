@@ -7,6 +7,7 @@ import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler
 import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadContextProvider
 import de.unioninvestment.eai.portal.support.vaadin.context.Context
+import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ConfigurableApplicationContext
@@ -17,13 +18,14 @@ import groovy.transform.PackageScope
 /**
  * Created by cmj on 17.07.14.
  */
-@Singleton(lazy=true,strict =false)
+@Singleton(lazy=true,strict=false)
+@CompileStatic
 class CrudTestContext {
 
     static final String TEST_PORTLET_ID = "PortletId"
     static final long LIFERAY_COMMUNITY_ID = 17808L
 
-    private ConfigurableApplicationContext applicationContext
+    private AnnotationConfigApplicationContext applicationContext
 
     private ScriptCompiler scriptCompiler = new ScriptCompiler()
 

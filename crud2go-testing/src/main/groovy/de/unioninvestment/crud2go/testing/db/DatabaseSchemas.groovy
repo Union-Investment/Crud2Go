@@ -4,7 +4,6 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource
 
-
 class DatabaseSchemas {
 	
 	private Map<String,DataSource> dataSources = [:]
@@ -25,7 +24,7 @@ class DatabaseSchemas {
         }
     }
 
-    def propertyMissing(name) {
+    def propertyMissing(String name) {
 		def dataSource = dataSources[name]
 		if (!dataSource) {
 			dataSource = createDataSource(name)
@@ -50,7 +49,8 @@ class DatabaseSchemas {
 	
 	def getSchemaNames() {
 		def schemaNames = [] as LinkedHashSet
-		props.each { name, value ->
+		props.each { key, value ->
+            def name = key.toString()
 			if (name.contains('.')) {
 				schemaNames.add (name.split('\\.')[0])
 			}

@@ -1,13 +1,17 @@
 package de.unioninvestment.crud2go.testing
 
-import java.util.Iterator;
+import groovy.transform.CompileStatic
 
+import java.util.Iterator
+import java.util.regex.Pattern;
+
+@CompileStatic
 class DirectoryWalkerProvider implements Iterable{
 
 	private String baseDirPath
-	private def nameFilter
+	private Pattern nameFilter
 	
-	public DirectoryWalkerProvider(String baseDir, Object nameFilter = ~/.*.xml/) {
+	public DirectoryWalkerProvider(String baseDir, Pattern nameFilter = ~/.*.xml/) {
 		super();
 		this.baseDirPath = baseDir;
 		this.nameFilter = nameFilter;
@@ -19,13 +23,13 @@ class DirectoryWalkerProvider implements Iterable{
 		def absBaseDirPath = new File(baseDirPath).getAbsolutePath()
 		def baseDir = new File(absBaseDirPath)
 		//matching files in currentDir
-		baseDir.eachFileMatch(nameFilter){  file ->
-			fileList << file.getAbsolutePath()
+		baseDir.eachFileMatch(nameFilter){ File file ->
+			fileList << file.absolutePath
 		}
 		//matching files in subdirectories
-		baseDir.eachDirRecurse { dir ->
-			dir.eachFileMatch(nameFilter) { file ->
-				fileList << file.getAbsolutePath()
+		baseDir.eachDirRecurse { File dir ->
+			dir.eachFileMatch(nameFilter) { File file ->
+				fileList << file.absolutePath
 			}
 		}
 		return fileList.iterator();

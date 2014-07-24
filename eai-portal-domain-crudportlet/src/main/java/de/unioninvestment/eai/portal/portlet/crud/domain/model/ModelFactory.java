@@ -88,7 +88,7 @@ public class ModelFactory {
 	/**
 	 * Konstruktor.
 	 */
-	ModelFactory() {
+	public ModelFactory() {
 		// for Spring
 	}
 

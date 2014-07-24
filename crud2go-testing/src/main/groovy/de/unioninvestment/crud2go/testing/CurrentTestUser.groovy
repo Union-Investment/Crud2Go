@@ -1,8 +1,10 @@
 package de.unioninvestment.crud2go.testing
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User
+import groovy.transform.CompileStatic;
 
+@CompileStatic
 class CurrentTestUser extends CurrentUser {
 
 	private User delegate

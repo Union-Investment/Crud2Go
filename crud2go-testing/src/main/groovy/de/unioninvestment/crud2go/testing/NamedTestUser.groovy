@@ -1,10 +1,13 @@
-package de.unioninvestment.crud2go.testing;
+package de.unioninvestment.crud2go.testing
+
+import groovy.transform.CompileStatic;
 
 import java.util.Set;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.NamedUser;
 
+@CompileStatic
 public class NamedTestUser extends NamedUser {
 
 	private Set<Role> portalRoles;
@@ -16,7 +19,7 @@ public class NamedTestUser extends NamedUser {
 	
 	@Override
 	Set<String> getPortalRoles() {
-		return portalRoles.collect { it.name };
+		return portalRoles.collect { it.name } as Set;
 	}
 
 	@Override

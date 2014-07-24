@@ -1,6 +1,7 @@
 package de.unioninvestment.crud2go.testing.db
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.AbstractConnectionPool
+import groovy.transform.CompileStatic
 
 import javax.naming.NamingException
 import javax.sql.DataSource
@@ -8,6 +9,7 @@ import javax.sql.DataSource
 /**
  * Created by cmj on 17.07.14.
  */
+@CompileStatic
 class TestConnectionPool extends AbstractConnectionPool {
 
     private DataSource dataSource

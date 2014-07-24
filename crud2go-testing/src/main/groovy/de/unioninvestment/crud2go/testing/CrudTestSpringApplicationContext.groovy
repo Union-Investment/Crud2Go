@@ -14,6 +14,7 @@ import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompi
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler
 import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory
+import groovy.transform.CompileStatic
 import net.sf.ehcache.Cache
 import net.sf.ehcache.Ehcache
 import net.sf.ehcache.config.CacheConfiguration
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.mock
  */
 @Profile("testing")
 @Configuration
+@CompileStatic
 class CrudTestSpringApplicationContext {
 
     int defaultSelectWidth = 300;
