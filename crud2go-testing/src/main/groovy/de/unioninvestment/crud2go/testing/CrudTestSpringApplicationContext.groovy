@@ -56,7 +56,8 @@ class CrudTestSpringApplicationContext {
     @Bean
     MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("de.unioninvestment.eai.portal.portlet.crud.domain.messages");
+        messageSource.setBasenames("de.unioninvestment.eai.portal.portlet.crud.messages",
+			"de.unioninvestment.eai.portal.support.vaadin.validation.messages");
         return messageSource;
     }
 

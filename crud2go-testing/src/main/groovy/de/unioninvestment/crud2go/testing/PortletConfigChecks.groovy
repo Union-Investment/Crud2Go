@@ -2,6 +2,7 @@ package de.unioninvestment.crud2go.testing
 
 import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationVisitor;
 import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig
+import org.junit.Assert
 import de.unioninvestment.eai.portal.portlet.crud.config.ComparisonFilterConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig

@@ -4,6 +4,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource
 
+
 class DatabaseSchemas {
 	
 	private Map<String,DataSource> dataSources = [:]
@@ -17,7 +18,7 @@ class DatabaseSchemas {
 	}
 
     private loadPropertiesIfExists(String resourceName) {
-        def stream = DatabaseSchemas.class.classLoader.getResourceAsStream("database-default.properties");
+        def stream = DatabaseSchemas.class.classLoader.getResourceAsStream(resourceName);
         if (stream) {
             props.load(stream)
             stream.close()

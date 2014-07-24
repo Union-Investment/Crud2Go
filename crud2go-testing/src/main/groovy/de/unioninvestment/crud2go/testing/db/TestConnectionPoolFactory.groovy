@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component
 @Profile("testing")
 class TestConnectionPoolFactory implements ConnectionPoolFactory {
 
-    DatabaseSchemas schemas
+    DatabaseSchemas schemas = new DatabaseSchemas()
 
 	ConnectionPool getPool(String name) {
         def dataSource = schemas[name]
         assert dataSource : "Unknown DataSource $name"
-        return new TestConnectionPool(dataSource)
+        return new TestConnectionPool(name, dataSource)
 	}
 }
 

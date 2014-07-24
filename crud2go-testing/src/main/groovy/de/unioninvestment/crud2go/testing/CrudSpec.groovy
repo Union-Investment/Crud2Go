@@ -13,12 +13,15 @@ import org.springframework.test.context.TestContextManager
 import org.springframework.test.context.TestExecutionListeners
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener
+
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser
 import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadContextProvider
 import de.unioninvestment.eai.portal.support.vaadin.context.Context
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction
@@ -33,8 +36,8 @@ import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory
-
 import spock.lang.Specification
+
 import org.junit.Rule
 
 @TestExecutionListeners( [DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class ])
@@ -43,7 +46,9 @@ public class CrudSpec extends Specification {
 
 	private static final String TEST_PORTLET_ID = "PortletId"
 	private static final long TEST_COMMUNITY_ID = 17808L
-
+	
+	private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
+	
 
 	protected EventBus eventBus
 	protected ConnectionPoolFactory connectionPoolFactory
@@ -127,7 +132,7 @@ public class CrudSpec extends Specification {
 	}
 
 	public void configurePortletUtils() {
-		Context.setProvider(new BackgroundThreadContextProvider(applicationContext, Locale.GERMANY))
+		Context.setProvider(new BackgroundThreadContextProvider(applicationContext, Locale.GERMANY, CrudTestContext.LIFERAY_COMMUNITY_ID))
 	}
 
 	public void initializeDependencies() {
@@ -190,7 +195,7 @@ public class CrudSpec extends Specification {
 		scriptsCompiler = new ConfigurationScriptsCompiler(scriptCompiler)
 		
 		factory = new ScriptModelFactory(testConnectionPoolFactory,
-						userFactoryMock, null)
+						userFactoryMock, null, scriptCompiler, DatabaseDialect.ORACLE)
 		
 	}
 
