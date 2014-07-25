@@ -86,6 +86,7 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
 		portlet.elements.adminComponent != null
     }
 
+    // TODO API erstellen und testen
     def 'should allow optional additional validation'() {
         when:
         load {

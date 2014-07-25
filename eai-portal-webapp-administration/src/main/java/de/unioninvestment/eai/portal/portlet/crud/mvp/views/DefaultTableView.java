@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1017,7 +1018,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 	}
 
 	private void exportExcelSheet(String customFilename) {
-		ExcelExporter exporter = new ExcelExporter();
+		ExcelExporter exporter = Context.getBean(ExcelExporter.class);
 		String filename = customFilename != null ? customFilename : "export_"
 				+ createFilenameTime() + ".xlsx";
 		Download download = new StreamingExporterDownload(filename,

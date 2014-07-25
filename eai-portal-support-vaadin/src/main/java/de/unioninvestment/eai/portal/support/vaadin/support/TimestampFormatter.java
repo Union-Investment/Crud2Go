@@ -77,14 +77,12 @@ public class TimestampFormatter implements Converter<String, Timestamp> {
 			Class<? extends String> targetType, Locale locale)
 			throws com.vaadin.data.util.converter.Converter.ConversionException {
 
-		if (value instanceof Timestamp) {
+		if (value != null) {
 			if (format != null) {
 				return format.format(value);
 			} else {
 				return TimestampUtils.formatTimestamp((Timestamp) value);
 			}
-		} else if (value != null) {
-			return value.toString();
 		} else {
 			return null;
 		}

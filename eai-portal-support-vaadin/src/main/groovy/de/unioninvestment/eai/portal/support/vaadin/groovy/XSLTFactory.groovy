@@ -32,16 +32,15 @@ class XSLTFactory extends AbstractBeanFactory {
 	
 	private static final int INITIAL_OUTPUTSTREAM_SIZE = 1024
 	
-	private DocumentBuilderFactory dbf
-	private TransformerFactory tf
+    @Lazy(soft=true) private TransformerFactory tf = TransformerFactory.newInstance()
+	@Lazy(soft=true) private DocumentBuilderFactory dbf = {
+        def factory = DocumentBuilderFactory.newInstance()
+        factory.setNamespaceAware(true)
+        factory
+    }
 	
 	XSLTFactory() {
 		ignoredAttributes = ['input', 'xslt']
-		
-		dbf = DocumentBuilderFactory.newInstance()
-		dbf.setNamespaceAware(true)
-		
-		tf = TransformerFactory.newInstance()
 	}
 	
 	def newInstance(FactoryBuilderSupport builder, name,value, Map args) throws InstantiationException ,IllegalAccessException {

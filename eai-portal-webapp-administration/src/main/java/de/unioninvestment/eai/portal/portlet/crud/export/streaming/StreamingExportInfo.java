@@ -43,6 +43,7 @@ public class StreamingExportInfo implements ExportInfo {
 	private final Class[] columnTypes;
 	private final String[] displayFormats;
 	private final String[] excelFormats;
+    private boolean[] multilineFlags;
 
 	public StreamingExportInfo(DataContainer container, Table table) {
 		this.container = container;
@@ -53,6 +54,7 @@ public class StreamingExportInfo implements ExportInfo {
 		this.columnTypes = generateColumnTypes(columnNames);
 		this.displayFormats = generateDisplayFormats(columnNames);
 		this.excelFormats = generateExcelFormats(columnNames);
+        this.multilineFlags = generateMultilineFlags(columnNames);
 	}
 
 	private String[] generateColumnNames() {
@@ -107,6 +109,18 @@ public class StreamingExportInfo implements ExportInfo {
 		return types;
 	}
 
+    private boolean[] generateMultilineFlags(String[] columnNames) {
+        boolean[] multilineFlags = new boolean[columnNames.length];
+        if (columns != null) {
+            for (int i = 0; i < columnNames.length; i++) {
+                TableColumn tableColumn = columns.get(columnNames[i]);
+                multilineFlags[i] = tableColumn.isMultiline();
+            }
+        }
+        return multilineFlags;
+    }
+
+
 	private TableColumn getExportableGeneratedColumn(String columnName) {
 		if (columns != null) {
 			TableColumn column = columns.get(columnName);
@@ -159,4 +173,8 @@ public class StreamingExportInfo implements ExportInfo {
 		return excelFormats;
 	}
 
+    @Override
+    public boolean[] getMultilineFlags() {
+        return multilineFlags;
+    }
 }

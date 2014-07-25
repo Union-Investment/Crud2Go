@@ -74,13 +74,14 @@ public class ConfigurationCachingServiceAspect {
 	/**
 	 * @param pjp
 	 *            die eigentlich aufgerufene Methode
-	 * @param windowId
-	 *            die WindowID des aktuellen Portlets
+     * @param portletId
+     *            die aktuelle Portlet-ID
+	 * @param communityId
+	 *            die communityId des aktuellen Portlets
 	 * @return eine gecachete oder neu gelesene PortletConfig Instanz
 	 * @throws Throwable
 	 *             bei Fehler
 	 */
-
 	@Around(value = "execution(* de.unioninvestment.eai.portal.portlet.crud.services.DefaultConfigurationService.getPortletConfig(..)) && args(portletId, communityId)")
 	public Object findInCache(ProceedingJoinPoint pjp, String portletId,
 			long communityId) throws Throwable {
@@ -125,8 +126,10 @@ public class ConfigurationCachingServiceAspect {
 	 *            der Dateiname
 	 * @param configXml
 	 *            die Konfiguration
-	 * @param windowId
-	 *            die WindowID
+     * @param portletId
+     *            die aktuelle Portlet-ID
+     * @param communityId
+     *            die communityId des aktuellen Portlets
 	 * @param username
 	 *            der aktuelle NamedUser
 	 */

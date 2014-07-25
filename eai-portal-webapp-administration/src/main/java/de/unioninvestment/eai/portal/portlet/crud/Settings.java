@@ -116,7 +116,13 @@ public class Settings {
 	@Value("${portlet.crud.portal.footerHeight}")
 	private int footerHeight;
 
-	private URL defaultPropertiesLocation = Settings.class.getClassLoader()
+    @Value("${portlet.crud.export.excel.rowAccessWindowSize}")
+    private int excelRowAccessWindowSize;
+
+    @Value("${portlet.crud.export.excel.fontName}")
+    private String excelFontName;
+
+    private URL defaultPropertiesLocation = Settings.class.getClassLoader()
 			.getResource("eai-portal-administration.properties");
 	private URL propertiesLocation = Settings.class.getClassLoader()
 			.getResource("eai/eai-portal-administration.properties");
@@ -129,7 +135,7 @@ public class Settings {
 
 	private Properties props;
 
-	/**
+    /**
 	 * Default Constructor.
 	 */
 	public Settings() {
@@ -324,5 +330,13 @@ public class Settings {
 	public boolean isValidateConfiguration() {
 		return validateConfiguration;
 	}
+
+    public int getExcelRowAccessWindowSize() {
+        return excelRowAccessWindowSize;
+    }
+
+    public String getExcelFontName() {
+        return excelFontName;
+    }
 
 }

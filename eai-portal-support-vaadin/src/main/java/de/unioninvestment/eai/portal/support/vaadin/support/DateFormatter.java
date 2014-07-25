@@ -82,14 +82,12 @@ public class DateFormatter implements Converter<String, Date> {
 			Class<? extends String> targetType, Locale locale)
 			throws com.vaadin.data.util.converter.Converter.ConversionException {
 
-		if (value instanceof Date) {
+		if (value != null) {
 			if (format != null) {
 				return format.format(value);
 			} else {
 				return new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(value);
 			}
-		} else if (value != null) {
-			return value.toString();
 		} else {
 			return null;
 		}
