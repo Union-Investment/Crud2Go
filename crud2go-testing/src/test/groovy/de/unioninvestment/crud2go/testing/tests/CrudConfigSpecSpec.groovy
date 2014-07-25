@@ -71,21 +71,22 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
     }
 
     def 'should allow modification of current user'() {
-    	when:
-		load {
-			 fromClasspath 'testingSimpleConfig.xml'
-			 currentUserName 'carsten'
-			 currentUserRoles(['admin'])
-		}
+        when:
+        load {
+            fromClasspath 'testingSimpleConfig.xml'
+            currentUserName 'carsten'
+            currentUserRoles(['admin'])
+        }
         ScriptCurrentUser currentUser = instance.mainScript.currentUser
 
-		then:
-		currentUser.name == 'carsten'
-		currentUser.roles == ['all', 'admin', 'authenticated'] as Set
+        then:
+        currentUser.name == 'carsten'
+        currentUser.roles == ['all', 'admin', 'authenticated'] as Set
         currentUser.authenticated == true
-		portlet.elements.adminComponent != null
+        portlet.elements.adminComponent != null
     }
 
+    // TODO API erstellen und testen
     def 'should allow optional additional validation'() {
         when:
         load {
@@ -97,4 +98,21 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         true // thrown ValidationException()
     }
 
+    def 'should load combined file relative to testclass if existing'() {
+        when:
+        load 'testingCombinedConfig.xml'
+        ScriptCurrentUser currentUser = instance.mainScript.currentUser
+
+        then:
+        instance.mainScript.type == 'combined'
+    }
+
+    def 'should load combined file relative to combined.path if existing'() {
+        when:
+        load '/de/unioninvestment/crud2go/testing/tests/testingCombinedConfig.xml'
+        ScriptCurrentUser currentUser = instance.mainScript.currentUser
+
+        then:
+        instance.mainScript.type == 'combined'
+    }
 }

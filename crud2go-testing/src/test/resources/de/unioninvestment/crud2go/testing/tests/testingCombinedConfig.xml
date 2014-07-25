@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+         title="Beispiel für Script-Container">
+    <page>
+		<component id="adminComponent" generator="new Label('test')"/>
+    </page>
+    <script><![CDATA[
+         type = 'classpath'
+    ]]></script>
+</portlet>
