@@ -17,9 +17,7 @@ class CrudConfigSpec extends Specification {
     private CrudTestConfig _instance
 
     void load(String name) {
-        _instance = CrudTestContext.instance.load(this.class) {
-            fromClasspath name
-        }
+        _instance = CrudTestContext.instance.load(this.class, name)
     }
 
     void load(Closure params) {

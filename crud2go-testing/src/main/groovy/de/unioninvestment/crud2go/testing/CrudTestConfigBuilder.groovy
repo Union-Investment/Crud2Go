@@ -68,6 +68,7 @@ class CrudTestConfigBuilder {
     @Autowired
     private UserFactory userFactoryMock
 
+    File combinedPath
     Class<?> testClass
     Map configCache
 	
@@ -95,8 +96,30 @@ class CrudTestConfigBuilder {
         eventBus = new EventBus();
     }
 
+    CrudTestConfigBuilder from(String name) {
+        File configFile = null
+        if (combinedPath?.exists()) {
+            if (name.startsWith('/') || name.startsWith('\\')) {
+                configFile = new File(combinedPath, name.substring(1))
+            } else {
+                String relativePath = testClass.package.name.replace('.', '/')
+                configFile = new File(new File(combinedPath, relativePath), name)
+            }
+        }
+        if (configFile?.exists()) {
+            fromFile(configFile)
+        } else {
+            fromClasspath name
+        }
+    }
+
     CrudTestConfigBuilder fromClasspath(String configFilename) {
         configResource = new ClassPathResource(configFilename, testClass)
+        return this
+    }
+
+    CrudTestConfigBuilder fromFile(File configFile) {
+        configResource = new FileSystemResource(configFile)
         return this
     }
 
