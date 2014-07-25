@@ -1,4 +1,4 @@
-package de.unioninvestment.eai.portal.portlet.crud;
+package de.unioninvestment.eai.portal.portlet.crud.domain.validation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

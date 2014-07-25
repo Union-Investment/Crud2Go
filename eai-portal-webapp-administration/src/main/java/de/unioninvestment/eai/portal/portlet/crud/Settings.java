@@ -100,6 +100,9 @@ public class Settings {
 
 	@Value("${portlet.crud.requestLog.enabled}")
 	private boolean isRequestLogEnabled;
+	
+	@Value("${portlet.crud.validateConfiguration}")
+	private boolean validateConfiguration;
 
 	@Value("${portlet.crud.requestLog.minimalDurationMillis}")
 	private int requestLogMinimalDurationMillis;
@@ -316,6 +319,10 @@ public class Settings {
 
 	public Integer getUiHistoryLimit() {
 		return uiHistoryLimit;
+	}
+	
+	public boolean isValidateConfiguration() {
+		return validateConfiguration;
 	}
 
 }
