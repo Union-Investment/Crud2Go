@@ -1,6 +1,7 @@
 package de.unioninvestment.crud2go.testing.spock
 
 import de.unioninvestment.crud2go.testing.CrudTestConfig
+import de.unioninvestment.crud2go.testing.CrudTestConfigBuilder
 import de.unioninvestment.crud2go.testing.CrudTestContext
 import de.unioninvestment.crud2go.testing.LiferayContext
 import org.junit.Rule
@@ -20,7 +21,7 @@ class CrudConfigSpec extends Specification {
         _instance = CrudTestContext.instance.load(this.class, name)
     }
 
-    void load(Closure params) {
+    void load(@DelegatesTo(CrudTestConfigBuilder) Closure params) {
         _instance = CrudTestContext.instance.load(this.class, params)
     }
 
