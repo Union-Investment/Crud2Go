@@ -96,6 +96,17 @@ class CrudTestConfigBuilder {
         eventBus = new EventBus();
     }
 
+    /**
+     * Load the configuration from the following places (match wins)
+     * <ul>
+     *   <li>A file relative to the combined.path + the package folder of the test class</li>
+     *   <li>For paths statring with slash: A path relative to the combined.path of the test class</li>
+     *   <li>A classpath resource besides the test class</li>
+     *   <li>For paths statring with slash: An absolute classpath entry</li>
+     * </ul>
+     * @param name
+     * @return
+     */
     CrudTestConfigBuilder from(String name) {
         File configFile = null
         if (combinedPath?.exists()) {
