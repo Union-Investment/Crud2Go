@@ -38,6 +38,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
+import groovy.lang.DelegatesTo;
 
 /**
  * Basisklasse für Container, die Event-Handler(onInsert, onCreate, onDelete,
@@ -63,7 +64,7 @@ public class ScriptContainer extends ScriptComponent {
 	 *            {@link ScriptFilterFactory} direkt aufgerufen werden können,
 	 *            um Filter auf dem Container zu setzen.
 	 */
-	public void addFilters(Closure<?> closure) {
+	public void addFilters(@DelegatesTo(ScriptFilterFactory.class) Closure<?> closure) {
 		Object oldDelegate = closure.getDelegate();
 		try {
 			List<Filter> filters = new FilterClosureCallable(closure).call();
@@ -81,7 +82,7 @@ public class ScriptContainer extends ScriptComponent {
 	 *            {@link ScriptFilterFactory} direkt aufgerufen werden können,
 	 *            um Filter auf dem Container zu setzen.
 	 */
-	public void replaceFilters(Closure<?> closure) {
+	public void replaceFilters(@DelegatesTo(ScriptFilterFactory.class) Closure<?> closure) {
 		Object oldDelegate = closure.getDelegate();
 		try {
 			List<Filter> filters = new FilterClosureCallable(closure).call();
@@ -101,7 +102,7 @@ public class ScriptContainer extends ScriptComponent {
 	 *            {@link ScriptFilterFactory} direkt aufgerufen werden können,
 	 *            um Filter auf dem Container zu setzen.
 	 */
-	public void replaceFilters(Map<String, Object> namedArgs, Closure<?> closure) {
+	public void replaceFilters(Map<String, Object> namedArgs, @DelegatesTo(ScriptFilterFactory.class) Closure<?> closure) {
 		Object oldDelegate = closure.getDelegate();
 		try {
 			List<Filter> filters = new FilterClosureCallable(closure).call();
