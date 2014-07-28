@@ -22,7 +22,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -589,4 +591,35 @@ public class CrudUITest extends SpringPortletContextTest {
 		verify(portletMock, never()).handleReload();
 	}
 
+	@Test
+	public void shouldValidateConfigurationOnlyWhenSettingsAreSet(){
+		when(settingsMock.isValidateConfiguration()).thenReturn(true);
+		stubPortletInitialization();
+		ModelValidator modelValidatorMock = mock(ModelValidator.class);
+		
+		ui.modelValidator = modelValidatorMock;
+		
+		when(configurationServiceMock.isConfigured(any(Config.class), any(javax.portlet.PortletPreferences.class))).thenReturn(true);
+		when(configurationServiceMock.getPortletConfig(any(String.class), anyLong())).thenReturn(configMock);
+		
+		ui.refreshViews();
+		verify(modelValidatorMock,times(1)).validateModel(any(ModelBuilder.class), any(Portlet.class), any(Config.class));		
+	}
+	
+	@Test
+	public void shouldNotValidateConfiguration_SettingsNotSet(){
+		when(settingsMock.isValidateConfiguration()).thenReturn(false);
+		stubPortletInitialization();
+		ModelValidator modelValidatorMock = mock(ModelValidator.class);
+		
+		ui.modelValidator = modelValidatorMock;
+		
+		when(configurationServiceMock.isConfigured(any(Config.class), any(javax.portlet.PortletPreferences.class))).thenReturn(true);
+		when(configurationServiceMock.getPortletConfig(any(String.class), anyLong())).thenReturn(configMock);
+		
+		ui.refreshViews();
+		verify(modelValidatorMock,never()).validateModel(any(ModelBuilder.class), any(Portlet.class), any(Config.class));		
+	}
+
+	
 }
