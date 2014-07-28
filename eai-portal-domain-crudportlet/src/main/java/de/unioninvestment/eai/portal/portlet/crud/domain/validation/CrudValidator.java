@@ -31,11 +31,11 @@ public class CrudValidator {
 	private PortletConfig portletConfig;
 	
 	public CrudValidator(ModelBuilder modelBuilder, Portlet portletDomain,
-			Config portletConfig) {
+                         PortletConfig portletConfig) {
 		super();
 		this.modelBuilder = modelBuilder;
 		this.portletDomain = portletDomain;
-		this.portletConfig = portletConfig.getPortletConfig();
+		this.portletConfig = portletConfig;
 	}
 
 	public void validate(){
@@ -96,7 +96,7 @@ public class CrudValidator {
 		if(searchColumnNames.size()>0 && columnNames.size()>0){
 			for(String name:searchColumnNames){
 				if(!columnNames.contains(name)){
-					throw new IllegalArgumentException("Spalte "+name+" ist nicht in Tabelle verfügbar");
+					throw new IllegalArgumentException("Spalte '"+name+"' ist nicht in Tabelle verfügbar");
 				}
 			}
 		}

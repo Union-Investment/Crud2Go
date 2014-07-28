@@ -189,10 +189,26 @@ class CrudTestConfigBuilder {
         ModelBuilder modelBuilder = createModelBuilder(portletConfig)
         Portlet portlet = modelBuilder.build()
 
-		if (validationEnabled) {
-			new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
-		}
-				
+        preparePortletPreferences(portletConfig, portlet)
+
+        Map mapping = modelBuilder.getModelToConfigMapping()
+        ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
+                testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
+                portlet, mapping)
+        def scriptPortlet = scriptModelBuilder.build()
+
+		long endTime = System.currentTimeMillis()
+        statistics.postCompileTime = endTime - postBuildStartTime
+        statistics.buildTime = endTime - startTime
+
+        if (validationEnabled) {
+            new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
+        }
+
+        return new CrudTestConfig(portletConfig, scriptPortlet, scriptBuilder.mainScript, statistics)
+    }
+
+    private void preparePortletPreferences(PortletConfig portletConfig, Portlet portlet) {
         def validPreferenceKeys = portletConfig.preferences?.preference?.collect { it.@key }
         portletPreferences.each { key, value ->
             if (validPreferenceKeys.contains(key)) {
@@ -201,20 +217,9 @@ class CrudTestConfigBuilder {
                 throw new IllegalArgumentException("Unknown preference '$key'. Allowed are $validPreferenceKeys")
             }
         }
-
-        Map mapping = modelBuilder.getModelToConfigMapping()
-        ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
-                testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
-                portlet, mapping)
-
-		long endTime = System.currentTimeMillis()
-        statistics.postCompileTime = endTime - postBuildStartTime
-        statistics.buildTime = endTime - startTime
-
-        return new CrudTestConfig(portletConfig, scriptModelBuilder.build(), scriptBuilder.mainScript, statistics)
     }
 
-	private mockCurrentUser() {
+    private mockCurrentUser() {
 		when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
 		when(portalMock.hasPermission(eq(currentUserName), eq("MEMBER"), eq(PortletRole.RESOURCE_KEY), anyString())).thenAnswer(
                 { InvocationOnMock inv ->

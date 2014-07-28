@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+         title="Beispiel für Script-Container">
+    <page>
+        <form id="form1">
+            <field name="CNUMBER5_2_NN" title="CNUMBER5_2_NN" />
+            <action title="search" id="id001">
+                <search>
+                    <apply-filters>
+                        <starts-with column="CNUMBER5_2_NN" field="CNUMBER5_2_NN"/>
+                    </apply-filters>
+                </search>
+            </action>
+        </form>
+        <table id="table1">
+            <script-container delegate="backend" />
+            <action onExecution="it.table.refresh()" title="refresh"></action>
+        </table>
+    </page>
+    <script><![CDATA[
+
+	backend = new MyCustomBackend(main: this)
+
+    class MyCustomBackend implements ScriptContainerBackend {
+        def main
+
+    	Map data = [:] as LinkedHashMap
+
+		Closure metaData = {
+			ID(type:Long,readonly:true, required:true, partOfPrimaryKey:true)
+			CNUMBER5_2(type:Integer,readonly:false, required:false)
+			CDATE(type:java.util.Date,readonly:false, required:false)
+			CTIMESTAMP(type:java.util.Date,readonly:true, required:false)
+			CVARCHAR5_NN(type:String,readonly:true, required:true)
+			CNUMBER5_2_NN(type:Integer,readonly:true, required:true)
+			CDATE_NN(type:java.util.Date,readonly:true, required:false)
+			CTIMESTAMP_NN(type:java.util.Date,readonly:true, required:false)
+			TESTDATA(type:String,readonly:true, required:false)
+		}
+
+		List read() {
+			if (!data) {
+				def rnd = new Random()
+				(1..4000).each { id ->
+					data.put id, [
+						id,
+						rnd.nextInt(),
+						new GregorianCalendar(1990+rnd.nextInt(20), rnd.nextInt(12), rnd.nextInt(30)+1).time,
+						new GregorianCalendar(1990+rnd.nextInt(20), rnd.nextInt(12), rnd.nextInt(30)+1, rnd.nextInt(24), rnd.nextInt(60), rnd.nextInt(60)).time,
+						"Hello Horst",
+						4710+id,
+						new GregorianCalendar(1990+rnd.nextInt(20), rnd.nextInt(12), rnd.nextInt(30)+1).time,
+						new GregorianCalendar(1990+rnd.nextInt(20), rnd.nextInt(12), rnd.nextInt(30)+1).time,
+						'012345678901234567890123456789'.substring(0, new Random().nextInt(30))
+					]
+				}
+			}
+			return data.values().asList()
+		}
+
+		void update(List rows) {
+			rows.each { row ->
+				if (row.isNewItem()) {
+					data.put(row.values.ID, [row.values.ID, row.values.CNUMBER5_2, row.values.CDATE,row.values.CTIMESTAMP,row.values.CVARCHAR5_NN,row.values.CNUMBER5_2_NN,row.values.CDATE_NN,row.values.CTIMESTAMP_NN,row.values.TESTDATA])
+				} else if (row.isModified()) {
+				  	data.put(row.values.ID, [row.values.ID, row.values.CNUMBER5_2, row.values.CDATE,row.values.CTIMESTAMP,row.values.CVARCHAR5_NN,row.values.CNUMBER5_2_NN,row.values.CDATE_NN,row.values.CTIMESTAMP_NN,row.values.TESTDATA])
+				} else if (row.isDeleted()) {
+					data.remove(row.values.ID)
+				}
+				main.log.info "Processing row with ID ${row.id.asMap()}"
+			}
+		}
+	}
+]]>
+    </script>
+</portlet>
