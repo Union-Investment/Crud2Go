@@ -35,7 +35,7 @@ public class Preference implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private PreferenceConfig config;
+	protected PreferenceConfig config;
 
 	public Preference(PreferenceConfig config) {
 		this.config = config;

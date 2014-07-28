@@ -27,13 +27,22 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
-import de.unioninvestment.eai.portal.portlet.crud.export.streaming.CsvExporter;
+import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig;
+import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Preference;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.PreferencesRepository;
 import de.unioninvestment.eai.portal.portlet.crud.export.streaming.ExcelExporter;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -66,7 +75,7 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFac
  * @author carsten.mjartan
  */
 @Configuration
-public class SpringApplicationFactory {
+public class SpringApplicationFactory implements PreferencesRepository {
 
 	@Autowired
 	private DefaultConfigurationDao configurationDao;
@@ -77,7 +86,19 @@ public class SpringApplicationFactory {
 	@Resource(name = "dataTypes")
 	private List<Object> dataTypeHelpers;
 
-	@Bean
+    @Autowired
+    private ConnectionPoolFactory connectionPoolFactory;
+
+    @Autowired
+    private UserFactory userFactory;
+
+    @Autowired
+    private Portal portal;
+
+    @Value("${portlet.crud.databaseBackend.dialect}")
+    private DatabaseDialect databaseDialect;
+
+    @Bean
 	static UIScope uiScope() {
 		return new UIScope();
 	}
@@ -243,6 +264,17 @@ public class SpringApplicationFactory {
     @Bean
     public ExcelExporter excelExporter() {
         return new ExcelExporter(settings.getExcelRowAccessWindowSize(), settings.getExcelFontName());
+    }
+
+    @Override
+    public Preference getPreference(Portlet requestor, PreferenceConfig config) {
+        return new Preference(config);
+    }
+
+    @Bean
+    ScriptModelFactory scriptModelFactory() {
+        return new ScriptModelFactory(connectionPoolFactory,
+                userFactory, portal, scriptCompiler(), databaseDialect, false);
     }
 
 }

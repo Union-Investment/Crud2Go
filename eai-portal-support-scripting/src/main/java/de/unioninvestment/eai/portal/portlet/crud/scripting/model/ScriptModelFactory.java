@@ -82,7 +82,8 @@ public class ScriptModelFactory {
 
 	private final ConnectionPoolFactory connectionPoolFactory;
 	private final UserFactory userFactory;
-	private Portal portal;
+    private final boolean inTest;
+    private Portal portal;
 	private DatabaseDialect databaseDialect;
     private ScriptCompiler scriptCompiler;
 
@@ -93,19 +94,20 @@ public class ScriptModelFactory {
 	 * @param userFactory
 	 *            Kactory-Objekt zum Erzeugen von Benutzer-Objekten.
 	 */
-	@Autowired
 	public ScriptModelFactory(
 			ConnectionPoolFactory connectionPoolFactory,
 			UserFactory userFactory,
 			Portal portal,
             ScriptCompiler scriptCompiler,
-			@Value("${portlet.crud.databaseBackend.dialect}") DatabaseDialect databaseDialect) {
+			DatabaseDialect databaseDialect,
+            boolean inTest) {
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.userFactory = userFactory;
 		this.portal = portal;
         this.scriptCompiler = scriptCompiler;
         this.databaseDialect = databaseDialect;
-	}
+	    this.inTest = inTest;
+    }
 
 	/**
 	 * Erstellt eine Builder-Instanz.
@@ -151,7 +153,7 @@ public class ScriptModelFactory {
 	 * @return eine neue Wrapper-Klasse
 	 */
 	public ScriptPortlet getScriptPortlet(Portlet portlet) {
-		return new ScriptPortlet(portlet);
+		return new ScriptPortlet(portlet, inTest);
 	}
 
 	/**

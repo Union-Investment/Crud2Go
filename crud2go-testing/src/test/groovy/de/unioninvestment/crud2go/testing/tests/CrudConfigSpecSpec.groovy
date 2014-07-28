@@ -28,6 +28,24 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         instance != null
     }
 
+    def 'should load combined file relative to testclass if existing'() {
+        when:
+        load 'testingCombinedConfig.xml'
+        ScriptCurrentUser currentUser = instance.mainScript.currentUser
+
+        then:
+        instance.mainScript.type == 'combined'
+    }
+
+    def 'should load combined file relative to combined.path if existing'() {
+        when:
+        load '/de/unioninvestment/crud2go/testing/tests/testingCombinedConfig.xml'
+        ScriptCurrentUser currentUser = instance.mainScript.currentUser
+
+        then:
+        instance.mainScript.type == 'combined'
+    }
+
     def 'should load a config from file by path relative to maven project root'() {
         when:
         load {
@@ -86,6 +104,28 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         portlet.elements.adminComponent != null
     }
 
+    def 'should allow setting preferences'() {
+        when:
+        load {
+            fromClasspath 'testingSimpleConfig.xml'
+            preference 'pref1', 'value1'
+            preference 'pref2', 'newValue2'
+        }
+
+        then:
+        portlet.preferences.pref1 == 'value1'
+        portlet.preferences.pref2 == 'newValue2'
+        portlet.preferences.pref3 == 'defaultValue3'
+    }
+
+    def 'should set a testing flag inside the portlet'() {
+        when:
+        load 'testingSimpleConfig.xml'
+
+        then:
+        portlet.inTest == true
+    }
+
     // TODO API erstellen und testen
     def 'should allow optional additional validation'() {
         when:
@@ -98,21 +138,4 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         true // thrown ValidationException()
     }
 
-    def 'should load combined file relative to testclass if existing'() {
-        when:
-        load 'testingCombinedConfig.xml'
-        ScriptCurrentUser currentUser = instance.mainScript.currentUser
-
-        then:
-        instance.mainScript.type == 'combined'
-    }
-
-    def 'should load combined file relative to combined.path if existing'() {
-        when:
-        load '/de/unioninvestment/crud2go/testing/tests/testingCombinedConfig.xml'
-        ScriptCurrentUser currentUser = instance.mainScript.currentUser
-
-        then:
-        instance.mainScript.type == 'combined'
-    }
 }

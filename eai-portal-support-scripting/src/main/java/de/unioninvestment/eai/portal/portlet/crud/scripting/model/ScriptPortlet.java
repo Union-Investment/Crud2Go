@@ -50,8 +50,9 @@ public class ScriptPortlet {
 
 	private Closure<?> onReload;
 	private Closure<?> onRefresh;
+    private boolean inTest = false;
 
-	/**
+    /**
 	 * Konstruktor mit Parameter.
 	 * 
 	 * @param portlet
@@ -60,10 +61,11 @@ public class ScriptPortlet {
 	/**
 	 * @param portlet
 	 */
-	ScriptPortlet(Portlet portlet) {
+	ScriptPortlet(Portlet portlet, boolean inTest) {
 		this.portlet = portlet;
 		addEventHandlerForOnRefresh();
 		addEventHandlerForOnReload();
+        this.inTest = inTest;
 	}
 
 	private void addEventHandlerForOnReload() {
@@ -211,6 +213,10 @@ public class ScriptPortlet {
 	public void refresh() {
 		portlet.refresh();
 	}
+
+    public boolean isInTest() {
+        return inTest;
+    }
 
 	public Map<String, Object> getElements() {
 		return unmodifiableMap(elementsById);

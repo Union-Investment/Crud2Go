@@ -29,6 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.PreferencesRepository;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -276,9 +278,10 @@ public class Portlet implements Serializable {
 		if (this.preferences == null) {
 			this.preferences = new LinkedHashMap<String, Preference>();
 			if (config.getPreferences() != null) {
+                PreferencesRepository repository = Context.getBean(PreferencesRepository.class);
 				for (PreferenceConfig pref : config.getPreferences()
 						.getPreference()) {
-					preferences.put(pref.getKey(), new Preference(pref));
+					preferences.put(pref.getKey(), repository.getPreference(this, pref));
 				}
 			}
 		}

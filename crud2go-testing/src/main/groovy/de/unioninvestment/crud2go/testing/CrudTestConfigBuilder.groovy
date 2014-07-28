@@ -1,6 +1,7 @@
 package de.unioninvestment.crud2go.testing
 
 import de.unioninvestment.crud2go.testing.db.TestConnectionPoolFactory
+import de.unioninvestment.eai.portal.portlet.crud.domain.validation.ModelValidator;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config
@@ -14,6 +15,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.NamedUser
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.PreferencesRepository
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory
 import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler
@@ -30,12 +32,10 @@ import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 
 import static org.mockito.Matchers.any
-import static org.mockito.Matchers.anyLong
 import static org.mockito.Matchers.anyString
 import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.reset
 import static org.mockito.Mockito.when
-import static org.mockito.Mockito.mock
 
 /**
  * Created by cmj on 17.07.14.
@@ -71,6 +71,9 @@ class CrudTestConfigBuilder {
     @Autowired
     private UserFactory userFactoryMock
 
+    @Autowired
+    private TestPreferencesRepository preferencesRepository
+
     File combinedPath
     Class<?> testClass
     Map<URL, CacheEntry> configCache
@@ -91,7 +94,9 @@ class CrudTestConfigBuilder {
 
     private Map<String, Long> resourceIds = new HashMap<String, Long>();
 
-    private ModelPreferences preferences = new ModelPreferences()
+    private ModelPreferences modelPreferences = new ModelPreferences()
+
+    private Map<String,String> portletPreferences = [:]
 
     private Statistics statistics = new Statistics()
 
@@ -99,6 +104,17 @@ class CrudTestConfigBuilder {
         eventBus = new EventBus();
     }
 
+    /**
+     * Load the configuration from the following places (match wins)
+     * <ul>
+     *   <li>A file relative to the combined.path + the package folder of the test class</li>
+     *   <li>For paths statring with slash: A path relative to the combined.path of the test class</li>
+     *   <li>A classpath resource besides the test class</li>
+     *   <li>For paths statring with slash: An absolute classpath entry</li>
+     * </ul>
+     * @param name
+     * @return
+     */
     CrudTestConfigBuilder from(String name) {
         File configFile = null
         if (combinedPath?.exists()) {
@@ -141,7 +157,12 @@ class CrudTestConfigBuilder {
 		this.currentUserRoles = roles as HashSet
 		return this
 	}
-	
+
+    CrudTestConfigBuilder preference(String key, String value) {
+        this.portletPreferences[key] = value
+        return this
+    }
+
     protected Portlet createModel(PortletConfig configuration) {
         ModelBuilder modelBuilder = createModelBuilder(configuration);
         return modelBuilder.build();
@@ -149,7 +170,7 @@ class CrudTestConfigBuilder {
 
     protected ModelBuilder createModelBuilder(PortletConfig configuration) {
         return modelFactory.getBuilder(eventBus, new Config((PortletConfig)configuration,
-                (Map<String, Long>)resourceIds, (String)null, (Date)null), preferences);
+                (Map<String, Long>)resourceIds, (String)null, (Date)null), modelPreferences);
     }
 
 
@@ -171,15 +192,25 @@ class CrudTestConfigBuilder {
         ModelBuilder modelBuilder = createModelBuilder(portletConfig)
         Portlet portlet = modelBuilder.build()
 
-        if (validationEnabled) {
-		    // TODO add validation
+		if (validationEnabled) {
+			new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
+		}
+				
+        def validPreferenceKeys = portletConfig.preferences?.preference?.collect { it.@key }
+        portletPreferences.each { key, value ->
+            if (validPreferenceKeys.contains(key)) {
+                preferencesRepository.setPreference(portlet, key, value)
+            } else {
+                throw new IllegalArgumentException("Unknown preference '$key'. Allowed are $validPreferenceKeys")
+            }
         }
-		
+
         Map mapping = modelBuilder.getModelToConfigMapping()
         ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
                 testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
                 portlet, mapping)
-        long endTime = System.currentTimeMillis()
+
+		long endTime = System.currentTimeMillis()
         statistics.postCompileTime = endTime - postBuildStartTime
         statistics.buildTime = endTime - startTime
 
@@ -218,7 +249,7 @@ class CrudTestConfigBuilder {
             statistics.compileTime = existingEntry.compileTime
             return existingEntry.config
         } else {
-            assert configResource.exists(): 'Configuration source does not exist'
+            assert configResource.exists(): "Configuration source $configResource.URL does not exist"
             long compileStartTime = System.currentTimeMillis()
             PortletConfig portletConfig = unmarshaller.unmarshal(configResource.inputStream)
             scriptsCompiler.compileAllScripts(portletConfig)
