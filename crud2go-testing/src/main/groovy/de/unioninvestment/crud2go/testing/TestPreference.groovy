@@ -4,6 +4,8 @@ import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Preference
 
 /**
+ * Preference as provided by the testing framework.
+ *
  * Created by cmj on 28.07.14.
  */
 class TestPreference extends Preference{

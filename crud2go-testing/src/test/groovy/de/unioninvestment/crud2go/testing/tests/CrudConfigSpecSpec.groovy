@@ -118,15 +118,12 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         portlet.preferences.pref3 == 'defaultValue3'
     }
 
-    def 'should fail setting unknown preference'() {
+    def 'should set a testing flag inside the portlet'() {
         when:
-        load {
-            fromClasspath 'testingSimpleConfig.xml'
-            preference 'unknown', 'newValue2'
-        }
+        load 'testingSimpleConfig.xml'
 
         then:
-        thrown IllegalArgumentException
+        portlet.inTest == true
     }
 
     // TODO API erstellen und testen

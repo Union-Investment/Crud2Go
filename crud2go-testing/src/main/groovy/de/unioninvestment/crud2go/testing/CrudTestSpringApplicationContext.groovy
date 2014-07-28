@@ -121,7 +121,7 @@ class CrudTestSpringApplicationContext {
     @Bean
     ScriptModelFactory scriptModelFactory() {
         new ScriptModelFactory(testConnectionPoolFactory(),
-                userFactoryMock(), portalMock(), scriptCompiler(), DatabaseDialect.ORACLE)
+                userFactoryMock(), portalMock(), scriptCompiler(), DatabaseDialect.ORACLE, true)
     }
 
     @Bean
