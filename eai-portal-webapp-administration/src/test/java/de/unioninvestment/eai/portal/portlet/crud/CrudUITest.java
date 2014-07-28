@@ -592,6 +592,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		verify(portletMock, never()).handleReload();
 	}
 
+
 	@Test
 	public void shouldValidateConfigurationOnlyWhenSettingsAreSet(){
 		when(settingsMock.isValidateConfiguration()).thenReturn(true);
