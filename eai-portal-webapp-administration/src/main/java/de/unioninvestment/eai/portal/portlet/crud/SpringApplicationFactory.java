@@ -27,7 +27,10 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
-import de.unioninvestment.eai.portal.portlet.crud.export.streaming.CsvExporter;
+import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Preference;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.PreferencesRepository;
 import de.unioninvestment.eai.portal.portlet.crud.export.streaming.ExcelExporter;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
@@ -66,7 +69,7 @@ import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFac
  * @author carsten.mjartan
  */
 @Configuration
-public class SpringApplicationFactory {
+public class SpringApplicationFactory implements PreferencesRepository {
 
 	@Autowired
 	private DefaultConfigurationDao configurationDao;
@@ -245,4 +248,8 @@ public class SpringApplicationFactory {
         return new ExcelExporter(settings.getExcelRowAccessWindowSize(), settings.getExcelFontName());
     }
 
+    @Override
+    public Preference getPreference(Portlet requestor, PreferenceConfig config) {
+        return new Preference(config);
+    }
 }

@@ -42,8 +42,18 @@
 			<artifactId>eai-portal-support-scripting</artifactId>
 		</dependency>
 
-		
-		<dependency>
+        <dependency>
+            <groupId>de.uit.eai.portal</groupId>
+            <artifactId>eai-portal-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpg-jdk16</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>

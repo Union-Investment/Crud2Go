@@ -104,6 +104,31 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         portlet.elements.adminComponent != null
     }
 
+    def 'should allow setting preferences'() {
+        when:
+        load {
+            fromClasspath 'testingSimpleConfig.xml'
+            preference 'pref1', 'value1'
+            preference 'pref2', 'newValue2'
+        }
+
+        then:
+        portlet.preferences.pref1 == 'value1'
+        portlet.preferences.pref2 == 'newValue2'
+        portlet.preferences.pref3 == 'defaultValue3'
+    }
+
+    def 'should fail setting unknown preference'() {
+        when:
+        load {
+            fromClasspath 'testingSimpleConfig.xml'
+            preference 'unknown', 'newValue2'
+        }
+
+        then:
+        thrown IllegalArgumentException
+    }
+
     // TODO API erstellen und testen
     def 'should allow optional additional validation'() {
         when:

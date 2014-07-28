@@ -2,12 +2,16 @@ package de.unioninvestment.crud2go.testing
 
 import de.unioninvestment.crud2go.spi.security.CryptorFactory
 import de.unioninvestment.crud2go.testing.db.TestConnectionPoolFactory
+import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Preference
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.DefaultQueryOptionListRepository
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.PreferencesRepository
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.QueryOptionListRepository
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory
 import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler
@@ -133,5 +137,10 @@ class CrudTestSpringApplicationContext {
     @Bean
     Portal portalMock() {
         mock(Portal)
+    }
+
+    @Bean
+    TestPreferencesRepository testPreferencesRepository() {
+        new TestPreferencesRepository()
     }
 }

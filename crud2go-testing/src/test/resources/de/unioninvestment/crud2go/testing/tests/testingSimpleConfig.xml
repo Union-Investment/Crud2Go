@@ -4,6 +4,11 @@
     <roles>
         <role name="admin"/>
     </roles>
+    <preferences>
+        <preference key="pref1"/>
+        <preference key="pref2" default="value2"/>
+        <preference key="pref3" default="defaultValue3"/>
+    </preferences>
     <page>
         <form>
             <field name="CNUMBER5_2_NN" title="CNUMBER5_2_NN" />
