@@ -1,6 +1,7 @@
 package de.unioninvestment.crud2go.testing
 
 import de.unioninvestment.crud2go.testing.db.TestConnectionPoolFactory
+import de.unioninvestment.eai.portal.portlet.crud.domain.validation.ModelValidator;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config
@@ -145,15 +146,16 @@ class CrudTestConfigBuilder {
         ModelBuilder modelBuilder = createModelBuilder(portletConfig)
         Portlet portlet = modelBuilder.build()
 
-        if (validationEnabled) {
-		    // TODO add validation
-        }
-		
+		if (validationEnabled) {
+			new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
+		}
+				
         Map mapping = modelBuilder.getModelToConfigMapping()
         ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
                 testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
                 portlet, mapping)
-        long endTime = System.currentTimeMillis()
+
+		long endTime = System.currentTimeMillis()
         statistics.postCompileTime = endTime - postBuildStartTime
         statistics.buildTime = endTime - startTime
 
