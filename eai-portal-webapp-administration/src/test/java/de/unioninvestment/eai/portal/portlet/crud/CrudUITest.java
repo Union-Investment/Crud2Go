@@ -82,6 +82,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelPreferences;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.validation.ModelValidator;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PortletPresenter;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.PresenterFactory;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.presenters.configuration.PortletConfigurationPresenter;
