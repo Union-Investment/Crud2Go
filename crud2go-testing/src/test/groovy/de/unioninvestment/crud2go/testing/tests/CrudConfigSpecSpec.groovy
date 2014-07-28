@@ -130,12 +130,12 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
     def 'should allow optional additional validation'() {
         when:
         load {
-            fromClasspath 'testingSimpleConfig.xml'
+            fromClasspath 'testingValidationConfig.xml'
             validate()
         }
 
         then:
-        true // thrown ValidationException()
+        thrown(IllegalArgumentException)
     }
 
 }

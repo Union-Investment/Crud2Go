@@ -604,7 +604,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		when(configurationServiceMock.getPortletConfig(any(String.class), anyLong())).thenReturn(configMock);
 		
 		ui.refreshViews();
-		verify(modelValidatorMock,times(1)).validateModel(any(ModelBuilder.class), any(Portlet.class), any(Config.class));		
+		verify(modelValidatorMock,times(1)).validateModel(any(ModelBuilder.class), any(Portlet.class), any(PortletConfig.class));
 	}
 	
 	@Test
@@ -619,7 +619,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		when(configurationServiceMock.getPortletConfig(any(String.class), anyLong())).thenReturn(configMock);
 		
 		ui.refreshViews();
-		verify(modelValidatorMock,never()).validateModel(any(ModelBuilder.class), any(Portlet.class), any(Config.class));		
+		verify(modelValidatorMock,never()).validateModel(any(ModelBuilder.class), any(Portlet.class), any(PortletConfig.class));
 	}
 
 	

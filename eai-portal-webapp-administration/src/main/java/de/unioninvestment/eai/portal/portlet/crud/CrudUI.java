@@ -527,7 +527,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			ScriptPortlet scriptPortlet = scriptModelBuilder.build();
 
 			if(settings.isValidateConfiguration()){
-				modelValidator.validateModel(modelBuilder, portletDomain, portletConfig);
+				modelValidator.validateModel(modelBuilder, portletDomain, portletConfig.getPortletConfig());
 			}
 				
 			LOG.debug("Building GUI");

@@ -24,6 +24,7 @@ import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus
 import groovy.transform.CompileStatic
 import groovy.transform.TupleConstructor
+import groovy.transform.TypeCheckingMode
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,7 +46,7 @@ class CrudTestConfigBuilder {
     private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller()
 
     @TupleConstructor
-    private class CacheEntry {
+    private static class CacheEntry {
         long compileTime
         PortletConfig config
     }
@@ -192,10 +193,27 @@ class CrudTestConfigBuilder {
         ModelBuilder modelBuilder = createModelBuilder(portletConfig)
         Portlet portlet = modelBuilder.build()
 
-		if (validationEnabled) {
-			new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
-		}
-				
+        preparePortletPreferences(portletConfig, portlet)
+
+        Map mapping = modelBuilder.getModelToConfigMapping()
+        ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
+                testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
+                portlet, mapping)
+        def scriptPortlet = scriptModelBuilder.build()
+
+		long endTime = System.currentTimeMillis()
+        statistics.postCompileTime = endTime - postBuildStartTime
+        statistics.buildTime = endTime - startTime
+
+        if (validationEnabled) {
+            new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
+        }
+
+        return new CrudTestConfig(portletConfig, scriptPortlet, scriptBuilder.mainScript, statistics)
+    }
+
+    @CompileStatic(TypeCheckingMode.SKIP)
+    private void preparePortletPreferences(PortletConfig portletConfig, Portlet portlet) {
         def validPreferenceKeys = portletConfig.preferences?.preference?.collect { it.@key }
         portletPreferences.each { key, value ->
             if (validPreferenceKeys.contains(key)) {
@@ -204,20 +222,9 @@ class CrudTestConfigBuilder {
                 throw new IllegalArgumentException("Unknown preference '$key'. Allowed are $validPreferenceKeys")
             }
         }
-
-        Map mapping = modelBuilder.getModelToConfigMapping()
-        ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
-                testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
-                portlet, mapping)
-
-		long endTime = System.currentTimeMillis()
-        statistics.postCompileTime = endTime - postBuildStartTime
-        statistics.buildTime = endTime - startTime
-
-        return new CrudTestConfig(portletConfig, scriptModelBuilder.build(), scriptBuilder.mainScript, statistics)
     }
 
-	private mockCurrentUser() {
+    private mockCurrentUser() {
 		when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
 		when(portalMock.hasPermission(eq(currentUserName), eq("MEMBER"), eq(PortletRole.RESOURCE_KEY), anyString())).thenAnswer(
                 { InvocationOnMock inv ->
