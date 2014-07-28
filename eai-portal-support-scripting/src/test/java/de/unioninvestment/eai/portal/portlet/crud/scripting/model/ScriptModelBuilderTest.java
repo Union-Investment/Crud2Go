@@ -131,7 +131,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		MockitoAnnotations.initMocks(this);
 
 		factory = new ScriptModelFactory(connectionPoolFactoryMock,
-				userFactoryMock, portalMock, new ScriptCompiler(), DatabaseDialect.ORACLE);
+				userFactoryMock, portalMock, new ScriptCompiler(), DatabaseDialect.ORACLE, false);
 
 		when(scriptBuilderMock.buildClosure(any(GroovyScript.class)))
 				.thenAnswer(new Answer<Object>() {

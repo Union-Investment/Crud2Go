@@ -167,7 +167,6 @@ public class ScriptModelBuilder {
 		this.userFactory = userFactory;
         this.scriptCompiler = scriptCompiler;
         this.scriptBuilder = scriptBuilder;
-
 		this.portlet = portlet;
 		this.configs = modelToConfigMapping;
 	}

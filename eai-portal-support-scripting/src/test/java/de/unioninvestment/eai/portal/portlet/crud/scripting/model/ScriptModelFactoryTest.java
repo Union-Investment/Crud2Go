@@ -64,7 +64,7 @@ public class ScriptModelFactoryTest {
 		MockitoAnnotations.initMocks(this);
 
 		scriptModelFactory = new ScriptModelFactory(connectionPoolFactoryMock,
-				userFactoryMock, portalMock, new ScriptCompiler(), DatabaseDialect.ORACLE);
+				userFactoryMock, portalMock, new ScriptCompiler(), DatabaseDialect.ORACLE, false);
 	}
 
 	@Test
