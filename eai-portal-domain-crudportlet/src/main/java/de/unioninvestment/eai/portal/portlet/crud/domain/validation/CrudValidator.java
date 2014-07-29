@@ -96,7 +96,8 @@ public class CrudValidator {
 		if(searchColumnNames.size()>0 && columnNames.size()>0){
 			for(String name:searchColumnNames){
 				if(!columnNames.contains(name)){
-					throw new IllegalArgumentException("Spalte '"+name+"' ist nicht in Tabelle verfügbar");
+					throw new IllegalArgumentException("Die Spalte '"
+                            + name + "' ist nicht den durchsuchten Tabellen verfügbar");
 				}
 			}
 		}

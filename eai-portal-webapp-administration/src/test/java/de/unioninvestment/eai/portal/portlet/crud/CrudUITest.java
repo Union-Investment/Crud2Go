@@ -595,7 +595,7 @@ public class CrudUITest extends SpringPortletContextTest {
 
 	@Test
 	public void shouldValidateConfigurationOnlyWhenSettingsAreSet(){
-		when(settingsMock.isValidateConfiguration()).thenReturn(true);
+		when(settingsMock.isDebugMode()).thenReturn(true);
 		stubPortletInitialization();
 		ModelValidator modelValidatorMock = mock(ModelValidator.class);
 		
@@ -610,7 +610,7 @@ public class CrudUITest extends SpringPortletContextTest {
 	
 	@Test
 	public void shouldNotValidateConfiguration_SettingsNotSet(){
-		when(settingsMock.isValidateConfiguration()).thenReturn(false);
+		when(settingsMock.isDebugMode()).thenReturn(false);
 		stubPortletInitialization();
 		ModelValidator modelValidatorMock = mock(ModelValidator.class);
 		
