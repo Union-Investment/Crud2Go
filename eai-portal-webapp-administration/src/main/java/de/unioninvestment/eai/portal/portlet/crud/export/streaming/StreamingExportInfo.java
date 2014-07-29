@@ -19,13 +19,13 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.export.streaming;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Container for export table metadata obtained from various sources.
@@ -63,14 +63,16 @@ public class StreamingExportInfo implements ExportInfo {
 		if (columns != null) {
 			results = new ArrayList<String>(visibleColumns.size());
 			for (String name : visibleColumns) {
-				TableColumn column = columns.get(name);
-				if (column.isGenerated()) {
-					if (column.getGeneratedValueGenerator() != null) {
-						results.add(name);
-					}
-				} else {
-					results.add(name);
-				}
+                if (columns.contains(name)) {
+                    TableColumn column = columns.get(name);
+                    if (column.isGenerated()) {
+                        if (column.getGeneratedValueGenerator() != null) {
+                            results.add(name);
+                        }
+                    } else {
+                        results.add(name);
+                    }
+                }
 			}
 		}
 		return results.toArray(new String[results.size()]);

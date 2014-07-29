@@ -19,24 +19,19 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.export.streaming;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-
-import java.math.BigDecimal;
-
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.GeneratedValueGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
+import java.math.BigDecimal;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 public class StreamingExportInfoTest {
 
@@ -88,7 +83,16 @@ public class StreamingExportInfoTest {
 		assertThat(info.getColumnNames(), is(new String[] { "col1" }));
 	}
 
-	@Test
+    @Test
+    public void shouldExcludeDynamicallyGeneratedColumns() {
+        when(tableMock.getVisibleColumns()).thenReturn(asList("col1", "col2", "addedAtRuntime"));
+        givenColumnMocks();
+
+        info = new StreamingExportInfo(containerMock, tableMock);
+        assertThat(info.getColumnNames(), is(new String[] { "col1", "col2" }));
+    }
+
+    @Test
 	public void shouldReturnVisibleColumnNamesAsTitlesByDefault() {
 		info = new StreamingExportInfo(containerMock, tableMock);
 		assertThat(info.getColumnTitles(), is(new String[] { "col1", "col2" }));
@@ -167,6 +171,8 @@ public class StreamingExportInfoTest {
 
 	private void givenColumnMocks() {
 		when(tableMock.getColumns()).thenReturn(columnsMock);
+        when(columnsMock.contains("col1")).thenReturn(true);
+        when(columnsMock.contains("col2")).thenReturn(true);
 		when(columnsMock.get("col1")).thenReturn(col1Mock);
 		when(columnsMock.get("col2")).thenReturn(col2Mock);
 	}
