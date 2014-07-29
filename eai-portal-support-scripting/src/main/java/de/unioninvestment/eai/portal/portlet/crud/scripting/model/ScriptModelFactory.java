@@ -77,7 +77,6 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
  * 
  * @author carsten.mjartan
  */
-@Component
 public class ScriptModelFactory {
 
 	private final ConnectionPoolFactory connectionPoolFactory;

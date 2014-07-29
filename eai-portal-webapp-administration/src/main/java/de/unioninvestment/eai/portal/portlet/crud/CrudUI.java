@@ -43,6 +43,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.ValidatorException;
 
+import com.vaadin.ui.*;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,15 +61,6 @@ import com.vaadin.server.VaadinPortletSession.PortletListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
-import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.ComponentContainer;
-import com.vaadin.ui.JavaScript;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Link;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 
 import de.unioninvestment.eai.portal.portlet.crud.UiHistory.HistoryAware;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
@@ -469,8 +461,11 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			viewPage.addComponent(new BusinessExceptionMessage(e));
 		} catch (Exception e) {
 			LOG.error("Error refreshing configuration", e);
-			viewPage.addComponent(new BusinessExceptionMessage(
-					"portlet.crud.error.internal"));
+			if (settings.isDebugMode()) {
+                Notification.show("Debug Information", e.getMessage(), Notification.Type.ERROR_MESSAGE);
+            }
+            viewPage.addComponent(new BusinessExceptionMessage(
+                    "portlet.crud.error.internal"));
 		} finally {
 			initializing = false;
 		}
@@ -526,7 +521,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 			ScriptPortlet scriptPortlet = scriptModelBuilder.build();
 
-			if(settings.isValidateConfiguration()){
+			if(settings.isDebugMode()){
 				modelValidator.validateModel(modelBuilder, portletDomain, portletConfig.getPortletConfig());
 			}
 				
