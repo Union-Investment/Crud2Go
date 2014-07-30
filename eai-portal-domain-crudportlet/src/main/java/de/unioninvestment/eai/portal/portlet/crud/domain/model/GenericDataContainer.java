@@ -18,16 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vaadin.data.Item;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.GenericVaadinContainerEventWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEvent;
@@ -35,12 +26,15 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerExce
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterMatcher;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericItem;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericItemId;
-import de.unioninvestment.eai.portal.support.vaadin.container.MetaData;
-import de.unioninvestment.eai.portal.support.vaadin.container.TemporaryItemId;
+import de.unioninvestment.eai.portal.support.vaadin.container.*;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Repräsentation eines auf generischen Daten basierten Vaadin Containers als
@@ -121,6 +115,9 @@ public class GenericDataContainer extends AbstractDataContainer {
 
 	@Override
 	public List<String> getColumns() {
+        if (metaData == null) {
+            getVaadinContainer();
+        }
 		return new ArrayList<String>(metaData.getColumnNames());
 	}
 	
