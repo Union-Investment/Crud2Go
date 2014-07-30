@@ -482,7 +482,11 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.7.1</version>
 					<configuration>
-						<excludes>
+                        <includes>
+                            <include>**/*Test.java</include>
+                            <include>**/*Spec.java</include>
+                        </includes>
+                        <excludes>
 							<exclude>**/*IntegrationTest.java</exclude>
 						</excludes>
 					</configuration>
