@@ -448,7 +448,7 @@ public class SearchFormAction implements ActionHandler {
 	 *            - das aktuelle Formular als Ausgangspunkt für die Suche
 	 * @return - eine Liste aller relevanten Tabellen für die Suche.
 	 */
-	List<Table> findSearchableTables(Form form) {
+	public List<Table> findSearchableTables(Form form) {
 		SearchTablesConfig tables = actionConfig.getSearch() == null ? null
 				: actionConfig.getSearch().getTables();
 		return new SearchableTablesFinder().findSearchableTables(form, tables);
