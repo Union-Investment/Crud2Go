@@ -16,6 +16,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GreaterFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GreaterOrEqualFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
+import de.unioninvestment.eai.portal.portlet.crud.config.IncludeFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.LessFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.LessOrEqualFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.NotFilterConfig;
@@ -32,19 +33,19 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.StaticOptionList;
 
 public class SearchFormTestUtility {
 
-	static FilterConfig createAnyFilter(FilterConfig... subfilters) {
+	public static FilterConfig createAnyFilter(FilterConfig... subfilters) {
 		AnyFilterConfig config = new AnyFilterConfig();
 		config.getFilters().addAll(Arrays.asList(subfilters));
 		return config;
 	}
 
-	static FilterConfig createAllFilter(FilterConfig... subfilters) {
+	public static FilterConfig createAllFilter(FilterConfig... subfilters) {
 		AllFilterConfig config = new AllFilterConfig();
 		config.getFilters().addAll(Arrays.asList(subfilters));
 		return config;
 	}
 
-	static FilterConfig createNotFilter(FilterConfig... subfilters) {
+	public static FilterConfig createNotFilter(FilterConfig... subfilters) {
 		NotFilterConfig config = new NotFilterConfig();
 		config.getFilters().addAll(Arrays.asList(subfilters));
 		return config;
@@ -97,7 +98,7 @@ public class SearchFormTestUtility {
 		return field;
 	}
 
-	static FilterConfig createSqlWhereFilter(String columnName,
+	public static FilterConfig createSqlWhereFilter(String columnName,
 			String whereCondition) {
 		SQLFilterConfig filter = new SQLFilterConfig();
 		filter.setColumn(columnName);
@@ -105,7 +106,7 @@ public class SearchFormTestUtility {
 		return filter;
 	}
 
-	static ContainsFilterConfig createContainsFilter(String fieldName,
+	public static ContainsFilterConfig createContainsFilter(String fieldName,
 			String columnName, boolean caseSensitive) {
 		ContainsFilterConfig filter = new ContainsFilterConfig();
 		filter.setField(fieldName);
@@ -114,7 +115,7 @@ public class SearchFormTestUtility {
 		return filter;
 	}
 
-	static RegExpFilterConfig createRegexpFilter(String fieldName,
+	public static RegExpFilterConfig createRegexpFilter(String fieldName,
 			String columnName, String modifiers) {
 		RegExpFilterConfig filter = new RegExpFilterConfig();
 		filter.setField(fieldName);
@@ -123,7 +124,7 @@ public class SearchFormTestUtility {
 		return filter;
 	}
 
-	static EndsWithFilterConfig createEndsWithFilter(String fieldName,
+	public static EndsWithFilterConfig createEndsWithFilter(String fieldName,
 			String columnName, boolean caseSensitive) {
 		EndsWithFilterConfig filter = new EndsWithFilterConfig();
 		filter.setField(fieldName);
@@ -132,7 +133,7 @@ public class SearchFormTestUtility {
 		return filter;
 	}
 
-	static StartsWithFilterConfig createStartsWithFilter(String fieldName,
+	public static StartsWithFilterConfig createStartsWithFilter(String fieldName,
 			String columnName, boolean caseSensitive) {
 		StartsWithFilterConfig filter = new StartsWithFilterConfig();
 		filter.setField(fieldName);
@@ -141,7 +142,7 @@ public class SearchFormTestUtility {
 		return filter;
 	}
 
-	static LessOrEqualFilterConfig createLessOrEqualsFilter(String fieldName,
+	public static LessOrEqualFilterConfig createLessOrEqualsFilter(String fieldName,
 			String columnName) {
 		LessOrEqualFilterConfig filter = new LessOrEqualFilterConfig();
 		filter.setField(fieldName);
@@ -149,13 +150,19 @@ public class SearchFormTestUtility {
 		return filter;
 	}
 
-	static CustomFilterConfig createCustomFilter() {
+	public static CustomFilterConfig createCustomFilter() {
 		CustomFilterConfig filter = new CustomFilterConfig();
 		filter.setFilter(new GroovyScript("abcde"));
 		return filter;
 	}
 
-	static LessFilterConfig createLessFilter(String fieldName,
+	public static IncludeFilterConfig createIncludeFilter(){
+		IncludeFilterConfig filter = new IncludeFilterConfig();
+		filter.setAction("abc");
+		return filter;
+	}
+	
+	public static LessFilterConfig createLessFilter(String fieldName,
 			String columnName) {
 		LessFilterConfig filter = new LessFilterConfig();
 		filter.setField(fieldName);
@@ -163,7 +170,7 @@ public class SearchFormTestUtility {
 		return filter;
 	}
 
-	static GreaterOrEqualFilterConfig createGreaterOrEqualsFilter(
+	public static GreaterOrEqualFilterConfig createGreaterOrEqualsFilter(
 			String fieldName, String columnName) {
 		GreaterOrEqualFilterConfig filter = new GreaterOrEqualFilterConfig();
 		filter.setField(fieldName);
@@ -171,7 +178,7 @@ public class SearchFormTestUtility {
 		return filter;
 	}
 
-	static GreaterFilterConfig createGreaterFilter(String fieldName,
+	public static GreaterFilterConfig createGreaterFilter(String fieldName,
 			String columnName) {
 		GreaterFilterConfig filter = new GreaterFilterConfig();
 		filter.setField(fieldName);
@@ -179,7 +186,7 @@ public class SearchFormTestUtility {
 		return filter;
 	}
 
-	static EqualsFilterConfig createEqualsFilter(String fieldName,
+	public static EqualsFilterConfig createEqualsFilter(String fieldName,
 			String columnName) {
 		EqualsFilterConfig filter = new EqualsFilterConfig();
 		filter.setField(fieldName);
