@@ -137,5 +137,17 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         then:
         thrown(IllegalArgumentException)
     }
+	
+	def 'should allow optional validation of form field'() {
+		when:
+		load {
+			fromClasspath 'testingValidationConfig_FormFields.xml'
+			validate()
+		}
+
+		then:
+		thrown(IllegalArgumentException)
+	}
+
 
 }
