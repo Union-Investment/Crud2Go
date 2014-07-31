@@ -1,10 +1,8 @@
 package de.unioninvestment.crud2go.testing.junit
-
 import de.unioninvestment.crud2go.testing.CrudTestConfig
 import de.unioninvestment.crud2go.testing.CrudTestContext
 import de.unioninvestment.crud2go.testing.LiferayContext
 import org.junit.Rule
-
 /**
  * Created by cmj on 21.07.14.
  */

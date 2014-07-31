@@ -1,4 +1,4 @@
-package de.unioninvestment.crud2go.testing.db
+package de.unioninvestment.crud2go.testing.internal.db
 
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 

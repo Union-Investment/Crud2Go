@@ -1,4 +1,4 @@
-package de.unioninvestment.crud2go.testing
+package de.unioninvestment.crud2go.testing.internal.prefs
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet

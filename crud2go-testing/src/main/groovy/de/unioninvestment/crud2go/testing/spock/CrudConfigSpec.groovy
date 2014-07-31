@@ -1,11 +1,9 @@
 package de.unioninvestment.crud2go.testing.spock
-
 import de.unioninvestment.crud2go.testing.CrudTestConfig
 import de.unioninvestment.crud2go.testing.CrudTestContext
 import de.unioninvestment.crud2go.testing.LiferayContext
 import org.junit.Rule
 import spock.lang.Specification
-
 /**
  * Created by cmj on 17.07.14.
  */

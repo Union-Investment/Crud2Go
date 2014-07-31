@@ -1,5 +1,6 @@
 package de.unioninvestment.crud2go.testing
 
+import de.unioninvestment.crud2go.testing.internal.NotificationMatcher
 
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.never;
