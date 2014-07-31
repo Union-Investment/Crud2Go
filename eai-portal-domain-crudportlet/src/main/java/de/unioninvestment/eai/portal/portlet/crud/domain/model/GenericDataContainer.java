@@ -95,35 +95,33 @@ public class GenericDataContainer extends AbstractDataContainer {
 
 	@Override
 	public boolean isInsertable() {
-		return metaData.isInsertSupported();
+		return getMetaData().isInsertSupported();
 	}
 
 	@Override
 	public boolean isUpdateable() {
-		return metaData.isUpdateSupported();
+		return getMetaData().isUpdateSupported();
 	}
 
 	@Override
 	public boolean isDeleteable() {
-		return metaData.isRemoveSupported();
+		return getMetaData().isRemoveSupported();
 	}
 
 	@Override
 	public List<String> getPrimaryKeyColumns() {
-		return new ArrayList<String>(metaData.getPrimaryKeys());
+		return new ArrayList<String>(getMetaData().getPrimaryKeys());
 	}
 
-	@Override
+   @Override
 	public List<String> getColumns() {
-        if (metaData == null) {
-            getVaadinContainer();
-        }
-		return new ArrayList<String>(metaData.getColumnNames());
+		return new ArrayList<String>(getMetaData().getColumnNames());
 	}
 	
 	@Override
 	public ContainerClob getCLob(ContainerRowId containerRowId,
 			String columnName) {
+        getVaadinContainer();
 
 		if (clobFields.containsKey(containerRowId)) {
 			if (clobFields.get(containerRowId).containsKey(columnName)) {
@@ -173,6 +171,8 @@ public class GenericDataContainer extends AbstractDataContainer {
 
 	@Override
 	public ContainerBlob getBLob(ContainerRowId rowId, String columnName) {
+        getVaadinContainer();
+
 		if (blobFields.containsKey(rowId)) {
 			if (blobFields.get(rowId).containsKey(columnName)) {
 				return blobFields.get(rowId).get(columnName);
@@ -214,7 +214,15 @@ public class GenericDataContainer extends AbstractDataContainer {
 				getOnUpdateEventRouter(), getOnDeleteEventRouter());
 	}
 
-	@Override
+    /**
+     * @return metadata from a lazily instantiated container
+     */
+    protected MetaData getMetaData() {
+        getVaadinContainer();
+        return metaData;
+    }
+
+    @Override
 	protected GenericVaadinContainerEventWrapper getVaadinContainer() {
 		return (GenericVaadinContainerEventWrapper) super.getVaadinContainer();
 	}
@@ -294,7 +302,7 @@ public class GenericDataContainer extends AbstractDataContainer {
 	 * 
 	 * @param metaData
 	 */
-	void setMetaData(MetaData metaData) {
+	protected void setMetaData(MetaData metaData) {
 		this.metaData = metaData;
 	}
 
