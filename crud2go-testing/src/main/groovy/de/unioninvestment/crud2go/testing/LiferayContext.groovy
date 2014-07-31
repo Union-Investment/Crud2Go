@@ -1,42 +1,24 @@
 package de.unioninvestment.crud2go.testing
 
+import com.vaadin.data.util.converter.DefaultConverterFactory
+import com.vaadin.server.*
+import com.vaadin.ui.ConnectorTracker
+import com.vaadin.ui.JavaScript
+import com.vaadin.ui.Notification.Type
+import com.vaadin.ui.UI
+import com.vaadin.util.CurrentInstance
+import de.unioninvestment.crud2go.testing.internal.NotificationMatcher
+import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortletService
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI
+import org.junit.rules.TestWatcher
 import org.junit.runner.Description
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import javax.portlet.*
 
-import javax.portlet.PortletContext;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-import javax.portlet.PortletSession;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
-import org.junit.rules.TestWatcher;
-import org.junit.runners.model.FrameworkMethod;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import com.vaadin.data.util.converter.DefaultConverterFactory;
-import com.vaadin.server.Page;
-import com.vaadin.server.VaadinPortletRequest;
-import com.vaadin.server.VaadinPortletResponse;
-import com.vaadin.server.VaadinPortletSession;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinResponse;
-import com.vaadin.server.VaadinService;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.ConnectorTracker;
-import com.vaadin.ui.JavaScript;
-import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.UI;
-import com.vaadin.util.CurrentInstance;
-
-import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortletService;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+import static org.mockito.Matchers.argThat
+import static org.mockito.Mockito.*
 
 class LiferayContext extends TestWatcher {
 

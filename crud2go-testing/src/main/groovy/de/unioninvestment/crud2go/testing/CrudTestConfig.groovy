@@ -1,40 +1,28 @@
 package de.unioninvestment.crud2go.testing
 
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet
-import groovy.transform.CompileStatic
 
 /**
- * Created by cmj on 17.07.14.
+ * Created by cmj on 31.07.14.
  */
-@CompileStatic
-class CrudTestConfig {
+interface CrudTestConfig {
+    /**
+     * @return the XML content of the configuration
+     */
+    String getXml()
 
-    private PortletConfig config
-    private ScriptPortlet portlet
-    private Script mainScript
-    private Statistics statistics
+    /**
+     * @return the portlet scripting API
+     */
+    ScriptPortlet getPortlet()
 
-    CrudTestConfig(PortletConfig config, ScriptPortlet portlet, Script mainScript, Statistics statistics) {
-        this.mainScript = mainScript
-        this.portlet = portlet
-        this.config = config
-        this.statistics = statistics
-    }
+    /**
+     * @return the portlet main script
+     */
+    Script getMainScript()
 
-    PortletConfig getConfig() {
-        config
-    }
-
-    ScriptPortlet getPortlet() {
-        portlet
-    }
-
-    Script getMainScript() {
-        mainScript
-    }
-
-    Statistics getStatistics() {
-        statistics
-    }
+    /**
+     * @return Statistics about loading times
+     */
+    Statistics getStatistics()
 }

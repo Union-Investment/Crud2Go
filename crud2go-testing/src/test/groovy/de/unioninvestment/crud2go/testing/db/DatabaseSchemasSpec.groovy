@@ -1,5 +1,6 @@
 package de.unioninvestment.crud2go.testing.db
 
+import de.unioninvestment.crud2go.testing.internal.db.DatabaseSchemas
 import spock.lang.Specification
 
 class DatabaseSchemasSpec extends Specification {

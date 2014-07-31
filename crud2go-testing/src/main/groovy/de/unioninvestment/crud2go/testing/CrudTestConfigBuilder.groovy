@@ -1,6 +1,10 @@
 package de.unioninvestment.crud2go.testing
 
-import de.unioninvestment.crud2go.testing.db.TestConnectionPoolFactory
+import de.unioninvestment.crud2go.testing.internal.db.TestConnectionPoolFactory
+import de.unioninvestment.crud2go.testing.internal.CrudTestConfigImpl
+import de.unioninvestment.crud2go.testing.internal.user.CurrentTestUser
+import de.unioninvestment.crud2go.testing.internal.prefs.TestPreferencesRepository
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role
 import de.unioninvestment.eai.portal.portlet.crud.domain.validation.ModelValidator;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller
@@ -15,7 +19,6 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.NamedUser
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal
-import de.unioninvestment.eai.portal.portlet.crud.domain.support.PreferencesRepository
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory
 import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler
@@ -48,6 +51,7 @@ class CrudTestConfigBuilder {
     @TupleConstructor
     private static class CacheEntry {
         long compileTime
+        String xml
         PortletConfig config
     }
 
@@ -84,10 +88,14 @@ class CrudTestConfigBuilder {
     private Set portalRoles = []
 	Map<Long,String> roleId2Name = [:]
 
-    private boolean ignoreCachedEntry = false
+    List<Closure<String>> xmlModifiers = [] as LinkedList
+
+    private boolean recompile = false
     private boolean validationEnabled = false
 
     private Resource configResource
+    private String configXml
+    private PortletConfig portletConfig
 
     private ScriptBuilder scriptBuilder = new ScriptBuilder()
 
@@ -106,15 +114,16 @@ class CrudTestConfigBuilder {
     }
 
     /**
-     * Load the configuration from the following places (match wins)
-     * <ul>
-     *   <li>A file relative to the combined.path + the package folder of the test class</li>
-     *   <li>For paths statring with slash: A path relative to the combined.path of the test class</li>
-     *   <li>A classpath resource besides the test class</li>
-     *   <li>For paths statring with slash: An absolute classpath entry</li>
-     * </ul>
+     * Load the configuration from the following places (match wins).
+     *
      * @param name
-     * @return
+     *          <ul>
+     *            <li>A file relative to the combined.path + the package folder of the test class</li>
+     *            <li>For paths statring with slash: A path relative to the combined.path of the test class</li>
+     *            <li>A classpath resource besides the test class</li>
+     *            <li>For paths statring with slash: An absolute classpath entry</li>
+     *          </ul>
+     * @return the builder instance
      */
     CrudTestConfigBuilder from(String name) {
         File configFile = null
@@ -133,32 +142,75 @@ class CrudTestConfigBuilder {
         }
     }
 
-    CrudTestConfigBuilder fromClasspath(String configFilename) {
-        configResource = new ClassPathResource(configFilename, testClass)
+    /**
+     * Load the configuration from classpath.
+     *
+     * @param classpathReference the path relative to the testing class or if starting with a slash, relative to the classloader root
+     * @return the builder instance
+     */
+    CrudTestConfigBuilder fromClasspath(String classpathReference) {
+        configResource = new ClassPathResource(classpathReference, testClass)
         return this
     }
 
+    /**
+     * Load the configuration from a file.
+     *
+     * @param configFile the xml configuration file
+     * @return the builder instance
+     */
     CrudTestConfigBuilder fromFile(File configFile) {
         configResource = new FileSystemResource(configFile)
         return this
     }
 
+    /**
+     * Load the configuration from a file.
+     *
+     * @param configFile a path relative to the execution folder (the maven project root)
+     * @return the builder instance
+     */
     CrudTestConfigBuilder fromFile(String configFilename) {
         configResource = new FileSystemResource(configFilename)
         return this
     }
 
-
+    CrudTestConfigBuilder modifyXml(Closure<String> modifier) {
+        xmlModifiers << modifier
+        return this
+    }
+    /**
+     * Changes the currentUserName in the script context.
+     *
+     * @param name the new user name
+     * @return the builder instance
+     */
     CrudTestConfigBuilder currentUserName(String name) {
 		this.currentUserName = name
 		return this
 	}
-	
-	CrudTestConfigBuilder currentUserRoles(roles) {
+
+    /**
+     * Changes the roles of the current user. If no user name is given, it is set to 'unnamed'.
+     *
+     * @param name the new user name
+     * @return the builder instance
+     */
+	CrudTestConfigBuilder currentUserRoles(String... roles) {
 		this.currentUserRoles = roles as HashSet
+        if (!currentUserName) {
+            currentUserName = 'unnamed'
+        }
 		return this
 	}
 
+    /**
+     * Changes a script preference.
+     *
+     * @param key the preference key
+     * @param value the preference value
+     * @return the builder instance
+     */
     CrudTestConfigBuilder preference(String key, String value) {
         this.portletPreferences[key] = value
         return this
@@ -180,7 +232,7 @@ class CrudTestConfigBuilder {
 
         long startTime = System.currentTimeMillis()
 
-        PortletConfig portletConfig = prepareConfig()
+        prepareConfig()
 
         long postBuildStartTime = System.currentTimeMillis()
 		long roleId = 1
@@ -209,7 +261,7 @@ class CrudTestConfigBuilder {
             new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
         }
 
-        return new CrudTestConfig(portletConfig, scriptPortlet, scriptBuilder.mainScript, statistics)
+        return new CrudTestConfigImpl(configXml, portletConfig, scriptPortlet, scriptBuilder.mainScript, statistics)
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)
@@ -228,18 +280,19 @@ class CrudTestConfigBuilder {
 		when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
 		when(portalMock.hasPermission(eq(currentUserName), eq("MEMBER"), eq(PortletRole.RESOURCE_KEY), anyString())).thenAnswer(
                 { InvocationOnMock inv ->
-                    long id = Long.parseLong((String)inv.arguments[3])
+                    long id = Long.parseLong(inv.arguments[3] as String)
                     currentUserRoles.contains(roleId2Name[id])
                 } as Answer);
 		when(userFactoryMock.getCurrentUser(any(Portlet))).thenAnswer({ InvocationOnMock inv ->
-			def user = currentUserName ? new NamedUser(currentUserName, ((Portlet)inv.arguments[0]).roles)
+            Portlet portlet = inv.arguments[0] as Portlet
+			def user = currentUserName ? new NamedUser(currentUserName, portlet.roles as HashSet<Role>)
 							: new AnonymousUser()
 			return new CurrentTestUser(user)
 		} as Answer<CurrentUser>)
 	}
 
     CrudTestConfigBuilder recompile() {
-        ignoreCachedEntry = true
+        recompile = true
         return this
     }
 
@@ -248,21 +301,29 @@ class CrudTestConfigBuilder {
         return this
     }
 
-    private PortletConfig prepareConfig() {
+    void prepareConfig() {
         assert configResource: 'No configuration source given'
-
         CacheEntry existingEntry = configCache[configResource.URL]
-        if (existingEntry && !ignoreCachedEntry) {
+        if (existingEntry && !recompile && !xmlModifiers) {
+            configXml = existingEntry.xml
+            portletConfig = existingEntry.config
             statistics.compileTime = existingEntry.compileTime
-            return existingEntry.config
         } else {
             assert configResource.exists(): "Configuration source $configResource.URL does not exist"
+
+            configXml = configResource.inputStream.getText('utf-8')
+            xmlModifiers.each { modifier ->
+                configXml = modifier.call(configXml)
+            }
+
             long compileStartTime = System.currentTimeMillis()
-            PortletConfig portletConfig = unmarshaller.unmarshal(configResource.inputStream)
+            portletConfig = unmarshaller.unmarshal(configXml)
             scriptsCompiler.compileAllScripts(portletConfig)
             statistics.compileTime = System.currentTimeMillis() - compileStartTime
-            configCache[configResource.URL] = new CacheEntry(statistics.compileTime, portletConfig)
-            return portletConfig
+
+            if (!xmlModifiers) {
+                configCache[configResource.URL] = new CacheEntry(statistics.compileTime, configXml, portletConfig)
+            }
         }
     }
 }

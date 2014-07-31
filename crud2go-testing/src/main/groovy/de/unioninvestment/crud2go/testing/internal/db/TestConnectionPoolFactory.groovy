@@ -1,4 +1,4 @@
-package de.unioninvestment.crud2go.testing.db
+package de.unioninvestment.crud2go.testing.internal.db
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory

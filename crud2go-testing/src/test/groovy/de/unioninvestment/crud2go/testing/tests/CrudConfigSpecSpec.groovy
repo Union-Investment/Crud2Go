@@ -1,9 +1,6 @@
 package de.unioninvestment.crud2go.testing.tests
-
 import de.unioninvestment.crud2go.testing.spock.CrudConfigSpec
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptCurrentUser
-import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationException
-
 /**
  * Created by cmj on 17.07.14.
  */
@@ -88,12 +85,26 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         portlet.elements.adminComponent == null
     }
 
+    def 'should switch to named user if roles are set'() {
+        when:
+        load {
+            fromClasspath 'testingSimpleConfig.xml'
+            // currentUserName 'carsten'
+            currentUserRoles('admin')
+        }
+        ScriptCurrentUser currentUser = instance.mainScript.currentUser
+
+        then:
+        currentUser.name == 'unnamed'
+        currentUser.isAuthenticated()
+    }
+
     def 'should allow modification of current user'() {
         when:
         load {
             fromClasspath 'testingSimpleConfig.xml'
             currentUserName 'carsten'
-            currentUserRoles(['admin'])
+            currentUserRoles('admin')
         }
         ScriptCurrentUser currentUser = instance.mainScript.currentUser
 
@@ -118,6 +129,25 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         portlet.preferences.pref3 == 'defaultValue3'
     }
 
+    def 'should provide access to the configuration XML'() {
+        when:
+        load 'testingSimpleConfig.xml'
+
+        then:
+        instance.xml.contains('backend =')
+    }
+
+    def 'should allow modification of the config XML'() {
+        when:
+        load {
+            fromClasspath 'testingSimpleConfig.xml'
+            modifyXml { it.replace('backend =', 'modified = true\nbackend =')}
+        }
+
+        then:
+        instance.mainScript.modified == true
+    }
+
     def 'should set a testing flag inside the portlet'() {
         when:
         load 'testingSimpleConfig.xml'
@@ -137,5 +167,17 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         then:
         thrown(IllegalArgumentException)
     }
+	
+	def 'should allow optional validation of form field'() {
+		when:
+		load {
+			fromClasspath 'testingValidationConfig_FormFields.xml'
+			validate()
+		}
+
+		then:
+		thrown(IllegalArgumentException)
+	}
+
 
 }

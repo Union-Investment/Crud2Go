@@ -18,7 +18,8 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.config.converter;
 
-import java.io.InputStream;
+import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -28,10 +29,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import org.xml.sax.SAXException;
-
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import java.io.InputStream;
+import java.io.StringReader;
 
 /**
  * Utility-Klasse die die Konvertierung zwischen XML-Konfiguration und dem
@@ -97,11 +96,32 @@ public class PortletConfigurationUnmarshaller {
 	 */
 	@SuppressWarnings("unchecked")
 	public PortletConfig unmarshal(InputStream stream) throws JAXBException {
-		Unmarshaller unmarshaller = context.createUnmarshaller();
-		unmarshaller.setSchema(schema);
-		JAXBElement<PortletConfig> element = (JAXBElement<PortletConfig>) unmarshaller
+		JAXBElement<PortletConfig> element = (JAXBElement<PortletConfig>) createUnmarshaller()
 				.unmarshal(stream);
 		return element.getValue();
 	}
+
+    /**
+     * Parsen, validieren und konvertieren der als String übergebenen
+     * XML-Konfiguration.
+     *
+     * @param xml
+     *            XML-String
+     * @return das konvertierte Java-Objektmodell
+     * @throws JAXBException
+     *             bei Fehlern
+     */
+    @SuppressWarnings("unchecked")
+    public PortletConfig unmarshal(String xml) throws JAXBException {
+        JAXBElement<PortletConfig> element = (JAXBElement<PortletConfig>) createUnmarshaller()
+                .unmarshal(new StringReader(xml));
+        return element.getValue();
+    }
+
+    private Unmarshaller createUnmarshaller() throws JAXBException {
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        unmarshaller.setSchema(schema);
+        return unmarshaller;
+    }
 
 }
