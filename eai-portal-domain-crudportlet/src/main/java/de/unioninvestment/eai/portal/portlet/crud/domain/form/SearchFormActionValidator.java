@@ -1,29 +1,15 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.form;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
+
 import java.util.Date;
 import java.util.List;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.AllFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.AnyFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ComparisonFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ContainsFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.EndsWithFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.EqualsFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.IncludeFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.NotFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RegExpFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SQLFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.StartsWithFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateFormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.MultiOptionListFormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-
+// FIXME: JavaDoc an Klasse und Public Methoden
+// FIXME: ggf. ebenfalls ins validation-Package verschieben
+// FIXME: Unklare Aufgabenverteilung zwischen dieser Klasse und Prüfungen in CrudValidator (Klassen- und Methodennamen überdenken)
+// FIXME: Durchgängige Verwendung von ModelValidationException (besser: Runtime statt Model?) statt IllegalArgumentException
 public class SearchFormActionValidator {
 	
 	private SearchFormAction action;
@@ -48,6 +34,7 @@ public class SearchFormActionValidator {
 		checkFiltersForTable(form, table, filterConfigs);
 	}
 
+    // FIXME: Aufteilen zu besseren Lesbarkeit (Clean Code)
 	private void checkFiltersForTable(Form form, Table table,
 			List<FilterConfig> filterConfigs) {
 		DataContainer container = table.getContainer();
@@ -121,7 +108,10 @@ public class SearchFormActionValidator {
 				
 				List<FilterConfig> includeFilterConfigsList = otherActionHandler.createFilterConfigs(form, table);
 				checkFiltersForTable(form, table, includeFilterConfigsList);
-			}
+			} else {
+                // FIXME: Sicherstellen dass auch zukünftig alle Filter berücksichtigt sind
+                // LOGGER.warn(...)
+            }
 
 		}
 	}

@@ -1,33 +1,24 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.validation;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
+import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormActionValidator;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
-import de.unioninvestment.eai.portal.portlet.crud.config.ComparisonFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FilterListConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.IncludeFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SQLFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SearchConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormActionValidator;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormActions;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-
+// FIXME: JavaDoc für Klasse und Public Methoden
+// FIXME: Umbenennen der Klasse: SearchFormActionsValidator und dafür ggf. kürzen der Methodennamen (um "Search")
 public class CrudValidator {
-	
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CrudValidator.class);
+
 	private ModelBuilder modelBuilder; 
 	private Portlet portletDomain;
 	private PortletConfig portletConfig;
@@ -55,17 +46,19 @@ public class CrudValidator {
 			FormActions actions = aForm.getActions();
 			FormAction searchActionWrapper = actions.getSearchAction();
 			if(searchActionWrapper!=null){
+                // FIXME: methode der besseren Lesbarkeit halber aufteilen
 				final List<String> searchFieldNames = new ArrayList<String>();
 				final Set<String> fieldNames = new LinkedHashSet<String>();
 
 				FormActionConfig actionConfig = (FormActionConfig) modelBuilder.getModelToConfigMapping().get(searchActionWrapper);
-				
+
 				// ermittle Ziel-Tabellen über SearchFormAction
 				// traversiere rekursiv über filterconfigs
 				//   wenn explizit Tabelle angegeben:, prüfe auf Existenz in dessen Container
-				//   wenn keine Tabelle angegeben: prüfe auf Existenz in mindestens einem der Container der Tabellen 
+				//   wenn keine Tabelle angegeben: prüfe auf Existenz in mindestens einem der Container der Tabellen
 				if(actionConfig.getSearch() != null){
 					SearchConfig searchConfig = actionConfig.getSearch();
+                    // FIXME: ApplyFilters ist optional. Wenn nicht gesetzt, Prüfung der Action abbrechen
 					List<FilterConfig> filters = searchConfig.getApplyFilters().getFilters();
 					gatherFormFieldNamesInFilter(filters, searchFieldNames);
 				}
@@ -78,8 +71,8 @@ public class CrudValidator {
 					throw new IllegalArgumentException("Die Feldern '"
                             + StringUtils.join(wrongFields, ", ") + "' sind nicht den durchsuchten Formen verfügbar");
 				}
-				
-				
+
+
 			}
 		}
 	}
@@ -92,6 +85,7 @@ public class CrudValidator {
 			FormActions actions = aForm.getActions();
 			FormAction searchActionWrapper = actions.getSearchAction();
 			if(searchActionWrapper!=null){
+                // FIXME: methode der besseren Lesbarkeit halber aufteilen, ggf. Codeduplikation der Iteration vermeiden
 				final List<String> searchColumnNames = new ArrayList<String>();
 				final Set<String> columnNames = new LinkedHashSet<String>();
 
@@ -103,6 +97,7 @@ public class CrudValidator {
 				//   wenn keine Tabelle angegeben: prüfe auf Existenz in mindestens einem der Container der Tabellen 
 				if(actionConfig.getSearch() != null){
 					SearchConfig searchConfig = actionConfig.getSearch();
+                    // FIXME: <apply-filters> ist optional. Wenn nicht gesetzt, Prüfung der Action abbrechen
 					List<FilterConfig> filters = searchConfig.getApplyFilters().getFilters();
 					gatherSearchColumnNames(filters, searchColumnNames);
 				}
@@ -149,7 +144,9 @@ public class CrudValidator {
 				//Do Nothing - Groovy Script
 			} else if (filterConf instanceof IncludeFilterConfig) {
 				//Skip - will be checked separately
-			}
+			} else {
+                LOGGER.warn("CrudValidator does not cover {}", filterConf.getClass().getName());
+            }
 		}
 	}
 
@@ -176,6 +173,8 @@ public class CrudValidator {
 				//Do Nothing - Groovy Script
 			} else if (filterConf instanceof IncludeFilterConfig) {
 				//Skip - will be checked separately
+            } else {
+                LOGGER.warn("CrudValidator does not cover {}", filterConf.getClass().getName());
 			}
 		}
 	}
