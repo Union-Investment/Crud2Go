@@ -1,17 +1,10 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.form;
 
 
-import static de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormTestUtility.createDateFormField;
-import static de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormTestUtility.createFormField;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
+import com.vaadin.ui.UI;
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,22 +13,14 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.vaadin.ui.UI;
+import java.util.*;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.ComparisonFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ContainsFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.EndsWithFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RegExpFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.StartsWithFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormFields;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
+import static de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormTestUtility.createDateFormField;
+import static de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormTestUtility.createFormField;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
+// FIXME Testabdeckung überprüfen
 public class SearchFormActionValidatorTest {
 	@SuppressWarnings("serial")
 	static abstract class UIMock extends UI implements InitializingUI {
