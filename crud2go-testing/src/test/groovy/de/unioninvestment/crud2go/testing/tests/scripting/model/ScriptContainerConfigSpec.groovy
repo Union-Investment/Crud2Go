@@ -1,9 +1,6 @@
 package de.unioninvestment.crud2go.testing.tests.scripting.model
-
 import de.unioninvestment.crud2go.testing.spock.CrudConfigSpec
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptContainer
-import org.junit.Before
-
 /**
  * Created by cmj on 23.07.14.
  */
@@ -12,7 +9,7 @@ class ScriptContainerConfigSpec extends CrudConfigSpec {
     ScriptContainer container
 
     def setup() {
-        load 'testingSimpleConfig.xml'
+        load '../../testingSimpleConfig.xml'
         container = portlet.elements.table1.container
     }
 
