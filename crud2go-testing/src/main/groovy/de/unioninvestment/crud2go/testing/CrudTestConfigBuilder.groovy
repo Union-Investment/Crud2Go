@@ -2,6 +2,7 @@ package de.unioninvestment.crud2go.testing
 
 import de.unioninvestment.crud2go.testing.internal.db.TestConnectionPoolFactory
 import de.unioninvestment.crud2go.testing.internal.CrudTestConfigImpl
+import de.unioninvestment.crud2go.testing.internal.gui.GuiMocksBuilder
 import de.unioninvestment.crud2go.testing.internal.user.CurrentTestUser
 import de.unioninvestment.crud2go.testing.internal.prefs.TestPreferencesRepository
 import de.unioninvestment.eai.portal.portlet.crud.domain.validation.ModelValidator;
@@ -20,6 +21,7 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet
 import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler
@@ -230,33 +232,48 @@ class CrudTestConfigBuilder {
         prepareConfig()
 
         long postBuildStartTime = System.currentTimeMillis()
-		long roleId = 1
-		portletConfig.roles?.role.each { role ->
-			roleId2Name[roleId] = role.name
-			resourceIds.put("${CrudTestContext.TEST_PORTLET_ID}_${CrudTestContext.LIFERAY_COMMUNITY_ID}_${role.name}".toString() , roleId++)
-        }
-		mockCurrentUser()
+        prepareUserAndRoles()
 
         ModelBuilder modelBuilder = createModelBuilder(portletConfig)
         Portlet portlet = modelBuilder.build()
 
         preparePortletPreferences(portletConfig, portlet)
 
-        Map mapping = modelBuilder.getModelToConfigMapping()
-        ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
-                testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
-                portlet, mapping)
-        def scriptPortlet = scriptModelBuilder.build()
+        ScriptPortlet scriptPortlet = prepareScriptModel(modelBuilder, portlet)
 
 		long endTime = System.currentTimeMillis()
         statistics.postCompileTime = endTime - postBuildStartTime
         statistics.buildTime = endTime - startTime
+
+        prepareGuiMocks(modelBuilder, portlet)
 
         if (validationEnabled) {
             new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
         }
 
         return new CrudTestConfigImpl(configXml, portletConfig, scriptPortlet, scriptBuilder.mainScript, statistics)
+    }
+
+    private void prepareGuiMocks(ModelBuilder modelBuilder, Portlet portlet) {
+        new GuiMocksBuilder(modelBuilder, portlet).build()
+    }
+
+    private ScriptPortlet prepareScriptModel(ModelBuilder modelBuilder, Portlet portlet) {
+        Map mapping = modelBuilder.getModelToConfigMapping()
+        ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
+                testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
+                portlet, mapping)
+        ScriptPortlet scriptPortlet = scriptModelBuilder.build()
+        scriptPortlet
+    }
+
+    private void prepareUserAndRoles() {
+        long roleId = 1
+        portletConfig.roles?.role.each { role ->
+            roleId2Name[roleId] = role.name
+            resourceIds.put("${CrudTestContext.TEST_PORTLET_ID}_${CrudTestContext.LIFERAY_COMMUNITY_ID}_${role.name}".toString(), roleId++)
+        }
+        mockCurrentUser()
     }
 
     private void preparePortletPreferences(PortletConfig portletConfig, Portlet portlet) {

@@ -1,4 +1,4 @@
-package de.unioninvestment.crud2go.testing.tests
+package de.unioninvestment.crud2go.testing.tests.scripting.model
 
 import de.unioninvestment.crud2go.testing.spock.CrudConfigSpec
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptContainer
