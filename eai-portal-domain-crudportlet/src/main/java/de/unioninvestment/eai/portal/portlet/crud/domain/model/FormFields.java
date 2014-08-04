@@ -18,15 +18,11 @@
 */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.FormFieldChangeEventHandler;
 import org.apache.commons.lang.StringUtils;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.FormFieldChangeEventHandler;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Aggregations-Objekt für Formularfelder, bietet Aggregatfunktionen.
@@ -79,10 +75,13 @@ public class FormFields implements Iterable<FormField>, Serializable {
 		return field;
 	}
 
+    public Collection<String> getNames() {
+        return fields.keySet();
+    }
+
 	/**
 	 * 
 	 * 
-	 * @param fields
 	 * @return Ob es min. ein Defaultwert gesetzt ist.
 	 */
 	public boolean hasDefaultValue() {

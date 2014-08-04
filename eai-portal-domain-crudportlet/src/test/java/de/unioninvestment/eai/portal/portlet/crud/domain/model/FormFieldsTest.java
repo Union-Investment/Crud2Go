@@ -18,15 +18,15 @@
 */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.NoSuchElementException;
-
+import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
+import java.util.NoSuchElementException;
+
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class FormFieldsTest {
 
@@ -56,7 +56,12 @@ public class FormFieldsTest {
 		assertThat(fields.count(), is(2));
 	}
 
-	@Test
+    @Test
+    public void shouldReturnFieldNames() {
+        assertThat(fields.getNames(), hasItems("field1", "field2"));
+    }
+
+    @Test
 	public void shouldAllowIteration() {
 		assertThat(fields.iterator().next(), is(field1));
 	}
