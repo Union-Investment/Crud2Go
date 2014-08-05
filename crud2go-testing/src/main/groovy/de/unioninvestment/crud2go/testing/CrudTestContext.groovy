@@ -59,11 +59,12 @@ class CrudTestContext {
         applicationContext.stop()
     }
 
-    CrudTestConfigBuilder configBuilder(Class<?> testClass) {
+    CrudTestConfigBuilder configBuilder(Class<?> testClass, LiferayContext liferayContext) {
         def builder = applicationContext.getBean(CrudTestConfigBuilder)
         builder.combinedPath = combinedPath
         builder.configCache = configCache
         builder.testClass = testClass
+        builder.liferayContext = liferayContext
         return builder
     }
 
@@ -74,12 +75,12 @@ class CrudTestContext {
      * @param name the relative or absolute filename of the configuration
      * @return an initialized configuration
      */
-    CrudTestConfig load(Class<?> testClass, String name) {
-        load(testClass) { from name }
+    CrudTestConfig load(Class<?> testClass, LiferayContext liferayContext, String name) {
+        load(testClass, liferayContext) { from name }
     }
 
-    CrudTestConfig load(Class<?> testClass, Closure params) {
-        def builder = CrudTestContext.instance.configBuilder(testClass)
+    CrudTestConfig load(Class<?> testClass, LiferayContext liferayContext, Closure params) {
+        def builder = configBuilder(testClass, liferayContext)
         builder.with params
         return builder.build()
     }

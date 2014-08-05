@@ -19,75 +19,16 @@
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
 import com.google.common.base.Strings;
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryDeleteStatementGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryInsertStatementGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryUpdateStatementGenerator;
-import de.unioninvestment.eai.portal.support.scripting.*;
-import groovy.lang.Closure;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import groovy.lang.GString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Supplier;
-
-import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig.Dynamic;
-import de.unioninvestment.eai.portal.portlet.crud.config.StatementConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.config.validation.ConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.AbstractDatabaseContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomColumnGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericDataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.JMXContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Page;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Region;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TextArea;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
@@ -98,10 +39,22 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ConfirmationDialogProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.NotificationProvider;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryDeleteStatementGenerator;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryInsertStatementGenerator;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryUpdateStatementGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.events.NewRowDefaultsSetterHandler;
+import de.unioninvestment.eai.portal.support.scripting.*;
 import de.unioninvestment.eai.portal.support.scripting.http.HttpProvider;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import groovy.lang.Closure;
+import groovy.lang.GString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Klasse zur Erstellung der Scripting-Modell-Objektstruktur. Nicht für die
@@ -125,6 +78,9 @@ public class ScriptModelBuilder {
 	private EventBus eventBus;
 	private AuditLogger auditLogger;
     private ScriptCompiler scriptCompiler;
+
+    // for testing
+    private boolean runMainScript = true;
 
     enum Operation {
         INSERT("generateInsertStatement"),
@@ -240,7 +196,11 @@ public class ScriptModelBuilder {
 			scriptBuilder.registerAndRunPropertyScript(script.getProperty(),
 					script.getValue());
 		}
-		scriptBuilder.runMainScript();
+
+        scriptBuilder.updateBindingsOfMainScript();
+        if (runMainScript) {
+		    scriptBuilder.runMainScript();
+        }
 
 		return scriptPortlet;
 	}
@@ -1021,4 +981,14 @@ public class ScriptModelBuilder {
 
 		scriptFormField.setOnChange(onExecution);
 	}
+
+    /**
+     * running the main script can be disabled for testing reasons
+     *
+     * @param runMainScript
+     */
+    public void setRunMainScript(boolean runMainScript) {
+        this.runMainScript = runMainScript;
+    }
+
 }
