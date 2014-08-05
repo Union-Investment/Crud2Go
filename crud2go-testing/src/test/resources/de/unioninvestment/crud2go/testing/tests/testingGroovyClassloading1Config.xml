@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+         title="Beispiel für Script-Container">
+    <page>
+		<component id="component" generator="createComponent()"/>
+    </page>
+    <script><![CDATA[
+       def newHello() {
+            new Hello().say()
+       }
+
+       class Hello {
+            String say() { "Hello 1" }
+       }
+    ]]></script>
+</portlet>

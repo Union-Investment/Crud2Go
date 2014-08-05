@@ -67,7 +67,8 @@ public class Table extends Component implements Component.ExpandableComponent,
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Table.class);
 
-	/**
+
+    /**
 	 * Permission Actions.
 	 */
 	public enum Permission {

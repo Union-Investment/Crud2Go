@@ -18,68 +18,17 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
-import groovy.lang.Closure;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.LoggerFactory;
-
+import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
-
-import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig.Dynamic;
-import de.unioninvestment.eai.portal.portlet.crud.config.StatementConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.config.validation.ConfigurationException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.AbstractDatabaseContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomColumnGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.CustomComponent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseQueryContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Dialog;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.GenericDataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.JMXContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionList;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Page;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ReSTContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Region;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TextArea;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
@@ -90,19 +39,22 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ConfirmationDialogProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.DynamicOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.NotificationProvider;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryDeleteStatementGenerator;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryInsertStatementGenerator;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.database.QueryUpdateStatementGenerator;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.events.NewRowDefaultsSetterHandler;
-import de.unioninvestment.eai.portal.support.scripting.DynamicColumnStyleRenderer;
-import de.unioninvestment.eai.portal.support.scripting.DynamicRowStyleRenderer;
-import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
-import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
-import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
-import de.unioninvestment.eai.portal.support.scripting.ScriptContainerDelegate;
-import de.unioninvestment.eai.portal.support.scripting.ScriptCustomFilterFactory;
-import de.unioninvestment.eai.portal.support.scripting.ScriptFormSQLWhereFactory;
-import de.unioninvestment.eai.portal.support.scripting.SqlProvider;
+import de.unioninvestment.eai.portal.support.scripting.*;
 import de.unioninvestment.eai.portal.support.scripting.http.HttpProvider;
 import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import groovy.lang.Closure;
+import groovy.lang.GString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Klasse zur Erstellung der Scripting-Modell-Objektstruktur. Nicht für die
@@ -111,6 +63,8 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
  * @author carsten.mjartan
  */
 public class ScriptModelBuilder {
+
+    private Logger LOGGER = LoggerFactory.getLogger(ScriptModelBuilder.class);
 
 	private final ScriptModelFactory factory;
 	private final ConnectionPoolFactory connectionPoolFactory;
@@ -123,6 +77,25 @@ public class ScriptModelBuilder {
 
 	private EventBus eventBus;
 	private AuditLogger auditLogger;
+    private ScriptCompiler scriptCompiler;
+
+    // for testing
+    private boolean runMainScript = true;
+
+    enum Operation {
+        INSERT("generateInsertStatement"),
+        UPDATE("generateUpdateStatement"),
+        DELETE("generateDeleteStatement");
+
+        private final String methodName;
+
+        private Operation(String methodName) {
+            this.methodName = methodName;
+        }
+        public String getMethodName() {
+            return methodName;
+        }
+    }
 
 	/**
 	 * Konstruktor mit Parameter.
@@ -142,14 +115,14 @@ public class ScriptModelBuilder {
 	 */
 	public ScriptModelBuilder(ScriptModelFactory factory, EventBus eventBus,
 			ConnectionPoolFactory connectionPoolFactory,
-			UserFactory userFactory, ScriptBuilder scriptBuilder,
+			UserFactory userFactory, ScriptCompiler scriptCompiler, ScriptBuilder scriptBuilder,
 			Portlet portlet, Map<Object, Object> modelToConfigMapping) {
 		this.factory = factory;
 		this.eventBus = eventBus;
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.userFactory = userFactory;
-		this.scriptBuilder = scriptBuilder;
-
+        this.scriptCompiler = scriptCompiler;
+        this.scriptBuilder = scriptBuilder;
 		this.portlet = portlet;
 		this.configs = modelToConfigMapping;
 	}
@@ -223,7 +196,11 @@ public class ScriptModelBuilder {
 			scriptBuilder.registerAndRunPropertyScript(script.getProperty(),
 					script.getValue());
 		}
-		scriptBuilder.runMainScript();
+
+        scriptBuilder.updateBindingsOfMainScript();
+        if (runMainScript) {
+		    scriptBuilder.runMainScript();
+        }
 
 		return scriptPortlet;
 	}
@@ -473,10 +450,14 @@ public class ScriptModelBuilder {
 
 		ScriptContainer scriptContainer = buildScriptContainer(table
 				.getContainer());
+        if (table.getContainer() instanceof DatabaseQueryContainer) {
+            prepareContainerForDynamicStatements(table, (ScriptDatabaseQueryContainer) scriptContainer);
+        }
+
 		scriptTable.setContainer(scriptContainer);
 
 		populateQueryDelegateOnDomainContainer(table.getColumns(),
-				table.getContainer());
+				table.getContainer(), scriptContainer);
 
 		registerOptionLists(table);
 
@@ -500,7 +481,14 @@ public class ScriptModelBuilder {
 		return scriptTable;
 	}
 
-	private void populateTableRowValidator(Table table, ScriptTable scriptTable) {
+    private void prepareContainerForDynamicStatements(Table table, ScriptDatabaseQueryContainer scriptContainer) {
+        DatabaseQueryContainer container = (DatabaseQueryContainer) table.getContainer();
+        scriptContainer.setInsertGenerator(new QueryInsertStatementGenerator(table));
+        scriptContainer.setUpdateGenerator(new QueryUpdateStatementGenerator(table));
+        scriptContainer.setDeleteGenerator(new QueryDeleteStatementGenerator(table));
+    }
+
+    private void populateTableRowValidator(Table table, ScriptTable scriptTable) {
 		TableConfig tc = (TableConfig) configs.get(table);
 		if (tc.getRowValidator() != null) {
 			Closure<Object> rowValidatorClosure = scriptBuilder.buildClosure(tc
@@ -601,22 +589,22 @@ public class ScriptModelBuilder {
 	}
 
 	private void populateQueryDelegateOnDomainContainer(TableColumns columns,
-			DataContainer container) {
+            DataContainer container, ScriptContainer scriptContainer) {
 		if (container instanceof DatabaseQueryContainer) {
 			DatabaseQueryContainer databaseQueryContainer = (DatabaseQueryContainer) container;
 			DatabaseQueryConfig config = (DatabaseQueryConfig) configs
 					.get(container);
 
-			StatementWrapper insertStatement = wrapStatement(config.getInsert());
-			StatementWrapper updateStatement = wrapStatement(config.getUpdate());
-			StatementWrapper deleteStatement = wrapStatement(config.getDelete());
+			StatementWrapper insertStatement = wrapStatement(config.getInsert(), Operation.INSERT);
+			StatementWrapper updateStatement = wrapStatement(config.getUpdate(), Operation.UPDATE);
+			StatementWrapper deleteStatement = wrapStatement(config.getDelete(), Operation.DELETE);
 
 			CurrentUser currentUser = userFactory.getCurrentUser(portlet);
 
 			ScriptDatabaseModificationsDelegate delegate = factory
 					.getDatabaseQueryDelegate(databaseQueryContainer,
 							config.getQuery(), insertStatement,
-							updateStatement, deleteStatement,
+							updateStatement, deleteStatement, (ScriptDatabaseQueryContainer) scriptContainer,
 							columns.getPrimaryKeyNames(), currentUser);
 
 			databaseQueryContainer.setDatabaseQueryDelegate(delegate);
@@ -624,16 +612,37 @@ public class ScriptModelBuilder {
 
 	}
 
-	private StatementWrapper wrapStatement(StatementConfig statement) {
+	private StatementWrapper wrapStatement(StatementConfig statement, Operation operation) {
 		if (statement != null) {
-			Closure<?> statementClosure = scriptBuilder.buildClosure(statement
-					.getStatement());
+            Closure<?> statementClosure;
+            if (statement.getStatement() != null && !Strings.isNullOrEmpty(statement.getStatement().getSource())) {
+                statementClosure = scriptBuilder.buildClosure(statement
+                        .getStatement());
+            } else {
+                statementClosure = createGeneratedStatementClosure(statement, operation);
+            }
 			return new StatementWrapper(statementClosure, statement.getType());
 		}
 		return null;
 	}
 
-	private void addNewRowDefaultsSetterHandler(Table table) {
+    private Closure<?> createGeneratedStatementClosure(StatementConfig statement, Operation operation) {
+        String closureString = "{ container, row, connection -> " +
+                "container." + operation.getMethodName() + "(row) }";
+        Closure<?> stmtClosure;
+        try {
+            stmtClosure = (Closure<GString>) scriptCompiler
+                    .compileScript(closureString).newInstance().run();
+            stmtClosure.setDelegate(scriptBuilder.getMainScript());
+            return stmtClosure;
+
+        } catch (Exception e) {
+            LOGGER.error("Error compiling script", e);
+            throw new BusinessException("portlet.crud.error.compilingScript");
+        }
+    }
+
+    private void addNewRowDefaultsSetterHandler(Table table) {
 		DataContainer container = table.getContainer();
 
 		Map<String, Closure<?>> columnsDefaultValuesMap = buildDefaultsMap(table);
@@ -972,4 +981,14 @@ public class ScriptModelBuilder {
 
 		scriptFormField.setOnChange(onExecution);
 	}
+
+    /**
+     * running the main script can be disabled for testing reasons
+     *
+     * @param runMainScript
+     */
+    public void setRunMainScript(boolean runMainScript) {
+        this.runMainScript = runMainScript;
+    }
+
 }

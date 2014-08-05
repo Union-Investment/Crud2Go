@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.liferay.PermissionsUtil;
 
 /**
@@ -33,15 +34,13 @@ import de.unioninvestment.eai.portal.support.vaadin.liferay.PermissionsUtil;
  * 
  * @author siva.selvarajah
  */
-@Configurable
 public class PortletRole implements Serializable, Role {
 
 	private static final long serialVersionUID = 1L;
 
 	public static final String RESOURCE_KEY = "de.unioninvestment.eai.portal.portlet.crud.domain.model.Role";
 
-	@Autowired
-	private Portal portal;
+	Portal portal;
 
 	private String name;
 	private final String primKey;
@@ -51,12 +50,13 @@ public class PortletRole implements Serializable, Role {
 	 * 
 	 * @param name
 	 *            Rollenname
-	 * @param porletInstanceId
+	 * @param primKey
 	 *            ID des Portlets
 	 */
 	public PortletRole(String name, long primKey) {
 		this.name = name;
 		this.primKey = String.valueOf(primKey);
+		this.portal = Context.getBean(Portal.class);
 	}
 
 	/**

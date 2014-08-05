@@ -21,6 +21,7 @@ package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -63,7 +64,7 @@ public class ScriptModelFactoryTest {
 		MockitoAnnotations.initMocks(this);
 
 		scriptModelFactory = new ScriptModelFactory(connectionPoolFactoryMock,
-				userFactoryMock, portalMock, DatabaseDialect.ORACLE);
+				userFactoryMock, portalMock, new ScriptCompiler(), DatabaseDialect.ORACLE, false);
 	}
 
 	@Test

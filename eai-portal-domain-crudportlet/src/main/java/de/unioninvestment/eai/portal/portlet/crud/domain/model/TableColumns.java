@@ -376,4 +376,24 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 		
 		
 	}
+
+    public List<TableColumn> getUpdateColumns() {
+        List<TableColumn> results = new LinkedList<TableColumn>();
+        for (TableColumn column : columnsList) {
+            if (column.isUpdateColumn()) {
+                results.add(column);
+            }
+        }
+        return results;
+    }
+
+    public List<TableColumn> getInsertColumns() {
+        List<TableColumn> results = new LinkedList<TableColumn>();
+        for (TableColumn column : columnsList) {
+            if (column.isInsertColumn()) {
+                results.add(column);
+            }
+        }
+        return results;
+    }
 }

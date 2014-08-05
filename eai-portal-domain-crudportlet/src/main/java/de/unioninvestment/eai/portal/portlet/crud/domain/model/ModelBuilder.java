@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -387,7 +388,6 @@ public class ModelBuilder {
 	private FormActions buildFormActions(FormConfig formConfig) {
 		List<FormAction> actionList = new ArrayList<FormAction>();
 		for (FormActionConfig config : formConfig.getAction()) {
-
 			if (currentUser.hasPermission(config, Form.Permission.BUILD, true)) {
 				Triggers triggers = buildTriggers(config);
 
@@ -714,6 +714,9 @@ public class ModelBuilder {
 					.hiddenStatus(getHiddenStatus(c)) //
 					.searchable(getSearchable(c)) //
 					.editableDefault(isEditable) //
+                    .sequence(c.getSequence()) //
+                    .insertColumn(c.isInsert()) //
+                    .updateColumn(c.isUpdate()) //
 					.primaryKey(c.isPrimaryKey()) //
 					.multiline(c.isMultiline()) //
 					.rows(c.getRows()) //
@@ -887,7 +890,7 @@ public class ModelBuilder {
 										.getSource() != null);
 		List<ContainerOrder> orderBys = getDefaultOrder(databaseQuery);
 		return factory.getDatabaseQueryContainer(eventBus,
-				databaseQuery.getDatasource(), databaseQuery.getQuery(),
+				databaseQuery, databaseQuery.getQuery(),
 				insertable, updateable, deleteable, primaryKeys,
 				currentUser.getName(), displayPattern, orderBys,
 				extractFilterPolicy(databaseQuery),
@@ -909,7 +912,7 @@ public class ModelBuilder {
 		List<ContainerOrder> orderBys = getDefaultOrder(config);
 
 		return factory.getDatabaseTableContainer(eventBus,
-				config.getDatasource(), config.getTablename(), insertable,
+				config, insertable,
 				updateable, deleteable, currentUser, formatPattern, orderBys,
 				extractFilterPolicy(config), config.getPagelength(),
 				config.getExportPagelength(), config.getSizeValid());
@@ -940,6 +943,10 @@ public class ModelBuilder {
 
 	CurrentUser getCurrentUser() {
 		return currentUser;
+	}
+	
+	public List<Form> getForms(){
+		return Collections.unmodifiableList(forms);
 	}
 
 }

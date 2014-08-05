@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+	title="Beispiel für eine Tabelle auf Basis einer Query">
+	<page>
+		<table id="table">
+			<database-query datasource="test" tablename="TEST_CRUD2">
+				<query><![CDATA[
+					SELECT * FROM test_crud2
+				]]></query>
+				<insert/>
+                <update/>
+                <delete/>
+			</database-query>
+			<columns>
+				<column name="ID" title="ID" primary-key="true" editable="true" sequence="TEST_CRUD2_SEQ" update="true"/>
+				<column name="CNUMBER5_2" title="Zahl" editable="true" />
+				<column name="CDATE" editable="false" />
+				<column name="CTIMESTAMP" />
+				<column name="CVARCHAR5_NN" editable="true" longtitle="CVARCHAR5 (Pflichtfeld)"/>
+				<column name="CNUMBER5_2_NN" editable="true"/>
+				<column name="CDATE_NN" editable="true" />
+				<column name="CTIMESTAMP_NN" hidden="true"/>
+				<column name="TESTDATA" editable="true" width="300" validate="maxlen=80,required" validation-message="Pflichtfeld, Max. 80 Zeichen sind erlaubt"/>
+			</columns>
+		</table>
+	</page>
+</portlet>

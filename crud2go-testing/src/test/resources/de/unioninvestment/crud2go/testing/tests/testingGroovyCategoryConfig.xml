@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet xmlns="http://www.unioninvestment.de/eai/portal/crud-portlet"
+         title="Beispiel für Script-Container">
+    <page>
+		<component id="component" generator="createComponent()"/>
+    </page>
+    <script><![CDATA[
+        a = "1"
+        b = 2
+
+        c = "$a $b"
+        d = "$c 3".flatten()
+    ]]></script>
+</portlet>

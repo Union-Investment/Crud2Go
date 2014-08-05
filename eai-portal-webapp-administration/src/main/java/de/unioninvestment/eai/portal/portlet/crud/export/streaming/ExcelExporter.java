@@ -251,8 +251,7 @@ public class ExcelExporter implements Exporter {
 		this.sheet = this.workbook.createSheet(this.sheetName);
 		this.createHelper = this.workbook.getCreationHelper();
 		this.dataFormat = this.workbook.createDataFormat();
-
-        this.dateDataFormat = defaultDateDataFormat();
+		this.dateDataFormat = defaultDateDataFormat();
 		this.doubleDataFormat = defaultDoubleDataFormat();
 
 		this.columnHeaderCellStyle = defaultHeaderCellStyle(this.workbook);

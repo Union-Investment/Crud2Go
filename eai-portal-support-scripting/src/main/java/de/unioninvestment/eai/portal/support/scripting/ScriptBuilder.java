@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.support.scripting;
 
+import com.google.common.base.Strings;
 import groovy.lang.Binding;
 import groovy.lang.Closure;
 import groovy.lang.Script;
@@ -70,12 +71,15 @@ public class ScriptBuilder {
 		propertyScriptBinding.setVariable(name, value);
 	}
 
+    public void updateBindingsOfMainScript() {
+        mainScript.setBinding(mainScriptBinding);
+    }
+
 	/**
 	 * Führt das Groovy-Script aus.
 	 * 
 	 */
 	public void runMainScript() {
-		mainScript.setBinding(mainScriptBinding);
 		mainScript.run();
 	}
 
@@ -93,7 +97,7 @@ public class ScriptBuilder {
 	@SuppressWarnings("unchecked")
 	public Closure<Object> buildClosure(GroovyScript closureScript) {
 		Closure<Object> closure = null;
-		if (closureScript != null) {
+		if (closureScript != null && !Strings.isNullOrEmpty(closureScript.getSource())) {
 			if (closureScript.getClazz() != null) {
 				closure = (Closure<Object>) createNewInstance(closureScript)
 						.run();

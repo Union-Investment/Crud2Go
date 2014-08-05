@@ -18,15 +18,12 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
+import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler;
 import groovy.lang.Closure;
 import groovy.lang.Script;
 
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
@@ -76,13 +73,14 @@ import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
  * 
  * @author carsten.mjartan
  */
-@Component
 public class ScriptModelFactory {
 
 	private final ConnectionPoolFactory connectionPoolFactory;
 	private final UserFactory userFactory;
-	private Portal portal;
+    private final boolean inTest;
+    private Portal portal;
 	private DatabaseDialect databaseDialect;
+    private ScriptCompiler scriptCompiler;
 
 	/**
 	 * @param connectionPoolFactory
@@ -91,17 +89,20 @@ public class ScriptModelFactory {
 	 * @param userFactory
 	 *            Kactory-Objekt zum Erzeugen von Benutzer-Objekten.
 	 */
-	@Autowired
 	public ScriptModelFactory(
 			ConnectionPoolFactory connectionPoolFactory,
 			UserFactory userFactory,
 			Portal portal,
-			@Value("${portlet.crud.databaseBackend.dialect}") DatabaseDialect databaseDialect) {
+            ScriptCompiler scriptCompiler,
+			DatabaseDialect databaseDialect,
+            boolean inTest) {
 		this.connectionPoolFactory = connectionPoolFactory;
 		this.userFactory = userFactory;
 		this.portal = portal;
-		this.databaseDialect = databaseDialect;
-	}
+        this.scriptCompiler = scriptCompiler;
+        this.databaseDialect = databaseDialect;
+	    this.inTest = inTest;
+    }
 
 	/**
 	 * Erstellt eine Builder-Instanz.
@@ -116,7 +117,7 @@ public class ScriptModelFactory {
 	public ScriptModelBuilder getBuilder(EventBus eventBus, Portlet portlet,
 			Map<Object, Object> modelToConfigMapping) {
 		return new ScriptModelBuilder(this, eventBus, connectionPoolFactory,
-				userFactory, getScriptBuilder(), portlet, modelToConfigMapping);
+				userFactory, scriptCompiler, getScriptBuilder(), portlet, modelToConfigMapping);
 	}
 
 	public ScriptBuilder getScriptBuilder() {
@@ -147,7 +148,7 @@ public class ScriptModelFactory {
 	 * @return eine neue Wrapper-Klasse
 	 */
 	public ScriptPortlet getScriptPortlet(Portlet portlet) {
-		return new ScriptPortlet(portlet);
+		return new ScriptPortlet(portlet, inTest);
 	}
 
 	/**
@@ -315,10 +316,10 @@ public class ScriptModelFactory {
 	}
 
 	public ScriptDatabaseModificationsDelegate getDatabaseQueryDelegate(
-			DatabaseQueryContainer databaseQueryContainer, String queryString,
-			StatementWrapper insertStatement, StatementWrapper updateStatement,
-			StatementWrapper deleteStatement, List<String> primaryKeyColumns,
-			CurrentUser currentUser) {
+            DatabaseQueryContainer databaseQueryContainer, String queryString,
+            StatementWrapper insertStatement, StatementWrapper updateStatement,
+            StatementWrapper deleteStatement, ScriptDatabaseContainer scriptContainer, List<String> primaryKeyColumns,
+            CurrentUser currentUser) {
 
 		DatabaseQueryDelegate queryDelegate;
 		switch (databaseDialect) {
@@ -337,7 +338,7 @@ public class ScriptModelFactory {
 
 		ScriptDatabaseModificationsDelegate delegate = new ScriptDatabaseModificationsDelegate(
 				databaseQueryContainer, insertStatement, updateStatement,
-				deleteStatement, currentUser, queryDelegate);
+				deleteStatement, scriptContainer, currentUser, queryDelegate);
 
 		return delegate;
 	}

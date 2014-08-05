@@ -73,7 +73,7 @@ public class UiHistory implements DetachListener {
 
         VaadinSession getSession();
 
-        /**
+		/**
 		 * This method has to be overridden to additionally call
 		 * {@link UiHistory#handleHeartbeat(HistoryAware)}.
 		 * 
@@ -100,7 +100,7 @@ public class UiHistory implements DetachListener {
 		 */
 		void setHistoryState(UiHistoryState state);
 
-    }
+	}
 
 	private final class WindowNameFilter implements Predicate<HistoryAware> {
 		private final String currentWindowName;
@@ -141,9 +141,9 @@ public class UiHistory implements DetachListener {
 	/**
      * @param portletSession
      *            the session storing all ui instances including the new one
-     * @param ui
-*            new UI instance
-     */
+	 * @param ui
+	 *            new UI instance
+	 */
 	private void closeOldUIs(PortletSession portletSession, HistoryAware ui) {
 		Collection<HistoryAware> allUIs = getUIsFromSession(portletSession);
 		List<HistoryAware> uiPageHistory = filterRelevantUIs(allUIs, ui
@@ -203,7 +203,7 @@ public class UiHistory implements DetachListener {
 		}
 	}
 
-    /**
+	/**
 	 * @param portletSession
 	 * @return the UIs
 	 */
@@ -233,13 +233,13 @@ public class UiHistory implements DetachListener {
 
 	private void updateUIsInSession(PortletSession portletSession, List<HistoryAware> uis) {
 		portletSession.setAttribute(UIS_SESSION_ATTRIBUTE, uis,
-                PortletSession.APPLICATION_SCOPE);
+				PortletSession.APPLICATION_SCOPE);
 	}
 
     private PortletSession getPortletSession(HistoryAware ui) {
         VaadinPortletSession vaadinSession = (VaadinPortletSession) ui.getSession();
         return (PortletSession) vaadinSession.getPortletSession();
-    }
+	}
 
 	private int getMaxUiHistoryLength(HistoryAware ui) {
 		return ui.getHistoryLimit();

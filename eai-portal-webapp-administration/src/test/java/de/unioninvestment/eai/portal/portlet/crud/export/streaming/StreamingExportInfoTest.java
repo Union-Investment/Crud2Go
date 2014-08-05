@@ -145,7 +145,7 @@ public class StreamingExportInfoTest {
 		assertThat(info.getDisplayFormats(), is(new String[] { null, "#" }));
 	}
 
-    @Test
+	@Test
     public void shouldReturnMultilineFlags() {
         givenColumnMocks();
         when(col2Mock.isMultiline()).thenReturn(true);

@@ -18,18 +18,19 @@
  */
 package de.unioninvestment.eai.portal.support.scripting;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
+import com.vaadin.ui.Component;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.Script;
-
+import org.codehaus.groovy.ast.expr.ClassExpression;
+import org.codehaus.groovy.ast.expr.Expression;
+import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
 
-import com.vaadin.ui.Component;
-
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 /**
  * Support-Klasse, die die Compilierung von Strings aus der Script-Konfiguration
@@ -39,7 +40,23 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet;
  */
 public class ScriptCompiler {
 
-	private GroovyClassLoader loader;
+    static class MethodCallExpressionChecker implements SecureASTCustomizer.ExpressionChecker {
+        public boolean isAuthorized(Expression expression) {
+            if (expression instanceof MethodCallExpression) {
+                Expression expr = ((MethodCallExpression) expression).getObjectExpression();
+                if (expr instanceof ClassExpression) {
+                    if (expr.getType().getName().equals(System.class.getName())) {
+                        if (((MethodCallExpression) expression).getMethodAsString().equals("exit")) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    }
+
+    private GroovyClassLoader loader;
 
 	/**
 	 * Initialisierung des Compilers.
@@ -87,11 +104,12 @@ public class ScriptCompiler {
 		imports.addStarImports(Component.class.getPackage().getName());
 		final SecureASTCustomizer customizer = new SecureASTCustomizer();
 		customizer.setImportsBlacklist(unmodifiableList(asList(
-				"java.lang.System", "groovy.lang.GroovyShell",
+				"groovy.lang.GroovyShell",
 				"groovy.lang.GroovyClassLoader")));
 		customizer.setIndirectImportCheckEnabled(true);
+        customizer.addExpressionCheckers(new MethodCallExpressionChecker());
 
-		CompilerConfiguration configuration = new CompilerConfiguration();
+        CompilerConfiguration configuration = new CompilerConfiguration();
 		configuration.addCompilationCustomizers(imports, customizer);
 
 		ClassLoader parent = ScriptCompiler.class.getClassLoader();

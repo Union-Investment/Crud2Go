@@ -63,14 +63,14 @@ public class ScriptPortletTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		scriptPortlet = new ScriptPortlet(portletMock);
+		scriptPortlet = new ScriptPortlet(portletMock, false);
 	}
 
 	@Test(expected = NoSuchElementException.class)
 	public void shouldThrowNoSuchElementExceptionOnUnknownId()
 			throws JAXBException {
 
-		ScriptPortlet scriptPortlet = new ScriptPortlet(portletMock);
+		ScriptPortlet scriptPortlet = new ScriptPortlet(portletMock, false);
 		scriptPortlet.getElementById("unknownId");
 	}
 

@@ -80,8 +80,6 @@ public class ScriptTable extends ScriptComponent {
 	/**
 	 * Konstruktor mit Parameter.
 	 * 
-	 * @param application
-	 *            die aktuelle Vaadin-Application-Instanz
 	 * @param table
 	 *            Tabelle
 	 */

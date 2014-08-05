@@ -23,7 +23,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,11 +37,13 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
 
 public class PortletRoleTest {
 
+    @Rule
+    public ContextMock contextMock = new ContextMock();
+
 	@Mock
 	private Portal portalMock;
 
-	@InjectMocks
-	private PortletRole portletRole = new PortletRole("admin", 1);
+	private PortletRole portletRole;
 
 	@Mock
 	private User userMock;
@@ -50,6 +54,8 @@ public class PortletRoleTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+        portletRole = new PortletRole("admin", 1);
+        portletRole.portal = portalMock;
 	}
 
 	@Test

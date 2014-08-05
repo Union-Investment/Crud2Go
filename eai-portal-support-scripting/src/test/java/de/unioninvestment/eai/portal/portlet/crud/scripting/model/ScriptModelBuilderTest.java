@@ -27,6 +27,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import de.unioninvestment.eai.portal.support.scripting.*;
 import groovy.lang.Closure;
 
 import java.util.Map;
@@ -69,10 +71,6 @@ import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.NotificationP
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.ShowPopupProvider;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.domain.container.rest.ReSTDelegateImpl;
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.portal.ScriptPortal;
-import de.unioninvestment.eai.portal.support.scripting.JMXProvider;
-import de.unioninvestment.eai.portal.support.scripting.ScriptAuditLogger;
-import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
-import de.unioninvestment.eai.portal.support.scripting.SqlProvider;
 import de.unioninvestment.eai.portal.support.scripting.http.HttpProvider;
 import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 
@@ -133,7 +131,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		MockitoAnnotations.initMocks(this);
 
 		factory = new ScriptModelFactory(connectionPoolFactoryMock,
-				userFactoryMock, portalMock, DatabaseDialect.ORACLE);
+				userFactoryMock, portalMock, new ScriptCompiler(), DatabaseDialect.ORACLE, false);
 
 		when(scriptBuilderMock.buildClosure(any(GroovyScript.class)))
 				.thenAnswer(new Answer<Object>() {
@@ -221,7 +219,7 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		when(portletMock.getTabs()).thenReturn(null);
 
 		scriptModelBuilder = new ScriptModelBuilder(factoryMock, eventBus,
-				connectionPoolFactoryMock, userFactoryMock, scriptBuilderMock,
+				connectionPoolFactoryMock, userFactoryMock, new ScriptCompiler(), scriptBuilderMock,
 				portletMock, mappingMock);
 
 		// sollte Exception werfen, weil weder Page noch Tabs vorhanden sind.
@@ -744,7 +742,12 @@ public class ScriptModelBuilderTest extends ModelSupport {
 		portlet = modelBuilder.build();
 		mapping = modelBuilder.getModelToConfigMapping();
 		scriptModelBuilder = new ScriptModelBuilder(factory, eventBus,
-				connectionPoolFactoryMock, userFactoryMock, scriptBuilderMock,
+				connectionPoolFactoryMock, userFactoryMock, new ScriptCompiler(), scriptBuilderMock,
 				portlet, mapping);
 	}
+
+    @Test
+    public void operationEnumShouldProvideMethodNameFromScriptModelBuilder() {
+        assertThat(ScriptModelBuilder.Operation.INSERT.getMethodName(), is("generateInsertStatement"));
+    }
 }

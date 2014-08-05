@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseTableConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,10 +70,8 @@ public class DatabaseTableContainer extends AbstractDatabaseContainer {
 	/**
 	 * Konstruktor.
 	 * 
-	 * @param datasource
-	 *            das DataSource-Kürzel
-	 * @param tablename
-	 *            der Tabellennane
+	 * @param config
+	 *            die Container-Konfiguration
 	 * @param connectionPool
 	 *            der zu verwendende ConnectionPool
 	 * @param deleteable
@@ -86,19 +85,17 @@ public class DatabaseTableContainer extends AbstractDatabaseContainer {
 	 *            Cachttimeout für die Anzahl aller selektierten Einträge
 	 * @param pageLength
 	 *            Anzahl der Einträge pro Seite
-	 * @param currentUsername
-	 *            Aktueller Benutzername
 	 */
-	public DatabaseTableContainer(EventBus eventBus, String datasource,
-			String tablename, ConnectionPool connectionPool,
+	public DatabaseTableContainer(EventBus eventBus, DatabaseTableConfig config,
+                                  ConnectionPool connectionPool,
 			boolean insertable, boolean updateable, boolean deleteable,
 			CurrentUser currentUser, Map<String, String> formatPattern,
 			List<ContainerOrder> containerOrders, FilterPolicy filterPolicy,
 			int pageLength, int exportPageLength, int sizeValidTimeout,
 			DatabaseDialect dialect) {
 		super(eventBus, formatPattern, containerOrders, filterPolicy);
-		this.datasource = datasource;
-		this.tablename = tablename;
+		this.datasource = config.getDatasource();
+		this.tablename = config.getTablename();
 		this.connectionPool = connectionPool;
 		this.insertable = insertable;
 		this.updateable = updateable;

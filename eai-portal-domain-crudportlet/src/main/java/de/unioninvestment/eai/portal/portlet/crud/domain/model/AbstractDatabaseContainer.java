@@ -55,8 +55,9 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 	protected TimeoutableQueryDelegate queryDelegate;
 
 	protected String datasource;
+    protected String tablename;
 
-	public AbstractDatabaseContainer(EventBus eventBus,
+    public AbstractDatabaseContainer(EventBus eventBus,
 			Map<String, String> displayPattern,
 			List<ContainerOrder> defaultOrder, FilterPolicy filterPolicy) {
 		super(eventBus, displayPattern, defaultOrder, filterPolicy);
@@ -81,7 +82,11 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 		return datasource;
 	}
 
-	public java.lang.Class<?> getType(String name) {
+    public String getTablename() {
+        return tablename;
+    }
+
+    public java.lang.Class<?> getType(String name) {
 		Class<?> type = getVaadinContainer().getType(name);
 		if (type == null) {
 			LOGGER.info(
@@ -205,4 +210,5 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 		columns.remove("rownum");
 		return columns;
 	}
+
 }

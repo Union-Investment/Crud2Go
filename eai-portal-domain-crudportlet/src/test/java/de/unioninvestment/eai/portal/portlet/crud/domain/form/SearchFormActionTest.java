@@ -44,7 +44,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.junit.After;
@@ -59,50 +58,33 @@ import org.mockito.stubbing.Answer;
 
 import com.vaadin.ui.UI;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.AllFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.AnyFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ApplyFiltersConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CheckboxConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.ContainsFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DateConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.EndsWithFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.EqualsFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.GreaterFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.GreaterOrEqualFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
 import de.unioninvestment.eai.portal.portlet.crud.config.IncludeFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.LessFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.LessOrEqualFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.NotFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RegExpFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SQLFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchTableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.SearchTablesConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.StartsWithFilterConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TimeoutException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Component;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormActions;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormFields;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.MultiOptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.OptionListFormField;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Page;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.StaticOptionList;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tabs;
@@ -124,6 +106,8 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.SQLWhereFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.InitializingUI;
+
+import static de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormTestUtility.*;
 
 public class SearchFormActionTest {
 
@@ -849,24 +833,6 @@ public class SearchFormActionTest {
 				anyBoolean(), anyBoolean());
 	}
 
-	private FilterConfig createAnyFilter(FilterConfig... subfilters) {
-		AnyFilterConfig config = new AnyFilterConfig();
-		config.getFilters().addAll(Arrays.asList(subfilters));
-		return config;
-	}
-
-	private FilterConfig createAllFilter(FilterConfig... subfilters) {
-		AllFilterConfig config = new AllFilterConfig();
-		config.getFilters().addAll(Arrays.asList(subfilters));
-		return config;
-	}
-
-	private FilterConfig createNotFilter(FilterConfig... subfilters) {
-		NotFilterConfig config = new NotFilterConfig();
-		config.getFilters().addAll(Arrays.asList(subfilters));
-		return config;
-	}
-
 	@Test(expected = NoSuchElementException.class)
 	public void shouldThrowExceptionOnUnkownFormField() {
 		prepareSimpleFormFieldToStringColumnSearch("filterValue1", String.class);
@@ -921,96 +887,6 @@ public class SearchFormActionTest {
 		filtersConfig = new ApplyFiltersConfig();
 		search.setApplyFilters(filtersConfig);
 		when(formActionConfigMock.getSearch()).thenReturn(search);
-	}
-
-	private EqualsFilterConfig createEqualsFilter(String fieldName,
-			String columnName) {
-		EqualsFilterConfig filter = new EqualsFilterConfig();
-		filter.setField(fieldName);
-		filter.setColumn(columnName);
-		return filter;
-	}
-
-	private GreaterFilterConfig createGreaterFilter(String fieldName,
-			String columnName) {
-		GreaterFilterConfig filter = new GreaterFilterConfig();
-		filter.setField(fieldName);
-		filter.setColumn(columnName);
-		return filter;
-	}
-
-	private GreaterOrEqualFilterConfig createGreaterOrEqualsFilter(
-			String fieldName, String columnName) {
-		GreaterOrEqualFilterConfig filter = new GreaterOrEqualFilterConfig();
-		filter.setField(fieldName);
-		filter.setColumn(columnName);
-		return filter;
-	}
-
-	private LessFilterConfig createLessFilter(String fieldName,
-			String columnName) {
-		LessFilterConfig filter = new LessFilterConfig();
-		filter.setField(fieldName);
-		filter.setColumn(columnName);
-		return filter;
-	}
-
-	private CustomFilterConfig createCustomFilter() {
-		CustomFilterConfig filter = new CustomFilterConfig();
-		filter.setFilter(new GroovyScript("abcde"));
-		return filter;
-	}
-
-	private LessOrEqualFilterConfig createLessOrEqualsFilter(String fieldName,
-			String columnName) {
-		LessOrEqualFilterConfig filter = new LessOrEqualFilterConfig();
-		filter.setField(fieldName);
-		filter.setColumn(columnName);
-		return filter;
-	}
-
-	private StartsWithFilterConfig createStartsWithFilter(String fieldName,
-			String columnName, boolean caseSensitive) {
-		StartsWithFilterConfig filter = new StartsWithFilterConfig();
-		filter.setField(fieldName);
-		filter.setColumn(columnName);
-		filter.setCaseSensitive(caseSensitive);
-		return filter;
-	}
-
-	private EndsWithFilterConfig createEndsWithFilter(String fieldName,
-			String columnName, boolean caseSensitive) {
-		EndsWithFilterConfig filter = new EndsWithFilterConfig();
-		filter.setField(fieldName);
-		filter.setColumn(columnName);
-		filter.setCaseSensitive(caseSensitive);
-		return filter;
-	}
-
-	private RegExpFilterConfig createRegexpFilter(String fieldName,
-			String columnName, String modifiers) {
-		RegExpFilterConfig filter = new RegExpFilterConfig();
-		filter.setField(fieldName);
-		filter.setColumn(columnName);
-		filter.setModifiers(modifiers);
-		return filter;
-	}
-
-	private ContainsFilterConfig createContainsFilter(String fieldName,
-			String columnName, boolean caseSensitive) {
-		ContainsFilterConfig filter = new ContainsFilterConfig();
-		filter.setField(fieldName);
-		filter.setColumn(columnName);
-		filter.setCaseSensitive(caseSensitive);
-		return filter;
-	}
-
-	private FilterConfig createSqlWhereFilter(String columnName,
-			String whereCondition) {
-		SQLFilterConfig filter = new SQLFilterConfig();
-		filter.setColumn(columnName);
-		filter.setWhere(whereCondition);
-		return filter;
 	}
 
 	@Test
@@ -1295,53 +1171,6 @@ public class SearchFormActionTest {
 		assertThat(tables.get(0), is(tableMock));
 		assertThat(tables.get(1), is(table2Mock));
 		assertThat(tables.get(2), is(table3Mock));
-	}
-
-	private FormField createFormField(String name, String title,
-			String inputPrompt, String value) {
-		FormFieldConfig config = createFormFieldConfig(name, title, inputPrompt);
-		FormField field = new FormField(config);
-		field.setValue(value);
-		return field;
-	}
-
-	private FormFieldConfig createFormFieldConfig(String name, String title,
-			String inputPrompt) {
-		FormFieldConfig config = new FormFieldConfig();
-		config.setName(name);
-		config.setTitle(title);
-		config.setInputPrompt(inputPrompt);
-		return config;
-	}
-
-	private FormField createDateFormField(String name, String title,
-			String inputPrompt, String format, String value) {
-		FormFieldConfig config = createFormFieldConfig(name, title, inputPrompt);
-		config.setDate(new DateConfig());
-		config.getDate().setFormat(format);
-		DateFormField field = new DateFormField(config);
-		field.setValue(value);
-		return field;
-	}
-
-	private FormField createSelectFormField(String name, String title,
-			String inputPrompt, String value, Map<String, String> selections) {
-		FormFieldConfig config = createFormFieldConfig(name, title, inputPrompt);
-		StaticOptionList selection = new StaticOptionList(selections);
-		OptionListFormField field = new OptionListFormField(config, selection);
-		field.setValue(value);
-		return field;
-	}
-
-	private FormField createCheckboxFormField(String name, String title,
-			String inputPrompt, String value) {
-		FormFieldConfig config = createFormFieldConfig(name, title, inputPrompt);
-		CheckboxConfig cbc = new CheckboxConfig();
-		config.setCheckbox(cbc);
-
-		CheckBoxFormField field = new CheckBoxFormField(config);
-		field.setValue(value);
-		return field;
 	}
 
 }

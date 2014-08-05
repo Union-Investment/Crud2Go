@@ -32,9 +32,9 @@ public class UiHistoryTest {
 
     private VaadinSession vaadinSessionMock;
 
-    static class HistoryAwareUI extends UI implements HistoryAware {
+	static class HistoryAwareUI extends UI implements HistoryAware {
 		private static final long serialVersionUID = 1L;
-
+		
 		private UiHistoryState state;
 
 		@Override
@@ -44,7 +44,7 @@ public class UiHistoryTest {
 
 		@Override
 		protected void init(VaadinRequest request) {
-
+			
 		}
 
 		@Override
@@ -58,7 +58,7 @@ public class UiHistoryTest {
 		}
 
 	}
-
+	
 	@Spy
 	private HistoryAwareUI ui1 = new HistoryAwareUI();
 	@Spy
@@ -71,7 +71,7 @@ public class UiHistoryTest {
 	@Mock
 	private Page page1, page2, page3, page4;
 
-    private UiHistory history = new UiHistory();
+	private UiHistory history = new UiHistory();
 
 	@Rule
 	public LiferayContext context = new LiferayContext();
@@ -103,9 +103,9 @@ public class UiHistoryTest {
         doReturn(id).when(ui).getId();
         doNothing().when(ui).addDetachListener(Matchers.any(ClientConnector.DetachListener.class));
         doNothing().when(ui).close();
-    }
+	}
 
-    private void stubSessionAttributeOperations() {
+	private void stubSessionAttributeOperations() {
 		when(
 				context.getPortletSessionMock().getAttribute(
 						UiHistory.UIS_SESSION_ATTRIBUTE,

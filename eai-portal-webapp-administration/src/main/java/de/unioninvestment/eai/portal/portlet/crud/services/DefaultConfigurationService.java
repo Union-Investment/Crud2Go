@@ -151,7 +151,7 @@ public class DefaultConfigurationService implements ConfigurationService {
 			long communityId, ConfigurationMetaData metaData)
 			throws JAXBException {
 		PortletConfig config = unmarshaller.unmarshal(stream);
-		applyRevisionToConfig(config);
+        applyRevisionToConfig(config);
 		compiler.compileAllScripts(config);
 
 		Map<String, Long> roleResourceIDs = new HashMap<String, Long>();
@@ -182,7 +182,7 @@ public class DefaultConfigurationService implements ConfigurationService {
 		}
 	}
 
-	@Override
+    @Override
 	public Long readRoleResourceIdPrimKey(String portletId, long communityId,
 			String roleId) {
 		String roleResourceId = PortletRole.createRoleResourceId(portletId,

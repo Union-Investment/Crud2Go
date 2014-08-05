@@ -23,14 +23,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import groovy.lang.Closure;
+import groovy.lang.GString;
 import groovy.lang.MissingPropertyException;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -72,7 +72,6 @@ public class ScriptDatabaseModificationsDelegateTest extends
 		AbstractSpringPortletContextTest {
 
 	private ScriptDatabaseModificationsDelegate scriptDatabaseQueryDelegate;
-	private static final String QUERY = "Select * from TestUser";
 
 	private static final String INSERT_STMT = "INSERT into TestUser values(?, ?)";
 
@@ -83,14 +82,14 @@ public class ScriptDatabaseModificationsDelegateTest extends
 	@Mock
 	private Connection connectionMock;
 
+    @Mock
+    private ExtendedSql sqlMock;
+
 	@Mock
 	private SQLContainer containerMock;
 
 	@Mock
 	private DataContainer databaseContainerMock;
-
-	@Mock
-	private PreparedStatement statementMock;
 
 	@Mock
 	private Closure<Object> insertClosureMock;
@@ -107,12 +106,8 @@ public class ScriptDatabaseModificationsDelegateTest extends
 	@Captor
 	private ArgumentCaptor<ScriptRow> rowCaptor;
 
-	private RowId temporaryId;
-	private Collection<ColumnProperty> newColumnProperties;
 	private RowItem newRowItem;
-	private RowId id;
 	private RowItem existingRowItem;
-	private Collection<ColumnProperty> updatedColumnProperties;
 
 	@Mock
 	private DatabaseQueryDelegate queryDelegateMock;
@@ -134,15 +129,20 @@ public class ScriptDatabaseModificationsDelegateTest extends
 		super.configurePortletUtils();
 		MockitoAnnotations.initMocks(this);
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
-				databaseContainerMock, queryDelegateMock);
+				databaseContainerMock, queryDelegateMock) {
+            @Override
+            protected ExtendedSql createSingleConnectionSql(Connection conn) {
+                return sqlMock;
+            }
+        };
 
 		prepareData();
 	}
 
 	private void prepareData() {
-		temporaryId = new TemporaryRowId(new Object[] { 1 });
+        RowId temporaryId = new TemporaryRowId(1);
 
-		newColumnProperties = new LinkedList<ColumnProperty>();
+        Collection<ColumnProperty> newColumnProperties = new LinkedList<ColumnProperty>();
 		newColumnProperties.add(new ColumnProperty("id", true, false, false,
 				false, 1, Integer.class));
 		newColumnProperties.add(new ColumnProperty("col", false, true, true,
@@ -154,8 +154,8 @@ public class ScriptDatabaseModificationsDelegateTest extends
 		when(databaseContainerMock.convertItemToRow(newRowItem, false, true))
 				.thenReturn(newRowMock);
 
-		id = new RowId(new Object[] { 1 });
-		updatedColumnProperties = new LinkedList<ColumnProperty>();
+        RowId id = new RowId(1);
+        Collection<ColumnProperty> updatedColumnProperties = new LinkedList<ColumnProperty>();
 		updatedColumnProperties.add(new ColumnProperty("id", true, false,
 				false, false, 1, Integer.class));
 		updatedColumnProperties.add(new ColumnProperty("col", false, true,
@@ -234,9 +234,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 						any(ScriptRow.class), any(ExtendedSql.class)))
 				.thenThrow(new MissingPropertyException("bla"));
 
-		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
-				databaseContainerMock, insertStatement, null, null, null,
-				queryDelegateMock);
+		scriptDatabaseQueryDelegate = createDelegate();
 
 		scriptDatabaseQueryDelegate.storeRow(connectionMock, newRowItem);
 	}
@@ -249,9 +247,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 						any(ScriptRow.class), any(ExtendedSql.class)))
 				.thenThrow(new RuntimeException("bla"));
 
-		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
-				databaseContainerMock, insertStatement, null, null, null,
-				queryDelegateMock);
+		scriptDatabaseQueryDelegate = createDelegate();
 
 		scriptDatabaseQueryDelegate.storeRow(connectionMock, newRowItem);
 	}
@@ -264,9 +260,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 		when(connectionMock.prepareStatement(Mockito.anyString())).thenThrow(
 				new SQLException("Invalid ExtendedSql"));
 
-		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
-				databaseContainerMock, insertStatement, null, null, null,
-				queryDelegateMock);
+		scriptDatabaseQueryDelegate = createDelegate();
 
 		when(connectionMock.prepareStatement(Mockito.anyString())).thenThrow(
 				new SQLException("Invalid SQL"));
@@ -277,32 +271,36 @@ public class ScriptDatabaseModificationsDelegateTest extends
 	@Test
 	public void shouldInsertANewRowWithSql() throws SQLException {
 
-		when(
+        GStringImpl insertGString = new GStringImpl(new Object[]{1, "Text"}, INSERT_STMT
+                .split("\\?"));
+        when(
 				insertClosureMock.call(any(ScriptDatabaseContainer.class),
 						rowCaptor.capture(), any(ExtendedSql.class)))
-				.thenReturn(
-						new GStringImpl(new Object[] { 1, "Text" }, INSERT_STMT
-								.split("\\?")));
+				.thenReturn(insertGString);
 
-		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
-				databaseContainerMock, insertStatement, null, null, null,
-				queryDelegateMock);
+        when(sqlMock.execute(insertGString)).thenReturn(true);
 
-		when(connectionMock.prepareStatement(Mockito.anyString())).thenReturn(
-				statementMock);
+		scriptDatabaseQueryDelegate = createDelegate();
 
-		int updateCount = scriptDatabaseQueryDelegate.storeRow(connectionMock,
+
+		int insertCount = scriptDatabaseQueryDelegate.storeRow(connectionMock,
 				newRowItem);
 
-		verify(connectionMock).prepareStatement(INSERT_STMT);
-		verify(statementMock).setObject(1, 1);
-		verify(statementMock).setObject(2, "Text");
-
-		verify(connectionMock, never()).close();
-		assertThat(updateCount, is(1));
+		assertThat(insertCount, is(1));
 	}
 
-	@Test
+    private ScriptDatabaseModificationsDelegate createDelegate() {
+        return new ScriptDatabaseModificationsDelegate(
+                databaseContainerMock, insertStatement, null, null, null,
+                null, queryDelegateMock) {
+            @Override
+            protected ExtendedSql createSingleConnectionSql(Connection conn) {
+                return sqlMock;
+            }
+        };
+    }
+
+    @Test
 	public void shouldInsertANewRowWithScript() throws SQLException {
 		when(
 				insertClosureMock.call(any(ScriptDatabaseContainer.class),
@@ -311,7 +309,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, new StatementWrapper(insertClosureMock,
 						StatementConfig.Type.SCRIPT), null, null, null,
-				queryDelegateMock);
+                null, queryDelegateMock);
 
 		int updateCount = scriptDatabaseQueryDelegate.storeRow(connectionMock,
 				newRowItem);
@@ -331,20 +329,17 @@ public class ScriptDatabaseModificationsDelegateTest extends
 
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, null, updateStatement, null, null,
-				queryDelegateMock);
+                null, queryDelegateMock) {
+            @Override
+            protected ExtendedSql createSingleConnectionSql(Connection conn) {
+                return sqlMock;
+            }
+        };
 
-		when(connectionMock.prepareStatement(Mockito.anyString())).thenReturn(
-				statementMock);
-		when(statementMock.executeUpdate()).thenReturn(1);
+        when(sqlMock.executeUpdate(any(GString.class))).thenReturn(1);
 
 		int updateCount = scriptDatabaseQueryDelegate.storeRow(connectionMock,
 				existingRowItem);
-
-		verify(connectionMock).prepareStatement(UPDATE_STMT);
-		verify(statementMock).setObject(1, "Text");
-		verify(statementMock).setObject(2, 1);
-
-		verify(connectionMock, never()).close();
 
 		assertThat(updateCount, is(1));
 	}
@@ -358,7 +353,7 @@ public class ScriptDatabaseModificationsDelegateTest extends
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, null, new StatementWrapper(
 						updateClosureMock, StatementConfig.Type.SCRIPT), null,
-				null, queryDelegateMock);
+                null, null, queryDelegateMock);
 
 		int updateCount = scriptDatabaseQueryDelegate.storeRow(connectionMock,
 				existingRowItem);
@@ -369,26 +364,25 @@ public class ScriptDatabaseModificationsDelegateTest extends
 
 	@Test
 	public void shouldDeleteAnExistingRowWithSql() throws SQLException {
-		when(
-				deleteClosureMock.call(rowCaptor.capture(),
+        GStringImpl deleteGString = new GStringImpl(new Object[]{1}, DELETE_STMT.split("\\?"));
+        when(
+				deleteClosureMock.call(any(ScriptDatabaseContainer.class),rowCaptor.capture(),
 						any(ExtendedSql.class))).thenReturn(
-				new GStringImpl(new Object[] { 1 }, DELETE_STMT.split("\\?")));
+                deleteGString);
 
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, null, null, deleteStatement, null,
-				queryDelegateMock);
+                null, queryDelegateMock) {
+            @Override
+            protected ExtendedSql createSingleConnectionSql(Connection conn) {
+                return sqlMock;
+            }
+        };
 
-		when(connectionMock.prepareStatement(Mockito.anyString())).thenReturn(
-				statementMock);
-		when(statementMock.executeUpdate()).thenReturn(1);
+        when(sqlMock.executeUpdate(deleteGString)).thenReturn(1);
 
 		boolean deleted = scriptDatabaseQueryDelegate.removeRow(connectionMock,
 				existingRowItem);
-
-		verify(connectionMock).prepareStatement(DELETE_STMT);
-		verify(statementMock).setObject(1, 1);
-
-		verify(connectionMock, never()).close();
 
 		assertThat(deleted, is(true));
 	}
@@ -396,12 +390,12 @@ public class ScriptDatabaseModificationsDelegateTest extends
 	@Test
 	public void shouldDeleteAnExistingRowWithScript() throws SQLException {
 		when(
-				deleteClosureMock.call(rowCaptor.capture(),
+				deleteClosureMock.call(any(ScriptDatabaseContainer.class),rowCaptor.capture(),
 						any(ExtendedSql.class))).thenReturn(1);
 		scriptDatabaseQueryDelegate = new ScriptDatabaseModificationsDelegate(
 				databaseContainerMock, null, null, new StatementWrapper(
 						deleteClosureMock, StatementConfig.Type.SCRIPT), null,
-				queryDelegateMock);
+                null, queryDelegateMock);
 
 		boolean deleted = scriptDatabaseQueryDelegate.removeRow(connectionMock,
 				existingRowItem);

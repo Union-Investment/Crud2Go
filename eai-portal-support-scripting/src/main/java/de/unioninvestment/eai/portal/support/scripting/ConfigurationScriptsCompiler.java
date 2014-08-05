@@ -18,6 +18,7 @@
  */
 package de.unioninvestment.eai.portal.support.scripting;
 
+import com.google.common.base.Strings;
 import groovy.lang.Script;
 
 import java.io.File;
@@ -370,24 +371,31 @@ public class ConfigurationScriptsCompiler {
 		if (container.getInsert() != null) {
 			// compileStatementScripts(container.getInsert(), location);
 			compileStatementScriptsWithParameter(container.getInsert(),
-					location, "container,row,connection");
+					location, "container,row,connection",
+                    "container.generateInsertStatement(row)");
 		}
 		if (container.getUpdate() != null) {
 			// compileStatementScripts(container.getUpdate(), location);
 			compileStatementScriptsWithParameter(container.getUpdate(),
-					location, "container,row,connection");
+					location, "container,row,connection",
+                    "container.generateUpdateStatement(row)");
 		}
 		if (container.getDelete() != null) {
 			compileStatementScriptsWithParameter(container.getDelete(),
-					location, "row,connection");
+					location, "container,row,connection",
+                    "container.generateDeleteStatement(row)");
 		}
 	}
 
 	private void compileStatementScriptsWithParameter(
-			StatementConfig statement, String location, String parameters) {
+			StatementConfig statement, String location, String parameters, String generatorScript) {
 		switch (statement.getType()) {
 		case SQL:
-			compileGString(statement.getStatement(), parameters, location);
+            if (Strings.isNullOrEmpty(statement.getStatement().getSource())) {
+                compileClosure(statement.getStatement(), parameters, location, generatorScript, false);
+            } else {
+			    compileGString(statement.getStatement(), parameters, location);
+            }
 			break;
 		case SCRIPT:
 			compileClosure(statement.getStatement(), parameters, location);
@@ -486,35 +494,40 @@ public class ConfigurationScriptsCompiler {
 	}
 
 	private boolean compileClosure(GroovyScript groovyScript, String location) {
-		return compileClosure(groovyScript, "it", location, false);
+		return compileClosure(groovyScript, "it", location, null, false);
 	}
 
 	private boolean compileClosure(GroovyScript groovyScript,
 			String parameterNames, String location) {
-		return compileClosure(groovyScript, parameterNames, location, false);
+		return compileClosure(groovyScript, parameterNames, location, null, false);
 	}
 
 	private boolean compileGString(GroovyScript groovyScript,
 			String parameterNames, String location) {
-		return compileClosure(groovyScript, parameterNames, location, true);
+		return compileClosure(groovyScript, parameterNames, location, null, true);
 	}
 
 	private boolean compileClosure(GroovyScript groovyScript,
-			String parameterNames, String location, boolean wrapSourceAsGString) {
-		if (groovyScript != null && groovyScript.getSource() != null) {
-			String source;
+			String parameterNames, String location, String defaultSource, boolean wrapSourceAsGString) {
+		if (groovyScript != null && (!Strings.isNullOrEmpty(groovyScript.getSource()) || defaultSource != null)) {
+			String source = groovyScript.getSource();
+            if (Strings.isNullOrEmpty(source)) {
+                source = defaultSource;
+            }
+
+            String code;
 			if (!wrapSourceAsGString) {
 				// { row -> code }
-				source = "{ " + parameterNames + " -> "
-						+ groovyScript.getSource() + " }";
+				code = "{ " + parameterNames + " -> "
+						+ source + " }";
 			} else {
 				// { row -> """code""" }
-				source = "{ " + parameterNames + " -> "
-						+ multilineGStringExpression(groovyScript.getSource())
+				code = "{ " + parameterNames + " -> "
+						+ multilineGStringExpression(source)
 						+ " }";
 			}
 			try {
-				Class<Script> script = compiler.compileScript(source);
+				Class<Script> script = compiler.compileScript(code);
 				groovyScript.setClazz(script);
 				return true;
 

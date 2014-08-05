@@ -100,6 +100,9 @@ public class Settings {
 
 	@Value("${portlet.crud.requestLog.enabled}")
 	private boolean isRequestLogEnabled;
+	
+	@Value("${portlet.crud.debugMode}")
+	private boolean debugMode;
 
 	@Value("${portlet.crud.requestLog.minimalDurationMillis}")
 	private int requestLogMinimalDurationMillis;
@@ -322,6 +325,10 @@ public class Settings {
 
 	public Integer getUiHistoryLimit() {
 		return uiHistoryLimit;
+	}
+	
+	public boolean isDebugMode() {
+		return debugMode;
 	}
 
     public int getExcelRowAccessWindowSize() {

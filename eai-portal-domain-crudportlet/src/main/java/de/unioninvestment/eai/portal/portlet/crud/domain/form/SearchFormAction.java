@@ -200,6 +200,12 @@ public class SearchFormAction implements ActionHandler {
 	 */
 	List<Filter> createFilters(Form form, Table table) {
 		List<Filter> filters;
+		List<FilterConfig> filterConfigs = createFilterConfigs(form, table);
+		filters = getExplicitFiltersForTable(form, table, filterConfigs);
+		return filters;
+	}
+
+	List<FilterConfig> createFilterConfigs(Form form, Table table) {
 		List<FilterConfig> filterConfigs;
 		if (actionConfig.getSearch() != null
 				&& actionConfig.getSearch().getApplyFilters() != null) {
@@ -208,8 +214,7 @@ public class SearchFormAction implements ActionHandler {
 		} else {
 			filterConfigs = createDefaultConfig(form, table);
 		}
-		filters = getExplicitFiltersForTable(form, table, filterConfigs);
-		return filters;
+		return filterConfigs;
 	}
 
 	private List<FilterConfig> createDefaultConfig(Form form, Table table) {
@@ -352,14 +357,11 @@ public class SearchFormAction implements ActionHandler {
 				}
 			} else if (config instanceof IncludeFilterConfig) {
 				IncludeFilterConfig includeFilterConfig = (IncludeFilterConfig) config;
-
-				String id = ((FormActionConfig) includeFilterConfig.getAction())
-						.getId();
-				FormAction formAction = (FormAction) portlet.getElementById(id);
-
+				FormAction formAction = getActionForIncludeFilter(includeFilterConfig);
+				
 				SearchFormAction otherActionHandler = (SearchFormAction) formAction
 						.getActionHandler();
-
+				
 				List<Filter> filters = otherActionHandler.createFilters(
 						formAction.getForm(), table);
 
@@ -369,6 +371,13 @@ public class SearchFormAction implements ActionHandler {
 			}
 		}
 		return result;
+	}
+
+	FormAction getActionForIncludeFilter(IncludeFilterConfig includeFilterConfig) {
+		String id = ((FormActionConfig) includeFilterConfig.getAction())
+				.getId();
+		FormAction formAction = (FormAction) portlet.getElementById(id);
+		return formAction;
 	}
 
 	private void addTemporalFilterByConfig(List<Filter> result,
@@ -392,7 +401,7 @@ public class SearchFormAction implements ActionHandler {
 		}
 	}
 
-	private boolean filterMatchesTable(Table table, FilterConfig config) {
+	boolean filterMatchesTable(Table table, FilterConfig config) {
 		return config.getTable() == null
 				|| config.getTable().equals(table.getId());
 	}
@@ -439,7 +448,7 @@ public class SearchFormAction implements ActionHandler {
 	 *            - das aktuelle Formular als Ausgangspunkt für die Suche
 	 * @return - eine Liste aller relevanten Tabellen für die Suche.
 	 */
-	List<Table> findSearchableTables(Form form) {
+	public List<Table> findSearchableTables(Form form) {
 		SearchTablesConfig tables = actionConfig.getSearch() == null ? null
 				: actionConfig.getSearch().getTables();
 		return new SearchableTablesFinder().findSearchableTables(form, tables);

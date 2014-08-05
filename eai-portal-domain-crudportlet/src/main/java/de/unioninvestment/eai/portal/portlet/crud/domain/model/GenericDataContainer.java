@@ -18,16 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vaadin.data.Item;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.GenericVaadinContainerEventWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEvent;
@@ -35,12 +26,15 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerExce
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilter;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.CustomFilterMatcher;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericItem;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericItemId;
-import de.unioninvestment.eai.portal.support.vaadin.container.MetaData;
-import de.unioninvestment.eai.portal.support.vaadin.container.TemporaryItemId;
+import de.unioninvestment.eai.portal.support.vaadin.container.*;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Repräsentation eines auf generischen Daten basierten Vaadin Containers als
@@ -101,32 +95,33 @@ public class GenericDataContainer extends AbstractDataContainer {
 
 	@Override
 	public boolean isInsertable() {
-		return metaData.isInsertSupported();
+		return getMetaData().isInsertSupported();
 	}
 
 	@Override
 	public boolean isUpdateable() {
-		return metaData.isUpdateSupported();
+		return getMetaData().isUpdateSupported();
 	}
 
 	@Override
 	public boolean isDeleteable() {
-		return metaData.isRemoveSupported();
+		return getMetaData().isRemoveSupported();
 	}
 
 	@Override
 	public List<String> getPrimaryKeyColumns() {
-		return new ArrayList<String>(metaData.getPrimaryKeys());
+		return new ArrayList<String>(getMetaData().getPrimaryKeys());
 	}
 
-	@Override
+   @Override
 	public List<String> getColumns() {
-		return new ArrayList<String>(metaData.getColumnNames());
+		return new ArrayList<String>(getMetaData().getColumnNames());
 	}
 	
 	@Override
 	public ContainerClob getCLob(ContainerRowId containerRowId,
 			String columnName) {
+        getVaadinContainer();
 
 		if (clobFields.containsKey(containerRowId)) {
 			if (clobFields.get(containerRowId).containsKey(columnName)) {
@@ -176,6 +171,8 @@ public class GenericDataContainer extends AbstractDataContainer {
 
 	@Override
 	public ContainerBlob getBLob(ContainerRowId rowId, String columnName) {
+        getVaadinContainer();
+
 		if (blobFields.containsKey(rowId)) {
 			if (blobFields.get(rowId).containsKey(columnName)) {
 				return blobFields.get(rowId).get(columnName);
@@ -217,7 +214,15 @@ public class GenericDataContainer extends AbstractDataContainer {
 				getOnUpdateEventRouter(), getOnDeleteEventRouter());
 	}
 
-	@Override
+    /**
+     * @return metadata from a lazily instantiated container
+     */
+    protected MetaData getMetaData() {
+        getVaadinContainer();
+        return metaData;
+    }
+
+    @Override
 	protected GenericVaadinContainerEventWrapper getVaadinContainer() {
 		return (GenericVaadinContainerEventWrapper) super.getVaadinContainer();
 	}
@@ -297,7 +302,7 @@ public class GenericDataContainer extends AbstractDataContainer {
 	 * 
 	 * @param metaData
 	 */
-	void setMetaData(MetaData metaData) {
+	protected void setMetaData(MetaData metaData) {
 		this.metaData = metaData;
 	}
 

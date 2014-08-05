@@ -18,51 +18,31 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
-
-import java.io.IOException;
-import java.nio.CharBuffer;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
 import com.vaadin.data.Property;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.GenericVaadinContainerEventWrapper;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.TransactionCallback;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericDelegate;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericItem;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericItemId;
-import de.unioninvestment.eai.portal.support.vaadin.container.GenericProperty;
-import de.unioninvestment.eai.portal.support.vaadin.container.MetaData;
-import de.unioninvestment.eai.portal.support.vaadin.container.TemporaryItemId;
+import de.unioninvestment.eai.portal.support.vaadin.container.*;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import java.io.IOException;
+import java.nio.CharBuffer;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 public class GenericDataContainerTest
 		extends
@@ -96,13 +76,16 @@ public class GenericDataContainerTest
 
 		GenericDataContainer genericDataContainer = new GenericDataContainer(
 				eventBus, displayPatternMock, new ArrayList<ContainerOrder>(),
-				null);
+				null) {
+            @Override
+            protected GenericVaadinContainerEventWrapper createVaadinContainer() {
+                setMetaData(metaDataMock);
+                return vaadinContainerMock;
+            }
+        };
 
 		when(genericDelegateMock.getMetaData()).thenReturn(metaDataMock);
 		genericDataContainer.setDelegate(genericDelegateMock);
-
-		genericDataContainer.setMetaData(metaDataMock);
-		genericDataContainer.setVaadinContainer(vaadinContainerMock);
 
 		return genericDataContainer;
 	}

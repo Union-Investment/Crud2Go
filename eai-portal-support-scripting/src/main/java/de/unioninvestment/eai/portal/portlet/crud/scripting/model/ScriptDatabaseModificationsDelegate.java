@@ -60,7 +60,9 @@ public class ScriptDatabaseModificationsDelegate implements
 	private static final Logger LOG = LoggerFactory
 			.getLogger(ScriptDatabaseModificationsDelegate.class);
 
-	private DataContainer container;
+    private final ScriptDatabaseContainer scriptContainer;
+
+    private DataContainer container;
 
 	private final StatementWrapper insertStatement;
 
@@ -77,14 +79,12 @@ public class ScriptDatabaseModificationsDelegate implements
 	 * 
 	 * @param container
 	 *            Datenbankcontainer
-	 * @param queryString
-	 *            Der SQL Query String
-	 * @param primaryKeyColumns
-	 *            Liste der Spaltennamen der Primärschlüssel
+	 * @param queryDelegate
+	 *            Datenbankspezifische Klasse für Queries
 	 */
 	public ScriptDatabaseModificationsDelegate(final DataContainer container,
 			DatabaseQueryDelegate queryDelegate) {
-		this(container, null, null, null, null, queryDelegate);
+		this(container, null, null, null, null, null, queryDelegate);
 	}
 
 	/**
@@ -98,18 +98,19 @@ public class ScriptDatabaseModificationsDelegate implements
 	 *            Die Closure für UPDATE Statements
 	 * @param deleteStatement
 	 *            Die Closure für DELETE Statements
-	 * @param primaryKeyColumns
-	 *            Liste der Spaltennamen der Primärschlüssel
 	 * @param queryDelegate
+     *            Datenbankspezifische Klasse für Queries
 	 */
 	public ScriptDatabaseModificationsDelegate(DataContainer container,
 			StatementWrapper insertStatement, StatementWrapper updateStatement,
-			StatementWrapper deleteStatement, CurrentUser currentUser,
+			StatementWrapper deleteStatement, ScriptDatabaseContainer scriptContainer,
+            CurrentUser currentUser,
 			DatabaseQueryDelegate queryDelegate) {
 		this.container = container;
 		this.insertStatement = insertStatement;
 		this.updateStatement = updateStatement;
 		this.deleteStatement = deleteStatement;
+        this.scriptContainer = scriptContainer;
 		this.queryDelegate = queryDelegate;
 		this.auditLogger = new AuditLogger(currentUser);
 	}
@@ -222,11 +223,11 @@ public class ScriptDatabaseModificationsDelegate implements
 		}
 	}
 
-	private int executeUpdate(ExtendedSql sql, GString updateGString)
+	private int executeUpdate(ExtendedSql sql, GString statementGString)
 			throws SQLException {
 		try {
-			auditLogger.audit(updateGString.toString());
-			return sql.executeUpdate(updateGString);
+			auditLogger.audit(statementGString.toString());
+			return sql.executeUpdate(statementGString);
 		} finally {
 			sql.close();
 		}
@@ -242,38 +243,28 @@ public class ScriptDatabaseModificationsDelegate implements
 		}
 	}
 
-	private ExtendedSql createSingleConnectionSql(Connection conn) {
+	protected ExtendedSql createSingleConnectionSql(Connection conn) {
 		return new ExtendedSql(new SingleConnectionDataSource(conn, true));
 	}
 
-	/**
-	 * Ruft die übergebende Closure auf und liefert ihre Rückgabe zurück. Die
-	 * Closure kann in ihrem Code auf {@code row} zugreifen.
-	 * 
-	 * @param closure
-	 *            die auszuführende Closure
-	 * @param row
-	 *            zu bearbeitende Zeile
-	 * @return das Ergebnis des Closure-Aufrufs
-	 * @throws SQLException
-	 *             wird bei jedem auftretenden Fehler geworfen, um ein Rollback
-	 *             zu garantieren.
-	 */
-	private Object callClosure(Closure<?> closure, RowItem row, ExtendedSql sql)
-			throws SQLException {
-		DatabaseContainerRow containerRow = (DatabaseContainerRow) container
-				.convertItemToRow(row, false, true);
-		ScriptRow scriptRow = new ScriptRow(containerRow);
-
-		return callClosureAndHandleExceptions(closure, scriptRow, sql);
-	}
-
+    /**
+     * Ruft die übergebende Closure auf und liefert ihre Rückgabe zurück. Die
+     * Closure kann in ihrem Code auf {@code row} zugreifen.
+     *
+     * @param closure
+     *            die auszuführende Closure
+     * @param row
+     *            zu bearbeitende Zeile
+     * @return das Ergebnis des Closure-Aufrufs
+     * @throws SQLException
+     *             wird bei jedem auftretenden Fehler geworfen, um ein Rollback
+     *             zu garantieren.
+     */
 	private Object callClosureWithContainer(Closure<?> closure, RowItem row,
 			ExtendedSql sql) throws SQLException {
 		DatabaseContainerRow containerRow = (DatabaseContainerRow) container
 				.convertItemToRow(row, false, true);
 		ScriptRow scriptRow = new ScriptRow(containerRow);
-		ScriptContainer scriptContainer = new ScriptDatabaseContainer(container);
 
 		return callClosureAndHandleExceptions(closure, scriptContainer,
 				scriptRow, sql);
@@ -333,12 +324,12 @@ public class ScriptDatabaseModificationsDelegate implements
 
 		switch (deleteStatement.getType()) {
 		case SQL:
-			GString deleteGString = (GString) callClosure(
-					deleteStatement.getStatementClosure(), row, sql);
+			GString deleteGString = (GString) callClosureWithContainer(
+                    deleteStatement.getStatementClosure(), row, sql);
 			return executeUpdate(sql, deleteGString) > 0;
 		case SCRIPT:
-			Object rowCount = callClosure(
-					deleteStatement.getStatementClosure(), row, sql);
+			Object rowCount = callClosureWithContainer(
+                    deleteStatement.getStatementClosure(), row, sql);
 			if (rowCount != null && rowCount instanceof Integer) {
 				return (Integer) rowCount > 0;
 			} else {
