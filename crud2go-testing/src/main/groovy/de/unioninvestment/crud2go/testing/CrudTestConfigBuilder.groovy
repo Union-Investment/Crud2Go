@@ -37,6 +37,8 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 
+import java.security.Principal
+
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
 import static org.mockito.Matchers.eq
@@ -81,6 +83,8 @@ class CrudTestConfigBuilder {
     @Autowired
     private TestPreferencesRepository preferencesRepository
 
+    private LiferayContext liferayContext
+
     File combinedPath
     Class<?> testClass
     Map<URL, CacheEntry> configCache
@@ -108,6 +112,7 @@ class CrudTestConfigBuilder {
     private ModelPreferences modelPreferences = new ModelPreferences()
 
     private Map<String,String> portletPreferences = [:]
+    private boolean runMainScript = true
 
     private Statistics statistics = new Statistics()
 
@@ -218,6 +223,11 @@ class CrudTestConfigBuilder {
         return this
     }
 
+    CrudTestConfigBuilder dontRunMainScript() {
+        this.runMainScript = false
+        return this
+    }
+
     protected ModelBuilder createModelBuilder(PortletConfig configuration) {
         return modelFactory.getBuilder(eventBus, new Config((PortletConfig)configuration,
                 (Map<String, Long>)resourceIds, (String)null, (Date)null), modelPreferences);
@@ -263,6 +273,7 @@ class CrudTestConfigBuilder {
         ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
                 testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
                 portlet, mapping)
+        scriptModelBuilder.runMainScript = runMainScript
         ScriptPortlet scriptPortlet = scriptModelBuilder.build()
         scriptPortlet
     }
@@ -289,6 +300,7 @@ class CrudTestConfigBuilder {
     }
 
     private mockCurrentUser() {
+        when(liferayContext.portletRequestMock.getUserPrincipal()).thenReturn({currentUserName} as Principal)
 		when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
 		when(portalMock.hasPermission(eq(currentUserName), eq("MEMBER"), eq(PortletRole.RESOURCE_KEY), anyString())).thenAnswer(
                 { InvocationOnMock inv ->
@@ -337,5 +349,9 @@ class CrudTestConfigBuilder {
                 configCache[configResource.URL] = new CacheEntry(statistics.compileTime, configXml, portletConfig)
             }
         }
+    }
+
+    void setLiferayContext(LiferayContext ctx) {
+        this.liferayContext = ctx
     }
 }

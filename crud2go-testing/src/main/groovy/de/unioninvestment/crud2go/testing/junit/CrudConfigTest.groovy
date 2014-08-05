@@ -13,11 +13,11 @@ class CrudConfigTest {
     CrudTestConfig _instance
 
     void load(String name) {
-        _instance = CrudTestContext.instance.load(this.class, name)
+        _instance = CrudTestContext.instance.load(this.class, context, name)
     }
 
     void load(Closure params) {
-        _instance = CrudTestContext.instance.load(this.class, params)
+        _instance = CrudTestContext.instance.load(this.class, context, params)
     }
 
     CrudTestConfig getInstance() {

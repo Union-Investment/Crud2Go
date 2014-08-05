@@ -50,7 +50,8 @@ public class ScriptBuilderTest extends AbstractSpringPortletContextTest {
 		ScriptBuilder builder = new ScriptBuilder();
 		builder.registerMainScript(config);
 		builder.addBindingVariable("list", list);
-		builder.runMainScript();
+		builder.updateBindingsOfMainScript();
+        builder.runMainScript();
 
 		assertThat(list, hasItem("Bla"));
 	}
@@ -78,6 +79,7 @@ public class ScriptBuilderTest extends AbstractSpringPortletContextTest {
 		Closure<?> closure = builder.buildClosure(closureScript.getValue());
 
 		builder.addBindingVariable("list", list);
+        builder.updateBindingsOfMainScript();
 		builder.runMainScript();
 
 		closure.call();
