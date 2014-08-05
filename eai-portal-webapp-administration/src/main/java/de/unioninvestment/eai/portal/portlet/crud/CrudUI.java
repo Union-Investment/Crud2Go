@@ -18,50 +18,11 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.EventRequest;
-import javax.portlet.EventResponse;
-import javax.portlet.PortletContext;
-import javax.portlet.PortletMode;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-import javax.portlet.PortletSession;
-import javax.portlet.ReadOnlyException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-import javax.portlet.ValidatorException;
-
-import com.vaadin.ui.*;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.portlet.context.PortletApplicationContextUtils;
-
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.Page;
-import com.vaadin.server.VaadinPortletService;
-import com.vaadin.server.VaadinPortletSession;
+import com.vaadin.server.*;
 import com.vaadin.server.VaadinPortletSession.PortletListener;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.server.WebBrowser;
-
+import com.vaadin.ui.*;
 import de.unioninvestment.eai.portal.portlet.crud.UiHistory.HistoryAware;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEvent;
@@ -98,6 +59,21 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.support.UnconfiguredMessage;
 import de.unioninvestment.eai.portal.support.vaadin.timing.TimingPortletListener;
 import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationException;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.portlet.context.PortletApplicationContextUtils;
+
+import javax.portlet.*;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * CRUD PortletPresenter Applikationsklasse. Enthaelt das Management der
@@ -522,7 +498,12 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			ScriptPortlet scriptPortlet = scriptModelBuilder.build();
 
 			if(settings.isDebugMode()){
-				modelValidator.validateModel(modelBuilder, portletDomain, portletConfig.getPortletConfig());
+                try {
+                    modelValidator.validateModel(modelBuilder, portletDomain, portletConfig.getPortletConfig());
+                } catch (Exception e) {
+                    // only show a warning, but don't fail initialization
+                    Notification.show("Debug Information - Validation failed", e.getMessage(), Notification.Type.ERROR_MESSAGE);
+                }
 			}
 				
 			LOG.debug("Building GUI");

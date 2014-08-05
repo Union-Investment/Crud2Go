@@ -18,63 +18,13 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Future;
-
-import javax.portlet.PortletMode;
-import javax.portlet.ReadOnlyException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-import javax.portlet.ValidatorException;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.mock.web.portlet.MockPortalContext;
-import org.springframework.mock.web.portlet.MockPortletURL;
-
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.ComponentContainer;
-import com.vaadin.ui.ConnectorTracker;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
-
+import com.vaadin.ui.*;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowPopupEvent;
@@ -96,6 +46,33 @@ import de.unioninvestment.eai.portal.portlet.test.commons.SpringPortletContextTe
 import de.unioninvestment.eai.portal.support.vaadin.CrudVaadinPortlet;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.mock.web.portlet.MockPortalContext;
+import org.springframework.mock.web.portlet.MockPortletURL;
+
+import javax.portlet.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.Future;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.*;
 
 public class CrudUITest extends SpringPortletContextTest {
 
@@ -594,7 +571,7 @@ public class CrudUITest extends SpringPortletContextTest {
 
 
 	@Test
-	public void shouldValidateConfigurationOnlyWhenSettingsAreSet(){
+	public void shouldValidateConfigurationOnlyInDebugMode(){
 		when(settingsMock.isDebugMode()).thenReturn(true);
 		stubPortletInitialization();
 		ModelValidator modelValidatorMock = mock(ModelValidator.class);
@@ -609,7 +586,7 @@ public class CrudUITest extends SpringPortletContextTest {
 	}
 	
 	@Test
-	public void shouldNotValidateConfiguration_SettingsNotSet(){
+	public void shouldNotValidateConfigurationInProductionMode(){
 		when(settingsMock.isDebugMode()).thenReturn(false);
 		stubPortletInitialization();
 		ModelValidator modelValidatorMock = mock(ModelValidator.class);
