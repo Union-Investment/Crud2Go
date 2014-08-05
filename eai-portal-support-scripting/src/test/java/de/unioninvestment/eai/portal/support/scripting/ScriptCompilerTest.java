@@ -18,11 +18,11 @@
  */
 package de.unioninvestment.eai.portal.support.scripting;
 
+import groovy.lang.Script;
+import org.junit.Test;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import groovy.lang.Script;
-
-import org.junit.Test;
 
 public class ScriptCompilerTest {
 
@@ -37,12 +37,18 @@ public class ScriptCompilerTest {
 	}
 
 	@Test(expected = ScriptingException.class)
-	public void shouldRejectSystemExit() throws InstantiationException,
+	public void shouldRejectDumbSystemExit() throws InstantiationException,
 			IllegalAccessException, ScriptingException {
 		compiler.compileScript("java.lang.System.exit(1)");
 	}
 
-	@Test(expected = ScriptingException.class)
+    @Test
+    public void shouldAllowSystemAccessForTimeMeasurement() throws InstantiationException,
+            IllegalAccessException, ScriptingException {
+        compiler.compileScript("System.currentTimeMillis()");
+    }
+
+    @Test(expected = ScriptingException.class)
 	public void shouldRejectInternalScriptEvaluation()
 			throws InstantiationException, IllegalAccessException,
 			ScriptingException {
