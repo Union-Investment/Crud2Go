@@ -18,21 +18,20 @@
  */
 package de.unioninvestment.eai.portal.support.scripting;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.hasItem;
+import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
+import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
 import groovy.lang.Closure;
-
-import java.util.LinkedList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ContextConfiguration;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
-import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.hasItem;
 
 @ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
 public class ScriptBuilderTest extends AbstractSpringPortletContextTest {
