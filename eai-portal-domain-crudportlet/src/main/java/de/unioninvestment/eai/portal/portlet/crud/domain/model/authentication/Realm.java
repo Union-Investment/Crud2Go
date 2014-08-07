@@ -18,47 +18,28 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication;
 
-import javax.portlet.PortletPreferences;
-
+import com.vaadin.server.VaadinPortletService;
+import de.unioninvestment.crud2go.spi.security.Cryptor;
+import de.unioninvestment.crud2go.spi.security.CryptorFactory;
+import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsConfig;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.vaadin.server.VaadinPortletService;
-
-import de.unioninvestment.crud2go.spi.security.Cryptor;
-import de.unioninvestment.crud2go.spi.security.CryptorFactory;
-import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsConfig;
+import javax.portlet.PortletPreferences;
 
 public class Realm {
 
-	private String username;
-	private String password;
-	private Cryptor cryptor;
+    private final AuthenticationRealmConfig config;
+    private final CryptorFactory cryptorFactory;
+
 
 	public Realm(AuthenticationRealmConfig config, CryptorFactory cryptorFactory) {
+        this.config = config;
+        this.cryptorFactory = cryptorFactory;
 
-		PortletPreferences preferences = VaadinPortletService
-				.getCurrentPortletRequest().getPreferences();
-
-		CredentialsConfig credentials = config.getCredentials();
-		String usernameKey = credentials.getUsername().getPreferenceKey();
-		if (usernameKey != null) {
-			username = preferences.getValue(usernameKey, null);
-		}
-
-		String passwordKey = credentials.getPassword().getPreferenceKey();
-		if (passwordKey != null) {
-			password = preferences.getValue(passwordKey, null);
-		}
-
-		String encryptionAlgorithm = credentials.getPassword()
-				.getEncryptionAlgorithm();
-		if (encryptionAlgorithm != null) {
-			cryptor = cryptorFactory.getCryptor(encryptionAlgorithm);
-		}
 	}
 
 	/**
@@ -68,8 +49,32 @@ public class Realm {
 	 * @param httpClient
 	 */
 	public void applyBasicAuthentication(DefaultHttpClient httpClient) {
-		String plaintextPassword = cryptor == null ? this.password : cryptor
-				.decrypt(this.password);
+        String username = null;
+        String password = null;
+        Cryptor cryptor = null;
+
+        PortletPreferences preferences = VaadinPortletService
+                .getCurrentPortletRequest().getPreferences();
+
+        CredentialsConfig credentials = config.getCredentials();
+        String usernameKey = credentials.getUsername().getPreferenceKey();
+        if (usernameKey != null) {
+            username = preferences.getValue(usernameKey, null);
+        }
+
+        String passwordKey = credentials.getPassword().getPreferenceKey();
+        if (passwordKey != null) {
+            password = preferences.getValue(passwordKey, null);
+        }
+
+        String encryptionAlgorithm = credentials.getPassword()
+                .getEncryptionAlgorithm();
+        if (encryptionAlgorithm != null) {
+            cryptor = cryptorFactory.getCryptor(encryptionAlgorithm);
+        }
+
+		String plaintextPassword = cryptor == null ? password : cryptor
+				.decrypt(password);
 		httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY,
 				new UsernamePasswordCredentials(username, plaintextPassword));
 	}

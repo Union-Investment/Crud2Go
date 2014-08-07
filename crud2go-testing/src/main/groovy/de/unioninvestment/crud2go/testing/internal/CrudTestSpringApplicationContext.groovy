@@ -83,7 +83,7 @@ class CrudTestSpringApplicationContext {
 
     @Bean
     ModelFactory modelFactory() {
-        new ModelFactory();
+        new CrudTestModelFactory();
 
     }
 

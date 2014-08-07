@@ -18,13 +18,12 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.server.StreamResource.StreamSource;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.FreeformQueryEventWrapper;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * BLob Implementierung für das Domain Model. Während geänderte Daten im

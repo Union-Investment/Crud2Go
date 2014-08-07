@@ -21,6 +21,10 @@
 
 
 	<dependencies>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+        </dependency>
 
 		<dependency>
 			<groupId>de.uit.eai.portal</groupId>
@@ -131,11 +135,12 @@
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
+            <scope>compile</scope>
 		</dependency>
 		
 		<dependency>

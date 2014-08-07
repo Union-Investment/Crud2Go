@@ -1,5 +1,4 @@
 package de.unioninvestment.crud2go.testing
-
 import de.unioninvestment.crud2go.testing.internal.CrudTestSpringApplicationContext
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory
@@ -9,9 +8,7 @@ import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadCont
 import de.unioninvestment.eai.portal.support.vaadin.context.Context
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
-
 /**
  * Created by cmj on 17.07.14.
  */

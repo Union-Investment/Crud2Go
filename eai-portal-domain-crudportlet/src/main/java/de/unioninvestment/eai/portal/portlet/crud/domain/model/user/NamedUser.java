@@ -18,29 +18,25 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.user;
 
-import static java.util.Collections.unmodifiableSet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
+import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
-import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * Benannter User.
  * 
  * @author carsten.mjartan
  */
-@Configurable
 public class NamedUser extends User {
 
 	private final String name;
 	private final Set<Role> portletRoles;
 
-	@Autowired
 	private transient Portal portal;
 	
 	private Set<String> cachedRoles;
@@ -54,6 +50,7 @@ public class NamedUser extends User {
 	 *            Alle Portalrollen
 	 */
 	public NamedUser(String username, Set<Role> portletRoles) {
+        this.portal = Context.getBean(Portal.class);
 		this.name = username;
 		this.portletRoles = portletRoles;
 	}

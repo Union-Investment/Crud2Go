@@ -1,25 +1,19 @@
 package de.unioninvestment.crud2go.testing
-
-import de.unioninvestment.crud2go.testing.internal.db.TestConnectionPoolFactory
 import de.unioninvestment.crud2go.testing.internal.CrudTestConfigImpl
+import de.unioninvestment.crud2go.testing.internal.db.TestConnectionPoolFactory
 import de.unioninvestment.crud2go.testing.internal.gui.GuiMocksBuilder
-import de.unioninvestment.crud2go.testing.internal.user.CurrentTestUser
 import de.unioninvestment.crud2go.testing.internal.prefs.TestPreferencesRepository
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role
-import de.unioninvestment.eai.portal.portlet.crud.domain.validation.ModelValidator;
+import de.unioninvestment.crud2go.testing.internal.user.CurrentTestUser
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelFactory
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelPreferences
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.AnonymousUser;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.AnonymousUser
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.NamedUser
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal
+import de.unioninvestment.eai.portal.portlet.crud.domain.validation.ModelValidator
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelBuilder
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet
@@ -30,8 +24,8 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus
 import groovy.transform.CompileStatic
 import groovy.transform.TupleConstructor
 import groovy.transform.TypeCheckingMode
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
@@ -39,18 +33,18 @@ import org.springframework.core.io.Resource
 
 import java.security.Principal
 
-import static org.mockito.Matchers.any
-import static org.mockito.Matchers.anyString
-import static org.mockito.Matchers.eq
+import static java.util.Collections.unmodifiableMap
+import static org.mockito.Matchers.*
 import static org.mockito.Mockito.reset
 import static org.mockito.Mockito.when
-
 /**
  * Created by cmj on 17.07.14.
  */
 @CompileStatic
 class CrudTestConfigBuilder {
     private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller()
+
+    static CrudTestConfigBuilder currentBuilder
 
     @TupleConstructor
     private static class CacheEntry {
@@ -235,33 +229,40 @@ class CrudTestConfigBuilder {
 
 
     synchronized CrudTestConfig build() {
-        reset(portalMock, userFactoryMock);
+        try {
+            currentBuilder = this
 
-        long startTime = System.currentTimeMillis()
+            reset(portalMock, userFactoryMock);
 
-        prepareConfig()
+            long startTime = System.currentTimeMillis()
 
-        long postBuildStartTime = System.currentTimeMillis()
-        prepareUserAndRoles()
+            prepareConfig()
 
-        ModelBuilder modelBuilder = createModelBuilder(portletConfig)
-        Portlet portlet = modelBuilder.build()
+            long postBuildStartTime = System.currentTimeMillis()
+            prepareUserAndRoles()
 
-        preparePortletPreferences(portletConfig, portlet)
+            ModelBuilder modelBuilder = createModelBuilder(portletConfig)
+            Portlet portlet = modelBuilder.build()
 
-        ScriptPortlet scriptPortlet = prepareScriptModel(modelBuilder, portlet)
+            preparePortletPreferences(portletConfig, portlet)
 
-		long endTime = System.currentTimeMillis()
-        statistics.postCompileTime = endTime - postBuildStartTime
-        statistics.buildTime = endTime - startTime
+            ScriptPortlet scriptPortlet = prepareScriptModel(modelBuilder, portlet)
 
-        prepareGuiMocks(modelBuilder, portlet)
+            long endTime = System.currentTimeMillis()
+            statistics.postCompileTime = endTime - postBuildStartTime
+            statistics.buildTime = endTime - startTime
 
-        if (validationEnabled) {
-            new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
+            prepareGuiMocks(modelBuilder, portlet)
+
+            if (validationEnabled) {
+                new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
+            }
+
+            return new CrudTestConfigImpl(configXml, portletConfig, scriptPortlet, scriptBuilder.mainScript, statistics)
+
+        } finally {
+            currentBuilder = null
         }
-
-        return new CrudTestConfigImpl(configXml, portletConfig, scriptPortlet, scriptBuilder.mainScript, statistics)
     }
 
     private void prepareGuiMocks(ModelBuilder modelBuilder, Portlet portlet) {
@@ -289,19 +290,29 @@ class CrudTestConfigBuilder {
 
     @CompileStatic(TypeCheckingMode.SKIP)
     private void preparePortletPreferences(PortletConfig portletConfig, Portlet portlet) {
+        def validAuthKeys = getAuthenticationPreferenceKeys(portletConfig)
         def validPreferenceKeys = portletConfig.preferences?.preference?.collect { it.@key }
         portletPreferences.each { key, value ->
             if (validPreferenceKeys.contains(key)) {
                 preferencesRepository.setPreference(portlet, key, value)
-            } else {
+            } else if (!validAuthKeys.contains(key)) {
                 throw new IllegalArgumentException("Unknown preference '$key'. Allowed are $validPreferenceKeys")
             }
         }
     }
 
+    Set getAuthenticationPreferenceKeys(PortletConfig portletConfig) {
+        Set keys = []
+        portletConfig.authentication?.realm*.credentials?.each { cred ->
+            keys << cred.username?.preferenceKey
+            keys << cred.password?.preferenceKey
+        }
+        return keys
+    }
+
     private mockCurrentUser() {
         when(liferayContext.portletRequestMock.getUserPrincipal()).thenReturn({currentUserName} as Principal)
-		when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
+        when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
 		when(portalMock.hasPermission(eq(currentUserName), eq("MEMBER"), eq(PortletRole.RESOURCE_KEY), anyString())).thenAnswer(
                 { InvocationOnMock inv ->
                     long id = Long.parseLong(inv.arguments[3] as String)
@@ -353,5 +364,9 @@ class CrudTestConfigBuilder {
 
     void setLiferayContext(LiferayContext ctx) {
         this.liferayContext = ctx
+    }
+
+    Map<String,String> getPortletPreferences() {
+        return unmodifiableMap(portletPreferences)
     }
 }
