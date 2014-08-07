@@ -198,6 +198,24 @@
 					</database-table>
 				</table>
 			</tab>
+            <tab title="Query-Container mit Rechten, aber ohne technische Änderungsmöglichkeit" id="tab9">
+                <table id="table8">
+                    <database-query datasource="test">
+                        <permissions>
+                            <allow roles="anonymous" action="insert" />
+                            <allow roles="anonymous" action="update" />
+                            <allow roles="anonymous" action="delete" />
+                        </permissions>
+                        <query><![CDATA[
+                            SELECT * FROM (SELECT * FROM test_crud2)
+                        ]]></query>
+                    </database-query>
+                    <columns>
+                        <column name="ID" title="ID" primary-key="true" />
+                        <column name="CNUMBER5_2" title="Zahl" editable="true" />
+                    </columns>
+                </table>
+            </tab>
 		</tabs>
 		<tabs>
 			<permissions>

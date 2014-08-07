@@ -18,48 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import de.unioninvestment.eai.portal.portlet.crud.config.*;
-import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.internal.matchers.InstanceOf;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.jdbc.core.RowMapper;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Resource;
@@ -70,7 +28,7 @@ import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.ResourceLocalService;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.vaadin.ui.UI;
-
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
@@ -82,12 +40,37 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidde
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
-import de.unioninvestment.eai.portal.portlet.crud.domain.test.commons.TestUser;
 import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
 import de.unioninvestment.eai.portal.support.vaadin.validation.ValidationException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.*;
+import org.mockito.internal.matchers.InstanceOf;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.jdbc.core.RowMapper;
+
+import java.io.InputStream;
+import java.util.*;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
 public class ModelBuilderTest {
@@ -816,7 +799,7 @@ eq(true), eq(true), eq(true),
 				eq(Arrays.asList("ID")), anyString(), anyMap(),
 				anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
 				anyInt(), anyInt(), anyInt(), anyBoolean());
-		verify(factoryMock).getDatabaseQueryContainer(eq(eventBus),any(DatabaseQueryConfig.class), anyString(), eq(false), eq(false), eq(false),
+		verify(factoryMock, times(2)).getDatabaseQueryContainer(eq(eventBus),any(DatabaseQueryConfig.class), anyString(), eq(false), eq(false), eq(false),
 				eq(Arrays.asList("ID")), anyString(), anyMap(),
 				anyListOf(ContainerOrder.class), eq(FilterPolicy.ALL),
 				anyInt(), anyInt(), anyInt(), anyBoolean());
@@ -844,7 +827,35 @@ eq(true), eq(true), eq(true),
 		assertThat(deleteBooleanCaptor.getAllValues().get(3), is(false));
 	}
 
-	@Test
+    /**
+     * Test due to Bug in 2.14.6
+     */
+    @Test
+    public void shouldRejectEditingIfContainerDoesntSupportItEvenIfAllowedExplicitly() throws Exception {
+
+        PortletConfig config = createConfiguration("validSecurityConfig.xml");
+        ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));
+
+        returnDatabaseTableContainerOnFactoryCall();
+
+        builder.build();
+
+        captureAnyDatabaseQueryContainerCreations();
+
+        assertThat(insertBooleanCaptor.getAllValues().get(2), is(false));
+        assertThat(updateBooleanCaptor.getAllValues().get(2), is(false));
+        assertThat(deleteBooleanCaptor.getAllValues().get(2), is(false));
+    }
+
+    private void captureAnyDatabaseQueryContainerCreations() {
+        verify(factoryMock, times(3)).getDatabaseQueryContainer(eq(eventBus), any(DatabaseQueryConfig.class), anyString(), insertBooleanCaptor.capture(),
+                updateBooleanCaptor.capture(), deleteBooleanCaptor.capture(),
+                anyListOf(String.class), anyString(), anyMap(),
+                anyListOf(ContainerOrder.class), any(FilterPolicy.class),
+                anyInt(), anyInt(), anyInt(), anyBoolean());
+    }
+
+    @Test
 	public void shouldBuildCustomComponentInPage() throws Exception {
 		PortletConfig config = createConfiguration("validCustomComponentConfig.xml");
 		ModelBuilder builder = createTestBuilder(new Config(config, resourceIds, null, null));

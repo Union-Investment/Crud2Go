@@ -18,52 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.unioninvestment.eai.portal.portlet.crud.config.AbstractActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.AuthenticationRealmConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.BinaryConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ColumnSearchableType;
-import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ComponentConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseTableConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DialogConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ExportTypeConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormSelectConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
-import de.unioninvestment.eai.portal.portlet.crud.config.JmxContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.OrderConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.PageConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.PanelConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SelectDisplayType;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TextAreaConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TriggerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TriggersConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.JmxDelegate;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
@@ -82,6 +37,11 @@ import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Erstellt und initialisiert anhand einer gegebenen
@@ -873,21 +833,15 @@ public class ModelBuilder {
 	private DataContainer buildQueryContainer(
 			DatabaseQueryConfig databaseQuery, List<String> primaryKeys,
 			Map<String, String> displayPattern) {
-		boolean insertable = currentUser
-				.hasPermission(databaseQuery, DataContainer.Permission.INSERT,
-						databaseQuery.getInsert() != null
-								&& databaseQuery.getInsert().getStatement()
-										.getSource() != null);
-		boolean updateable = currentUser
-				.hasPermission(databaseQuery, DataContainer.Permission.UPDATE,
-						databaseQuery.getUpdate() != null
-								&& databaseQuery.getUpdate().getStatement()
-										.getSource() != null);
-		boolean deleteable = currentUser
-				.hasPermission(databaseQuery, DataContainer.Permission.DELETE,
-						databaseQuery.getDelete() != null
-								&& databaseQuery.getDelete().getStatement()
-										.getSource() != null);
+		boolean insertable = databaseQuery.getInsert() != null
+                && databaseQuery.getInsert().getStatement().getSource() != null
+                && currentUser.hasPermission(databaseQuery, DataContainer.Permission.INSERT, true);
+		boolean updateable = databaseQuery.getUpdate() != null
+                && databaseQuery.getUpdate().getStatement().getSource() != null
+                && currentUser.hasPermission(databaseQuery, DataContainer.Permission.UPDATE, true);
+		boolean deleteable = databaseQuery.getDelete() != null
+                && databaseQuery.getDelete().getStatement().getSource() != null
+                && currentUser.hasPermission(databaseQuery, DataContainer.Permission.DELETE, true);
 		List<ContainerOrder> orderBys = getDefaultOrder(databaseQuery);
 		return factory.getDatabaseQueryContainer(eventBus,
 				databaseQuery, databaseQuery.getQuery(),
