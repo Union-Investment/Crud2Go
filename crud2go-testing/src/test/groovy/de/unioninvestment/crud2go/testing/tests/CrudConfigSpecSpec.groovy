@@ -104,13 +104,15 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         load {
             fromClasspath 'testingSimpleConfig.xml'
             currentUserName 'carsten'
-            currentUserRoles('admin')
+            currentUserRoles 'admin'
+            currentUserPortalRoles 'EAI-AV'
         }
         ScriptCurrentUser currentUser = instance.mainScript.currentUser
 
         then:
         currentUser.name == 'carsten'
         currentUser.roles == ['all', 'admin', 'authenticated'] as Set
+        currentUser.portalRoles == ['EAI-AV'] as Set
         currentUser.authenticated == true
         portlet.elements.adminComponent != null
     }

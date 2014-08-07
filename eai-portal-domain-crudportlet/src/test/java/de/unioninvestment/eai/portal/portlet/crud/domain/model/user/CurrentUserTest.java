@@ -18,32 +18,31 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.user;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
+import com.vaadin.server.VaadinPortletRequest;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.UI;
+import com.vaadin.util.CurrentInstance;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
+import javax.portlet.PortletRequest;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.portlet.PortletRequest;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import com.vaadin.server.VaadinPortletRequest;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.UI;
-import com.vaadin.util.CurrentInstance;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
-import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 public class CurrentUserTest {
 
@@ -64,7 +63,10 @@ public class CurrentUserTest {
 	@Mock
 	private VaadinPortletRequest portletRequestMock;
 
-	@Before
+    @Rule
+    public ContextMock context = new ContextMock();
+
+    @Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 

@@ -205,6 +205,13 @@ class CrudTestConfigBuilder {
 		return this
 	}
 
+    CrudTestConfigBuilder currentUserPortalRoles(String... portalRoles) {
+        this.portalRoles = portalRoles as HashSet
+        if (!currentUserName) {
+            currentUserName = 'unnamed'
+        }
+        return this
+    }
     /**
      * Changes a script preference.
      *

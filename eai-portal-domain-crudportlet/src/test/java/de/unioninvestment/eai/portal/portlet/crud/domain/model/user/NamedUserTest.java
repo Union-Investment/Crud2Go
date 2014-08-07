@@ -18,33 +18,32 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model.user;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.RoleService;
 import com.liferay.portal.service.RoleServiceUtil;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.service.UserServiceUtil;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.PortletRole;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Role;
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
+import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 public class NamedUserTest {
 	@Mock
@@ -62,19 +61,24 @@ public class NamedUserTest {
 	@Mock
 	private Portal portalMock;
 
-	@InjectMocks
 	private NamedUser user;
 
 	@Mock
 	private PortletRole domainRoleMock;
 
+    @Rule
+    public ContextMock context = new ContextMock();
+
 	@Before
 	public void setUp() throws PortalException, SystemException {
-		Set<Role> prtalRoles = new HashSet<Role>();
-		prtalRoles.add(domainRoleMock);
-		user = new NamedUser("Jürgen", prtalRoles);
+		Set<Role> portalRoles = new HashSet<Role>();
+		portalRoles.add(domainRoleMock);
 
 		MockitoAnnotations.initMocks(this);
+        when(context.getProvider().getBean(Portal.class)).thenReturn(portalMock);
+
+        user = new NamedUser("Jürgen", portalRoles);
+
 		new UserServiceUtil().setService(userService);
 		new RoleServiceUtil().setService(roleService);
 
