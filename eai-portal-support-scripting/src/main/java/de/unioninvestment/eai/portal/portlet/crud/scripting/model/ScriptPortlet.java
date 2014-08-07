@@ -18,20 +18,16 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
-import static java.util.Collections.unmodifiableMap;
-import groovy.lang.Closure;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import groovy.lang.Closure;
+
+import java.util.*;
+
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * Repräsentation das Portlets.
@@ -219,7 +215,7 @@ public class ScriptPortlet {
     }
 
 	public Map<String, Object> getElements() {
-		return unmodifiableMap(elementsById);
+        return inTest ? elementsById : unmodifiableMap(elementsById);
 	}
 
 	/**

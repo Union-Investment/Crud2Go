@@ -14,7 +14,7 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         instance != null
         instance.mainScript != null
         instance.portlet != null
-        instance.config != null
+        instance.xml != null
     }
 
     def 'should load a config from classpath by absolute path'() {
@@ -148,15 +148,6 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         instance.mainScript.modified == true
     }
 
-    def 'should set a testing flag inside the portlet'() {
-        when:
-        load 'testingSimpleConfig.xml'
-
-        then:
-        portlet.inTest == true
-    }
-
-    // TODO API erstellen und testen
     def 'should allow optional additional validation'() {
         when:
         load {

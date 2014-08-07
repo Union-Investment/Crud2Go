@@ -44,6 +44,8 @@
 
 	backend = new MyCustomBackend(main: this)
 
+    scriptPortletConfigSpecMock = portlet.elements.table1
+
     class MyCustomBackend implements ScriptContainerBackend {
         def main
 
