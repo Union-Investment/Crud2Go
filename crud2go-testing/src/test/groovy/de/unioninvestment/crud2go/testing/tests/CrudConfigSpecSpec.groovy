@@ -27,7 +27,10 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
 
     def 'should load combined file relative to testclass if existing'() {
         when:
-        load 'testingCombinedConfig.xml'
+        load {
+            preferCombinedFiles()
+            from 'testingCombinedConfig.xml'
+        }
         ScriptCurrentUser currentUser = instance.mainScript.currentUser
 
         then:
@@ -36,11 +39,25 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
 
     def 'should load combined file relative to combined.path if existing'() {
         when:
-        load '/de/unioninvestment/crud2go/testing/tests/testingCombinedConfig.xml'
+        load {
+            preferCombinedFiles()
+            from '/de/unioninvestment/crud2go/testing/tests/testingCombinedConfig.xml'
+        }
         ScriptCurrentUser currentUser = instance.mainScript.currentUser
 
         then:
         instance.mainScript.type == 'combined'
+    }
+
+    def 'should combine files on-the-fly'() {
+        when:
+        load {
+            fromClasspath 'testingCombinedConfig.xml'
+        }
+        ScriptCurrentUser currentUser = instance.mainScript.currentUser
+
+        then:
+        instance.mainScript.type == 'classpath'
     }
 
     def 'should load a config from file by path relative to maven project root'() {

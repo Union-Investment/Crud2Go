@@ -4,7 +4,5 @@
     <page>
 		<component id="adminComponent" generator="new Label('test')"/>
     </page>
-    <script><![CDATA[
-         type = 'classpath'
-    ]]></script>
+    <script src="testingCombinedConfig.groovy"/>
 </portlet>

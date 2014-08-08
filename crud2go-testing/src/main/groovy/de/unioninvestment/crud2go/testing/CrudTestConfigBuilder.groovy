@@ -4,6 +4,7 @@ import de.unioninvestment.crud2go.testing.internal.db.TestConnectionPoolFactory
 import de.unioninvestment.crud2go.testing.internal.gui.GuiMocksBuilder
 import de.unioninvestment.crud2go.testing.internal.prefs.TestPreferencesRepository
 import de.unioninvestment.crud2go.testing.internal.user.CurrentTestUser
+import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
 import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config
@@ -22,10 +23,13 @@ import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus
 import groovy.transform.CompileStatic
+import groovy.transform.PackageScope
 import groovy.transform.TupleConstructor
 import groovy.transform.TypeCheckingMode
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
@@ -42,6 +46,8 @@ import static org.mockito.Mockito.when
  */
 @CompileStatic
 class CrudTestConfigBuilder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CrudTestConfigBuilder)
+
     private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller()
 
     static CrudTestConfigBuilder currentBuilder
@@ -77,12 +83,12 @@ class CrudTestConfigBuilder {
     @Autowired
     private TestPreferencesRepository preferencesRepository
 
-    private LiferayContext liferayContext
+    @PackageScope LiferayContext liferayContext
+    @PackageScope File combinedPath
+    @PackageScope Class<?> testClass
+    @PackageScope Map<URL, CacheEntry> configCache
 
-    File combinedPath
-    Class<?> testClass
-    Map<URL, CacheEntry> configCache
-	
+    private boolean preferCombinedFiles = false
 	private String currentUserName = null
     private Set currentUserRoles = []
     private Set portalRoles = []
@@ -115,11 +121,23 @@ class CrudTestConfigBuilder {
     }
 
     /**
+     * Prefer combined files over the file in the classpath if using load(String). The default behaviour is to use files
+     * from the classpath and merge external scripts on the fly.
+     *
+     * @param preferCombinedFiles true, if a combined file should be loaded for testing
+     * @return the builder instance
+     */
+    CrudTestConfigBuilder preferCombinedFiles(boolean preferCombinedFiles = true) {
+        this.preferCombinedFiles = preferCombinedFiles
+        return this
+    }
+
+    /**
      * Load the configuration from the following places (match wins).
      *
      * @param name
      *          <ul>
-     *            <li>A file relative to the combined.path + the package folder of the test class</li>
+     *            <li>If preferred and existing: A file relative to the combined.path + the package folder of the test class</li>
      *            <li>For paths statring with slash: A path relative to the combined.path of the test class</li>
      *            <li>A classpath resource besides the test class</li>
      *            <li>For paths statring with slash: An absolute classpath entry</li>
@@ -128,7 +146,7 @@ class CrudTestConfigBuilder {
      */
     CrudTestConfigBuilder from(String name) {
         File configFile = null
-        if (combinedPath?.exists()) {
+        if (preferCombinedFiles && combinedPath?.exists()) {
             if (name.startsWith('/') || name.startsWith('\\')) {
                 configFile = new File(combinedPath, name.substring(1))
             } else {
@@ -360,12 +378,25 @@ class CrudTestConfigBuilder {
 
             long compileStartTime = System.currentTimeMillis()
             portletConfig = unmarshaller.unmarshal(configXml)
+            mergeConfigScripts()
             scriptsCompiler.compileAllScripts(portletConfig)
             statistics.compileTime = System.currentTimeMillis() - compileStartTime
 
             if (!xmlModifiers) {
                 configCache[configResource.URL] = new CacheEntry(statistics.compileTime, configXml, portletConfig)
             }
+        }
+    }
+
+    def mergeConfigScripts() {
+        portletConfig.script
+                .findAll { it.src != null &&
+                    (it.value == null || it.value.source == null || it.value.source.isEmpty()) }
+                .each { script ->
+            def scriptResource = configResource.createRelative(script.src)
+            LOGGER.debug("Merging $scriptResource.URL into $configResource.URL")
+            assert scriptResource.exists()
+            script.value = new GroovyScript(scriptResource.getInputStream().getText('UTF-8'))
         }
     }
 

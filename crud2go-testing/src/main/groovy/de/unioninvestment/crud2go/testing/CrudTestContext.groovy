@@ -24,6 +24,7 @@ class CrudTestContext {
     private ScriptCompiler scriptCompiler = new ScriptCompiler()
 
     File combinedPath
+    boolean preferCombinedFiles
 
     private Map configCache = [:]
 
@@ -44,6 +45,7 @@ class CrudTestContext {
             props.close()
         }
         combinedPath = new File(config.getProperty('combined.path','target/combined'))
+        preferCombinedFiles = config.getProperty('preferCombinedFiles', 'false') == 'true'
 
         applicationContext = new AnnotationConfigApplicationContext()
         applicationContext.getEnvironment().setActiveProfiles("testing")
@@ -64,6 +66,7 @@ class CrudTestContext {
         builder.configCache = configCache
         builder.testClass = testClass
         builder.liferayContext = liferayContext
+        builder.preferCombinedFiles(preferCombinedFiles)
         return builder
     }
 

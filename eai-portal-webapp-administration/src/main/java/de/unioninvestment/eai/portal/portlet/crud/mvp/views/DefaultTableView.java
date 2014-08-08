@@ -18,33 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
-import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.ConcurrentModificationException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import de.unioninvestment.eai.portal.support.vaadin.context.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.task.TaskExecutor;
-
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Buffered.SourceException;
 import com.vaadin.data.Item;
@@ -56,44 +29,41 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Page;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.shared.ui.MultiSelectMode;
-import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Layout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table.ColumnGenerator;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-
 import de.unioninvestment.eai.portal.portlet.crud.CrudErrorHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.ContainerException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.SelectionMode;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.export.DownloadExportTask;
 import de.unioninvestment.eai.portal.portlet.crud.export.ExportDialog;
 import de.unioninvestment.eai.portal.portlet.crud.export.ExportTask;
 import de.unioninvestment.eai.portal.portlet.crud.export.streaming.CsvExporter;
 import de.unioninvestment.eai.portal.portlet.crud.export.streaming.ExcelExporter;
 import de.unioninvestment.eai.portal.portlet.crud.export.streaming.StreamingExporterDownload;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.BLobColumnGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudCellStyleGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTable;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.CrudTableColumnGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.DefaultCrudFieldFactory;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.VaadinCustomColumnGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.VaadinExportableColumnGenerator;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.ValidationFieldFactoryWrapper;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.ui.*;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.support.BufferedTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
+
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 
 /**
  * View-Objekt, dass die Anzeige eine Tabelle kapselt.
