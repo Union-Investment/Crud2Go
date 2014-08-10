@@ -120,6 +120,8 @@ class CrudTestConfigBuilder {
         eventBus = new EventBus();
     }
 
+    // Builder methods
+
     /**
      * Prefer combined files over the file in the classpath if using load(String). The default behaviour is to use files
      * from the classpath and merge external scripts on the fly.
@@ -247,12 +249,29 @@ class CrudTestConfigBuilder {
         return this
     }
 
+    CrudTestConfigBuilder recompile() {
+        recompile = true
+        return this
+    }
+
+    CrudTestConfigBuilder validate() {
+        validationEnabled = true
+        return this
+    }
+
+
     protected ModelBuilder createModelBuilder(PortletConfig configuration) {
         return modelFactory.getBuilder(eventBus, new Config((PortletConfig)configuration,
                 (Map<String, Long>)resourceIds, (String)null, (Date)null), modelPreferences);
     }
 
+    // final build
 
+    /**
+     * Creates a CrudTestConfig instance based on previous settings
+     *
+     * @return a CrudTestConfig instance
+     */
     synchronized CrudTestConfig build() {
         try {
             currentBuilder = this
@@ -290,78 +309,7 @@ class CrudTestConfigBuilder {
         }
     }
 
-    private void prepareGuiMocks(ModelBuilder modelBuilder, Portlet portlet) {
-        new GuiMocksBuilder(modelBuilder, portlet).build()
-    }
-
-    private ScriptPortlet prepareScriptModel(ModelBuilder modelBuilder, Portlet portlet) {
-        Map mapping = modelBuilder.getModelToConfigMapping()
-        ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
-                testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
-                portlet, mapping)
-        scriptModelBuilder.runMainScript = runMainScript
-        ScriptPortlet scriptPortlet = scriptModelBuilder.build()
-        scriptPortlet
-    }
-
-    private void prepareUserAndRoles() {
-        long roleId = 1
-        portletConfig.roles?.role?.each { role ->
-            roleId2Name[roleId] = role.name
-            resourceIds.put("${CrudTestContext.TEST_PORTLET_ID}_${CrudTestContext.LIFERAY_COMMUNITY_ID}_${role.name}".toString(), roleId++)
-        }
-        mockCurrentUser()
-    }
-
-    @CompileStatic(TypeCheckingMode.SKIP)
-    private void preparePortletPreferences(PortletConfig portletConfig, Portlet portlet) {
-        def validAuthKeys = getAuthenticationPreferenceKeys(portletConfig)
-        def validPreferenceKeys = portletConfig.preferences?.preference?.collect { it.@key }
-        portletPreferences.each { key, value ->
-            if (validPreferenceKeys.contains(key)) {
-                preferencesRepository.setPreference(portlet, key, value)
-            } else if (!validAuthKeys.contains(key)) {
-                throw new IllegalArgumentException("Unknown preference '$key'. Allowed are $validPreferenceKeys")
-            }
-        }
-    }
-
-    Set getAuthenticationPreferenceKeys(PortletConfig portletConfig) {
-        Set keys = []
-        portletConfig.authentication?.realm*.credentials?.each { cred ->
-            keys << cred.username?.preferenceKey
-            keys << cred.password?.preferenceKey
-        }
-        return keys
-    }
-
-    private mockCurrentUser() {
-        when(liferayContext.portletRequestMock.getUserPrincipal()).thenReturn({currentUserName} as Principal)
-        when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
-		when(portalMock.hasPermission(eq(currentUserName), eq("MEMBER"), eq(PortletRole.RESOURCE_KEY), anyString())).thenAnswer(
-                { InvocationOnMock inv ->
-                    long id = Long.parseLong(inv.arguments[3] as String)
-                    currentUserRoles.contains(roleId2Name[id])
-                } as Answer);
-		when(userFactoryMock.getCurrentUser(any(Portlet))).thenAnswer({ InvocationOnMock inv ->
-            Portlet portlet = inv.arguments[0] as Portlet
-			def user = currentUserName ? new NamedUser(currentUserName, portlet.roles as HashSet<Role>)
-							: new AnonymousUser()
-			return new CurrentTestUser(user)
-		} as Answer<CurrentUser>)
-	}
-
-    CrudTestConfigBuilder recompile() {
-        recompile = true
-        return this
-    }
-
-    CrudTestConfigBuilder validate() {
-        validationEnabled = true
-        return this
-    }
-
-    void prepareConfig() {
+    private void prepareConfig() {
         assert configResource: 'No configuration source given'
         CacheEntry existingEntry = configCache[configResource.URL]
         if (existingEntry && !recompile && !xmlModifiers) {
@@ -388,17 +336,79 @@ class CrudTestConfigBuilder {
         }
     }
 
-    def mergeConfigScripts() {
+    private void mergeConfigScripts() {
         portletConfig.script
                 .findAll { it.src != null &&
-                    (it.value == null || it.value.source == null || it.value.source.isEmpty()) }
-                .each { script ->
+                (it.value == null || it.value.source == null || it.value.source.isEmpty()) }
+        .each { script ->
             def scriptResource = configResource.createRelative(script.src)
             LOGGER.debug("Merging $scriptResource.URL into $configResource.URL")
             assert scriptResource.exists()
             script.value = new GroovyScript(scriptResource.getInputStream().getText('UTF-8'))
         }
     }
+
+    private void prepareUserAndRoles() {
+        long roleId = 1
+        portletConfig.roles?.role?.each { role ->
+            roleId2Name[roleId] = role.name
+            resourceIds.put("${CrudTestContext.TEST_PORTLET_ID}_${CrudTestContext.LIFERAY_COMMUNITY_ID}_${role.name}".toString(), roleId++)
+        }
+        mockCurrentUser()
+    }
+
+    @CompileStatic(TypeCheckingMode.SKIP)
+    private void preparePortletPreferences(PortletConfig portletConfig, Portlet portlet) {
+        def validAuthKeys = getAuthenticationPreferenceKeys(portletConfig)
+        def validPreferenceKeys = portletConfig.preferences?.preference?.collect { it.@key }
+        portletPreferences.each { key, value ->
+            if (validPreferenceKeys.contains(key)) {
+                preferencesRepository.setPreference(portlet, key, value)
+            } else if (!validAuthKeys.contains(key)) {
+                throw new IllegalArgumentException("Unknown preference '$key'. Allowed are $validPreferenceKeys")
+            }
+        }
+    }
+
+    private Set getAuthenticationPreferenceKeys(PortletConfig portletConfig) {
+        Set keys = []
+        portletConfig.authentication?.realm*.credentials?.each { cred ->
+            keys << cred.username?.preferenceKey
+            keys << cred.password?.preferenceKey
+        }
+        return keys
+    }
+
+    private ScriptPortlet prepareScriptModel(ModelBuilder modelBuilder, Portlet portlet) {
+        Map mapping = modelBuilder.getModelToConfigMapping()
+        ScriptModelBuilder scriptModelBuilder = new ScriptModelBuilder(scriptModelFactory, eventBus,
+                testConnectionPoolFactory, userFactoryMock, scriptCompiler, scriptBuilder,
+                portlet, mapping)
+        scriptModelBuilder.runMainScript = runMainScript
+        ScriptPortlet scriptPortlet = scriptModelBuilder.build()
+        scriptPortlet
+    }
+
+    private void prepareGuiMocks(ModelBuilder modelBuilder, Portlet portlet) {
+        new GuiMocksBuilder(modelBuilder, portlet).build()
+    }
+
+    private mockCurrentUser() {
+        when(liferayContext.portletRequestMock.getUserPrincipal()).thenReturn({currentUserName} as Principal)
+        when(portalMock.getRoles(currentUserName)).thenReturn(portalRoles);
+		when(portalMock.hasPermission(eq(currentUserName), eq("MEMBER"), eq(PortletRole.RESOURCE_KEY), anyString())).thenAnswer(
+                { InvocationOnMock inv ->
+                    long id = Long.parseLong(inv.arguments[3] as String)
+                    currentUserRoles.contains(roleId2Name[id])
+                } as Answer);
+		when(userFactoryMock.getCurrentUser(any(Portlet))).thenAnswer({ InvocationOnMock inv ->
+            Portlet portlet = inv.arguments[0] as Portlet
+			def user = currentUserName ? new NamedUser(currentUserName, portlet.roles as HashSet<Role>)
+							: new AnonymousUser()
+			return new CurrentTestUser(user)
+		} as Answer<CurrentUser>)
+	}
+
 
     void setLiferayContext(LiferayContext ctx) {
         this.liferayContext = ctx
