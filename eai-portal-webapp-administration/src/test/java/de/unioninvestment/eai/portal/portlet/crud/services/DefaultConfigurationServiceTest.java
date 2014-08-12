@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
 
 import de.unioninvestment.eai.portal.portlet.crud.Settings;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationMarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.ConfigurationMetaData;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.DefaultConfigurationDao;
@@ -108,7 +108,7 @@ public class DefaultConfigurationServiceTest {
 	@Mock
 	private ConfigurationMetaData metaDataMock;
 
-	private static PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
+	private static PortletConfigurationMarshaller unmarshaller = new PortletConfigurationMarshaller();
 
 	@Before
 	public void setUp() throws JAXBException, SAXException {

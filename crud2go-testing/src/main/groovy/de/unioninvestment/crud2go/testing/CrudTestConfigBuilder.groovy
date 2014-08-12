@@ -6,7 +6,7 @@ import de.unioninvestment.crud2go.testing.internal.prefs.TestPreferencesReposito
 import de.unioninvestment.crud2go.testing.internal.user.CurrentTestUser
 import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
-import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationMarshaller
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.*
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.AnonymousUser
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when
 class CrudTestConfigBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(CrudTestConfigBuilder)
 
-    private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller()
+    private static final PortletConfigurationMarshaller unmarshaller = new PortletConfigurationMarshaller()
 
     static CrudTestConfigBuilder currentBuilder
 

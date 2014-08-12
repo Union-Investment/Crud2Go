@@ -87,7 +87,7 @@ public class SearchFormActionValidator {
 					}
 				} else {
 					throw new IllegalArgumentException("Cannot filter column '"
-							+ columnName + ": Unkown column type '"
+							+ columnName + ": Unknown column type '"
 							+ columnType + "'");
 				}
 				

@@ -38,7 +38,7 @@ import org.mockito.MockitoAnnotations;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.TextAreaConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationMarshaller;
 import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 
 public class TextAreaTest {
@@ -52,7 +52,7 @@ public class TextAreaTest {
 	public static void prepareConfig() throws JAXBException {
 		InputStream stream = TextAreaTest.class.getClassLoader()
 				.getResourceAsStream("validTextAreaConfig.xml");
-		config = new PortletConfigurationUnmarshaller().unmarshal(stream);
+		config = new PortletConfigurationMarshaller().unmarshal(stream);
 	}
 
 	@Before

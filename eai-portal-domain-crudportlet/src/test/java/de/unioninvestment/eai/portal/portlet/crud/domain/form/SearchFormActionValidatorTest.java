@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 import static de.unioninvestment.eai.portal.portlet.crud.domain.form.SearchFormTestUtility.createDateFormField;
@@ -110,8 +111,13 @@ public class SearchFormActionValidatorTest {
 	public void shouldRaiseError_StartsWith_DateField(){
 		checkComparisonFilterColumnType(Date.class, new StartsWithFilterConfig(), emptyDateField());
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
+
+    @Test
+    public void noError_Equals_TimestampField(){
+        checkComparisonFilterColumnType(Timestamp.class, new EqualsFilterConfig(), emptyDateField());
+    }
+
+    @Test(expected=IllegalArgumentException.class)
 	public void shouldRaiseError_EndsWith_DateField(){
 		checkComparisonFilterColumnType(Date.class, new EndsWithFilterConfig(), emptyDateField());
 	}

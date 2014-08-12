@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Rule;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationMarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
@@ -47,7 +47,7 @@ public abstract class ModelSupport extends AbstractSpringPortletContextTest {
 	private static final String TEST_PORTLET_ID = "PortletId";
 	private static final long TEST_COMMUNITY_ID = 17808L;
 
-	private static final PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
+	private static final PortletConfigurationMarshaller unmarshaller = new PortletConfigurationMarshaller();
 
 	protected EventBus eventBus;
 	protected ConnectionPoolFactory connectionPoolFactory;

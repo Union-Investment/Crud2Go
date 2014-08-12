@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.data.Validator;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationMarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.validation.SecurityValidationVisitor;
 import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationProcessor;
 
@@ -72,7 +72,7 @@ public class ConfigurationUploadValidator implements Validator {
 	private PortletConfig validateAndUnmarshal(Object value)
 			throws JAXBException {
 		ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) value);
-		PortletConfig portletConfig = new PortletConfigurationUnmarshaller()
+		PortletConfig portletConfig = new PortletConfigurationMarshaller()
 				.unmarshal(stream);
 		return portletConfig;
 	}

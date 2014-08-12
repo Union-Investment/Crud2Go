@@ -42,7 +42,7 @@ import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsPasswordConf
 import de.unioninvestment.eai.portal.portlet.crud.config.CredentialsUsernameConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.RoleConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationMarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.config.validation.RevisionRoleVisitor;
 import de.unioninvestment.eai.portal.portlet.crud.config.visitor.ConfigurationProcessor;
@@ -70,7 +70,7 @@ public class DefaultConfigurationService implements ConfigurationService {
 
 	private ConfigurationScriptsCompiler compiler;
 
-	private PortletConfigurationUnmarshaller unmarshaller;
+	private PortletConfigurationMarshaller unmarshaller;
 
 	private Settings settings;
 
@@ -96,7 +96,7 @@ public class DefaultConfigurationService implements ConfigurationService {
 		this.dao = dao;
 		this.compiler = compiler;
 		this.settings = settings;
-		this.unmarshaller = new PortletConfigurationUnmarshaller();
+		this.unmarshaller = new PortletConfigurationMarshaller();
 	}
 
 	/**

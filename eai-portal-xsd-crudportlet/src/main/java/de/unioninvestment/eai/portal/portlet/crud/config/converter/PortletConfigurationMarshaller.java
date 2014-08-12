@@ -19,18 +19,25 @@
 package de.unioninvestment.eai.portal.portlet.crud.config.converter;
 
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.*;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  * Utility-Klasse die die Konvertierung zwischen XML-Konfiguration und dem
@@ -38,7 +45,7 @@ import java.io.StringReader;
  * 
  * @author carsten.mjartan
  */
-public class PortletConfigurationUnmarshaller {
+public class PortletConfigurationMarshaller {
 	private static final JAXBContext context = createContext();
 	private static Schema schema = createSchema();
 
@@ -50,7 +57,7 @@ public class PortletConfigurationUnmarshaller {
 	 */
 	private static JAXBContext createContext() {
 		try {
-			ClassLoader classLoader = PortletConfigurationUnmarshaller.class
+			ClassLoader classLoader = PortletConfigurationMarshaller.class
 					.getClassLoader();
 
 			return JAXBContext.newInstance(
@@ -70,13 +77,13 @@ public class PortletConfigurationUnmarshaller {
 	 */
 	private static Schema createSchema() {
 		try {
-			ClassLoader classLoader = PortletConfigurationUnmarshaller.class
+			ClassLoader classLoader = PortletConfigurationMarshaller.class
 					.getClassLoader();
+			InputStream is = classLoader
+					.getResourceAsStream("de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
 
 			SchemaFactory factory = SchemaFactory
 					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			InputStream is = classLoader
-					.getResourceAsStream("de/unioninvestment/eai/portal/portlet/crud/crud-portlet.xsd");
 			return factory.newSchema(new StreamSource(is));
 
 		} catch (SAXException e) {
@@ -123,5 +130,55 @@ public class PortletConfigurationUnmarshaller {
         unmarshaller.setSchema(schema);
         return unmarshaller;
     }
+
+    /**
+     * Konvertieren des Portlet-Java-Modells in eine XML-Repräsentation
+     *
+     * @param PortletConfig
+     *            Portlet-Konfiguration
+     * @return das konvertierte XML
+     * @throws JAXBException
+     *             bei Fehlern
+     */
+    @SuppressWarnings("unchecked")
+    public String marshal(PortletConfig config) throws JAXBException {
+        try {
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setSchema(schema);
+
+            JAXBElement<PortletConfig> jaxbElement = new JAXBElement<PortletConfig>(
+                    new QName("http://www.unioninvestment.de/eai/portal/crud-portlet", "portlet"),
+                    PortletConfig.class, config);
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document document = builder.newDocument();
+
+            marshaller.marshal(jaxbElement, document);
+
+
+            Transformer nullTransformer = null;
+
+            nullTransformer = TransformerFactory.newInstance().newTransformer();
+            nullTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            nullTransformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            nullTransformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS,
+                    "query insert update delete script where");
+
+            Writer writer = new StringWriter();
+            nullTransformer.transform(new DOMSource(document), new StreamResult(writer));
+
+
+            return writer.toString();
+
+        } catch (TransformerConfigurationException e) {
+            throw new RuntimeException(e);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        } catch (TransformerException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

@@ -29,7 +29,7 @@ import com.liferay.portal.service.ResourceLocalService;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.vaadin.ui.UI;
 import de.unioninvestment.eai.portal.portlet.crud.config.*;
-import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationUnmarshaller;
+import de.unioninvestment.eai.portal.portlet.crud.config.converter.PortletConfigurationMarshaller;
 import de.unioninvestment.eai.portal.portlet.crud.config.resource.Config;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
@@ -156,7 +156,7 @@ public class ModelBuilderTest {
 	@Mock
 	private GroovyScript onDoubleClickMock;
 	
-	private static PortletConfigurationUnmarshaller unmarshaller = new PortletConfigurationUnmarshaller();
+	private static PortletConfigurationMarshaller unmarshaller = new PortletConfigurationMarshaller();
 
 	@Before
 	public void setUp() throws Exception {
