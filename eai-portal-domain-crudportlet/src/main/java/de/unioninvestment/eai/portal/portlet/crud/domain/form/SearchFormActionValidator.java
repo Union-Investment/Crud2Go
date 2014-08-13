@@ -106,8 +106,8 @@ public class SearchFormActionValidator {
 				FormAction formAction = action.getActionForIncludeFilter(includeFilterConfig);
 				SearchFormAction otherActionHandler = (SearchFormAction) formAction.getActionHandler();
 				
-				List<FilterConfig> includeFilterConfigsList = otherActionHandler.createFilterConfigs(form, table);
-				checkFiltersForTable(form, table, includeFilterConfigsList);
+				List<FilterConfig> includeFilterConfigsList = otherActionHandler.createFilterConfigs(formAction.getForm(), table);
+				checkFiltersForTable(formAction.getForm(), table, includeFilterConfigsList);
 			} else {
                 // FIXME: Sicherstellen dass auch zukünftig alle Filter berücksichtigt sind
                 // LOGGER.warn(...)
