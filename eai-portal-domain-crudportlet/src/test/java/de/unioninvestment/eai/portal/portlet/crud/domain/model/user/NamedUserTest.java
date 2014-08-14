@@ -71,10 +71,11 @@ public class NamedUserTest {
 
 	@Before
 	public void setUp() throws PortalException, SystemException {
-		Set<Role> portalRoles = new HashSet<Role>();
-		portalRoles.add(domainRoleMock);
-
 		MockitoAnnotations.initMocks(this);
+
+        Set<Role> portalRoles = new HashSet<Role>();
+        portalRoles.add(domainRoleMock);
+
         when(context.getProvider().getBean(Portal.class)).thenReturn(portalMock);
 
         user = new NamedUser("Jürgen", portalRoles);
@@ -111,11 +112,7 @@ public class NamedUserTest {
 
 	@Test
 	public void shouldGetRoles() {
-		Set<Role> prtalRoles = new HashSet<Role>();
-		prtalRoles.add(domainRoleMock);
-		user = new NamedUser("Jürgen", prtalRoles);
-
-		when(domainRoleMock.getName()).thenReturn("adminRolle");
+        when(domainRoleMock.getName()).thenReturn("adminRolle");
 		when(domainRoleMock.isMember(user)).thenReturn(true);
 
 		Set<String> result = user.getRoles();

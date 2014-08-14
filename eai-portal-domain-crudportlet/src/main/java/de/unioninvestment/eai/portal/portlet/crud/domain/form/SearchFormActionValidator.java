@@ -105,7 +105,7 @@ public class SearchFormActionValidator {
 				IncludeFilterConfig includeFilterConfig = (IncludeFilterConfig) config;
 				FormAction formAction = action.getActionForIncludeFilter(includeFilterConfig);
 				SearchFormAction otherActionHandler = (SearchFormAction) formAction.getActionHandler();
-				
+				//TODO: yevtushs - add unit test
 				List<FilterConfig> includeFilterConfigsList = otherActionHandler.createFilterConfigs(formAction.getForm(), table);
 				checkFiltersForTable(formAction.getForm(), table, includeFilterConfigsList);
 			} else {
