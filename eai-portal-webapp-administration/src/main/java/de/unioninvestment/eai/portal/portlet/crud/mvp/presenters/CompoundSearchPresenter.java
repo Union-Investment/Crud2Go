@@ -19,14 +19,14 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
-import java.util.Collection;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.CompoundSearchView;
+
+import java.util.Map;
 
 /**
  * Presenter für {@link CompoundSearchView}.
@@ -49,8 +49,8 @@ public class CompoundSearchPresenter extends PanelContentPresenter implements
 					"portlet.crud.error.compoundsearch.noSearchableFields");
 		}
 
-		Collection<String> defaultFields = searchableColumns
-				.getDefaultSearchableColumnNames();
+		Map<String, String> defaultFields = searchableColumns
+				.getDefaultSearchablePrefixes();
 		if (defaultFields.size() == 0) {
 			throw new BusinessException(
 					"portlet.crud.error.compoundsearch.noDefaultFields");

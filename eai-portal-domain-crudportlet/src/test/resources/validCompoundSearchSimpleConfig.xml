@@ -13,9 +13,9 @@
 				<column name="ID" title="ID" primary-key="true" editable="true" />
 				<column name="CNUMBER5_2" title="Zahl" editable="true" />
 				<column name="CDATE" editable="false" />
-				<column name="CTIMESTAMP" />
+				<column name="CTIMESTAMP" title="Timestamp" search-prefix="Timestamp"/>
 				<column name="CVARCHAR5_NN" editable="true"
-					longtitle="CVARCHAR5 (Pflichtfeld)" searchable="default">
+					longtitle="CVARCHAR5 (Pflichtfeld)" searchable="default" search-prefix="CVNN">
 					<select>
 						<query><![CDATA[
 							select distinct CVARCHAR5_NN as key,CVARCHAR5_NN as title from TEST_CRUD2

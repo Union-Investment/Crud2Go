@@ -19,28 +19,25 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.ui.search;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.gwt.thirdparty.guava.common.collect.Sets;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.gwt.thirdparty.guava.common.collect.Sets;
+import java.util.Collections;
+import java.util.Set;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 public class SearchOptionsHandlerTest {
 
@@ -48,18 +45,25 @@ public class SearchOptionsHandlerTest {
 
 	@Mock
 	private TableColumns fieldsMock;
+    @Mock
+    private TableColumn masterColumnMock, secondColumnMock, optionsColumnMock;
 
-	@Before
+    @Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		when(fieldsMock.getSearchableColumnNames()).thenReturn(
+		when(fieldsMock.getSearchableColumnPrefixes()).thenReturn(
 				asList("MASTER", "SECOND", "THIRD", "MATCH", "OPTS"));
-		when(fieldsMock.getDefaultSearchableColumnNames()).thenReturn(
-				asList("OPTS"));
-		when(fieldsMock.isSelection("OPTS")).thenReturn(true);
+		when(fieldsMock.getDefaultSearchablePrefixes()).thenReturn(
+				ImmutableMap.of("OPTIONS", "OPTS"));
+		when(fieldsMock.isSelection("OPTIONS")).thenReturn(true);
 		when(fieldsMock.getLowerCaseColumnNamesMapping()).thenReturn(
 				ImmutableMap.<String, String> of("master", "MASTER", "second",
-						"SECOND", "third", "THIRD", "match", "MATCH", "opts", "OPTS"));
+						"SECOND", "third", "THIRD", "match", "MATCH", "opts", "OPTIONS"));
+        when(fieldsMock.get("MASTER")).thenReturn(masterColumnMock);
+        when(fieldsMock.get("SECOND")).thenReturn(secondColumnMock);
+        when(fieldsMock.get("OPTIONS")).thenReturn(optionsColumnMock);
+        when(optionsColumnMock.getSearchPrefix()).thenReturn("OPTS");
+
 		handler = new SearchOptionsHandler(fieldsMock);
 	}
 
@@ -135,18 +139,18 @@ public class SearchOptionsHandlerTest {
 
 	@Test
 	public void shouldDeliverOptionsWhileEnteringOptionListTerm() {
-		when(fieldsMock.getDropdownSelections("OPTS", "", 100)).thenReturn(
+		when(fieldsMock.getDropdownSelections("OPTIONS", "", 100)).thenReturn(
 				ImmutableMap.of("1", "Option 1", "2", "Option 2", "3",
 						"Option 3", "4", "OtherOption"));
-		when(fieldsMock.getDropdownSelections("OPTS", "Option 1", 100))
+		when(fieldsMock.getDropdownSelections("OPTIONS", "Option 1", 100))
 				.thenReturn(ImmutableMap.of("1", "Option 1"));
-		when(fieldsMock.getDropdownSelections("OPTS", "Opt", 100)).thenReturn(
+		when(fieldsMock.getDropdownSelections("OPTIONS", "Opt", 100)).thenReturn(
+                ImmutableMap.of("1", "Option 1", "2", "Option 2", "3",
+                        "Option 3"));
+		when(fieldsMock.getDropdownSelections("OPTIONS", "opt", 100)).thenReturn(
 				ImmutableMap.of("1", "Option 1", "2", "Option 2", "3",
 						"Option 3"));
-		when(fieldsMock.getDropdownSelections("OPTS", "opt", 100)).thenReturn(
-				ImmutableMap.of("1", "Option 1", "2", "Option 2", "3",
-						"Option 3"));
-		when(fieldsMock.getDropdownSelections("OPTS", "Oth", 100)).thenReturn(
+		when(fieldsMock.getDropdownSelections("OPTIONS", "Oth", 100)).thenReturn(
 				ImmutableMap.of("4", "OtherOption"));
 
 		Set<String> options = ImmutableSet.copyOf(new String[] {
@@ -169,7 +173,7 @@ public class SearchOptionsHandlerTest {
 
 	@Test
 	public void shouldDeliverOptionsForDefaultPhraseIfDefaultFieldsAreASelections() {
-		when(fieldsMock.getDropdownSelections("OPTS", "", 100)).thenReturn(
+		when(fieldsMock.getDropdownSelections("OPTIONS", "", 100)).thenReturn(
 				ImmutableMap.of("1", "Option 1", "2", "Option 2", "3",
 						"Option 3", "4", "OtherOption"));
 
@@ -181,7 +185,7 @@ public class SearchOptionsHandlerTest {
 
 	@Test
 	public void shouldDeliverOptionsForDefaultTermIfDefaultFieldsAreASelections() {
-		when(fieldsMock.getDropdownSelections("OPTS", "opt", 100)).thenReturn(
+		when(fieldsMock.getDropdownSelections("OPTIONS", "opt", 100)).thenReturn(
 				ImmutableMap.of("1", "Option 1", "2", "Option 2", "3",
 						"Option 3"));
 
@@ -192,7 +196,7 @@ public class SearchOptionsHandlerTest {
 
 	@Test
 	public void shouldDeliverOptionsOnEmptyStringIfDefaultFieldsAreASelections() {
-		when(fieldsMock.getDropdownSelections("OPTS", "", 100)).thenReturn(
+		when(fieldsMock.getDropdownSelections("OPTIONS", "", 100)).thenReturn(
 				ImmutableMap.of("1", "Option 1", "2", "Option 2", "3",
 						"Option 3"));
 

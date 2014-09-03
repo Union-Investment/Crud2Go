@@ -19,59 +19,16 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.sort;
-
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.PrefixQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TermRangeQuery;
-import org.apache.lucene.search.WildcardQuery;
-import org.apache.lucene.util.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Strings;
 import com.vaadin.data.util.converter.Converter.ConversionException;
-
 import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
 import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchDetailsConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Wildcard;
 import de.unioninvestment.eai.portal.portlet.crud.domain.search.AsIsAnalyzer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.search.SearchableTablesFinder;
 import de.unioninvestment.eai.portal.support.vaadin.context.Context;
@@ -79,6 +36,23 @@ import de.unioninvestment.eai.portal.support.vaadin.date.DateUtils;
 import de.unioninvestment.eai.portal.support.vaadin.date.GermanDateFormats;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 import de.unioninvestment.eai.portal.support.vaadin.support.NumberFormatter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.util.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.sort;
 
 /**
  * Repräsentation der Compound-Suche. Konvertiert eine Suche in Lucene-Syntax in
@@ -508,7 +482,7 @@ public class CompoundSearch extends Panel {
 		}
 
 		Collection<String> defaultFields = getSearchableColumns()
-				.getDefaultSearchableColumnNames();
+				.getDefaultSearchablePrefixes().values();
 		String[] defaultFieldsArray = defaultFields
 				.toArray(new String[defaultFields.size()]);
 

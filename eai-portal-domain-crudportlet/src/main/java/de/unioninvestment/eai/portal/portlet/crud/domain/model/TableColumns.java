@@ -18,25 +18,17 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.vaadin.tokenfield.TokenField;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.gwt.thirdparty.guava.common.collect.Maps;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
+import org.vaadin.tokenfield.TokenField;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Aggregations-Objekt für Tabellenspalteninformationen, bietet
@@ -305,21 +297,21 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 		return columns.containsKey(columnName);
 	}
 
-	public Collection<String> getSearchableColumnNames() {
+	public Collection<String> getSearchableColumnPrefixes() {
 		List<String> searchable = new LinkedList<String>();
 		for (TableColumn column : columnsList) {
 			if (column.getSearchable() != Searchable.FALSE) {
-				searchable.add(column.getName());
+				searchable.add(column.getSearchPrefix());
 			}
 		}
 		return searchable;
 	}
 
-	public Collection<String> getDefaultSearchableColumnNames() {
-		List<String> defaultFields = new LinkedList<String>();
+	public Map<String,String> getDefaultSearchablePrefixes() {
+		Map<String,String> defaultFields = new LinkedHashMap<String,String>();
 		for (TableColumn column : columnsList) {
 			if (column.getSearchable() == Searchable.DEFAULT) {
-				defaultFields.add(column.getName());
+				defaultFields.put(column.getName(), column.getSearchPrefix());
 			}
 		}
 		return defaultFields;
@@ -368,7 +360,7 @@ public class TableColumns implements Iterable<TableColumn>, Serializable {
 			Builder<String, String> builder = ImmutableMap
 					.<String, String> builder();
 			for (TableColumn column : columnsList) {
-				builder.put(column.getName().toLowerCase(), column.getName());
+                builder.put(column.getSearchPrefix().toLowerCase(), column.getName());
 			}
 			lowerCaseColumnNamesMapping = builder.build();
 		}

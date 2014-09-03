@@ -19,25 +19,17 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-
+import com.google.common.collect.ImmutableMap;
+import com.vaadin.ui.UI;
+import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.search.SearchableTablesFinder;
+import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,27 +40,16 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ContextConfiguration;
 
-import com.google.common.collect.ImmutableMap;
-import com.vaadin.ui.UI;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.*;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Wildcard;
-import de.unioninvestment.eai.portal.portlet.crud.domain.search.SearchableTablesFinder;
-import de.unioninvestment.eai.portal.support.vaadin.junit.AbstractSpringPortletContextTest;
-import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.*;
 
 @ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
 public class CompoundSearchTest extends AbstractSpringPortletContextTest {
@@ -139,9 +120,9 @@ public class CompoundSearchTest extends AbstractSpringPortletContextTest {
 		doReturn(
 				asList("MASTER", "SECOND", "THIRD", "NUMERIC", "TIMESTAMP",
 						"SELECT", "SELECTTEXT", "NOTINTABLE"))
-				.when(columnsMock).getSearchableColumnNames();
-		doReturn(asList("MASTER", "SECOND")).when(columnsMock)
-				.getDefaultSearchableColumnNames();
+				.when(columnsMock).getSearchableColumnPrefixes();
+		doReturn(ImmutableMap.of("MASTER", "MASTER", "SECOND", "SECOND")).when(columnsMock)
+				.getDefaultSearchablePrefixes();
 
 		doReturn(String.class).when(containerMock).getType("MASTER");
 		doReturn(String.class).when(containerMock).getType("SECOND");
@@ -185,7 +166,7 @@ public class CompoundSearchTest extends AbstractSpringPortletContextTest {
 	@Test
 	public void shouldDeliverSearchableColumnsInRightOrder() {
 		assertThat(
-				search.getSearchableColumns().getSearchableColumnNames(),
+				search.getSearchableColumns().getSearchableColumnPrefixes(),
 				equalTo((Collection<String>)asList("MASTER", "SECOND", "NUMERIC", "SELECT", "SELECTTEXT",
 						"THIRD", "TIMESTAMP")));
 	}

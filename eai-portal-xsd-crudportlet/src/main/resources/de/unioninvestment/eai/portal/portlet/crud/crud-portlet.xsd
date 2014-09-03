@@ -2705,6 +2705,13 @@
 						</documentation>
 					</annotation>
 				</attribute>
+                <attribute name="search-prefix" type="string">
+                    <annotation>
+                        <documentation>
+                            Spaltenschlüssel für die Compound-Suche
+                        </documentation>
+                    </annotation>
+                </attribute>
 				<attribute name="searchable" type="tns:ColumnSearchableType">
 					<annotation>
 						<documentation>

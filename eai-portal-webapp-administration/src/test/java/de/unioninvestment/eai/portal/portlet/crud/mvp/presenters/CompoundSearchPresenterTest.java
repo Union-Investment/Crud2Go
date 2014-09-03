@@ -19,14 +19,11 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Collection;
-
+import com.google.common.collect.ImmutableMap;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
+import de.unioninvestment.eai.portal.portlet.crud.mvp.views.CompoundSearchView;
 import org.apache.lucene.search.Query;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,16 +33,17 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.CompoundQueryChangedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.CompoundSearch;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
-import de.unioninvestment.eai.portal.portlet.crud.mvp.views.CompoundSearchView;
+import java.util.Collection;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.*;
 
 public class CompoundSearchPresenterTest {
 
 	private CompoundSearchPresenter presenter;
 	private Collection<String> searchableFields;
-	private Collection<String> defaultFields;
+	private Map<String, String> defaultFields;
 
 	@Mock
 	private CompoundSearchView viewMock;
@@ -61,11 +59,11 @@ public class CompoundSearchPresenterTest {
 		MockitoAnnotations.initMocks(this);
 
 		searchableFields = asList("A", "B", "C");
-		defaultFields = asList("A", "B");
+		defaultFields = ImmutableMap.of("A", "A", "B", "B");
 		when(modelMock.getSearchableColumns()).thenReturn(searchableColumnsMock);
 		when(searchableColumnsMock.size()).thenReturn(3);
-		when(searchableColumnsMock.getSearchableColumnNames()).thenReturn(searchableFields);
-		when(searchableColumnsMock.getDefaultSearchableColumnNames()).thenReturn(defaultFields);
+		when(searchableColumnsMock.getSearchableColumnPrefixes()).thenReturn(searchableFields);
+		when(searchableColumnsMock.getDefaultSearchablePrefixes()).thenReturn(defaultFields);
 
 		presenter = new CompoundSearchPresenter(viewMock, modelMock);
 	}

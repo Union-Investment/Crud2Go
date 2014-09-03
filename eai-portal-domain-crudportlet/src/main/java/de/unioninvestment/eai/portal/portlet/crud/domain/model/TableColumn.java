@@ -18,16 +18,14 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
+import com.google.common.base.Preconditions;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.ColumnStyleRenderer;
+import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
+import org.springframework.util.Assert;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.springframework.util.Assert;
-
-import com.google.common.base.Preconditions;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.ColumnStyleRenderer;
-import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidator;
 
 /**
  * Modell Klasse für die Tabellenspaltenkonfiguration zur Übergabe an die
@@ -75,6 +73,7 @@ public class TableColumn implements Serializable {
 	private GeneratedValueGenerator generatedValueGenerator;
 	private Class<?> generatedType;
 	private Searchable searchable;
+    private String searchPrefix;
 	private Table table;
 
 	/**
@@ -101,6 +100,7 @@ public class TableColumn implements Serializable {
 		this.longTitle = builder.longTitle;
 		this.hiddenStatus = builder.hiddenStatus;
 		this.searchable = builder.searchable;
+        this.searchPrefix = builder.searchPrefix;
 		this.editableDefault = builder.editableDefault;
 		this.multiline = builder.multiline;
 		this.rows = builder.rows;
@@ -311,6 +311,7 @@ public class TableColumn implements Serializable {
 		protected String longTitle;
 		protected Hidden hiddenStatus = Hidden.FALSE;
 		protected Searchable searchable = Searchable.TRUE;
+        protected String searchPrefix;
 		protected boolean editableDefault = false;
 		protected boolean multiline = false;
 		protected Integer rows;
@@ -374,6 +375,15 @@ public class TableColumn implements Serializable {
 		 */
 		public T searchable(Searchable searchable) {
 			this.searchable = searchable;
+			return self();
+		}
+
+		/**
+		 * @param searchable
+		 * @return den builder
+		 */
+		public T searchPrefix(String prefix) {
+			this.searchPrefix = prefix;
 			return self();
 		}
 
@@ -565,7 +575,18 @@ public class TableColumn implements Serializable {
 		return searchable;
 	}
 
-	public void setTable(Table table) {
+    /**
+     * @return an explicit search prefix or the column name, if not configured
+     */
+    public String getSearchPrefix() {
+        if (searchPrefix == null) {
+            return name;
+        } else {
+            return searchPrefix;
+        }
+    }
+
+    public void setTable(Table table) {
 		if (this.table == null) {
 			this.table = table;
 		} else {

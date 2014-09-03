@@ -19,39 +19,29 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.mvp.views;
 
-import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
-
-import java.util.Date;
-import java.util.LinkedList;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.PopupView;
 import com.vaadin.ui.PopupView.Content;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.CellStyleGenerator;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.LiferayTheme;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.CheckBoxTableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DateTableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.SelectionTableColumn;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.ui.search.SearchBox;
 import de.unioninvestment.eai.portal.portlet.crud.ui.search.SearchBox.QuerySearchHandler;
 import de.unioninvestment.eai.portal.portlet.crud.ui.search.SearchOptionsHandler;
+
+import java.util.Date;
+import java.util.LinkedList;
+
+import static de.unioninvestment.eai.portal.support.vaadin.context.Context.getMessage;
 
 /**
  * Darstellung der Compound-Suche. Falls eine Detailsuche konfiguriert ist, kann
@@ -179,7 +169,7 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 
 		for (TableColumn column : fields) {
 			table.addItem(new Object[] { //
-					column.getName(), //
+					column.getSearchPrefix(), //
 							column.getTitle(), //
 							createColumnDescription(column), //
 							column.getSearchable() == Searchable.DEFAULT }, //

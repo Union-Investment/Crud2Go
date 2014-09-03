@@ -673,6 +673,7 @@ public class ModelBuilder {
 					.longTitle(c.getLongtitle()) //
 					.hiddenStatus(getHiddenStatus(c)) //
 					.searchable(getSearchable(c)) //
+                    .searchPrefix(c.getSearchPrefix()) //
 					.editableDefault(isEditable) //
                     .sequence(c.getSequence()) //
                     .insertColumn(c.isInsert()) //

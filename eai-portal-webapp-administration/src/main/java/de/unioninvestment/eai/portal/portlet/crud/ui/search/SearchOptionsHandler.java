@@ -19,24 +19,19 @@
 
 package de.unioninvestment.eai.portal.portlet.crud.ui.search;
 
-import static java.util.Arrays.asList;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
 import com.google.gwt.thirdparty.guava.common.collect.Lists;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumns;
 import de.unioninvestment.eai.portal.portlet.crud.ui.search.SearchBox.OptionHandler;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.Arrays.asList;
 
 public class SearchOptionsHandler implements OptionHandler {
 
@@ -251,16 +246,16 @@ public class SearchOptionsHandler implements OptionHandler {
 		columnNamesMapping = fields.getLowerCaseColumnNamesMapping();
 		opsAndAttrsWithColon = new TreeSet<String>(keywords);
 		opsAndAttrsWithColon.addAll( //
-				FluentIterable.from(fields.getSearchableColumnNames())
+				FluentIterable.from(fields.getSearchableColumnPrefixes())
 						.transform(new AppendString(":")).toList());
 
-		Collection<String> defaultNames = fields
-				.getDefaultSearchableColumnNames();
+		Map<String,String> defaultNames = fields
+				.getDefaultSearchablePrefixes();
 		defaultSelectionFieldNames = Lists
 				.newArrayListWithCapacity(defaultNames.size());
-		for (String defaultName : defaultNames) {
-			if (fields.isSelection(defaultName)) {
-				defaultSelectionFieldNames.add(defaultName);
+		for (Map.Entry<String,String> defaultName : defaultNames.entrySet()) {
+			if (fields.isSelection(defaultName.getKey())) {
+				defaultSelectionFieldNames.add(defaultName.getValue());
 			}
 		}
 	}
@@ -289,8 +284,9 @@ public class SearchOptionsHandler implements OptionHandler {
 		} else if (filterString.isInFieldValue()) {
 			// lastColonIndex >= 0
 			String lowercaseFieldName = filterString.getLowercaseFieldname();
-			String fieldName = columnNamesMapping.get(lowercaseFieldName);
-			if (fieldName != null) {
+			String columnName = columnNamesMapping.get(lowercaseFieldName);
+			if (columnName != null) {
+    			String fieldName = fields.get(columnName).getSearchPrefix();
 				String partialFieldvalue = filterString.getPartialFieldValue();
 				addFilteredOptionListOptions(options, filterString,
 						lowercaseFieldName, partialFieldvalue,
@@ -313,7 +309,7 @@ public class SearchOptionsHandler implements OptionHandler {
 			String partialFieldvalue, String prefix) {
 		String fieldname = columnNamesMapping.get(lowercaseFieldName);
 		if (fieldname != null && fields.isSelection(fieldname)) {
-			Map<String, String> fieldOptions = fields.getDropdownSelections(
+            Map<String, String> fieldOptions = fields.getDropdownSelections(
 					fieldname, partialFieldvalue, maximumFieldOptions);
 			if (fieldOptions != null) {
 				for (String fieldOption : fieldOptions.values()) {

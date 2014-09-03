@@ -18,35 +18,27 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.google.common.collect.ImmutableMap;
+import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
+import de.unioninvestment.eai.portal.portlet.crud.config.SelectDisplayType;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import com.google.common.collect.ImmutableMap;
-
-import de.unioninvestment.eai.portal.portlet.crud.config.DateDisplayType;
-import de.unioninvestment.eai.portal.portlet.crud.config.SelectDisplayType;
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Hidden;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableColumn.Searchable;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.*;
 
 public class TableColumnsTest {
 
@@ -97,6 +89,7 @@ public class TableColumnsTest {
 				.inputPrompt("") //
 				.optionList(optionList) //
 				.searchable(Searchable.DEFAULT) //
+                .searchPrefix("prefix2") //
 				.build();
 		column3 = new TableColumn.Builder() //
 				.name("name3") //
@@ -314,17 +307,17 @@ public class TableColumnsTest {
 	}
 
 	@Test
-	public void shouldReturnSearchableColumns() {
+	public void shouldReturnSearchableColumnPrefixes() {
 		assertThat(
-				tableColumns.getSearchableColumnNames(),
-				is((Collection<String>) asList("name1", "name2", "name3",
+				tableColumns.getSearchableColumnPrefixes(),
+				is((Collection<String>) asList("name1", "prefix2", "name3",
 						"name4", "name5")));
 	}
 
 	@Test
 	public void shouldReturnDefaultSearchableColumns() {
-		assertThat(tableColumns.getDefaultSearchableColumnNames(),
-				is((Collection<String>) asList("name1", "name2")));
+		assertThat(tableColumns.getDefaultSearchablePrefixes(),
+				is((Map<String,String>)ImmutableMap.of("name1", "name1", "name2", "prefix2")));
 	}
 
 	@Test
