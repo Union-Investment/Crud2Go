@@ -13,7 +13,7 @@ class DatabaseSchemas {
 	DatabaseSchemas() {
 		props = new Properties()
         loadPropertiesIfExists("database-default.properties")
-        loadPropertiesIfExists("database.properties")
+        loadPropertiesIfExists(System.getProperty('database.config', "database.properties"))
 	}
 
     private loadPropertiesIfExists(String resourceName) {
@@ -25,14 +25,18 @@ class DatabaseSchemas {
     }
 
     def propertyMissing(String name) {
-		def dataSource = dataSources[name]
-		if (!dataSource) {
-			dataSource = createDataSource(name)
-			dataSources[name] = dataSource
-		}
-		return dataSource
+        get(name)
 	}
-	
+
+    DataSource get(String name) {
+        def dataSource = dataSources[name]
+        if (!dataSource) {
+            dataSource = createDataSource(name)
+            dataSources[name] = dataSource
+        }
+        return dataSource
+    }
+
 	DataSource createDataSource(name) {
 		def data = schemaData(name)
 		assert data?.url : "DataSource $name not configured properly"
