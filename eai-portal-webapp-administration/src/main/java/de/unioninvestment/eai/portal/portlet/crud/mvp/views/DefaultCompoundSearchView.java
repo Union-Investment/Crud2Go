@@ -168,12 +168,14 @@ public class DefaultCompoundSearchView extends VerticalLayout implements
 		});
 
 		for (TableColumn column : fields) {
-			table.addItem(new Object[] { //
-					column.getSearchPrefix(), //
-							column.getTitle(), //
-							createColumnDescription(column), //
-							column.getSearchable() == Searchable.DEFAULT }, //
-					column.getName());
+            if (column.getSearchable() != Searchable.FALSE) {
+                table.addItem(new Object[] { //
+                        column.getSearchPrefix(), //
+                                column.getTitle(), //
+                                createColumnDescription(column), //
+                                column.getSearchable() == Searchable.DEFAULT }, //
+                        column.getName());
+            }
 		}
 
 		table.setVisibleColumns("field", "title", "description");
