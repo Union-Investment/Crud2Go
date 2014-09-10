@@ -6,7 +6,7 @@ import org.junit.Rule
 /**
  * Created by cmj on 21.07.14.
  */
-class CrudConfigTest {
+abstract class CrudConfigTest {
     @Rule
     public LiferayContext context = new LiferayContext(CrudTestContext.TEST_PORTLET_ID, CrudTestContext.LIFERAY_COMMUNITY_ID)
 

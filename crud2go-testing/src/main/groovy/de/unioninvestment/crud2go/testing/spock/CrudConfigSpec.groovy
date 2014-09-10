@@ -8,7 +8,7 @@ import spock.lang.Specification
 /**
  * Created by cmj on 17.07.14.
  */
-class CrudConfigSpec extends Specification {
+abstract class CrudConfigSpec extends Specification {
 
     @Rule
     LiferayContext context = new LiferayContext(CrudTestContext.TEST_PORTLET_ID, CrudTestContext.LIFERAY_COMMUNITY_ID)
