@@ -43,4 +43,9 @@ class CrudTestConfigImpl implements CrudTestConfig {
     Statistics getStatistics() {
         statistics
     }
+
+    void runMainScript() {
+        mainScript.run()
+        portlet.portlet.handleLoad()
+    }
 }

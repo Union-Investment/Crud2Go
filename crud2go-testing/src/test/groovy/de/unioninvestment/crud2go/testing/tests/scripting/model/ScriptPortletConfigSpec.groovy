@@ -32,7 +32,7 @@ class ScriptPortletConfigSpec extends CrudConfigSpec {
 
         when:
         portlet.elements.table1 = [test: { 1 }]
-        instance.mainScript.run()
+        instance.runMainScript()
 
         then:
         scriptPortletConfigSpecMock.test() == 1

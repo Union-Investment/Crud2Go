@@ -25,4 +25,9 @@ interface CrudTestConfig {
      * @return Statistics about loading times
      */
     Statistics getStatistics()
+
+    /**
+     * run the main script that has been skipped before by the dontRunMainScript() statement
+     */
+    void runMainScript()
 }

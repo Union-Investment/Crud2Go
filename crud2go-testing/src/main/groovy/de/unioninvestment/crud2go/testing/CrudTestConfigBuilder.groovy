@@ -298,6 +298,11 @@ class CrudTestConfigBuilder {
 
             prepareGuiMocks(modelBuilder, portlet)
 
+            if (runMainScript) {
+                // also execute onLoad() after main script was executed
+                portlet.handleLoad()
+            }
+
             if (validationEnabled) {
                 new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
             }
