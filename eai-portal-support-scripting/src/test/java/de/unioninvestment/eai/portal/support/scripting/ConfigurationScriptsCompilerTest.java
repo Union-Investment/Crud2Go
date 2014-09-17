@@ -18,6 +18,31 @@
  */
 package de.unioninvestment.eai.portal.support.scripting;
 
+import com.vaadin.ui.Button;
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelSupport;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptTab;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptTabs;
+import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
+import groovy.lang.Closure;
+import groovy.lang.Script;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.internal.matchers.InstanceOf;
+import org.slf4j.LoggerFactory;
+import org.springframework.test.context.ContextConfiguration;
+import org.xml.sax.SAXException;
+
+import javax.xml.bind.JAXBException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -26,57 +51,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.startsWith;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import groovy.lang.Closure;
-import groovy.lang.Script;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.bind.JAXBException;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.internal.matchers.InstanceOf;
-import org.slf4j.LoggerFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.xml.sax.SAXException;
-
-import com.vaadin.ui.Button;
-
-import de.unioninvestment.eai.portal.portlet.crud.config.AnyFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ColumnsConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTAttributeConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelSupport;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptRow;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptTab;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptTabs;
-import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
+import static org.mockito.Mockito.*;
 
 @ContextConfiguration({ "/eai-portal-web-test-applicationcontext.xml" })
 public class ConfigurationScriptsCompilerTest extends ModelSupport {
@@ -154,6 +129,7 @@ public class ConfigurationScriptsCompilerTest extends ModelSupport {
 				.compileAllScripts(portletConfig);
 
 		assertThat(portletConfig.getOnRefresh().getClazz(), notNullValue());
+		assertThat(portletConfig.getOnLoad().getClazz(), notNullValue());
 		assertThat(portletConfig.getOnReload().getClazz(), notNullValue());
 		assertThat(getTabs(portletConfig).getOnChange().getClazz(),
 				notNullValue());

@@ -503,6 +503,7 @@ public class CrudUITest extends SpringPortletContextTest {
 		ui.refreshViews();
 
 		verify(viewPageMock).addComponent(portletViewMock);
+		verify(portletMock).handleLoad();
 		assertThat(ui.isInitializing(), is(false));
 
 	}

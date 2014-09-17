@@ -18,16 +18,10 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
 import groovy.lang.Closure;
-
-import java.util.Map;
-import java.util.NoSuchElementException;
-
-import javax.xml.bind.JAXBException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,12 +29,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
+import javax.xml.bind.JAXBException;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 
 public class ScriptPortletTest {
 	private ScriptPortlet scriptPortlet;
@@ -59,6 +54,9 @@ public class ScriptPortletTest {
 
 	@Captor
 	private ArgumentCaptor<PortletReloadedEventHandler> reloadedHandlerCaptor;
+
+	@Captor
+	private ArgumentCaptor<PortletLoadedEventHandler> loadedHandlerCaptor;
 
 	@Before
 	public void setup() {
@@ -92,6 +90,17 @@ public class ScriptPortletTest {
 
 		reloadedHandlerCaptor.getValue().onPortletReload(
 				new PortletReloadedEvent(portletMock));
+
+		verify(closureMock).call(scriptPortlet);
+	}
+
+	@Test
+	public void shouldCallOnLoadClosureOnLoad() {
+		scriptPortlet.setOnLoad(closureMock);
+		verify(portletMock).addLoadHandler(loadedHandlerCaptor.capture());
+
+		loadedHandlerCaptor.getValue().onPortletLoad(
+				new PortletLoadedEvent(portletMock));
 
 		verify(closureMock).call(scriptPortlet);
 	}

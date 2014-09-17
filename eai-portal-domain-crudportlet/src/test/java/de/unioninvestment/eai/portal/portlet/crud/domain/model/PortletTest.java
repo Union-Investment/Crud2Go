@@ -18,26 +18,20 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-
+import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.User;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.*;
 
 public class PortletTest {
 
@@ -55,6 +49,9 @@ public class PortletTest {
 
 	@Mock
 	private PortletReloadedEventHandler portletReloadHandlerMock;
+
+	@Mock
+	private PortletLoadedEventHandler portletLoadHandlerMock;
 
 	private EventBus eventBus = new EventBus();
 
@@ -137,7 +134,7 @@ public class PortletTest {
 	}
 
 	@Test
-	public void shouldRefreshOnPageReloadIfNotConfigured() {
+	public void shouldNotRefreshOnPageReloadIfNotConfigured() {
 		config.setRefreshOnPageReload(false);
 		portlet = new Portlet(eventBus, config, contextMock);
 		portlet.addRefreshHandler(portletRefreshHandlerMock);
@@ -155,6 +152,16 @@ public class PortletTest {
 
 		verify(portletReloadHandlerMock).onPortletReload(
 				new PortletReloadedEvent(portlet));
+	}
+
+	@Test
+	public void shouldFireLoadEventOnReload() {
+		portlet.addLoadHandler(portletLoadHandlerMock);
+
+		portlet.handleLoad();
+
+		verify(portletLoadHandlerMock).onPortletLoad(
+				new PortletLoadedEvent(portlet));
 	}
 
 	@Test
