@@ -19,47 +19,19 @@
 package de.unioninvestment.eai.portal.support.scripting;
 
 import com.google.common.base.Strings;
+import de.unioninvestment.eai.portal.portlet.crud.config.*;
+import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig.Dynamic;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
 import groovy.lang.Script;
-
-import java.io.File;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.ColumnConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ComponentConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CompoundSearchDetailsConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.CustomFilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DatabaseQueryConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.DialogConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FilterConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FilterListConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.FormFieldConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.GroovyScript;
-import de.unioninvestment.eai.portal.portlet.crud.config.PanelConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTAttributeConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ReSTContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.RegionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptComponentConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.ScriptContainerConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.SelectConfig.Dynamic;
-import de.unioninvestment.eai.portal.portlet.crud.config.StatementConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableActionConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.TabsConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
-import de.unioninvestment.eai.portal.portlet.crud.domain.util.Util;
+import java.io.File;
+import java.util.List;
 
 /**
  * Diese Klasse dient der Kompilierung aller Groovy-Scripte, die in der
@@ -99,6 +71,7 @@ public class ConfigurationScriptsCompiler {
 	}
 
 	private void compileAllClosureScripts(PortletConfig config) {
+		compileClosure(config.getOnLoad(), "/onLoad");
 		compileClosure(config.getOnReload(), "/onReload");
 		compileClosure(config.getOnRefresh(), "/onRefresh");
 

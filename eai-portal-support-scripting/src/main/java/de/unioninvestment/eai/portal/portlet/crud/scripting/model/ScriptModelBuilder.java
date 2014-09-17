@@ -155,6 +155,8 @@ public class ScriptModelBuilder {
 
 		buildScriptDialogs();
 
+		scriptPortlet.setOnLoad(scriptBuilder.buildClosure(config
+				.getOnLoad()));
 		scriptPortlet.setOnReload(scriptBuilder.buildClosure(config
 				.getOnReload()));
 		scriptPortlet.setOnRefresh(scriptBuilder.buildClosure(config

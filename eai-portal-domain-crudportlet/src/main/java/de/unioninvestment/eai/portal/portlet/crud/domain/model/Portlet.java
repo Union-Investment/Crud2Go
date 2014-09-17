@@ -18,31 +18,22 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
-
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
+import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
+import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.PreferencesRepository;
 import de.unioninvestment.eai.portal.support.vaadin.context.Context;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig;
-import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.authentication.Realm;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
-import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
+import java.io.Serializable;
+import java.util.*;
+
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * Repräsentation das Portlets im Modell.
@@ -55,7 +46,7 @@ public class Portlet implements Serializable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Portlet.class);
 
-	/**
+    /**
 	 * Permission Actions.
 	 */
 	public enum Permission {
@@ -71,6 +62,7 @@ public class Portlet implements Serializable {
 	private String title;
 	private final PortletConfig config;
 
+	private EventRouter<PortletLoadedEventHandler, PortletLoadedEvent> loadEventRouter = new EventRouter<PortletLoadedEventHandler, PortletLoadedEvent>();
 	private EventRouter<PortletReloadedEventHandler, PortletReloadedEvent> reloadEventRouter = new EventRouter<PortletReloadedEventHandler, PortletReloadedEvent>();
 
 	private Set<Role> portletRoles = new HashSet<Role>();
@@ -238,12 +230,29 @@ public class Portlet implements Serializable {
 	 * Informs the portlet that a page reload is happening. It's up to the
 	 * Portlet configuration if this triggers a refresh.
 	 */
+	public void handleLoad() {
+		LOG.info("Portlet is loaded (GUI is initialized)");
+		loadEventRouter.fireEvent(new PortletLoadedEvent(this));
+	}
+
+	/**
+	 * Informs the portlet that a page reload is happening. It's up to the
+	 * Portlet configuration if this triggers a refresh.
+	 */
 	public void handleReload() {
 		LOG.info("Portlet is reloaded");
 		reloadEventRouter.fireEvent(new PortletReloadedEvent(this));
 		if (config.isRefreshOnPageReload()) {
 			refresh();
 		}
+	}
+
+	/**
+	 * @param handler
+	 *            a new handler for custom handling of page reloads
+	 */
+	public void addLoadHandler(PortletLoadedEventHandler handler) {
+		loadEventRouter.addHandler(handler);
 	}
 
 	/**

@@ -509,6 +509,8 @@ public class CrudUI extends LiferayUI implements PortletListener,
 			LOG.debug("Building GUI");
 			portletGui = guiBuilder.build(portletDomain);
 
+            portletDomain.handleLoad();
+
 			viewPage.addComponent(portletGui.getView());
 
 			provideBackButtonFunctionality(portletId);

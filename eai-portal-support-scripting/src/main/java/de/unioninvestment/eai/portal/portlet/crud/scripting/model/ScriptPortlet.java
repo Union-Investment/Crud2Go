@@ -18,10 +18,7 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletReloadedEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import groovy.lang.Closure;
 
@@ -44,6 +41,7 @@ public class ScriptPortlet {
 	private ScriptUser currentUser;
 	private Map<String, Object> elementsById = new HashMap<String, Object>();
 
+	private Closure<?> onLoad;
 	private Closure<?> onReload;
 	private Closure<?> onRefresh;
     private boolean inTest = false;
@@ -60,8 +58,22 @@ public class ScriptPortlet {
 	ScriptPortlet(Portlet portlet, boolean inTest) {
 		this.portlet = portlet;
 		addEventHandlerForOnRefresh();
+		addEventHandlerForOnLoad();
 		addEventHandlerForOnReload();
         this.inTest = inTest;
+	}
+
+	private void addEventHandlerForOnLoad() {
+		this.portlet.addLoadHandler(new PortletLoadedEventHandler() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void onPortletLoad(PortletLoadedEvent event) {
+                if (onLoad != null) {
+                    onLoad.call(ScriptPortlet.this);
+                }
+            }
+        });
 	}
 
 	private void addEventHandlerForOnReload() {
@@ -177,6 +189,14 @@ public class ScriptPortlet {
 	public void setOnReload(Closure<?> onReload) {
 		this.onReload = onReload;
 	}
+    /**
+     * @param onLoad
+     *            Closure mit dem Parameter { ScriptPortlet it -> ... }, die
+     *            nach dem Laden des Portlets aufgerufen wird
+     */
+    public void setOnLoad(Closure<?> onLoad) {
+        this.onLoad = onLoad;
+    }
 
 	/**
 	 * @param onRefresh
@@ -193,6 +213,14 @@ public class ScriptPortlet {
 	 */
 	public Closure<?> getOnReload() {
 		return onReload;
+	}
+
+	/**
+	 * @return Closure mit dem Parameter { ScriptPortlet it -> ... }, die nach
+	 *         dem Laden des Portlets aufgerufen wird
+	 */
+	public Closure<?> getOnLoad() {
+		return onLoad;
 	}
 
 	/**

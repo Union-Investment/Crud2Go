@@ -68,6 +68,14 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="onLoad" type="tns:groovy">
+					<annotation>
+						<documentation>
+							Groovy Closure, die nach Initialisierung des Portlets (inkl. GUI) aufgerufen
+							wird
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="onReload" type="tns:groovy">
 					<annotation>
 						<documentation>
