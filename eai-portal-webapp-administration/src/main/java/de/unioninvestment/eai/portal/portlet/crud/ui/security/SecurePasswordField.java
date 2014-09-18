@@ -18,6 +18,8 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.ui.security;
 
+import com.vaadin.data.util.converter.Converter;
+import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import org.springframework.util.Assert;
 
 import com.vaadin.data.Property;
@@ -41,9 +43,10 @@ public class SecurePasswordField extends PasswordField {
 
 	private Property<String> realDataSource;
 
-	private Object realValue;
+	private String realValue;
+    private Converter<String, String> converter;
 
-	public SecurePasswordField(String caption, Property<String> dataSource) {
+    public SecurePasswordField(String caption, Property<String> dataSource) {
 		super(caption);
 		Assert.isAssignable(String.class, dataSource.getType(),
 				"SecurePasswordField only works for String properties");
@@ -69,19 +72,36 @@ public class SecurePasswordField extends PasswordField {
 		}
 		super.setValue(placeholder(newValue), repaintIsNotNeeded);
 		if (!isBuffered() && realDataSource != null) {
-			realDataSource.setValue((String) realValue);
-		}
+            updateRealDataSource();
+        }
 	}
 
-	@Override
+    private void updateRealDataSource() {
+        if (converter != null) {
+            String convertedValue = converter.convertToModel(realValue, String.class, Context.getLocale());
+            realDataSource.setValue(convertedValue);
+        } else {
+            realDataSource.setValue(realValue);
+        }
+    }
+
+    @Override
 	public void commit() throws SourceException, InvalidValueException {
 		super.commit();
-		realDataSource.setValue((String) realValue);
-	}
+        updateRealDataSource();
+    }
 
 	@Override
 	public void discard() throws SourceException {
 		super.discard();
-		realValue = realDataSource.getValue();
+        realValue = realDataSource.getValue();
+        if (converter != null) {
+            realValue = converter.convertToPresentation(realValue, String.class, Context.getLocale());
+        }
 	}
+
+    @Override
+    public void setConverter(Converter<String, ?> converter) {
+        this.converter = (Converter<String, String>) converter;
+    }
 }

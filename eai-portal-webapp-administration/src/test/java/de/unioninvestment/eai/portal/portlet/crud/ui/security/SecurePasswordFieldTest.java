@@ -18,17 +18,36 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.ui.security;
 
+import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.data.util.converter.Converter;
+import de.unioninvestment.eai.portal.support.vaadin.junit.ContextMock;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+
+import java.util.Locale;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-
-import org.junit.Test;
-
-import com.vaadin.data.util.ObjectProperty;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SecurePasswordFieldTest {
 
-	@Test
+    @Mock
+    private Converter<String, String> converterMock;
+
+    @Rule
+    public ContextMock contextMock = new ContextMock();
+
+    @Before
+    public void setup() {
+        initMocks(this);
+    }
+
+    @Test
 	public void shouldReturnNullOnNullPassword() {
 		SecurePasswordField field = new SecurePasswordField("Test",
 				new ObjectProperty<String>(null, String.class));
@@ -130,5 +149,29 @@ public class SecurePasswordFieldTest {
 
 		assertThat((String) realDataSource.getValue(), is("abcde"));
 	}
+
+    @Test
+    public void shouldSupportConverterForSettingValue() {
+        when(contextMock.getProvider().getLocale()).thenReturn(Locale.GERMANY);
+        ObjectProperty<String> realDataSource = new ObjectProperty<String>("encryptedValue",
+                String.class);
+        SecurePasswordField field = new SecurePasswordField("Test",
+                realDataSource);
+        field.setConverter(converterMock);
+        field.setBuffered(true);
+
+        when(converterMock.convertToPresentation("encryptedValue", String.class, Locale.GERMANY)).thenReturn("plainTextValue");
+        when(converterMock.convertToModel("plainTextValue", String.class, Locale.GERMANY)).thenReturn("encryptedValue");
+
+        field.setValue("plainTextValue");
+        field.commit();
+
+        assertThat((String) realDataSource.getValue(), is("encryptedValue"));
+
+        field.setValue("ddd");
+        field.discard();
+        assertThat((String) field.getValue(), is("xxxxxxxx"));
+
+    }
 
 }
