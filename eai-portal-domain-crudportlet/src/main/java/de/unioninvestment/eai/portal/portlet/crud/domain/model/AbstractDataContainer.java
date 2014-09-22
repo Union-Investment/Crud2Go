@@ -18,29 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.EMPTY_LIST;
-
-import java.sql.SQLTimeoutException;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.format.number.NumberFormatter;
-
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Container.Ordered;
@@ -49,45 +26,31 @@ import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Like;
 import com.vaadin.data.util.filter.Or;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.VaadinContainerDataStream;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.PortletRefreshedEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.container.DataStream;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.EndsWith;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.StartsWith;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Wildcard;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.*;
 import de.unioninvestment.eai.portal.support.vaadin.context.Context;
 import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
 import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
+import org.apache.commons.lang.ArrayUtils;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.format.number.NumberFormatter;
+
+import javax.annotation.Resource;
+import java.sql.SQLTimeoutException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.EMPTY_LIST;
 
 /**
  * Repräsentation eines Vaadin Containers als Backend für die Tabellenansicht.
@@ -472,17 +435,24 @@ public abstract class AbstractDataContainer implements DataContainer,
 		return convertItemToRow(item, transactional, immutable);
 	}
 
-	@Override
+    @Override
+    public void eachImmutableRow(final Set<ContainerRowId> ids,
+                        final EachRowCallback eachRowCallback) {
+        for (ContainerRowId rowId : ids) {
+            ContainerRow row = getRowByInternalRowId(rowId.getInternalId(), false, true);
+            eachRowCallback.doWithRow(row);
+        }
+    }
+
+    @Override
 	public void eachRow(final Set<ContainerRowId> ids,
 			final EachRowCallback eachRowCallback) {
 		withTransaction(new TransactionCallback<Object>() {
 			@Override
 			public Object doInTransaction() {
 				for (ContainerRowId rowId : ids) {
-					Item item = getVaadinContainer().getItem(
-							rowId.getInternalId());
-					eachRowCallback.doWithRow(convertItemToRow(item, true,
-							false));
+					ContainerRow row = getRowByInternalRowId(rowId.getInternalId(), true, false);
+					eachRowCallback.doWithRow(row);
 				}
 				return null;
 			}

@@ -18,14 +18,13 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import groovy.lang.Closure;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 
 /**
  * Informationsobjekt zu einer Selektion. Liefert die Liste der Zeilen-IDs und
@@ -95,8 +94,30 @@ public class ScriptTableSelection {
 		return containerRowIds;
 	}
 
-	/**
-	 * Iteriert durch alle Zeilen und führt für jede Zeile den Cosure aus.
+    /**
+     * Iteriert durch alle Zeilen und führt für jede Zeile die Cosure aus.
+     *
+     * Achtung: Bitte nicht mit dem SQL-Backend benutzen, da diese Methode
+     * zusammen mit Vaadin-Versionen < 6.8.5 ernsthafte Performanceprobleme
+     * verursacht.
+     *
+     * @param c
+     *            Closure mit einem Parameter { ScriptRow row -> ... }, die für
+     *            jede selektierte Zeile aufgerufen wird
+     */
+    public void eachImmutableRow(final Closure<?> c) {
+        container.eachImmutableRow(collectContainerRowIds(),
+                new DataContainer.EachRowCallback() {
+                    @Override
+                    public void doWithRow(ContainerRow row) {
+                        c.call(new ScriptRow(row));
+                    }
+                });
+    }
+
+    /**
+	 * Iteriert durch alle Zeilen und führt für jede Zeile die Cosure aus.
+     * Zu Beginn und nach dem Ende der Operation wird die aktuelle Transaktion committet.
 	 * 
 	 * Achtung: Bitte nicht mit dem SQL-Backend benutzen, da diese Methode
 	 * zusammen mit Vaadin-Versionen < 6.8.5 ernsthafte Performanceprobleme

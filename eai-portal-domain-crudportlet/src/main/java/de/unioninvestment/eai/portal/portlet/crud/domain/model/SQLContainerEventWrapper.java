@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
+import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.IndexResolver;
@@ -133,7 +134,8 @@ public class SQLContainerEventWrapper extends SQLContainer implements
 
 	@Override
 	public int indexOfId(Object itemId) {
-		if (getItemUnfiltered(itemId) != null
+		if (itemId instanceof TemporaryRowId ||
+				getItemUnfiltered(itemId) != null
 				|| !(getQueryDelegate() instanceof IndexResolver)) {
 			return super.indexOfId(itemId);
 		}

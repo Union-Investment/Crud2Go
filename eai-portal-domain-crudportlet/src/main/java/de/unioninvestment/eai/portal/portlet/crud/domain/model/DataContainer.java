@@ -433,6 +433,17 @@ public interface DataContainer extends Serializable {
 	 * @param eachRowCallback
 	 *            das Callback-Objekt
 	 */
+	void eachImmutableRow(Set<ContainerRowId> ids, EachRowCallback eachRowCallback);
+
+	/**
+	 * Liest die angegebenen Zeilen aus der Datenquelle und übergibt sie einer
+	 * Callback-Methode. Zu Beginn und nach dem Ende der Operation wird die aktuelle Transaktion committet.
+	 *
+	 * @param ids
+	 *            die IDs der zu verarbeitenden Zeilen
+	 * @param eachRowCallback
+	 *            das Callback-Objekt
+	 */
 	void eachRow(Set<ContainerRowId> ids, EachRowCallback eachRowCallback);
 
 	/**
