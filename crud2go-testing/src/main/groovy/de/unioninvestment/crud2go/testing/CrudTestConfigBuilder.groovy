@@ -112,6 +112,7 @@ class CrudTestConfigBuilder {
     private ModelPreferences modelPreferences = new ModelPreferences()
 
     private Map<String,String> portletPreferences = [:]
+    private Map<String,String[]> portalParameters = [:]
     private boolean runMainScript = true
 
     private Statistics statistics = new Statistics()
@@ -244,6 +245,30 @@ class CrudTestConfigBuilder {
         return this
     }
 
+    /**
+     * Sets a parameter
+     *
+     * @param key the parameter name
+     * @param value the parameter value
+     * @return the builder instance
+     */
+    CrudTestConfigBuilder parameter(String key, String value) {
+        this.portalParameters[key] = [value] as String[]
+        return this
+    }
+
+    /**
+     * Sets a parameter
+     *
+     * @param key the parameter name
+     * @param value the parameter value
+     * @return the builder instance
+     */
+    CrudTestConfigBuilder parameter(String key, Collection value) {
+        this.portalParameters[key] = value as String[]
+        return this
+    }
+
     CrudTestConfigBuilder dontRunMainScript() {
         this.runMainScript = false
         return this
@@ -289,6 +314,7 @@ class CrudTestConfigBuilder {
             Portlet portlet = modelBuilder.build()
 
             preparePortletPreferences(portletConfig, portlet)
+            preparePortalParameters()
 
             ScriptPortlet scriptPortlet = prepareScriptModel(modelBuilder, portlet)
 
@@ -312,6 +338,10 @@ class CrudTestConfigBuilder {
         } finally {
             currentBuilder = null
         }
+    }
+
+    def preparePortalParameters() {
+        when(portalMock.getParameters()).thenReturn(portalParameters)
     }
 
     private void prepareConfig() {

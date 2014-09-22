@@ -148,6 +148,19 @@ class CrudConfigSpecSpec extends CrudConfigSpec {
         portlet.preferences.pref3 == 'defaultValue3'
     }
 
+    def 'should allow setting parameters'() {
+        when:
+        load {
+            fromClasspath 'testingSimpleConfig.xml'
+            parameter 'param', 'value'
+            parameter 'multiParam', ['value1', 'value2']
+        }
+
+        then:
+        portal.parameters['param'] == ['value'] as String[]
+        portal.parameters['multiParam'] == ['value1', 'value2'] as String[]
+    }
+
     def 'should provide access to the configuration XML'() {
         when:
         load 'testingSimpleConfig.xml'

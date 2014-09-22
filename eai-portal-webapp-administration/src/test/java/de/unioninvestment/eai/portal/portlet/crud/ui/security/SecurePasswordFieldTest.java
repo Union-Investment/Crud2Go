@@ -174,4 +174,28 @@ public class SecurePasswordFieldTest {
 
     }
 
+
+    @Test
+    public void shouldSupportConverterEmptyValue() {
+        when(contextMock.getProvider().getLocale()).thenReturn(Locale.GERMANY);
+        ObjectProperty<String> realDataSource = new ObjectProperty<String>(null,
+                String.class);
+        SecurePasswordField field = new SecurePasswordField("Test",
+                realDataSource);
+        field.setConverter(converterMock);
+        field.setBuffered(true);
+
+        when(converterMock.convertToPresentation("encryptedValue", String.class, Locale.GERMANY)).thenReturn("plainTextValue");
+        when(converterMock.convertToModel("plainTextValue", String.class, Locale.GERMANY)).thenReturn("encryptedValue");
+
+        field.setValue("plainTextValue");
+        field.commit();
+
+        assertThat((String) realDataSource.getValue(), is("encryptedValue"));
+
+        field.setValue("ddd");
+        field.discard();
+        assertThat((String) field.getValue(), is("xxxxxxxx"));
+
+    }
 }
