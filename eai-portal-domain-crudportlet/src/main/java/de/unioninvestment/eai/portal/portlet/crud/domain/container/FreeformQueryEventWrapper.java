@@ -18,15 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
-
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
@@ -34,18 +25,20 @@ import com.vaadin.data.util.sqlcontainer.connection.JDBCConnectionPool;
 import com.vaadin.data.util.sqlcontainer.query.FreeformQuery;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseContainerRow;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 import de.unioninvestment.eai.portal.support.vaadin.table.DatabaseQueryDelegate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.lob.DefaultLobHandler;
+import org.springframework.jdbc.support.lob.LobHandler;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Unterklasse von {@link FreeformQuery}, die bei INSERT, UPDATE, DELETE und
@@ -135,11 +128,11 @@ public class FreeformQueryEventWrapper extends CrudFreeformQuery implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getIndexById(RowId rowId) {
+	public Integer getIndexById(RowId rowId) {
 		DatabaseQueryDelegate delegate = (DatabaseQueryDelegate) getDelegate();
 		StatementHelper sh = delegate.getIndexStatement(rowId);
 
-		int rownum = connectionPool.querySingleResultWithJdbcTemplate(sh,
+		Integer rownum = connectionPool.querySingleResultWithJdbcTemplate(sh,
 				new RowMapper<Integer>() {
 
 					@Override
@@ -149,7 +142,7 @@ public class FreeformQueryEventWrapper extends CrudFreeformQuery implements
 					}
 				});
 
-		return rownum - 1;
+		return rownum == null ? null : rownum - 1;
 	}
 
 	public byte[] getBLob(RowId rowId, final String columnName) {

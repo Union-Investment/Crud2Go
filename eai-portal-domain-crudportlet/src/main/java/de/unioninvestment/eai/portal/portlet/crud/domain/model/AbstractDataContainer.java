@@ -40,6 +40,7 @@ import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.format.number.NumberFormatter;
 
@@ -60,6 +61,8 @@ import static java.util.Collections.EMPTY_LIST;
 @Configurable
 public abstract class AbstractDataContainer implements DataContainer,
 		PortletRefreshedEventHandler {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractDataContainer.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -440,7 +443,11 @@ public abstract class AbstractDataContainer implements DataContainer,
                         final EachRowCallback eachRowCallback) {
         for (ContainerRowId rowId : ids) {
             ContainerRow row = getRowByInternalRowId(rowId.getInternalId(), false, true);
-            eachRowCallback.doWithRow(row);
+            if (row != null) {
+                eachRowCallback.doWithRow(row);
+            } else {
+                LOGGER.warn("Skipping non-existing row for ID {}", rowId.getInternalId());
+            }
         }
     }
 
@@ -452,7 +459,11 @@ public abstract class AbstractDataContainer implements DataContainer,
 			public Object doInTransaction() {
 				for (ContainerRowId rowId : ids) {
 					ContainerRow row = getRowByInternalRowId(rowId.getInternalId(), true, false);
-					eachRowCallback.doWithRow(row);
+                    if (row != null) {
+					    eachRowCallback.doWithRow(row);
+                    } else {
+                        LOGGER.warn("Skipping non-existing row for ID {}", rowId.getInternalId());
+                    }
 				}
 				return null;
 			}

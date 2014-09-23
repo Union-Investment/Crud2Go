@@ -95,7 +95,8 @@ public class ScriptTableSelection {
 	}
 
     /**
-     * Iteriert durch alle Zeilen und führt für jede Zeile die Cosure aus.
+     * Iteriert durch alle Zeilen und führt für jede Zeile die Cosure aus. Die Zeilen sind nicht änderbar, dafür funktioniert
+     * der Methodenaufruf auch für in Arbeit befindliche Zeilen.
      *
      * Achtung: Bitte nicht mit dem SQL-Backend benutzen, da diese Methode
      * zusammen mit Vaadin-Versionen < 6.8.5 ernsthafte Performanceprobleme

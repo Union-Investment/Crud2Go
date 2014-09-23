@@ -34,6 +34,6 @@ public interface IndexResolver {
 	 *            Primärschlüssel
 	 * @return Zeilennummer
 	 */
-	public int getIndexById(RowId rowId);
+	public Integer getIndexById(RowId rowId);
 
 }

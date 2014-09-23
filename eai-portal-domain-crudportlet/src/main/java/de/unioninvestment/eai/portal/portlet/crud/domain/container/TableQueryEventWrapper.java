@@ -18,13 +18,6 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.container;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
-
-import org.springframework.jdbc.core.RowMapper;
-
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
@@ -34,14 +27,8 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.TableQuery;
 import com.vaadin.data.util.sqlcontainer.query.generator.SQLGenerator;
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPool;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DatabaseContainerRowId;
@@ -49,6 +36,12 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.CurrentUser;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.AuditLogger;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
 import de.unioninvestment.eai.portal.support.vaadin.table.CrudSQLGenerator;
+import org.springframework.jdbc.core.RowMapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Unterklasse von {@link TableQuery}, die bei INSERT, UPDATE, DELETE und COMMIT
@@ -94,8 +87,8 @@ public class TableQueryEventWrapper extends CrudTableQuery implements
 	 *            der Router für UPDATE Events
 	 * @param onDeleteEventRouter
 	 *            der Router für DELETE Events
-	 * @param currentUserName
-	 *            Aktueller Benutzername
+	 * @param currentUser
+	 *            Aktueller Benutzer
 	 */
 	public TableQueryEventWrapper(DataContainer container, String tableName,
 			ConnectionPool connectionPool, SQLGenerator sqlGenerator,
@@ -129,8 +122,8 @@ public class TableQueryEventWrapper extends CrudTableQuery implements
 	 *            der Router für UPDATE Events
 	 * @param onDeleteEventRouter
 	 *            der Router für DELETE Events
-	 * @param currentUserName
-	 *            Aktueller Benutzername
+	 * @param currentUser
+	 *            Aktueller Benutzer
 	 */
 	public TableQueryEventWrapper(DataContainer container, String tableName,
 			ConnectionPool connectionPool,
@@ -240,12 +233,12 @@ public class TableQueryEventWrapper extends CrudTableQuery implements
 	}
 
 	@Override
-	public int getIndexById(RowId rowId) {
+	public Integer getIndexById(RowId rowId) {
 		CrudSQLGenerator sqlGenerator = (CrudSQLGenerator) getSqlGenerator();
 		final StatementHelper sh = sqlGenerator.getIndexStatement(rowId,
 				getTableName(), filters, orderBys);
 
-		int rownum = connectionPool.querySingleResultWithJdbcTemplate(sh,
+		Integer rownum = connectionPool.querySingleResultWithJdbcTemplate(sh,
 				new RowMapper<Integer>() {
 
 					@Override
@@ -255,7 +248,7 @@ public class TableQueryEventWrapper extends CrudTableQuery implements
 					}
 				});
 
-		return rownum - 1;
+		return rownum == null ? null : rownum - 1;
 	}
 
 	private void logSQLStatement(StatementHelper sh, RowItem row) {

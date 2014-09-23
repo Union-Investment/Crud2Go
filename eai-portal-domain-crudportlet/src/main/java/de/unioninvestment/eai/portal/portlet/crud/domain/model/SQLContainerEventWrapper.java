@@ -18,27 +18,25 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
 import com.vaadin.data.util.sqlcontainer.TemporaryRowId;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
-
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.IndexResolver;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEvent;
 import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEventHandler;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.BusinessException;
 import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Wrapper zum Feuern von {@link CreateEvent}'s. Er wird nur die
@@ -105,7 +103,7 @@ public class SQLContainerEventWrapper extends SQLContainer implements
 	/**
 	 * Mark item as modified (for blobs and clobs)
 	 * 
-	 * @param containerRowId
+	 * @param itemId
 	 *            modified item
 	 */
 	public void markRowAsModified(Object itemId) {
@@ -141,11 +139,11 @@ public class SQLContainerEventWrapper extends SQLContainer implements
 		}
 		if (itemId != null) {
 			IndexResolver tableQuery = (IndexResolver) getQueryDelegate();
-			int index = tableQuery.getIndexById((RowId) itemId);
-
-			getIdByIndex(index);
-
-			return index;
+			Integer index = tableQuery.getIndexById((RowId) itemId);
+            if (index != null) {
+    			getIdByIndex(index);
+			    return index;
+            }
 		}
 		return -1;
 	}
