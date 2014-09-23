@@ -397,7 +397,7 @@ class CrudTestConfigBuilder {
         def validAuthKeys = getAuthenticationPreferenceKeys(portletConfig)
         def validPreferenceKeys = portletConfig.preferences?.preference?.collect { it.@key }
         portletPreferences.each { key, value ->
-            if (validPreferenceKeys.contains(key)) {
+            if (validPreferenceKeys?.contains(key)) {
                 preferencesRepository.setPreference(portlet, key, value)
             } else if (!validAuthKeys.contains(key)) {
                 throw new IllegalArgumentException("Unknown preference '$key'. Allowed are $validPreferenceKeys")
