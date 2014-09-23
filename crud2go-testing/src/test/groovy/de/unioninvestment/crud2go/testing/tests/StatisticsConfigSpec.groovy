@@ -9,7 +9,10 @@ class StatisticsConfigSpec extends CrudConfigSpec {
 
     def 'should collect statistics for build times'() {
         when:
-        load 'testingSimpleConfig.xml'
+        load {
+            from 'testingSimpleConfig.xml'
+            preference 'sleep', '100'
+        }
 
         then:
         instance.statistics.compileTime > 0

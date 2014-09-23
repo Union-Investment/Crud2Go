@@ -8,6 +8,7 @@
         <preference key="pref1"/>
         <preference key="pref2" default="value2"/>
         <preference key="pref3" default="defaultValue3"/>
+        <preference key="sleep" default="0"/>
     </preferences>
     <page>
         <form>
@@ -41,6 +42,12 @@
 		</component>
     </page>
     <script><![CDATA[
+
+    sleepTime = portlet.preferences.sleep
+    if (sleepTime) {
+        log.info "Sleeping ${sleepTime}ms"
+        Thread.sleep(sleepTime as long)
+    }
 
 	backend = new MyCustomBackend(main: this)
 
