@@ -18,21 +18,11 @@
 */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.EachRowCallback;
 import groovy.lang.Closure;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -40,10 +30,15 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.EachRowCallback;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 public class ScriptTableSelectionTest {
 
@@ -98,6 +93,27 @@ public class ScriptTableSelectionTest {
 		}).when(containerMock).eachRow(eq(ids), any(EachRowCallback.class));
 
 		selection.eachRow(closureMock);
+
+		verify(closureMock).call(any(ScriptRow.class));
+	}
+
+	@Test
+	public void shouldCallClosureWithEachImmutableRow() {
+		Set<ContainerRowId> ids = new HashSet<ContainerRowId>(Arrays.asList(
+				rowId1Mock, rowId2Mock));
+		doAnswer(new Answer<Object>() {
+
+			@Override
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				EachRowCallback callback = (EachRowCallback) invocation
+						.getArguments()[1];
+				ContainerRow rowMock = mock(ContainerRow.class);
+				callback.doWithRow(rowMock);
+				return null;
+			}
+		}).when(containerMock).eachImmutableRow(eq(ids), any(EachRowCallback.class));
+
+		selection.eachImmutableRow(closureMock);
 
 		verify(closureMock).call(any(ScriptRow.class));
 	}

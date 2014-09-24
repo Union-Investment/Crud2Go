@@ -18,77 +18,43 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.google.common.collect.ImmutableSet;
+import com.vaadin.data.Container;
+import com.vaadin.data.Container.Ordered;
+import com.vaadin.data.Item;
+import com.vaadin.data.util.filter.And;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.Like;
+import com.vaadin.data.util.filter.Or;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.*;
+import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
+import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
+import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.*;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.math.BigDecimal;
 import java.sql.SQLTimeoutException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import com.vaadin.data.Container.Ordered;
-import com.vaadin.data.util.filter.And;
-import com.vaadin.data.util.filter.Compare;
-import com.vaadin.data.util.filter.Like;
-import com.vaadin.data.util.filter.Or;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.CommitEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.CreateEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.DeleteEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InsertEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.UpdateEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.FilterPolicy;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.All;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Any;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Contains;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Equal;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Filter;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Greater;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.IsNull;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Less;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Not;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Nothing;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.filter.Wildcard;
-import de.unioninvestment.eai.portal.support.vaadin.filter.AdvancedStringFilter;
-import de.unioninvestment.eai.portal.support.vaadin.filter.NothingFilter;
-import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext;
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.*;
 
 public abstract class AbstractDataContainerTest<C extends AbstractDataContainer, V extends Ordered> {
 
@@ -130,10 +96,21 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 	@Mock
 	private ExportWithExportSettings exportMock;
 
+    @Mock
+    private ContainerRowId rowIdMock1, rowIdMock2;
+    @Mock
+    private Item itemMock1, itemMock2;
+    @Mock
+    private ContainerRow rowMock1, rowMock2;
+    @Mock
+    private DataContainer.EachRowCallback eachRowCallbackMock;
+    @Mock
+    private EventBus eventBusMock;
+
 	@Rule
 	public LiferayContext liferayContext = new LiferayContext();
 
-	@Before
+    @Before
 	public final void setUp() {
 		MockitoAnnotations.initMocks(this);
 		editors.add(editorSupportMock);
@@ -588,5 +565,176 @@ public abstract class AbstractDataContainerTest<C extends AbstractDataContainer,
 		container.withExportSettings(exportMock);
 		verify(exportMock).export();
 	}
+
+    @Test
+    public void shouldIterateOverImmutableRowsByIds() {
+        AbstractDataContainer containerMock = createPartialContainerMock();
+
+        when(rowIdMock1.getInternalId()).thenReturn(1);
+        when(rowIdMock2.getInternalId()).thenReturn(2);
+        // spy stubbing
+        doReturn(rowIdMock1).when(containerMock).convertInternalRowId(1);
+        doReturn(rowIdMock2).when(containerMock).convertInternalRowId(2);
+        doReturn(rowMock1).when(containerMock).getRow(rowIdMock1, false, true);
+        doReturn(rowMock2).when(containerMock).getRow(rowIdMock2, false, true);
+
+        containerMock.eachImmutableRow(ImmutableSet.of(rowIdMock1, rowIdMock2), eachRowCallbackMock);
+
+        verify(eachRowCallbackMock).doWithRow(rowMock1);
+        verify(eachRowCallbackMock).doWithRow(rowMock2);
+    }
+
+    @Test
+    public void shouldIterateOverImmutableRowsByIdsIgnoringMissingRows() {
+        AbstractDataContainer containerMock = createPartialContainerMock();
+
+        when(rowIdMock1.getInternalId()).thenReturn(1);
+        when(rowIdMock2.getInternalId()).thenReturn(2);
+        // spy stubbing
+        doReturn(rowIdMock1).when(containerMock).convertInternalRowId(1);
+        doReturn(rowIdMock2).when(containerMock).convertInternalRowId(2);
+        doReturn(rowMock1).when(containerMock).getRow(rowIdMock1, false, true);
+        doReturn(null).when(containerMock).getRow(rowIdMock2, false, true);
+
+        containerMock.eachImmutableRow(ImmutableSet.of(rowIdMock1, rowIdMock2), eachRowCallbackMock);
+
+        verify(eachRowCallbackMock).doWithRow(rowMock1);
+        verifyNoMoreInteractions(eachRowCallbackMock);
+    }
+
+    @Test
+    public void shouldIterateOverRowsByIdsInsideATransaction() {
+        AbstractDataContainer containerMock = createPartialContainerMock();
+
+        when(rowIdMock1.getInternalId()).thenReturn(1);
+        when(rowIdMock2.getInternalId()).thenReturn(2);
+        // spy stubbing
+        doReturn(rowIdMock1).when(containerMock).convertInternalRowId(1);
+        doReturn(rowIdMock2).when(containerMock).convertInternalRowId(2);
+        doReturn(rowMock1).when(containerMock).getRow(rowIdMock1, true, false);
+        doReturn(rowMock2).when(containerMock).getRow(rowIdMock2, true, false);
+
+        containerMock.eachRow(ImmutableSet.of(rowIdMock1, rowIdMock2), eachRowCallbackMock);
+
+        InOrder inOrder = inOrder(containerMock, eachRowCallbackMock);
+
+        inOrder.verify(containerMock).commit();
+        inOrder.verify(eachRowCallbackMock).doWithRow(rowMock1);
+        inOrder.verify(eachRowCallbackMock).doWithRow(rowMock2);
+        inOrder.verify(containerMock).commit();
+    }
+
+    @Test
+    public void shouldIterateOverRowsByIdsIgnoringMissingRows() {
+        AbstractDataContainer containerMock = createPartialContainerMock();
+
+        when(rowIdMock1.getInternalId()).thenReturn(1);
+        when(rowIdMock2.getInternalId()).thenReturn(2);
+        // spy stubbing
+        doReturn(rowIdMock1).when(containerMock).convertInternalRowId(1);
+        doReturn(rowIdMock2).when(containerMock).convertInternalRowId(2);
+        doReturn(rowMock1).when(containerMock).getRow(rowIdMock1, true, false);
+        doReturn(null).when(containerMock).getRow(rowIdMock2, true, false);
+
+        containerMock.eachRow(ImmutableSet.of(rowIdMock1, rowIdMock2), eachRowCallbackMock);
+
+        InOrder inOrder = inOrder(containerMock, eachRowCallbackMock);
+
+        inOrder.verify(containerMock).commit();
+        inOrder.verify(eachRowCallbackMock).doWithRow(rowMock1);
+        inOrder.verify(containerMock).commit();
+    }
+
+    private AbstractDataContainer createPartialContainerMock() {
+        AbstractDataContainer containerMock = spy(new AbstractDataContainer(eventBusMock, null, null, null) {
+
+            @Override
+            protected Container createVaadinContainer() {
+                return null;
+            }
+
+            @Override
+            public boolean isInsertable() {
+                return false;
+            }
+
+            @Override
+            public boolean isUpdateable() {
+                return false;
+            }
+
+            @Override
+            public boolean isDeleteable() {
+                return false;
+            }
+
+            @Override
+            public Class<?> getType(String name) {
+                return null;
+            }
+
+            @Override
+            public void rollback() {
+
+            }
+
+            @Override
+            public void commit() {
+
+            }
+
+            @Override
+            public List<String> getPrimaryKeyColumns() {
+                return null;
+            }
+
+            @Override
+            public List<String> getColumns() {
+                return null;
+            }
+
+            @Override
+            public ContainerRow convertItemToRow(Item item, boolean transactional, boolean immutable) {
+                return null;
+            }
+
+            @Override
+            public ContainerRowId convertInternalRowId(Object internalId) {
+                return null;
+            }
+
+            @Override
+            public void refresh() {
+
+            }
+
+            @Override
+            public ContainerClob getCLob(ContainerRowId rowId, String columnName) {
+                return null;
+            }
+
+            @Override
+            public boolean isCLob(String columnName) {
+                return false;
+            }
+
+            @Override
+            public ContainerBlob getBLob(ContainerRowId rowId, String columnName) {
+                return null;
+            }
+
+            @Override
+            public boolean isBLobEmpty(ContainerRowId rowId, String columnName) {
+                return false;
+            }
+
+            @Override
+            public boolean isBLob(String columnName) {
+                return false;
+            }
+        });
+        containerMock.setVaadinContainer(vaadinContainerMock);
+        return containerMock;
+    }
 
 }
