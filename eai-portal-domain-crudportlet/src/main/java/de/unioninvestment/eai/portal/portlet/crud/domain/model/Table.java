@@ -18,40 +18,24 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
-import static java.util.Collections.singleton;
-import static java.util.Collections.unmodifiableSet;
-import groovy.lang.Closure;
-
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Table.ColumnGenerator;
-
 import de.unioninvestment.eai.portal.portlet.crud.config.TableConfig;
 import de.unioninvestment.eai.portal.portlet.crud.domain.container.GeneratedColumnsDataStreamWrapper;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InitializeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InitializeEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.RowChangeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.RowChangeEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer.ExportWithExportSettings;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.container.DataStream;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.EmptyColumnGenerator;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventRouter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.*;
+
+import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * Modell-Klasse für Tabellen.
@@ -209,6 +193,11 @@ public class Table extends Component implements Component.ExpandableComponent,
 		public ContainerRow createNewRow(Map<String, Object> values);
 
 		void download(Download download);
+
+        /**
+         * Verwirft die Änderungen auf der Tabelle.
+         */
+        public void revertChanges();
 	}
 
 	/**
@@ -881,6 +870,13 @@ public class Table extends Component implements Component.ExpandableComponent,
 		}
 		return stream;
 	}
+
+    /**
+     * Revert changes made in editing mode
+     */
+    public void revertChanges() {
+        presenter.revertChanges();
+    }
 
 	public void setRowValidator(Validator rowValidator) {
 		this.rowValidator = rowValidator;

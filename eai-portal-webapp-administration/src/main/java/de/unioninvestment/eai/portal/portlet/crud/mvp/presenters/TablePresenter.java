@@ -18,38 +18,18 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.mvp.presenters;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vaadin.data.Item;
-import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Table.ColumnGenerator;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.BeforeCommitEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.ShowEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.DataContainer;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Download;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Tab;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DisplayMode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColumnChanges;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.TableAction;
 import de.unioninvestment.eai.portal.portlet.crud.mvp.views.TableView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Repräsentiert eine Tabelle.
@@ -311,9 +291,7 @@ public class TablePresenter extends
 		getModel().changeDisplayMode(DisplayMode.FORM);
 	}
 
-	/**
-	 * Verwirft die Änderungen auf der Tabelle.
-	 */
+    @Override
 	public void revertChanges() {
 		getView().onRevertChanges();
 	}

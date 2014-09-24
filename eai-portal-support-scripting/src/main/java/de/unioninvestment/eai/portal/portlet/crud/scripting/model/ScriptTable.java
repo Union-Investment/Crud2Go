@@ -18,31 +18,9 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud.scripting.model;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableSet;
-import groovy.lang.Closure;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Table.ColumnGenerator;
-
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InitializeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.InitializeEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.ModeChangeEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.RowChangeEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.RowChangeEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.SelectionEventHandler;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.events.TableDoubleClickEventHandler;
+import de.unioninvestment.eai.portal.portlet.crud.domain.events.*;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRow;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.ContainerRowId;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table;
@@ -51,6 +29,12 @@ import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.DynamicColu
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Table.Mode;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.map.TransformedEntryMap;
 import de.unioninvestment.eai.portal.support.vaadin.groovy.VaadinBuilder;
+import groovy.lang.Closure;
+
+import java.util.*;
+
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * 
@@ -469,6 +453,10 @@ public class ScriptTable extends ScriptComponent {
 			}
 		});
 	}
+
+    public void revertChanges() {
+        table.revertChanges();
+    }
 
 	/**
 	 * @param columnId

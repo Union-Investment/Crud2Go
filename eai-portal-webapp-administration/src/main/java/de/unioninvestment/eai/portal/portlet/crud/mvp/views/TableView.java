@@ -141,6 +141,7 @@ public interface TableView extends View {
 		 * @param uncommittedItemId die aktuell in Änderung befindliche Zeile
 		 */
 		void updateUncommittedItemId(Object uncommittedItemId);
+
 	}
 
 	/**

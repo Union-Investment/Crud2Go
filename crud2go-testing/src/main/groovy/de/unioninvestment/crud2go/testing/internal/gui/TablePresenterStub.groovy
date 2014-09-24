@@ -65,4 +65,9 @@ class TablePresenterStub implements Table.Presenter {
     void download(Download download) {
         // do nothing
     }
+
+    @Override
+    void revertChanges() {
+        // do nothing
+    }
 }
