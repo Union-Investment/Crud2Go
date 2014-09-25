@@ -21,6 +21,7 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -89,9 +90,9 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
     public java.lang.Class<?> getType(String name) {
 		Class<?> type = getVaadinContainer().getType(name);
 		if (type == null) {
-			LOGGER.info(
-					"Could not retrieve type information for column '{}'. Does it exist in the backend?",
-					name);
+
+            LOGGER.info(
+                    getNoTypeInformationForColumnMessage(name));
 			return null;
 		} else if (Clob.class.isAssignableFrom(type)) {
 			return ContainerClob.class;
@@ -100,7 +101,11 @@ public abstract class AbstractDatabaseContainer extends AbstractDataContainer {
 		} else {
 			return type;
 		}
-	};
+	}
+
+    protected String getNoTypeInformationForColumnMessage(String name) {
+        return MessageFormat.format("Could not retrieve type information for column ''{0}''. Does it exist in the backend?", name);
+    }
 
 	@Override
 	public boolean isCLob(String columnName) {

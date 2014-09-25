@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
@@ -355,5 +356,14 @@ public class DatabaseQueryContainerTest
 		assertThat(container.getCurrentQuery(false), is(helper));
 		verify(databaseQueryDelegateMock).setOrderBy(previousOrderBys);
 	}
+
+    @Test
+    public void noInfoForTypeMessage(){
+        String message = container.getNoTypeInformationForColumnMessage("col1");
+        assertThat(message, equalTo("Could not retrieve type information for column 'col1' from query 'select * from test'. Does it exist in the backend?"));
+
+    }
+
+
 
 }

@@ -19,6 +19,7 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -222,5 +223,12 @@ public class DatabaseTableContainer extends AbstractDatabaseContainer {
 		throw new UnsupportedOperationException(
 				"No BLob support for TableContainer.");
 	}
+
+    @Override
+    protected String getNoTypeInformationForColumnMessage(String name) {
+        return MessageFormat.format("Could not retrieve type information for column ''{0}'' from table ''{1}''. Does it exist in the backend?",
+                name, tablename);
+    }
+
 
 }

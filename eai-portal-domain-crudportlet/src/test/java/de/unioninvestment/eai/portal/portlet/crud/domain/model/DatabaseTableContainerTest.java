@@ -19,7 +19,9 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -146,5 +148,13 @@ public class DatabaseTableContainerTest
 	public void shouldNotRemoveDurableFilters() {
 
 	}
+
+
+    @Test
+    public void noInfoForTypeMessage(){
+        String message = container.getNoTypeInformationForColumnMessage("col1");
+        assertThat(message, equalTo("Could not retrieve type information for column 'col1' from table 'test'. Does it exist in the backend?"));
+
+    }
 
 }

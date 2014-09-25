@@ -20,7 +20,10 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.model;
 
 import static java.util.Collections.unmodifiableList;
 
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -157,6 +160,11 @@ public class DatabaseQueryContainer extends AbstractDatabaseContainer {
 			}
 		}
 	}
+
+    @Override
+    protected String getNoTypeInformationForColumnMessage(String name) {
+        return MessageFormat.format("Could not retrieve type information for column ''{0}'' from query ''{1}''. Does it exist in the backend?", name, query);
+    }
 
 	private boolean isEditable() {
 		return insertable || updateable || deleteable;
