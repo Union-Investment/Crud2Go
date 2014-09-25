@@ -333,7 +333,7 @@ class CrudTestConfigBuilder {
                 new ModelValidator().validateModel(modelBuilder, portlet, portletConfig)
             }
 
-            return new CrudTestConfigImpl(configXml, portletConfig, scriptPortlet, scriptBuilder.mainScript, statistics)
+            return new CrudTestConfigImpl(configXml, portletConfig, modelBuilder, portlet, scriptPortlet, scriptBuilder.mainScript, statistics)
 
         } finally {
             currentBuilder = null

@@ -3,6 +3,9 @@ package de.unioninvestment.crud2go.testing.internal
 import de.unioninvestment.crud2go.testing.CrudTestConfig
 import de.unioninvestment.crud2go.testing.Statistics
 import de.unioninvestment.eai.portal.portlet.crud.config.PortletConfig
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet
+import de.unioninvestment.eai.portal.portlet.crud.domain.validation.ModelValidator
 import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptPortlet
 
 /**
@@ -12,14 +15,18 @@ class CrudTestConfigImpl implements CrudTestConfig {
 
     private String xml
     private PortletConfig config
-    private ScriptPortlet portlet
+    private ModelBuilder modelBuilder
+    private Portlet modelPortlet
+    private ScriptPortlet scriptPortlet
     private Script mainScript
     private Statistics statistics
 
-    CrudTestConfigImpl(String xml, PortletConfig config, ScriptPortlet portlet, Script mainScript, Statistics statistics) {
+    CrudTestConfigImpl(String xml, PortletConfig config, ModelBuilder modelBuilder, Portlet portlet, ScriptPortlet scriptPortlet, Script mainScript, Statistics statistics) {
+        this.modelBuilder = modelBuilder
         this.xml = xml
         this.mainScript = mainScript
-        this.portlet = portlet
+        this.modelPortlet = portlet
+        this.scriptPortlet = scriptPortlet
         this.config = config
         this.statistics = statistics
     }
@@ -33,7 +40,7 @@ class CrudTestConfigImpl implements CrudTestConfig {
     }
 
     ScriptPortlet getPortlet() {
-        portlet
+        scriptPortlet
     }
 
     Script getMainScript() {
@@ -46,6 +53,10 @@ class CrudTestConfigImpl implements CrudTestConfig {
 
     void runMainScript() {
         mainScript.run()
-        portlet.portlet.handleLoad()
+        modelPortlet.handleLoad()
+    }
+
+    void validate() {
+        new ModelValidator().validateModel(modelBuilder, modelPortlet, config)
     }
 }
