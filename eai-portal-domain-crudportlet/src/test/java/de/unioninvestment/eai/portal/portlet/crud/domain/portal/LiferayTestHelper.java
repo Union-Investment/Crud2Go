@@ -33,6 +33,7 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.CompanyLocalService;
+import com.liferay.portal.service.LayoutLocalService;
 import com.liferay.portal.service.PermissionLocalService;
 import com.liferay.portal.service.ResourceLocalService;
 import com.liferay.portal.service.RoleLocalService;
@@ -77,6 +78,9 @@ public class LiferayTestHelper {
 	private PermissionChecker permissionCheckerMock;
 
 	@Mock
+	private LayoutLocalService layoutLocalServiceMock;
+
+	@Mock
 	private BeanLocator beanLocatorMock;
 
 	/**
@@ -112,6 +116,8 @@ public class LiferayTestHelper {
 				.thenReturn(resourceLocalService);
 		when(beanLocatorMock.locate(PermissionLocalService.class.getName()))
 				.thenReturn(permissionLocalService);
+		when(beanLocatorMock.locate(LayoutLocalService.class.getName()))
+				.thenReturn(layoutLocalServiceMock);
 
 		PortalBeanLocatorUtil.setBeanLocator(beanLocatorMock);
 
@@ -176,6 +182,10 @@ public class LiferayTestHelper {
 
 	public BeanLocator getBeanLocatorMock() {
 		return beanLocatorMock;
+	}
+
+	public LayoutLocalService getLayoutLocalServiceMock() {
+		return layoutLocalServiceMock;
 	}
 
 }

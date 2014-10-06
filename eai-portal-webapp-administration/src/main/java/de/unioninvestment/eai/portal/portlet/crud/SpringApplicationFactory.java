@@ -18,56 +18,50 @@
  */
 package de.unioninvestment.eai.portal.portlet.crud;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
-
+import com.cybercom.vaadin.spring.UIScope;
+import com.google.common.base.Preconditions;
+import de.unioninvestment.eai.portal.portlet.crud.CrudUI.LifecycleEvent;
 import de.unioninvestment.eai.portal.portlet.crud.config.PreferenceConfig;
+import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
 import de.unioninvestment.eai.portal.portlet.crud.domain.database.ConnectionPoolFactory;
+import de.unioninvestment.eai.portal.portlet.crud.domain.exception.TechnicalCrudPortletException;
+import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Portlet;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.Preference;
 import de.unioninvestment.eai.portal.portlet.crud.domain.model.user.UserFactory;
 import de.unioninvestment.eai.portal.portlet.crud.domain.portal.Portal;
 import de.unioninvestment.eai.portal.portlet.crud.domain.support.PreferencesRepository;
 import de.unioninvestment.eai.portal.portlet.crud.export.streaming.ExcelExporter;
-import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
-import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.xml.sax.SAXException;
-
-import com.cybercom.vaadin.spring.UIScope;
-import com.google.gwt.thirdparty.guava.common.base.Preconditions;
-
-import de.unioninvestment.eai.portal.portlet.crud.CrudUI.LifecycleEvent;
-import de.unioninvestment.eai.portal.portlet.crud.domain.container.EditorSupport;
-import de.unioninvestment.eai.portal.portlet.crud.domain.form.ResetFormAction;
+import de.unioninvestment.eai.portal.portlet.crud.liferay.CrudPortletLayoutListener;
 import de.unioninvestment.eai.portal.portlet.crud.persistence.DefaultConfigurationDao;
+import de.unioninvestment.eai.portal.portlet.crud.scripting.model.ScriptModelFactory;
 import de.unioninvestment.eai.portal.portlet.crud.services.ConfigurationService;
 import de.unioninvestment.eai.portal.portlet.crud.services.DefaultConfigurationService;
 import de.unioninvestment.eai.portal.support.scripting.ConfigurationScriptsCompiler;
 import de.unioninvestment.eai.portal.support.scripting.ScriptBuilder;
 import de.unioninvestment.eai.portal.support.scripting.ScriptCompiler;
+import de.unioninvestment.eai.portal.support.vaadin.database.DatabaseDialect;
 import de.unioninvestment.eai.portal.support.vaadin.mvp.EventBus;
 import de.unioninvestment.eai.portal.support.vaadin.table.DisplaySupport;
 import de.unioninvestment.eai.portal.support.vaadin.validation.FieldValidatorFactory;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.*;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.xml.sax.SAXException;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Spring ApplicationContext Konfiguration.
@@ -106,7 +100,17 @@ public class SpringApplicationFactory implements PreferencesRepository {
 	@PostConstruct
 	public void initialize() {
 		CrudUI.logLifecycleEvent(LifecycleEvent.CRUD2GO_INIT);
-	}
+
+        try {
+            CrudPortletLayoutListener
+                    .setConfigurationService(configurationService());
+
+        } catch (JAXBException e) {
+            throw new TechnicalCrudPortletException("Error creating ConfigurationService", e);
+        } catch (SAXException e) {
+            throw new TechnicalCrudPortletException("Error creating ConfigurationService", e);
+        }
+    }
 	
 	@PreDestroy
 	public void shutdown() {

@@ -205,6 +205,16 @@ public class DefaultConfigurationService implements ConfigurationService {
 	}
 
 	@Override
+	public void removePortletInstanceData(String portletId, long communityId) {
+		removeConfiguration(portletId, communityId);
+		removeExistingRoleResourceIds(portletId, communityId);
+	}
+	
+	private void removeConfiguration(String portletId, long communityId) {
+		dao.removeConfiguration(portletId, communityId);
+	}
+
+	@Override
 	public void removeExistingRoleResourceIds(String portletId, long communityId) {
 		dao.removeExistingRoleResourceIds(portletId, communityId);
 	}

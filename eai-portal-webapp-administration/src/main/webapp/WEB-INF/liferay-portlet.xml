@@ -4,6 +4,7 @@
 	<portlet>
 		<portlet-name>crudportlet</portlet-name>
 		<portlet-data-handler-class>de.unioninvestment.eai.portal.portlet.crud.export.CrudPortletDataHandler</portlet-data-handler-class>
+		<portlet-layout-listener-class>de.unioninvestment.eai.portal.portlet.crud.liferay.CrudPortletLayoutListener</portlet-layout-listener-class>
 		<instanceable>true</instanceable>
 		<user-principal-strategy>screenName</user-principal-strategy>
 		<ajaxable>false</ajaxable>

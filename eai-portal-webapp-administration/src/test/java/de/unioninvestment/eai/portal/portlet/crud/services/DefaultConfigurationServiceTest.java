@@ -306,4 +306,11 @@ public class DefaultConfigurationServiceTest {
 				settingsMock);
 	}
 
+	@Test
+	public void shouldRemovePortletInstanceData() {
+		service.removePortletInstanceData("myPortletId", 4711L);
+		verify(daoMock).removeConfiguration("myPortletId", 4711L);
+		verify(daoMock).removeExistingRoleResourceIds("myPortletId", 4711L);
+	}
+	
 }
