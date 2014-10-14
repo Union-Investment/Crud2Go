@@ -18,13 +18,11 @@
  */
 package de.unioninvestment.eai.portal.support.vaadin;
 
+import com.vaadin.server.*;
+
+import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
-
-import com.vaadin.server.DeploymentConfiguration;
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.VaadinPortlet;
-import com.vaadin.server.VaadinPortletService;
 
 /**
  * Code from SpringVaadinPortlet, modified by our custom
@@ -49,6 +47,17 @@ public class CrudVaadinPortlet extends VaadinPortlet {
 		// initializePlugin(service);
 		return service;
 	}
+
+    @Override
+    protected void portletInitialized() throws PortletException {
+        super.portletInitialized();
+        getService().addSessionInitListener(new SessionInitListener() {
+            @Override
+            public void sessionInit(SessionInitEvent event) {
+                event.getSession().addBootstrapListener(new LoadingIndicatorBootstrapListener());
+            }
+        });
+    }
 
 	/**
 	 * Return the portlet title from the portlet preferences,

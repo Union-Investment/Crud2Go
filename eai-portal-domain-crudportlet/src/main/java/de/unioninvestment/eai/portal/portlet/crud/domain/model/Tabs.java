@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.vaadin.ui.UI;
+import de.unioninvestment.eai.portal.support.vaadin.LiferayUI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -112,7 +114,7 @@ public class Tabs extends Component {
 	private void fireTabChangeEvent() {
 		TabChangeEvent event = new TabChangeEvent(this);
 		eventRouter.fireEvent(event);
-		eventBus.fireEvent(event);
+        eventBus.fireEvent(event);
 	}
 
 	public List<Tab> getElements() {
