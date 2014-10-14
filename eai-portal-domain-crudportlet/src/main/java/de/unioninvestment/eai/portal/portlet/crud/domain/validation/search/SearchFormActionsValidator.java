@@ -1,22 +1,16 @@
 package de.unioninvestment.eai.portal.portlet.crud.domain.validation.search;
 
-import com.google.common.base.Optional;
+import java.util.List;
 
-import de.unioninvestment.eai.portal.portlet.crud.config.*;
-import de.unioninvestment.eai.portal.portlet.crud.domain.model.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.Form;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormAction;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.FormActions;
+import de.unioninvestment.eai.portal.portlet.crud.domain.model.ModelBuilder;
 
 // FIXME: JavaDoc für Klasse und Public Methoden
 // FIXME: Umbenennen der Klasse: SearchFormActionsValidator und dafür ggf. kürzen der Methodennamen (um "Search")
 
 public class SearchFormActionsValidator {
-
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(SearchFormActionsValidator.class);
 
 	private ModelBuilder modelBuilder;
 

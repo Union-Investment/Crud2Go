@@ -29,6 +29,37 @@ public class SearchFilterFieldsContainedInFormFieldsTest {
         checkGatherFieldNames(createSqlWhereFilter("COLUMN", "some sql query"));
     }
 
+    @Test
+    public void gatherFieldNames_SQLFilterConfig_CaseField(){
+        //No information should be checked hier
+        checkGatherFieldNames(createSqlWhereFilter("COLUMN", "LIKE ${fields.fonds_id.value?.toUpperCase()}||'%'"), "fonds_id");
+    }
+
+    @Test
+    public void gatherFieldNames_SQLFilterConfig_CaseField_2(){
+        //No information should be checked hier
+        checkGatherFieldNames(createSqlWhereFilter("COLUMN", "in (select x.kofo_fonds_id from ko_fonds x where x.kofo_kofg_id = $fields.fondsgroup.value)"), "fondsgroup");
+    }
+
+    @Test
+    public void gatherFieldNames_SQLFilterConfig_CaseManyFields_1(){
+        //No information should be checked hier
+        checkGatherFieldNames(createSqlWhereFilter("COLUMN", "LIKE ${( fields.started.value=='Y' && fields.node.value != null) ? '%'+fields.node.value+'%' : '%'}"), "started", "node");
+    }
+
+    @Test
+    public void gatherFieldNames_SQLFilterConfig_CaseManyFields_2(){
+        //No information should be checked hier
+        checkGatherFieldNames(createSqlWhereFilter("FONDS_ID", "in ("
+        		+ "select KOFO_FONDS_ID from KO_FONDS where KOFO_KOFG_ID = $fields.fondsgroup.value "
+        		+ "UNION "
+        		+ "select KOFO_FONDS_ID from KO_FONDS_AWV where KOFO_KOFG_ID = $fields.fondsgroup.value "
+        		+ "UNION "
+    + "select KOFO_FONDS_ID from KO_FONDS_BVI where KOFO_KOFG_ID = $fields.fondsgroup.value )"
+), "fondsgroup");
+    }
+
+    
 
     @Test
     public void gatherFieldNames_AnyFilterConfig(){
