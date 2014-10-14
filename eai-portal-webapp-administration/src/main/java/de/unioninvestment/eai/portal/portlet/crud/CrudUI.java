@@ -499,6 +499,7 @@ public class CrudUI extends LiferayUI implements PortletListener,
 
 			if(settings.isDebugMode()){
                 try {
+                    LOG.debug("Debug mode: Validating model");
                     modelValidator.validateModel(modelBuilder, portletDomain, portletConfig.getPortletConfig());
                 } catch (Exception e) {
                     // only show a warning, but don't fail initialization
