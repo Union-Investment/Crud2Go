@@ -17,10 +17,14 @@
  * under the License.
  */
 package de.unioninvestment.eai.portal.support.vaadin.groovy
-
-import static org.mockito.Mockito.*
-
-import org.jfree.chart.ChartFactory;
+import com.vaadin.event.MouseEvents.ClickEvent
+import com.vaadin.server.ExternalResource
+import com.vaadin.server.Sizeable
+import com.vaadin.server.Sizeable.Unit
+import com.vaadin.server.StreamResource
+import com.vaadin.ui.*
+import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext
+import org.jfree.chart.ChartFactory
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.data.category.DefaultCategoryDataset
@@ -33,25 +37,6 @@ import org.vaadin.addon.JFreeChartWrapper
 import org.vaadin.peter.contextmenu.ContextMenu
 import org.vaadin.svg.SvgComponent
 import org.vaadin.svg.SvgComponent.SvgMessageEvent
-
-import com.vaadin.event.MouseEvents.ClickEvent
-import com.vaadin.server.ExternalResource
-import com.vaadin.server.Sizeable
-import com.vaadin.server.StreamResource
-import com.vaadin.server.Sizeable.Unit
-import com.vaadin.ui.Button
-import com.vaadin.ui.CheckBox
-import com.vaadin.ui.Embedded
-import com.vaadin.ui.HorizontalLayout
-import com.vaadin.ui.Label
-import com.vaadin.ui.Link
-import com.vaadin.ui.Select
-import com.vaadin.ui.Table
-import com.vaadin.ui.Tree
-import com.vaadin.ui.Upload
-import com.vaadin.ui.VerticalLayout
-
-import de.unioninvestment.eai.portal.support.vaadin.junit.LiferayContext
 
 @SuppressWarnings("deprecation")
 class VaadinBuilderTest {
@@ -148,6 +133,20 @@ class VaadinBuilderTest {
 
 		assert link.resource instanceof StreamResource
 		assert link.resource.filename == 'abc.txt'
+	}
+
+	@Test
+	void shouldCreateInputStreamConvertedViaXslt() {
+		InputStream result = builder.xslt(
+                input: new ByteArrayInputStream('''<a><b/></a>'''.getBytes('UTF8')),
+                xslt: new ByteArrayInputStream('''<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:template match="b">
+        <c/>
+    </xsl:template>
+</xsl:stylesheet>'''.getBytes('UTF8')))
+
+        assert result.getText('UTF8') == '<?xml version="1.0" encoding="UTF-8"?><c/>'
 	}
 
 	@Test

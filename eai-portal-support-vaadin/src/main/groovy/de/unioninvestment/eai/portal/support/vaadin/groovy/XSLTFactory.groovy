@@ -37,7 +37,7 @@ class XSLTFactory extends AbstractBeanFactory {
         def factory = DocumentBuilderFactory.newInstance()
         factory.setNamespaceAware(true)
         factory
-    }
+    } ()
 	
 	XSLTFactory() {
 		ignoredAttributes = ['input', 'xslt']
