@@ -8,6 +8,7 @@ import de.unioninvestment.eai.portal.support.vaadin.context.BackgroundThreadCont
 import de.unioninvestment.eai.portal.support.vaadin.context.Context
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.wiring.BeanConfigurerSupport
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 /**
  * Created by cmj on 17.07.14.
@@ -52,6 +53,7 @@ class CrudTestContext {
         applicationContext.register(CrudTestSpringApplicationContext)
         applicationContext.refresh()
         applicationContext.autowireCapableBeanFactory.autowireBean(this)
+        BeanConfigurerSupport
 
         Context.setProvider(new BackgroundThreadContextProvider(applicationContext, Locale.GERMANY, LIFERAY_COMMUNITY_ID))
     }
