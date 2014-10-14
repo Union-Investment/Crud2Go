@@ -2,7 +2,9 @@ package de.unioninvestment.eai.portal.portlet.crud.domain.validation.search;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -59,7 +61,9 @@ class SearchFilterFieldsContainedInFormFields extends
 					formFieldNames.add(column);
 				}
 			} else if (filterConf instanceof SQLFilterConfig) {
-				// Do Nothing - no analysis of where statement
+				SQLFilterConfig sqlFilterConfig = (SQLFilterConfig) filterConf;
+				Set<String> fieldNames = extractFieldNames(sqlFilterConfig.getWhere());
+				formFieldNames.addAll(fieldNames);
 			} else if (filterConf instanceof FilterListConfig) {
 				gatherFormFieldNamesInFilter(
 						((FilterListConfig) filterConf).getFilters(),
@@ -73,6 +77,49 @@ class SearchFilterFieldsContainedInFormFields extends
 						.getClass().getName());
 			}
 		}
+	}
+
+	static void extractFieldNamesFromExpression(String exprString, int startIndex, Set<String> result){
+		final String FIELDS_EXPR = "fields.";
+		
+		int firstExprStartIndex = exprString.indexOf(FIELDS_EXPR, startIndex);
+		while(firstExprStartIndex!=-1){
+			int fieldStartIndex = firstExprStartIndex;
+			int endIndex = exprString.indexOf(".", fieldStartIndex+FIELDS_EXPR.length());
+			String fieldName = exprString.substring(fieldStartIndex+FIELDS_EXPR.length(), endIndex);
+			result.add(fieldName);
+			startIndex = endIndex+1;
+			firstExprStartIndex = exprString.indexOf(FIELDS_EXPR, startIndex);
+		}
+	}
+	
+	static void doExtractFieldNames(String whereString, int startIndex, Set<String> result){
+		final String FIELDS_EXPR = "$fields.";
+		
+		final int firstExprStartIndex = whereString.indexOf(FIELDS_EXPR, startIndex);
+		if(firstExprStartIndex!=-1){
+			int fieldStartIndex = firstExprStartIndex;
+			int endIndex = whereString.indexOf(".", fieldStartIndex+FIELDS_EXPR.length());
+			String fieldName = whereString.substring(fieldStartIndex+FIELDS_EXPR.length(), endIndex);
+			result.add(fieldName);
+			doExtractFieldNames(whereString, endIndex+1, result);
+		}
+		final String SECOND_FIELDS_EXPR = "${";
+		final int secondExprStartIndex = whereString.indexOf(SECOND_FIELDS_EXPR, startIndex);
+		if(secondExprStartIndex!=-1){
+			int exprStartIndex = secondExprStartIndex;
+			int exprEndIndex = whereString.indexOf("}", exprStartIndex);
+			String subexpression = whereString.substring(secondExprStartIndex+SECOND_FIELDS_EXPR.length(), exprEndIndex);
+			extractFieldNamesFromExpression(subexpression, 0, result);
+			doExtractFieldNames(whereString, exprEndIndex+1, result);		
+		}
+		
+	}
+	
+	static Set<String> extractFieldNames(String whereString) {
+		Set<String> results = new LinkedHashSet<String>();
+		doExtractFieldNames(whereString, 0, results);
+		return results;
 	}
 
 }
