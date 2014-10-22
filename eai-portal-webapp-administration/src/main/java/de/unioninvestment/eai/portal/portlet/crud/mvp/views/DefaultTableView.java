@@ -496,8 +496,7 @@ public class DefaultTableView extends VerticalLayout implements TableView {
 		} else {
 			applySelection(selection);
 			presenter.changeSelection(selection);
-			if (inEditMode() && !presenter.isFormEditEnabled()
-					&& isSingleSelection(selection)) {
+			if (inEditMode() && !presenter.isFormEditEnabled()) {
 				table.refreshRowCache();
 				table.enableContentRefreshing(true);
 			}
